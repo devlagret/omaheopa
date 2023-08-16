@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>MOZAIC Point Of Sales</title>
+        <title>MOZAIC Omah'e Opa</title>
         <link rel="icon" type="image/x-icon" href="{{ asset('resources/assets/img/logo_baru_mozaic/logo baru set-09.png') }}" />
         <!-- Font Awesome icons (free version)-->
         <script src="https://use.fontawesome.com/releases/v5.15.3/js/all.js" crossorigin="anonymous"></script>
@@ -26,7 +26,7 @@
                 <div class="container-fluid px-4 px-lg-0">
                     {{-- <img src="{{asset('resources/img/logosmart/logosmart5-05crop.png')}}" id="logo" style="width: 400px; height: 100px;"> --}}
                     <h1 class="fst-italic lh-1 mb-2">MOZAIC</h1>
-                    <p class="mb-3">Point Of Sales</p>
+                    <p class="mb-3">Omah'e Opa</p>
                     <form>
                         <!-- Email address input-->
                         <div class="row input-group-newsletter">
