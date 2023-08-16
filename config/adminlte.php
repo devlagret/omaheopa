@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'title' => 'MOZAIC Point Of Sales',
+    'title' => "MOZAIC Omah'e Opa",
     'title_prefix' => '',
     'title_postfix' => '',
 
@@ -46,12 +46,12 @@ return [
     |
     */
 
-    'logo' => '<b>MOZAIC</b> Point Of Sales',
+    'logo' => "<b>MOZAIC</b> Omah'e Opa",
     'logo_img' => 'resources/assets/img/logo_baru_mozaic/logo baru set-09.png',
     'logo_img_class' => 'brand-image',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
-    'logo_img_alt' => 'MOZAIC Point Of Sales',
+    'logo_img_alt' => "MOZAIC Omah'e Opa",
 
     /*
     |--------------------------------------------------------------------------

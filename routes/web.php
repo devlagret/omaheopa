@@ -9,6 +9,8 @@ use App\Http\Controllers\AcctProfitLossReportController;
 use App\Http\Controllers\AcctProfitLossYearReportController;
 use App\Http\Controllers\AcctReceiptsController;
 use App\Http\Controllers\AcctReceiptsReportController;
+use App\Http\Controllers\CoreRoomController;
+use App\Http\Controllers\CoreRoomTypeController;
 use App\Http\Controllers\GeneralLedgerController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
@@ -270,3 +272,34 @@ Route::post('/cash-disbursement-report/filter',[AcctDisbursementReportController
 Route::get('/cash-disbursement-report/reset-filter',[AcctDisbursementReportController::class, 'resetFilterDisbursementReport'])->name('reset-filter-cash-disbursement-report');
 Route::get('/cash-disbursement-report/print',[AcctDisbursementReportController::class, 'printDisbursementReport'])->name('print-cash-disbursement-report');
 Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController::class, 'exportDisbursementReport'])->name('export-cash-disbursement-report');
+
+ // Room pages
+ Route::prefix('room')->name('room.')->group(function () {
+    Route::get('/', [CoreRoomController::class, 'index'])->name('index');
+    Route::get('/add', [CoreRoomController::class, 'add'])->name('add');
+    Route::post('/process-add', [CoreRoomController::class, 'processAdd'])->name('process-add');
+    Route::get('/edit/{room_id}', [CoreRoomController::class, 'edit'])->name('edit');
+    Route::post('/process-edit', [CoreRoomController::class, 'processEdit'])->name('process-edit');
+    Route::get('/delete/{room_id}', [CoreRoomController::class, 'delete'])->name('delete');
+    Route::post('/elements-add', [CoreRoomController::class, 'elementsAdd'])->name('elements-add');
+});
+ // Building pages
+ Route::prefix('room')->name('room.')->group(function () {
+    Route::get('/', [CoreRoomController::class, 'index'])->name('index');
+    Route::get('/add', [CoreRoomController::class, 'add'])->name('add');
+    Route::post('/process-add', [CoreRoomController::class, 'processAdd'])->name('process-add');
+    Route::get('/edit/{room_id}', [CoreRoomController::class, 'edit'])->name('edit');
+    Route::post('/process-edit', [CoreRoomController::class, 'processEdit'])->name('process-edit');
+    Route::get('/delete/{room_id}', [CoreRoomController::class, 'delete'])->name('delete');
+    Route::post('/elements-add', [CoreRoomController::class, 'elementsAdd'])->name('elements-add');
+});
+ // Room Type pages
+ Route::prefix('room-type')->name('room-type.')->group(function () {
+    Route::get('/', [CoreRoomTypeController::class, 'index'])->name('index');
+    Route::get('/add', [CoreRoomTypeController::class, 'add'])->name('add');
+    Route::post('/process-add', [CoreRoomTypeController::class, 'processAdd'])->name('process-add');
+    Route::get('/edit/{room_type_id}', [CoreRoomTypeController::class, 'edit'])->name('edit');
+    Route::post('/process-edit', [CoreRoomTypeController::class, 'processEdit'])->name('process-edit');
+    Route::get('/delete/{room_type_id}', [CoreRoomTypeController::class, 'delete'])->name('delete');
+    Route::post('/elements-add', [CoreRoomTypeController::class, 'elementsAdd'])->name('elements-add');
+});
