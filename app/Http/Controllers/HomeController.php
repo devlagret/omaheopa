@@ -30,10 +30,10 @@ class HomeController extends Controller
         ->join('system_menu_mapping','system_menu_mapping.user_group_level','=','system_user_group.user_group_level')
         ->join('system_menu','system_menu.id_menu','=','system_menu_mapping.id_menu')
         ->where('system_user.user_id','=',Auth::id())
-        ->where('system_menu_mapping.company_id', Auth::user()->company_id)
+        // ->where('system_menu_mapping.company_id', Auth::user()->company_id)
         ->orderBy('system_menu_mapping.id_menu','ASC')
         ->get();
-
+        // $menus = Auth::user();
         return view('home',compact('menus'));
     }
 }

@@ -1,7 +1,7 @@
 @inject('PurchaseInvoice','App\Http\Controllers\PurchaseInvoiceController')
 @extends('adminlte::page')
 
-@section('title', 'MOZAIC Point of Sales')
+@section('title', "MOZAIC Point of Sales")
 @section('js')
 <script>
     function reset_add(){
@@ -125,33 +125,41 @@
         <div class="table-responsive">
             <table id="example" style="width:100%" class="table table-striped table-bordered table-hover table-full-width">
                 <thead>
-                    <tr>
                         <th style="text-align: center">No </th>
                         <th style="text-align: center">No Pembelian</th>
                         <th style="text-align: center">Tanggal Pembelian</th>
-                        <th style="text-align: center">Nama Pemasok</th>
+                        <th style="text-align: center">Nama Supplier</th>
                         <th style="text-align: center">Nama Gudang</th>
                         <th style="text-align: center">Jumlah Pembelian</th>	
                         <th style="text-align: center">Dibayar</th>
-                        <th style="text-align: center">Sisa</th>		
+                        <th style="text-align: center">Hutang</th>		
+                        <th style="text-align: center">Jumlah Retur</th>	
+                        <th style="text-align: center">Status</th>	
                         <th style="text-align: center">Aksi</th>
-                    </tr>
                 </thead>
                 <tbody>
                     <?php $no = 1; ?>
                    @foreach ($data as $row )
                    <tr>
-                        <td>{{ $no++ }}</td>
-                        <td>{{ $row['purchase_invoice_no'] }}</td>
-                        <td>{{ date('d-m-Y', strtotime($row['purchase_invoice_date'])) }}</td>
-                        <td>{{ $row['purchase_invoice_supplier'] }}</td>
-                        <td>{{ $PurchaseInvoice->getWarehouseName($row['warehouse_id']) }}</td>
-                        <td style="text-align: right">{{ number_format($row['total_amount'],2,',','.') }}</td>
-                        <td style="text-align: right">{{ number_format($row['paid_amount'],2,',','.') }}</td>
-                        <td style="text-align: right">{{ number_format($row['owing_amount'],2,',','.') }}</td>
-                        <td class="text-center">
-                            <a type="button" class="btn btn-outline-warning btn-sm" href="{{ url('/purchase-invoice/detail/'.$row['purchase_invoice_id']) }}">Detail</a>
-                        </td>
+                    <td class="text-center">{{ $no++ }}.</td>
+                    <td>{{ $row['purchase_invoice_no'] }}</td>
+                    <td>{{ date('d-m-Y', strtotime($row['purchase_invoice_date'])) }}</td>
+                    <td>{{ $PurchaseInvoice->getSupplierName($row['supplier_id']) }}</td>
+                    <td>{{ $PurchaseInvoice->getWarehouseName($row['warehouse_id']) }}</td>
+                    <td style="text-align: right">{{ number_format($row['total_amount'],2,',','.') }}</td>
+                    <td style="text-align: right">{{ number_format($row['paid_amount'],2,',','.') }}</td>
+                    <td style="text-align: right">{{ number_format($row['owing_amount'],2,',','.') }}</td>
+                    <td style="text-align: right">{{ number_format($row['return_amount'],2,',','.') }}</td>
+                    <td class="text-center">
+                        @if ($row['data_state'] == 0)
+                            <a type="button" class="btn btn-outline-danger btn-sm" href="{{ url('/purchase-invoice/delete/'.$row['purchase_invoice_id']) }}">Hapus</a>
+                        @else
+                            Dihapus
+                        @endif
+                    </td>
+                    <td class="text-center">
+                        <a type="button" class="btn btn-outline-warning btn-sm" href="{{ url('/purchase-invoice/detail/'.$row['purchase_invoice_id']) }}">Detail</a>
+                    </td>
                    </tr>
                    @endforeach
                 </tbody>

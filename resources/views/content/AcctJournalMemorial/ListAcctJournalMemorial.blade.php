@@ -1,7 +1,7 @@
 @inject('JournalMemorial','App\Http\Controllers\AcctJournalMemorialController')
 @extends('adminlte::page')
 
-@section('title', 'MOZAIC Point of Sales')
+@section('title',  "MOZAIC Omah'e Opa")
 
 @section('content_header')
     

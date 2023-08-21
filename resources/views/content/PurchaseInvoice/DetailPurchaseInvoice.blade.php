@@ -1,7 +1,7 @@
 @inject('PurchaseInvoice','App\Http\Controllers\PurchaseInvoiceController')
 @extends('adminlte::page')
 
-@section('title', 'MOZAIC Point of Sales')
+@section('title',  "MOZAIC Omah'e Opa")
 @section('js')
 <script>
 

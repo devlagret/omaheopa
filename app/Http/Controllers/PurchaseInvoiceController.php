@@ -26,9 +26,9 @@ class PurchaseInvoiceController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        
+
     }
-    
+
     public function index()
     {
         if(!$start_date = Session::get('start_date')){
@@ -137,7 +137,7 @@ class PurchaseInvoiceController extends Controller
     {
         $arrayBaru			= array();
         $dataArrayHeader	= Session::get('arraydatases');
-        
+
         foreach($dataArrayHeader as $key=>$val){
             if($key != $record_id){
                 $arrayBaru[$key] = $val;
@@ -148,7 +148,7 @@ class PurchaseInvoiceController extends Controller
 
         return redirect('/purchase-invoice/add');
     }
-    
+
     public function processAddPurchaseInvoice(Request $request)
     {
         $transaction_module_code = 'PBL';
@@ -228,7 +228,7 @@ class PurchaseInvoiceController extends Controller
                     'created_id'        => Auth::id(),
                     'updated_id'        => Auth::id()
                 );
-               
+
                 PurchaseInvoiceItem::create($dataarray);
                 $stock_item = InvtItemStock::where('item_id',$dataarray['item_id'])
                 ->where('warehouse_id', $dataStock['warehouse_id'])
@@ -271,7 +271,7 @@ class PurchaseInvoiceController extends Controller
                 'updated_id'                    => Auth::id()
             );
             JournalVoucherItem::create($journal_debit);
-            
+
             $account_setting_name = 'purchase_account';
             $account_id = $this->getAccountId($account_setting_name);
             $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
