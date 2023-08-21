@@ -12,8 +12,8 @@ class CoreRoomType extends Model
     use SoftDeletes;
     protected $table = 'core_room_type';
     protected $primaryKey = 'room_type_id';
-    public function room(){
-        $this->hasMany(CoreRoomType::class,'room_type_id','room_type_id');
+    public function rooms(){
+        return $this->hasMany(CoreRoom::class,'room_type_id','room_type_id');
     }
     protected $guarded = [
         'created_at',

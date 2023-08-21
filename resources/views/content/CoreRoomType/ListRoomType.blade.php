@@ -15,7 +15,7 @@ function check(name,uri){
 
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="{{ url('home') }}">Beranda</a></li>
+      <li class="breadcrumb-item"><a href="{{ route('home') }}">Beranda</a></li>
       <li class="breadcrumb-item active" aria-current="page">Daftar Tipe Kamar</li>
     </ol>
   </nav>

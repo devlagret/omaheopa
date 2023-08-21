@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\CoreRoomType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
 class CoreRoomTypeController extends Controller
@@ -25,16 +26,13 @@ class CoreRoomTypeController extends Controller
     public function elementsAdd(Request $request){
         $sessiondata = Session::get('room-data');
         if(!$sessiondata || $sessiondata == ''){
-            $sessiondata['purchase_invoice_supplier']   = '';
-            $sessiondata['warehouse_id']                = '';
-            $sessiondata['purchase_invoice_date']       = '';
-            $sessiondata['purchase_invoice_remark']     = '';
+            $sessiondata['room_type_name']   = '';
         }
         $sessiondata[$request->name] = $request->value;
         Session::put('room-data', $sessiondata);
     }
     public function processAdd(Request $request) {
-        if(CoreRoomType::create(['room_type_name'=>$request->room_type_name])){
+        if(CoreRoomType::create(['room_type_name'=>$request->room_type_name,'created_id'=>Auth::id()])){
            return redirect()->route('room-type.index')->with(['type'=>'success','msg'=>'Tambah Tipe Kamar Berhasil']);
         }
         return redirect()->route('room-type.index')->with(['type'=>'danger','msg'=>'Tambah Tipe Kamar Gagal']);
@@ -48,6 +46,7 @@ class CoreRoomTypeController extends Controller
     public function processEdit(Request $request){
         $roomtype = CoreRoomType::find($request->room_type_id);
         $roomtype->room_type_name = $request->room_type_name;
+        $roomtype->updated_id = Auth::id();
         if($roomtype->save()){
            return redirect()->route('room-type.index')->with(['type'=>'success','msg'=>'Edit Tipe Kamar Berhasil']);
         }
@@ -56,6 +55,7 @@ class CoreRoomTypeController extends Controller
     public function delete($room_type_id) {
         $roomtype=CoreRoomType::find($room_type_id);
         $roomtype->data_state = '1';
+        $roomtype->deleted_id = Auth::id();
         if($roomtype->save()){if($roomtype->delete()){
            return redirect()->route('room-type.index')->with(['type'=>'success','msg'=>'Hapus Tipe Kamar Berhasil']);
         };}

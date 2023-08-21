@@ -28,8 +28,8 @@
 
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ url('home') }}">Beranda</a></li>
-        <li class="breadcrumb-item"><a href="{{ url('item') }}">Daftar Tipe Kamar</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('home') }}">Beranda</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('room-type.index') }}">Daftar Tipe Kamar</a></li>
         <li class="breadcrumb-item active" aria-current="page">Tambah Tipe Kamar</li>
     </ol>
   </nav>
