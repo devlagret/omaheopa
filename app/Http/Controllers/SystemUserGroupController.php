@@ -34,15 +34,16 @@ class SystemUserGroupController extends Controller
      */
     public function index()
     {
-        $systemusergroup = SystemUserGroup::where('data_state','=',0)
+        $systemusergroup = SystemUserGroup::where('data_state','=','0')
         ->where('company_id', Auth::user()->company_id)
+        ->where('user_group_status', '0')
         ->get();
         return view('content/SystemUserGroup/ListSystemUserGroup',compact('systemusergroup'));
     }
 
     public function addSystemUserGroup(Request $request)
     {
-        $systemusergroup    = SystemUserGroup::where('data_state','=',0)
+        $systemusergroup    = SystemUserGroup::where('data_state','=','0')
         ->where('company_id', Auth::user()->company_id)
         ->get();
 
@@ -55,7 +56,6 @@ class SystemUserGroupController extends Controller
     {
         $fields = $request->validate([
             'user_group_name'           => 'required',
-            'user_group_level'          => 'required',
         ]);
 
         $systemmenu = SystemMenu::get();
@@ -64,15 +64,17 @@ class SystemUserGroupController extends Controller
 
         $usergroup = array(
             'user_group_name'           => $fields['user_group_name'],
-            'user_group_level'          => $fields['user_group_level'],
             'company_id'                => Auth::user()->company_id,
         );
 
         if(SystemUserGroup::create($usergroup)){
+            $group = SystemUserGroup::orderByDesc('user_group_id')->first();
+            $group->user_group_level = $group->user_group_id;
+            $group->save();
             foreach($systemmenu as $key => $val){
                 if(isset($allrequest['checkbox_'.$val['id_menu']])){
                     $menumapping = array(
-                        'user_group_level' => $fields['user_group_level'],
+                        'user_group_level' => $group->user_group_id,
                         'id_menu'          => $val['id_menu'],
                         'company_id'       => Auth::user()->company_id
                     );
@@ -106,7 +108,6 @@ class SystemUserGroupController extends Controller
         $fields = $request->validate([
             'user_group_id'             => 'required',
             'user_group_name'           => 'required',
-            'user_group_level'          => 'required'
         ]);
 
         $systemmenu = SystemMenu::get();
@@ -116,7 +117,7 @@ class SystemUserGroupController extends Controller
         $usergroup                   = SystemUserGroup::findOrFail($fields['user_group_id']);
         $user_group_level_last       = $usergroup['user_group_level'];
         $usergroup->user_group_name  = $fields['user_group_name'];
-        $usergroup->user_group_level = $fields['user_group_level'];
+        // $usergroup->user_group_level = $fields['user_group_level'];
 
         if($usergroup->save()){
             foreach($systemmenu as $key => $val){

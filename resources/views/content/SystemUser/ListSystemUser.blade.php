@@ -2,7 +2,7 @@
 
 @extends('adminlte::page')
 
-@section('title', 'MOZAIC Point of Sales')
+@section('title',  "MOZAIC Omah'e Opa")
 
 @section('content_header')
     
@@ -45,6 +45,7 @@
                         <th width="2%" style='text-align:center'>User ID</th>
                         <th width="10%" style='text-align:center'>Nama</th>
                         <th width="20%" style='text-align:center'>User Group</th>
+                        <th width="20%" style='text-align:center'>Bagian</th>
                         <th width="10%" style='text-align:center'>Aksi</th>
                     </tr>
                 </thead>
@@ -54,6 +55,7 @@
                         <td style='text-align:center'>{{$user['user_id']}}</td>
                         <td>{{$user['name']}}</td>
                         <td>{{$SystemUser->getUserGroupName($user['user_group_id'])}}</td>
+                        <td>{{$user->division->division_name}}</td>
                         <td class="">
                             <a type="button" class="btn btn-outline-warning btn-sm" href="{{ url('/system-user/edit/'.$user['user_id']) }}">Edit</a>
                             <a type="button" class="btn btn-outline-danger btn-sm" href="{{ url('/system-user/delete-system-user/'.$user['user_id']) }}">Hapus</a>

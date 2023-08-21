@@ -1,9 +1,23 @@
 @extends('adminlte::page')
 
-@section('title', 'MOZAIC Point of Sales')
-
+@section('title', "MOZAIC Omah'e Opa")
+@section('js')
+<script>
+function openform(){
+		var a = document.getElementById("passwordf").style;
+		if(a.display=="none"){
+			a.display = "block";
+            $('#passIsChanged').val(1);
+		}else{
+            $('#passIsChanged').val(0);
+			a.display = "none";
+			document.getElementById("password").value ='';
+		}
+}
+</script>
+@stop
 @section('content_header')
-    
+
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ url('home') }}">Beranda</a></li>
@@ -46,24 +60,30 @@
                         <input class="form-control input-bb" type="hidden" name="user_id" id="user_id" value="{{$user_id}}"/>
                     </div>
                 </div>
-                <div class="col-md-4">
+                {{-- <div class="col-md-4">
                     <div class="form-group">
                         <a class="text-dark">Nama Panjang<a class='red'> *</a></a>
                         <input class="form-control input-bb" type="text" name="full_name" id="full_name" value="{{$systemuser['full_name']}}"/>
                     </div>
-                </div>
-                <div class="col-md-4">
+                </div> --}}
+                @if(Auth::id() == 1)
+                <div class="col-md-1 mt-3">
                     <div class="form-group">
-                        <a class="text-dark">Password<a class='red'> *</a></a>
+                        <button type="button" class="button btn btn-primary" onclick="openform()">Ganti Password</button>
+                    </div></div>
+                <div class="col-md-4" style ="display:none;" id="passwordf">
+                    <div class="form-group">
+                        <a class="text-dark">Password</a>
                         <input class="form-control input-bb" type="password" name="password" id="password" value=""/>
                     </div>
                 </div>
-                <div class="col-md-4">
+                @endif
+                {{-- <div class="col-md-4">
                     <div class="form-group">
                         <a class="text-dark">No HP</a>
                         <input class="form-control input-bb" type="text" name="phone_number" id="phone_number" value="{{$systemuser['phone_number']}}"/>
                     </div>
-                </div>
+                </div> --}}
                 <div class="col-md-4">
                     <a class="text-dark">User Group<a class='red'> *</a></a>
                     <br/>
@@ -72,7 +92,7 @@
                 <div class="col-md-4">
                     <a class="text-dark">Bagian<a class='red'> *</a></a>
                     <br/>
-                    {!! Form::select('section_id',  $coresection, $systemuser['section_id'], ['class' => 'selection-search-clear select-form']) !!}
+                    {!! Form::select('division_id',  $coresection, $systemuser['division_id'], ['class' => 'selection-search-clear select-form']) !!}
                 </div>
             </div>
         </div>
@@ -89,13 +109,13 @@
 @stop
 
 @section('footer')
-    
+
 @stop
 
 @section('css')
-    
+
 @stop
 
 @section('js')
-    
+
 @stop

@@ -2,7 +2,7 @@
 
 @extends('adminlte::page')
 
-@section('title', 'MOZAIC Point of Sales')
+@section('title',  "MOZAIC Omah'e Opa")
 
 @section('js')
 <script>
@@ -63,12 +63,12 @@
                         <input class="form-control input-bb" type="hidden" name="user_group_id" id="user_group_id" value="{{$systemusergroup['user_group_id']}}"/>
                     </div>
                 </div>
-                <div class="col-md-6">
+                {{-- <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">User Group Level<a class='red'> *</a></a>
                         <input class="form-control input-bb" type="text" name="user_group_level" id="user_group_level" value="{{$systemusergroup['user_group_level']}}"/>
                     </div>
-                </div>
+                </div> --}}
             </div>
 
             <br/>

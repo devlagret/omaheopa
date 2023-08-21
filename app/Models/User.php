@@ -27,8 +27,8 @@ class User extends Authenticatable
         'email',
         'password',
         'user_group_id',
-        'section_id',
-        'full_name',
+        'division_id',
+        'user_token',
         'company_id',
         'phone_number',
     ];
@@ -51,4 +51,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+    public function division(){
+        return $this->hasOne(CoreDivision::class,'division_id','division_id');
+    }
 }

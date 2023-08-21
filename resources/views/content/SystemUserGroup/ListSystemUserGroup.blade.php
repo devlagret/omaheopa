@@ -2,7 +2,7 @@
 
 @extends('adminlte::page')
 
-@section('title', 'MOZAIC Point of Sales')
+@section('title',  "MOZAIC Omah'e Opa")
 
 @section('content_header')
     
@@ -42,16 +42,17 @@
             <table id="example" style="width:100%" class="table table-striped table-bordered table-hover table-full-width">
                 <thead>
                     <tr>
-                        <th width="2%" style='text-align:center'>User Group ID</th>
+                        <th width="2%" style='text-align:center'>No</th>
                         <th width="10%" style='text-align:center'>Nama</th>
                         <th width="20%" style='text-align:center'>User Group Level</th>
                         <th width="10%" style='text-align:center'>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
+                    <?php $no = 1; ?>
                     @foreach($systemusergroup as $usergroup)
                     <tr>
-                        <td style='text-align:center'>{{$usergroup['user_group_id']}}</td>
+                        <td style='text-align:center'>{{$no++}}</td>
                         <td>{{$usergroup['user_group_name']}}</td>
                         <td>{{$usergroup['user_group_level']}}</td>
                         <td class="">

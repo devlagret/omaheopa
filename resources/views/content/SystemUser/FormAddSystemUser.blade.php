@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'MOZAIC Point of Sales')
+@section('title',  "MOZAIC Omah'e Opa")
 
 @section('content_header')
     
@@ -45,24 +45,24 @@
                         <input class="form-control input-bb" type="text" name="name" id="name" value=""/>
                     </div>
                 </div>
-                <div class="col-md-3">
+                {{-- <div class="col-md-3">
                     <div class="form-group">
                         <a class="text-dark">Nama Panjang<a class='red'> *</a></a>
                         <input class="form-control input-bb" type="text" name="full_name" id="full_name" value=""/>
                     </div>
-                </div>
+                </div> --}}
                 <div class="col-md-3">
                     <div class="form-group">
                         <a class="text-dark">Password<a class='red'> *</a></a>
                         <input class="form-control input-bb" type="password" name="password" id="password" value=""/>
                     </div>
                 </div>
-                <div class="col-md-3">
+                {{-- <div class="col-md-3">
                     <div class="form-group">
                         <a class="text-dark">No HP</a>
                         <input class="form-control input-bb" type="text" name="phone_number" id="phone_number" value=""/>
                     </div>
-                </div>
+                </div> --}}
                 <div class="col-md-3">
                     <a class="text-dark">User Group<a class='red'> *</a></a>
                     <select class="selection-search-clear" name="user_group_id" style="width: 100% !important">
@@ -74,9 +74,9 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <a class="text-dark">Bagian</a>
-                        <select class="selection-search-clear" name="section_id" style="width: 100% !important">
+                        <select class="selection-search-clear" name="division_id" style="width: 100% !important">
                             @foreach($coresection as $section)
-                                <option value="{{$section['section_id']}}">{{$section['section_name']}}</option>
+                                <option value="{{$section['division_id']}}">{{$section['division_name']}}</option>
                             @endforeach
                         </select>
                     </div>
