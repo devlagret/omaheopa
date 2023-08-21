@@ -28,9 +28,9 @@
 
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="{{ url('home') }}">Beranda</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('home') }}">Beranda</a></li>
         <li class="breadcrumb-item"><a href="{{ route('building.index') }}">Daftar Bangunan</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Tambah Bangunan</li>
+        <li class="breadcrumb-item active" aria-current="page">Edit Bangunan</li>
     </ol>
   </nav>
 
@@ -39,7 +39,7 @@
 @section('content')
 
 <h3 class="page-title">
-    Form Tambah Bangunan
+    Form Edit Bangunan
 </h3>
 <br/>
 @if(session('msg'))
@@ -58,7 +58,7 @@
     <div class="card border border-dark">
     <div class="card-header border-dark bg-dark">
         <h5 class="mb-0 float-left">
-            Form Tambah Bangunan
+            Form Edit
         </h5>
         <div class="float-right">
             <button onclick="location.href='{{ route('building.index') }}'" name="Find" class="btn btn-sm btn-info" title="Back"><i class="fa fa-angle-left"></i>  Kembali</button>
@@ -71,7 +71,7 @@
             }
         ?>
 
-    <form method="post" action="{{ route('building.process-add') }}" enctype="multipart/form-data">
+    <form method="post" action="{{ route('building.process-edit') }}" enctype="multipart/form-data">
         @csrf
         <div class="card-body">
               <div class="tab-content">
@@ -80,7 +80,8 @@
                         <div class="col">
                             <div class="form-group">
                                 <a class="text-dark">Nama Bangunan<a class='red'> *</a></a>
-                                <input placeholder="Masukan nama bangunan" required class="form-control input-bb required" name="building_name" id="building_name" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value)" value="{{old('building_name',$sessiondata['building_name']??'') }}"/>
+                                <input type="hidden" autocomplete="off" name="building_id" value="{{$building->building_id}}"/>
+                                <input placeholder="Masukan tipe kamar" required class="form-control input-bb required" name="building_name" id="building_name" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value)" value="{{old('building_name',$sessiondata['building_name']?$sessiondata['building_name']:$building->building_name) }}"/>
                             </div>
                         </div>
                     </div>
