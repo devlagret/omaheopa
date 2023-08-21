@@ -38,7 +38,7 @@
             </div>
         </div>
         <div style="position:absolute; bottom: 0; right:0;">
-            <a>www.ciptasolutindo.id</a>
+            <a href="www.ciptasolutindo.id">www.ciptasolutindo.id</a>
         </div>
         <!-- Social Icons-->
         <!-- For more icon options, visit https://fontawesome.com/icons?d=gallery&p=2&s=brands-->
