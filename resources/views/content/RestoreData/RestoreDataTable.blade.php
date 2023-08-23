@@ -4,8 +4,8 @@
 @section('title', "MOZAIC Omah'e Opa")
 @section('js')
 <script>
-function check(name,uri){
-  if(confirm(`Yakin Ingin Menghapus Divisi dengan nama '`+name+`' ?`)){
+function checkh(name,uri){
+  if(confirm(`Yakin Ingin Menghapus Data nomor '`+name+`' Secara Permanen ?`)){
     window.location.href = uri;
   }
 }
@@ -51,11 +51,9 @@ function check(name,uri){
                 <thead>
                     <tr>
                         <th width="auto" style='text-align:center'>No</th>
-                        <th width="auto" style='text-align:center'>Aksi</th>
+                        <th width="10" style='text-align:center'>Aksi</th>
                         @foreach($header as $val)
-                        @if ($val!='data_state')
-                        <th width="auto" style='text-align:center'>{{$val}}</th>
-                        @endif
+                        <th width="auto" style='text-align:center'>{{$val}}</th>   
                         @endforeach
                     </tr>
                 </thead>
@@ -65,12 +63,11 @@ function check(name,uri){
                     <tr>
                         <td style='text-align:center'>{{ $no++ }}</td>
                         <td class="text-center">
-                            <a type="button" class="btn btn-success btn-sm" href="{{ route('restore.data',['table'=>$table,'col'=>$pk,'id'=>$row->$pk]) }}">Restore</a>
+                            <a type="button" class="btn btn-success m-1 btn-sm" href="{{ route('restore.data',['table'=>$table,'col'=>$pk,'id'=>$row->$pk]) }}">Restore</a>
+                            {{-- <button type="button" class="btn btn-danger m-1 btn-sm" onclick="checkh({{$no++}},'{{route('restore.force-delete',['table'=>$table,'col'=>$pk,'id'=>$row->$pk])}}')">Delete</button> --}}
                         </td>
                         @foreach($header as $key)
-                        @if($key!='data_state')
                         <td>{{ $row->$key }}</td>
-                        @endif
                         @endforeach
                     </tr>
                     @endforeach

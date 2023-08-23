@@ -70,4 +70,15 @@ class RestoreDataController extends Controller
         }
         return redirect()->route('restore.table', ['table' => $table])->with(['type'=>'success','msg'=>'Restore Data Berhasil']);
     }
+    public function forceDelete($table,$col,$id) {
+        return [$table,$col,$id];
+        $this->check();
+        try{
+        $data = DB::table($table)->where($col,$id);
+        $data->forceDelete();}catch(\Illuminate\Database\QueryException $e){
+            error_log($e);
+            return redirect()->route('restore.table', ['table' => $table])->with(['type'=>'danger','msg'=>'Hapus Gagal']);
+        }
+        return redirect()->route('restore.table', ['table' => $table])->with(['type'=>'success','msg'=>'Hapus Berhasil']);
+    }
 }
