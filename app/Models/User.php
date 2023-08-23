@@ -30,6 +30,7 @@ class User extends Authenticatable
         'division_id',
         'user_token',
         'company_id',
+        'merchant_id',
         'phone_number',
     ];
 
@@ -51,7 +52,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-    public function division(){
-        return $this->hasOne(CoreDivision::class,'division_id','division_id');
+    public function merchant(){
+        return $this->belongsTo(SalesMerchant::class,'merchant_id','merchant_id');
     }
 }

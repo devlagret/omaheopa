@@ -69,12 +69,12 @@ function openform(){
                 @if(Auth::id() == 1)
                 <div class="col-md-1 mt-3">
                     <div class="form-group">
-                        <button type="button" class="button btn btn-primary" onclick="openform()">Ganti Password</button>
+                        <button type="button" class="button btn btn-sm btn-primary" onclick="openform()">Ganti Password</button>
                     </div></div>
                 <div class="col-md-4" style ="display:none;" id="passwordf">
                     <div class="form-group">
                         <a class="text-dark">Password</a>
-                        <input class="form-control input-bb" type="password" name="password" id="password" value=""/>
+                        <input class="form-control input-bb required" type="password" name="password" id="password" value=""/>
                     </div>
                 </div>
                 @endif
@@ -87,12 +87,12 @@ function openform(){
                 <div class="col-md-4">
                     <a class="text-dark">User Group<a class='red'> *</a></a>
                     <br/>
-                    {!! Form::select('user_group_id',  $systemusergroup, $systemuser['user_group_id'], ['class' => 'selection-search-clear select-form']) !!}
+                    {!! Form::select('user_group_id',  $systemusergroup, $systemuser['user_group_id'], ['class' => 'selection-search-clear required select-form']) !!}
                 </div>
                 <div class="col-md-4">
-                    <a class="text-dark">Bagian<a class='red'> *</a></a>
+                    <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
                     <br/>
-                    {!! Form::select('division_id',  $coresection, $systemuser['division_id'], ['class' => 'selection-search-clear select-form']) !!}
+                    {!! Form::select('merchant_id',  $merchant, $systemuser['merchant_id'], ['class' => 'selection-search-clear required select-form']) !!}
                 </div>
             </div>
         </div>

@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use App\Models\User;
 use App\Models\CoreDivision;
+use App\Models\SalesMerchant;
 use Illuminate\Support\Str;
 use App\Models\SystemUserGroup;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -35,7 +36,7 @@ class SystemUserController extends Controller
      */
     public function index()
     {
-        $systemuser = User::with('division')->where('data_state','=','0')
+        $systemuser = User::with('merchant')->where('data_state','=','0')
         ->where('company_id', Auth::user()->company_id)
         ->where('user_level', 0)
         ->get();
@@ -48,10 +49,9 @@ class SystemUserController extends Controller
         ->where('company_id', Auth::user()->company_id)
         ->where('user_group_status', '0')
         ->get();
-        $coresection        = CoreDivision::where('data_state','=','0')
-        ->where('company_id', Auth::user()->company_id)
+        $merchant   = SalesMerchant::where('data_state','=','0')
         ->get();
-        return view('content/SystemUser/FormAddSystemUser',compact('systemusergroup', 'coresection'));
+        return view('content/SystemUser/FormAddSystemUser',compact('systemusergroup', 'merchant'));
     }
 
     public function processAddSystemUser(Request $request)
@@ -61,22 +61,22 @@ class SystemUserController extends Controller
             // 'full_name'             => 'required',
             'password'              => 'required',
             'user_group_id'         => 'required',
-            'division_id'            => 'required'
+            'merchant_id'            => 'required'
         ]);
-
         $user = User::create([
             'name'                  => $fields['name'],
             // 'full_name'             => $fields['full_name'],
             'password'              => Hash::make($fields['password']),
             // 'phone_number'          => $request->phone_number,
             'user_group_id'         => $fields['user_group_id'],
-            'division_id'            => $fields['division_id'],
+            'merchant_id'            => $fields['merchant_id'],
             'user_token'            => Str::uuid(),
-            'company_id'            => Auth::user()->company_id
+            'company_id'            => Auth::user()->company_id,
+            'created_id'            => Auth::id(),
         ]);
 
         $msg = 'Tambah System User Berhasil';
-        return redirect('/system-user/add')->with('msg',$msg);
+        return redirect('/system-user/')->with('msg',$msg);
     }
 
     public function editSystemUser($user_id)
@@ -87,12 +87,11 @@ class SystemUserController extends Controller
         ->get()
         ->pluck('user_group_name','user_group_id');
         $systemuser         = User::where('user_id',$user_id)->first();
-        $coresection        = CoreDivision::where('data_state','=',0)
-        ->where('company_id', Auth::user()->company_id)
+        $merchant        = SalesMerchant::where('data_state','=',0)
         ->get()
-        ->pluck('division_name','division_id');
-        // $coresection[0]     = "Multi Section";
-        return view('content/SystemUser/FormEditSystemUser',compact('systemusergroup', 'systemuser', 'user_id', 'coresection'));
+        ->pluck('merchant_name','merchant_id');
+        // $merchant[0]     = "Multi Section";
+        return view('content/SystemUser/FormEditSystemUser',compact('systemusergroup', 'systemuser', 'user_id', 'merchant'));
     }
 
     public function processEditSystemUser(Request $request)
@@ -102,7 +101,7 @@ class SystemUserController extends Controller
             'name'                      => 'required',
             // 'full_name'                 => 'required',
             'user_group_id'             => 'required',
-            'division_id'                => 'required'
+            'merchant_id'                => 'required'
         ]);
 
         $user                   = User::findOrFail($fields['user_id']);
@@ -112,7 +111,8 @@ class SystemUserController extends Controller
             $user->password         = Hash::make($request->password);
         }
         $user->user_group_id    = $fields['user_group_id'];
-        $user->division_id       = $fields['division_id'];
+        $user->merchant_id       = $fields['merchant_id'];
+        $user->updated_id       = Auth::id();
         // $user->phone_number     = $request->phone_number;
 
         if($user->save()){
