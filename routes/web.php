@@ -15,8 +15,10 @@ use App\Http\Controllers\CoreDivisionController;
 use App\Http\Controllers\CorePriceTypeController;
 use App\Http\Controllers\CoreRoomController;
 use App\Http\Controllers\CoreRoomTypeController;
+use App\Http\Controllers\CoreSupplierController;
 use App\Http\Controllers\GeneralLedgerController;
 use App\Http\Controllers\RestoreDataController;
+use App\Http\Controllers\SalesMerchantController;
 use App\Http\Controllers\SalesRoomMenuController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
@@ -72,7 +74,7 @@ Route::post('/item-unit/process-edit-item-unit', [InvtItemUnitController::class,
 Route::get('/item-unit/delete/{item_unit_id}', [InvtItemUnitController::class, 'deleteInvtItemUnit'])->name('delete-item-unit');
 
 Route::get('/item-category',[InvtItemCategoryController::class, 'index'])->name('item-category');
-Route::get('/item-category/add',[InvtItemCategoryController::class, 'addItemCategory'])->name('add-item-category');
+Route::get('/item-category/add/{merchant_id?}',[InvtItemCategoryController::class, 'addItemCategory'])->name('add-item-category');
 Route::post('/item-category/elements-add',[InvtItemCategoryController::class, 'elementsAddItemCategory'])->name('elements-add-category');
 Route::post('/item-category/process-add-category', [InvtItemCategoryController::class, 'processAddItemCategory'])->name('process-add-item-category');
 Route::get('/item-category/reset-add',[InvtItemCategoryController::class, 'addReset'])->name('add-reset-category');
@@ -81,6 +83,9 @@ Route::post('/item-category/process-edit-item-category', [InvtItemCategoryContro
 Route::get('/item-category/delete-category/{item_category_id}', [InvtItemCategoryController::class, 'deleteItemCategory'])->name('delete-item-category');
 
 Route::get('/item',[InvtItemController::class, 'index'])->name('item');
+Route::post('/item/category',[InvtItemController::class, 'getCategory'])->name('get-item-category');
+Route::get('/item/add-kemasan',[InvtItemController::class, 'addKemasan'])->name('add-kemasan');
+Route::get('/item/remove-kemasan',[InvtItemController::class, 'removeKemasan'])->name('remove-kemasan');
 Route::get('/item/add-item', [InvtItemController::class, 'addItem'])->name('add-item');
 Route::get('/item/add-reset', [InvtItemController::class, 'addResetItem'])->name('add-reset-item');
 Route::post('/item/add-item-elements', [InvtItemController::class, 'addItemElements'])->name('add-item-elements');
@@ -285,6 +290,7 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
     Route::get('/', [RestoreDataController::class, 'index'])->name('index');
     Route::get('/{table}', [RestoreDataController::class, 'table'])->name('table');
     Route::get('/{table}/{col}/{id}', [RestoreDataController::class, 'restore'])->name('data');
+    Route::get('/force/{table}/{col}/{id}', [RestoreDataController::class, 'forceDelete'])->name('force-delete');
 });
  // Division pages
  Route::prefix('division')->name('division.')->group(function () {
@@ -365,4 +371,24 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
     Route::post('/process-edit', [BookingController::class, 'processEdit'])->name('process-edit');
     Route::get('/delete/{booking_id}', [BookingController::class, 'delete'])->name('delete');
     Route::post('/elements-add', [BookingController::class, 'elementsAdd'])->name('elements-add');
+});
+ // Suppplier pages
+ Route::prefix('core-supplier')->name('supplier.')->group(function () {
+    Route::get('/', [CoreSupplierController::class, 'index'])->name('index');
+    Route::get('/add', [CoreSupplierController::class, 'add'])->name('add');
+    Route::post('/process-add', [CoreSupplierController::class, 'processAdd'])->name('process-add');
+    Route::get('/edit/{supplier_id}', [CoreSupplierController::class, 'edit'])->name('edit');
+    Route::post('/process-edit', [CoreSupplierController::class, 'processEdit'])->name('process-edit');
+    Route::get('/delete/{supplier_id}', [CoreSupplierController::class, 'delete'])->name('delete');
+    Route::post('/elements-add', [CoreSupplierController::class, 'elementsAdd'])->name('elements-add');
+});
+ // Merchant (wahana) pages
+ Route::prefix('sales-merchant')->name('sales-merchant.')->group(function () {
+    Route::get('/', [SalesMerchantController::class, 'index'])->name('index');
+    Route::get('/add', [SalesMerchantController::class, 'add'])->name('add');
+    Route::post('/process-add', [SalesMerchantController::class, 'processAdd'])->name('process-add');
+    Route::get('/edit/{merchant_id}', [SalesMerchantController::class, 'edit'])->name('edit');
+    Route::post('/process-edit', [SalesMerchantController::class, 'processEdit'])->name('process-edit');
+    Route::get('/delete/{merchant_id}', [SalesMerchantController::class, 'delete'])->name('delete');
+    Route::post('/elements-add', [SalesMerchantController::class, 'elementsAdd'])->name('elements-add');
 });
