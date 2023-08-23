@@ -16,8 +16,8 @@ class CoreRoomTypeController extends Controller
     }
     public function index() {
         Session::forget('room-data');
-        $room = CoreRoomType::get();
-        return view('content.CoreRoomType.ListRoomType')->with(['room'=>$room]);
+        $roomtype = CoreRoomType::get();
+        return view('content.CoreRoomType.ListRoomType')->with(['room'=>$roomtype]);
     }
     public function add() {
         $sessiondata = Session::get('room-data');
