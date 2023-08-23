@@ -68,14 +68,18 @@
             Form Tambah
         </h5>
         <div class="float-right">
-            <button onclick="location.href='{{ url('item-category') }}'" name="Find" class="btn btn-sm btn-info" title="Back"><i class="fa fa-angle-left"></i>  Kembali</button>
+            <button onclick="location.href='{{ route($url) }}'" name="Find" class="btn btn-sm btn-info" title="Back"><i class="fa fa-angle-left"></i> Kembali</button>
         </div>
     </div>
 
     <?php 
-            // if (empty($coresection)){
-            //     $coresection['section_name'] = '';
-            // }
+            if (empty($datacategory)){
+            $datacategory['item_category_code']    = '';
+            $datacategory['item_category_name']    = '';
+            $datacategory['item_category_remark']  = '';
+            $datacategory['merchant_id']  = '';
+            $datacategory['from_item']  = 0;
+            }
         ?>
 
     <form method="post" action="{{ route('process-add-item-category') }}" enctype="multipart/form-data">
@@ -84,21 +88,33 @@
             <div class="row form-group">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <a class="text-dark">Kode Kategori Barang<a class='red'> *</a></a>
-                        <input class="form-control input-bb" name="item_category_code" id="category_code" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value);" value="{{ $datacategory['item_category_code'] }}"/>
+                        <a class="text-dark">Kode Kategori<a class='red'> *</a></a>
+                        <input class="form-control input-bb required" placeholder="Masukan Kode Kategori" autofocus="autofocus" name="item_category_code" id="category_code" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value);" value="{{ $datacategory['item_category_code'] }}"/>
+                        <input name="from_item" id="from_item" type="hidden"  value="{{ $datacategory['from_item'] }}"/>
 
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <a class="text-dark">Nama Kategori Barang<a class='red'> *</a></a>
-                        <input class="form-control input-bb" name="item_category_name" id="category_name" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value);" value="{{ $datacategory['item_category_name'] }}"/>
+                        <a class="text-dark">Nama Kategori<a class='red'> *</a></a>
+                        <input class="form-control input-bb required" placeholder="Masukan Nama Kategori" required name="item_category_name" id="category_name" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value);" value="{{ $datacategory['item_category_name'] }}"/>
                     </div>
                 </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
+                            {!! Form::select('merchant_id', $merchant, $datacategory['merchant_id'] ?? '', [
+                                'class' => 'form-control selection-search-clear select-form required',
+                                'name' => 'merchant_id',
+                                'id' => 'merchant_id',
+                                'onchange' => 'function_elements_add(this.name, this.value)',
+                            ]) !!}
+                        </div>
+                    </div>
                 <div class="col-md-8 mt-3">
                     <div class="form-group">
-                        <a class="text-dark">Keterangan<a class='red'> *</a></a>
-                        <textarea class="form-control input-bb" name="item_category_remark" id="category_remark" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value);">{{ $datacategory['item_category_remark'] }}</textarea>
+                        <a class="text-dark">Keterangan</a>
+                        <textarea class="form-control input-bb" placeholder="Masukan Keterangan Kategori" name="item_category_remark" id="category_remark" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value);">{{ $datacategory['item_category_remark'] }}</textarea>
                     </div>
                 </div>
             </div>

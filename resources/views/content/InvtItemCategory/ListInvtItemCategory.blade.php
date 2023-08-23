@@ -5,7 +5,7 @@
 @section('title',  "MOZAIC Omah'e Opa")
 
 @section('content_header')
-    
+
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="{{ url('home') }}">Beranda</a></li>
@@ -26,7 +26,7 @@
 <div class="alert alert-info" role="alert">
     {{session('msg')}}
 </div>
-@endif 
+@endif
 <div class="card border border-dark">
   <div class="card-header bg-dark clearfix">
     <h5 class="mb-0 float-left">
@@ -43,8 +43,9 @@
                 <thead>
                     <tr>
                         <th width="2%" style='text-align:center'>No</th>
-                        <th width="10%" style='text-align:center'>Kode Kategori Barang</th>
-                        <th width="20%" style='text-align:center'>Nama Kategori Barang</th>
+                        <th width="10%" style='text-align:center'>Kode Kategori</th>
+                        <th width="20%" style='text-align:center'>Nama Kategori</th>
+                        <th width="20%" style='text-align:center'>Wahana / Merchant</th>
                         <th width="10%" style='text-align:center'>Aksi</th>
                     </tr>
                 </thead>
@@ -55,9 +56,10 @@
                         <td style='text-align:center'>{{ $no++ }}</td>
                         <td>{{ $row['item_category_code'] }}</td>
                         <td>{{ $row['item_category_name'] }}</td>
+                        <td>{{ $row->merchant->merchant_name }}</td>
                         <td class="">
                             <a type="button" class="btn btn-outline-warning btn-sm" href="{{ url('/item-category/edit-category/'.$row['item_category_id']) }}">Edit</a>
-                            <a type="button" class="btn btn-outline-danger btn-sm" href="{{ url('/item-category/delete-category/'.$row['item_category_id']) }}">Hapus</a>
+                            <button type="button" onclick="$('this').attr('disabled');check('{{$row->item_category_name}}','{{ route('delete-item-category',$row->item_category_id) }}')" class="btn btn-outline-danger btn-sm" >Hapus</button>
                         </td>
                     </tr>
                     @endforeach
@@ -71,13 +73,19 @@
 @stop
 
 @section('footer')
-    
+
 @stop
 
 @section('css')
-    
+
 @stop
 
 @section('js')
-    
+    <script>
+        function check(name,uri){
+  if(confirm(`Yakin Ingin Menghapus Kategori dengan Nama '`+name+`' ?`)){
+    window.location.href = uri;
+  }
+}
+    </script>
 @stop

@@ -70,9 +70,12 @@
     </div>
 
     <?php 
-            // if (empty($coresection)){
-            //     $coresection['section_name'] = '';
-            // }
+            if (empty($datacategory)){
+            $datacategory['category_code']    = '';
+            $datacategory['category_name']    = '';
+            $datacategory['category_remark']  = '';
+            $datacategory['merchant_id']  = '';
+            }
         ?>
 
     <form method="post" action="/item-category/process-edit-item-category" enctype="multipart/form-data">
@@ -81,21 +84,32 @@
             <div class="row form-group">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <a class="text-dark">Kode Barang Satuan<a class='red'> *</a></a>
-                        <input class="form-control input-bb" name="category_code" id="category_code" type="text" autocomplete="off" value="{{ $data['item_category_code'] }}{{ old('category_code') }}"/>
+                        <a class="text-dark">Kode Kategori<a class='red'> *</a></a>
+                        <input class="form-control input-bb required" placeholder="Masukan Kode Kategori" name="category_code" required id="category_code" type="text" autocomplete="off" value="{{  old('category_code', $datacategory['category_code'] ?$datacategory['category_code']:$data->item_category_code) }}"/>
                         <input class="form-control input-bb" name="category_id" id="category_id" type="text" autocomplete="off" value="{{ $data['item_category_id'] }}" hidden/>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <a class="text-dark">Nama Barang Satuan<a class='red'> *</a></a>
-                        <input class="form-control input-bb" name="category_name" id="category_name" type="text" autocomplete="off" value="{{ $data['item_category_name'] }}{{ old('category_name') }}"/>
+                        <a class="text-dark">Nama Kategori<a class='red'> *</a></a>
+                        <input class="form-control input-bb required" placeholder="Masukan Nama Kategori" required name="category_name" id="category_name" type="text" autocomplete="off" value="{{ old('category_name',  $datacategory['category_name'] ?$datacategory['category_name']:$data->item_category_name) }}"/>
                     </div>
                 </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
+                            {!! Form::select('merchant_id', $merchant, $datacategory['merchant_id'] ?$datacategory['merchant_id']:$data->merchant_id, [
+                                'class' => 'form-control selection-search-clear select-form required',
+                                'name' => 'merchant_id',
+                                'id' => 'merchant_id',
+                                'onchange' => 'function_elements_add(this.name, this.value)',
+                            ]) !!}
+                        </div>
+                    </div>
                 <div class="col-md-8 mt-3">
                     <div class="form-group">
-                        <a class="text-dark">Keterangan<a class='red'> *</a></a>
-                        <textarea class="form-control input-bb" name="category_remark" id="category_remark" type="text" autocomplete="off">{{ $data['item_category_remark'] }}{{ old('category_remark') }}</textarea>
+                        <a class="text-dark">Keterangan</a>
+                        <textarea class="form-control input-bb" placeholder="Masukan Keterangan Kategori" name="category_remark" id="category_remark" type="text" autocomplete="off">{{  old('category_remark', $datacategory['category_remark'] ?$datacategory['category_remark']:$data->item_category_remark) }}</textarea>
                     </div>
                 </div>
             </div>

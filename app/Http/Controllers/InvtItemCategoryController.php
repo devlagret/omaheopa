@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\InvtItemCategory;
+use App\Models\SalesMerchant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 
 class InvtItemCategoryController extends Controller
@@ -20,14 +22,25 @@ class InvtItemCategoryController extends Controller
         Session::forget('datacategory');
         $data = InvtItemCategory::where('data_state', 0)
         ->where('company_id', Auth::user()->company_id)
+        ->with('merchant')
         ->get();
         return view('content.InvtItemCategory.ListInvtItemCategory', compact('data'));
     }
 
-    public function addItemCategory()
+    public function addItemCategory($merchant_id = null)
     {
         $datacategory = Session::get('datacategory');
-        return view('content.InvtItemCategory.FormAddInvtItemCategory',compact('datacategory'));
+        $url = 'item-category';
+        $merchant = SalesMerchant::get()->pluck('merchant_name','merchant_id');
+        if($merchant_id != null){
+            $datacategory['item_category_code']  = '';
+            $datacategory['item_category_name']    = '';
+            $datacategory['item_category_remark']  = '';
+            $datacategory['merchant_id']  = $merchant_id;
+            $datacategory['from_item']  = 1;
+            $url = 'add-item';
+        }
+        return view('content.InvtItemCategory.FormAddInvtItemCategory',compact('datacategory','merchant','url'));
     }
 
     public function elementsAddItemCategory(Request $request)
@@ -35,8 +48,10 @@ class InvtItemCategoryController extends Controller
         $datacategory = Session::get('datacategory');
         if(!$datacategory || $datacategory == ''){
             $datacategory['item_category_code']    = '';
-            $datacategory['item_category_name']    = '';   
+            $datacategory['item_category_name']    = '';
             $datacategory['item_category_remark']  = '';
+            $datacategory['merchant_id']  = '';
+            $datacategory['from_item']  = 0;
         }
         $datacategory[$request->name] = $request->value;
         Session::put('datacategory', $datacategory);
@@ -53,31 +68,35 @@ class InvtItemCategoryController extends Controller
         $fields = $request->validate([
             'item_category_code'     => 'required',
             'item_category_name'     => 'required',
-            'item_category_remark'   => 'required'
+            'merchant_id'     => 'required',
         ]);
 
         $data = InvtItemCategory::create([
             'item_category_code'        => $fields['item_category_code'],
             'item_category_name'        => $fields['item_category_name'],
-            'item_category_remark'      => $fields['item_category_remark'],
+            'merchant_id'               => $fields['merchant_id'],
+            'item_category_remark'      => $request->item_category_remark,
             'company_id'                => Auth::user()->company_id,
-            'updated_id'                => Auth::id(),
             'created_id'                => Auth::id(),
         ]);
-
         if($data->save()){
+            if($request->from_item){
+                return redirect()->route('add-item')->with(['msg'=>'Tambah Kategori Berhasil','merchant_id'=>$fields['merchant_id']]);
+            }
             $msg = 'Tambah Kategori Berhasil';
-            return redirect('/item-category/add')->with('msg',$msg);
+            return redirect('/item-category/')->with('msg',$msg);
         } else {
             $msg = 'Tambah Kategori Gagal';
-            return redirect('/item-category/add')->with('msg',$msg);
+            return redirect('/item-category/')->with('msg',$msg);
         }
     }
 
     public function editItemCategory($item_category_id)
     {
+        $datacategory = Session::get('datacategory');
         $data = InvtItemCategory::where('item_category_id',$item_category_id)->first();
-        return view('content.InvtItemCategory.FormEditInvtItemCategory', compact('data'));
+        $merchant = SalesMerchant::get()->pluck('merchant_name','merchant_id');
+        return view('content.InvtItemCategory.FormEditInvtItemCategory', compact('data','datacategory','merchant'));
     }
 
     public function processEditItemCategory(Request $request)
@@ -86,13 +105,15 @@ class InvtItemCategoryController extends Controller
             'category_id'       => '',
             'category_code'     => 'required',
             'category_name'     => 'required',
-            'category_remark'   => 'required'
+            'merchant_id'     => 'required',
+
         ]);
 
         $table                          = InvtItemCategory::findOrFail($fields['category_id']);
         $table->item_category_code      = $fields['category_code'];
         $table->item_category_name      = $fields['category_name'];
-        $table->item_category_remark    = $fields['category_remark'];
+        $table->merchant_id             = $fields['merchant_id'];
+        $table->item_category_remark    = $request->category_remark;
         $table->updated_id  = Auth::id();
 
         if($table->save()){

@@ -5,13 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class InvtItem extends Model
+class InvtItemPackge extends Model
 {
-    protected $table = 'invt_item';
-    protected $primaryKey = 'item_id';
-    public function merchant() {
-        return $this->belongsTo(SalesMerchant::class,'merchant_id');
-    }
+    // use HasFactory;
+    protected $table        = 'invt_item_packge';
+    protected $primaryKey   = 'item_packge_id';
     protected $guarded = [
         'updated_at',
         'created_at',

@@ -14,7 +14,7 @@ class InvtItemUnitController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        
+
     }
 
     public function index()
@@ -49,25 +49,23 @@ class InvtItemUnitController extends Controller
         $fields = $request->validate([
             'item_unit_code'     => 'required',
             'item_unit_name'     => 'required',
-            'item_unit_remark'   => 'required'
         ]);
 
         $data = InvtItemUnit::create([
             'item_unit_code'    => $fields['item_unit_code'],
             'item_unit_name'    => $fields['item_unit_name'],
-            'item_unit_remark'  => $fields['item_unit_remark'],
+            'item_unit_remark'  => $request->item_unit_remark,
             'company_id'        => Auth::user()->company_id,
             'created_id'        => Auth::id(),
-            'updated_id'        => Auth::id()
         ]);
-        
+
 
         if($data->save()){
             $msg = 'Tambah data Berhasil';
-            return redirect('/item-unit/add')->with('msg',$msg);
+            return redirect('/item-unit/')->with('msg',$msg);
         } else {
             $msg = 'Tambah data Gagal';
-            return redirect('/item-unit/add')->with('msg',$msg);
+            return redirect('/item-unit/')->with('msg',$msg);
         }
     }
 
@@ -82,9 +80,9 @@ class InvtItemUnitController extends Controller
     {
         $itemunitgroup = InvtItemUnit::where('data_state','=',0)->get();
         $itemunits     = InvtItemUnit::where('item_unit_id',$item_unit_id)->first();
+        $sessiondata  = Session::get('itemunits');
 
-
-        return view('content.InvtItemUnit.FormEditListInvtItemUnit', compact('itemunitgroup','itemunits'));
+        return view('content.InvtItemUnit.FormEditListInvtItemUnit', compact('itemunitgroup','itemunits','sessiondata'));
 
     }
 
@@ -94,15 +92,14 @@ class InvtItemUnitController extends Controller
             'item_unit_id'       => '',
             'item_unit_code'     => 'required',
             'item_unit_name'     => 'required',
-            'item_unit_remark'   => 'required'
         ]);
 
         $table                      = InvtItemUnit::findOrFail($fields['item_unit_id']);
         $table->item_unit_code      = $fields['item_unit_code'];
         $table->item_unit_name      = $fields['item_unit_name'];
-        $table->item_unit_remark    = $fields['item_unit_remark'];
+        $table->item_unit_remark    = $request->item_unit_remark;
         $table->updated_id          = Auth::id();
-        
+
         if($table->save()){
             $msg = "Edit Data Berhasil";
             return redirect('/item-unit')->with('msg', $msg);
@@ -116,7 +113,7 @@ class InvtItemUnitController extends Controller
     {
         $table             = InvtItemUnit::findOrFail($item_unit_id);
         $table->data_state = 1;
-        $table->updated_id = Auth::id();
+        $table->deleted_id = Auth::id();
 
         if($table->save())
         {
@@ -127,6 +124,6 @@ class InvtItemUnitController extends Controller
             return redirect('/item-unit')->with('msg', $msg);
         }
 
-        
+
     }
 }

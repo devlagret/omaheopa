@@ -45,6 +45,7 @@
                         <th width="2%" style='text-align:center'>No</th>
                         <th width="20%" style='text-align:center'>Nama Kategori Barang</th>
                         <th width="20%" style='text-align:center'>Kode Barang</th>
+                        <th width="20%" style='text-align:center'>Wahana / Merchant</th>
                         <th width="20%" style='text-align:center'>Nama Barang</th>
                         <th width="10%" style='text-align:center'>Aksi</th>
                     </tr>
@@ -56,6 +57,7 @@
                         <td style='text-align:center'>{{ $no++ }}</td>
                         <td>{{ $row['item_category_name'] }}</td>
                         <td>{{ $row['item_code'] }}</td>
+                        <td>{{ $row->merchant->merchant_name }}</td>
                         <td>{{ $row['item_name'] }}</td>
                         <td class="text-center">
                             <a type="button" class="btn btn-outline-warning btn-sm" href="{{ url('/item/edit-item/'.$row['item_id']) }}">Edit</a>
