@@ -30,5 +30,11 @@ class SystemUserGroup extends Model
      */
     protected $hidden = [
     ];
+    public function menus() {
+        return  $this->hasManyThrough(SystemMenu::class,SystemMenuMapping::class,'user_group_level','id_menu');
+    }
+    public function maping() {
+        return $this->hasMany(SystemMenuMapping::class,'user_group_level','user_group_level');
+    }
 
 }

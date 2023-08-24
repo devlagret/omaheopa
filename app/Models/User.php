@@ -52,6 +52,9 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+    public function group() {
+        return $this->hasOne(SystemUserGroup::class,'user_group_id');
+    }
     public function merchant(){
         return $this->belongsTo(SalesMerchant::class,'merchant_id','merchant_id');
     }
