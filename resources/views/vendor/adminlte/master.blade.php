@@ -85,6 +85,9 @@
     .pull-left{
 float: left !important;
 }
+.content-wrapper{
+    overflow-x: hidden;
+}
 </style>
 <body class="@yield('classes_body')" @yield('body_data')>
 
@@ -144,7 +147,7 @@ float: left !important;
                     width: 'resolve', 
                 });
             });
-            $('#date').datepicker({ dateFormat: 'dd-mm-yy' }).val();
+            // $('#date').datepicker({ dateFormat: 'dd-mm-yy' }).val();
         </script>
 
         {{-- Configured Scripts --}}

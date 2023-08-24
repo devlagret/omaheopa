@@ -152,7 +152,7 @@ if (empty($items)) {
     <div class="card border border-dark">
         <div class="card-header border-dark bg-dark">
             <h5 class="mb-0 float-left">
-                Form Tambah
+                Form Ubah
             </h5>
             <div class="float-right">
                 <button onclick="location.href='{{ url('item') }}'" name="Find" class="btn btn-sm btn-info"
@@ -234,9 +234,6 @@ if (empty($items)) {
                             data-placement="top" name="Add" class="btn mt-4 btn-sm btn-info"
                             title="Tambah Kategori"><i class="fa fa-plus"></i> Tambah Kemasan</button>
                         <div class="div-kemasan" id="div-kemasan">
-                            @php
-                                dump($package);
-                            @endphp
                             <input type="hidden" name="base_kemasan" value="{{$base_kemasan}}" />
                             @for ($x = 1; $x <= $items['kemasan'] + ($base_kemasan-1); $x++)
                                 <div class="input-kemasan" id="input-kemasan-{{ $x }}">
@@ -255,29 +252,28 @@ if (empty($items)) {
                                                 {!! Form::select(
                                                     'item_unit_id',
                                                     $itemunits,
-                                                    isset($items['kemasan[' . ($x - 1) . '][item_unit_id]'])
-                                                        ? $items['kemasan[' . ($x - 1) . '][item_unit_id]']
-                                                        : ($x<=$base_kemasan?$package[$x - 1]->item_unit_id:''),
+                                                    isset($items['item_unit_id'.$x])
+                                                        ? $items['item_unit_id'.$x]
+                                                        : ($x<=$base_kemasan? $data['item_unit_id'.$x]:''),
                                                     [
                                                         'class' => 'selection-search-clear required select-form form-control',
-                                                        'name' => 'kemasan[' . ($x - 1) . '][item_unit_id]',
+                                                        'name' => 'item_unit_id'.$x,
                                                         'id' => 'item_unit_id_' . ($x - 1),
                                                         'onchange' => 'function_elements_add(this.name, this.value)',
                                                     ],
                                                 ) !!}
                                             </div>
-                                        </div>
+                                            </div>
                                         <div class="col-md-3">
                                             <div class="form-group">
                                                 <a class="text-dark">Kuantitas Standar {{ $x }}<a
                                                         class='red'> *</a></a>
-                                                <input type="hidden" name="kemasan[{{($x - 1)}}][item_packge_id]" value="{{$x<=$base_kemasan?$package[$x - 1]->item_packge_id:''}}" />
                                                 <input class="form-control input-bb required" required
-                                                    name="kemasan[{{ $x - 1 }}][item_default_quantity]"
+                                                    name="item_default_quantity{{$x}}"
                                                     id="item_default_quantity_{{ $x - 1 }}" type="text"
                                                     autocomplete="off"
                                                     onchange="function_elements_add(this.name, this.value)"
-                                                    value="{{ isset($items['kemasan[' . ($x - 1) . '][item_default_quantity]']) ? $items['kemasan[' . ($x - 1) . '][item_default_quantity]'] : ($x<=$base_kemasan?$package[$x - 1]->item_default_quantity:'') }}" />
+                                                    value="{{ isset($items['item_default_quantity'.$x]) ? $items['item_default_quantity'.$x] : ($x<=$base_kemasan?$data['item_default_quantity'.$x]:'') }}" />
                                             </div>
                                         </div>
                                         <div class="col-md-3">
@@ -285,11 +281,11 @@ if (empty($items)) {
                                                 <a class="text-dark">Harga Jual {{ $x }}<a class='red'>
                                                         *</a></a>
                                                 <input class="form-control input-bb"
-                                                    name="kemasan[{{ $x - 1 }}][item_unit_price]"
+                                                    name="item_unit_price{{$x}}"
                                                     id="item_unit_price_{{ $x - 1 }}" type="text"
                                                     autocomplete="off"
                                                     onchange="function_elements_add(this.name, this.value)"
-                                                    value="{{ isset($items['kemasan[' . ($x - 1) . '][item_unit_price]']) ? $items['kemasan[' . ($x - 1) . '][item_unit_price]'] : ($x<=$base_kemasan?$package[$x - 1]->item_unit_price:'') }}" />
+                                                    value="{{ isset($items['item_unit_price'.$x]) ? $items['item_unit_price'.$x] : ($x<=$base_kemasan?$data['item_unit_price'.$x]:'') }}" />
                                             </div>
                                         </div>
                                         <div class="col-md-3">
@@ -297,10 +293,10 @@ if (empty($items)) {
                                                 <a class="text-dark">Harga Beli {{ $x }}<a class='red'>
                                                         *</a></a>
                                                 <input class="form-control input-bb"
-                                                    name="kemasan[{{ $x - 1 }}][item_unit_cost]"
+                                                    name="item_unit_cost{{$x}}"
                                                     id="item_unit_cost_{{ $x - 1 }}" type="text" autocomplete="off"
                                                     onchange="function_elements_add(this.name, this.value)"
-                                                    value="{{ isset($items['kemasan[' . ($x - 1) . '][item_unit_cost]']) ? $items['kemasan[' . ($x - 1) . '][item_unit_cost]'] : ($x<=$base_kemasan?$package[$x - 1]->item_unit_cost:'') }}" />
+                                                    value="{{ isset($items['item_unit_cost'.$x]) ? $items['item_unit_cost'.$x] : ($x<=$base_kemasan?$data['item_unit_cost'.$x]:'') }}" />
                                             </div>
                                         </div>
                                     </div>

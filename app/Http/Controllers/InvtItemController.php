@@ -8,6 +8,8 @@ use App\Models\InvtItemCategory;
 use App\Models\InvtItemPackge;
 use App\Models\InvtItemUnit;
 use App\Models\SalesMerchant;
+use App\Models\SystemMenu;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -32,6 +34,7 @@ class InvtItemController extends Controller
 
     public function addItem()
     {
+        $canAddCategory =0;
         $items      = Session::get('items');
         $itemunits  = InvtItemUnit::where('data_state', 0)
             ->where('company_id', Auth::user()->company_id)
@@ -44,7 +47,11 @@ class InvtItemController extends Controller
         $merchant   = SalesMerchant::where('data_state', 0)
             ->get()
             ->pluck('merchant_name', 'merchant_id');
-        return view('content.InvtItem.FormAddInvtItem', compact('category', 'itemunits', 'items', 'merchant'));
+        $invtitm   = InvtItem::where('data_state', 0)
+            ->get()
+            ->pluck('item_name', 'item_id');
+         $canAddCategory=!empty(User::with('group.maping.menu')->find(Auth::id())->group->maping->where('id_menu',SystemMenu::where('id','item-category')->first()->id_menu));
+        return view('content.InvtItem.FormAddInvtItem', compact('category', 'itemunits', 'items', 'merchant','invtitm','canAddCategory'));
     }
 
     public function addItemElements(Request $request)
@@ -57,6 +64,7 @@ class InvtItemController extends Controller
             $items['item_remark']  = '';
             $items['item_quantity']  = '';
             $items['item_price']  = '';
+            $items['package_item_id']  = 1;
             $items['item_cost']  = '';
             $items['item_category_id']  = '';
             $items['kemasan']  = 1;
@@ -81,18 +89,29 @@ class InvtItemController extends Controller
                 'item_code'             => $fields['item_code'],
                 'item_name'             => $fields['item_name'],
                 'item_barcode'          => $request->item_barcode,
-                'merchant_id'          => $request->merchant_id,
+                'merchant_id'           => $request->merchant_id,
                 'item_remark'           => $request->item_remark,
+                // * Kemasan
+                'item_unit_id1'         => $request->item_unit_id1,
+                'item_default_quantity1'=> $request->item_default_quantity1,
+                'item_unit_price1'      => $request->item_unit_price1,
+                'item_unit_cost1'       => $request->item_unit_cost1,
+                'item_unit_id2'         => $request->item_unit_id2,
+                'item_default_quantity2'=> $request->item_default_quantity2,
+                'item_unit_price2'      => $request->item_unit_price2,
+                'item_unit_cost2'       => $request->item_unit_cost2,
+                'item_unit_id3'         => $request->item_unit_id3,
+                'item_default_quantity3'=> $request->item_default_quantity3,
+                'item_unit_price3'      => $request->item_unit_price3,
+                'item_unit_cost3'       => $request->item_unit_cost3,
+                'item_unit_id4'         => $request->item_unit_id4,
+                'item_default_quantity4'=> $request->item_default_quantity4,
+                'item_unit_price4'      => $request->item_unit_price4,
+                'item_unit_cost4'       => $request->item_unit_cost4,
+                // *
                 'company_id'            => Auth::user()->company_id,
                 'created_id'            => Auth::id(),
             ]);
-            $itm = InvtItem::where('data_state', '0')->orderByDesc('item_id')->get()->pluck('item_id');
-            // * iterate kemasan
-            foreach ($request->kemasan as $item) {
-                $item['item_id'] = $itm[0];
-                $item['company_id'] = Auth::user()->company_id;
-                InvtItemPackge::create($item);
-            }
             DB::commit();
             $msg    = "Tambah Barang Berhasil";
             return redirect('/item')->with('msg', $msg);
@@ -117,16 +136,17 @@ class InvtItemController extends Controller
         $merchant   = SalesMerchant::where('data_state', 0)
             ->get()
             ->pluck('merchant_name', 'merchant_id');
-        $package = InvtItemPackge::where('data_state', '=', 0)
-            ->where('item_id', $item_id)->get();
         $data  = InvtItem::where('item_id', $item_id)->first();
-        $base_kemasan = $package->count();
-        return view('content.InvtItem.FormEditInvtItem', compact('data', 'itemunits', 'category', 'items', 'package', 'merchant', 'base_kemasan'));
+        $base_kemasan=0;
+        for($n=1;$n<=4;$n++){
+            $data['item_unit_id'.$n] != null ? $base_kemasan++ : '';
+        }
+        return view('content.InvtItem.FormEditInvtItem', compact('data', 'itemunits', 'category', 'items', 'merchant', 'base_kemasan'));
     }
 
     public function processEditItem(Request $request)
     {
-        dump($request->all());exit;
+
         $fields = $request->validate([
             'item_category_id'  => 'required',
             'item_code'         => 'required',
@@ -141,20 +161,25 @@ class InvtItemController extends Controller
         $table->item_barcode            = $request->item_barcode;
         $table->merchant_id             = $request->merchant_id;
         $table->item_remark             = $request->item_remark;
+        // * Kemasan
+        $table->item_unit_id1           = $request->item_unit_id1;
+        $table->item_default_quantity1  = $request->item_default_quantity1;
+        $table->item_unit_price1        = $request->item_unit_price1;
+        $table->item_unit_cost1         = $request->item_unit_cost1;
+        $table->item_unit_id2           = $request->item_unit_id2;
+        $table->item_default_quantity2  = $request->item_default_quantity2;
+        $table->item_unit_price2        = $request->item_unit_price2;
+        $table->item_unit_cost2         = $request->item_unit_cost2;
+        $table->item_unit_id3           = $request->item_unit_id3;
+        $table->item_default_quantity3  = $request->item_default_quantity3;
+        $table->item_unit_price3        = $request->item_unit_price3;
+        $table->item_unit_cost3         = $request->item_unit_cost3;
+        $table->item_unit_id4           = $request->item_unit_id4;
+        $table->item_default_quantity4  = $request->item_default_quantity4;
+        $table->item_unit_price4        = $request->item_unit_price4;
+        $table->item_unit_cost4         = $request->item_unit_cost4;
         $table->updated_id              = Auth::id();
 
-        // * iterate kemasan
-        foreach ($request->kemasan as $item) {
-            $item['item_id'] = $fields['item_id'];
-            $item['updated_id'] = Auth::id();
-            for($c=1;$c<=$request->base_kemasan;$c++){
-               $pkg = InvtItemPackge::findOrFail($request->item_packge_id);
-               $pkg->item_unit_id = $request->item_unit_id;
-               $pkg->item_default_quantity = $request->item_default_quantity;
-               $pkg->item_unit_price = $request->item_unit_price;
-               $pkg->item_unit_cost = $request->item_unit_cost;
-            }
-        }
         if ($table->save()) {
             $msg = "Ubah Barang Berhasil";
             return redirect('/item')->with('msg', $msg);
@@ -192,7 +217,6 @@ class InvtItemController extends Controller
             ->where('merchant_id', $request->merchant_id)
             ->where('data_state', 0)
             ->get();
-        error_log("category id : " . $items['item_category_id']);
         foreach ($category as $val) {
             $data .= "<option value='$val[item_category_id]' " . ($items['item_category_id'] == $val['item_category_id'] ? 'selected' : '') . ">$val[item_category_name]</option>\n";
         }
@@ -215,6 +239,7 @@ class InvtItemController extends Controller
             $items['item_category_id']  = '';
             $items['kemasan']  = 1;
             $items['max_kemasan']  = 4;
+            $items['package_item_id']  = 1;
         }
         $items['kemasan'] = $items['kemasan'] + 1;
         Session::put('items', $items);
@@ -233,9 +258,34 @@ class InvtItemController extends Controller
             $items['item_category_id']  = '';
             $items['kemasan']  = 1;
             $items['max_kemasan']  = 4;
+            $items['package_item_id']  = 1;
         }
         $items['kemasan'] = $items['kemasan'] - 1;
-        error_log($items['kemasan']);
         Session::put('items', $items);
+    }
+    public function getMerchantItem(Request $request){
+        $data = '';
+        $items = Session::get('items');
+        try{
+        $item = InvtItem::select('item_id', 'item_name')
+            ->where('merchant_id', $request->merchant_id)
+            ->where('data_state', 0)
+            ->get();
+        $items['package_item_id'] ?? $items['package_item_id'] = 1;
+        foreach ( $item as $val) {
+            $data .= "<option value='$val[item_id]' " . ($items['package_item_id'] == $val['item_id'] ? 'selected' : '') . ">$val[item_name]</option>\n";
+        }
+        if ($item->count() == 0) {
+            $data = "<option>Wahana / Merchant Tidak Memiliki Barang</option>\n";
+        }
+        error_log(strval($item));
+        error_log(strval("merchant id :".$request->merchant_id));
+        error_log(strval("merchant id :".$request->merchant_id));
+        return response($data);
+    }catch(\Exception $e){
+        error_log($e);
+        return response($data);
+
+    }
     }
 }

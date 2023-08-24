@@ -131,8 +131,9 @@ class SystemUserGroupController extends Controller
 
                 if(isset($allrequest['checkbox_'.$val['id_menu']])){
                     $menumapping = array(
-                        'user_group_level' => $fields['user_group_level'],
+                        'user_group_level' => $user_group_level_last,
                         'id_menu'          => $val['id_menu'],
+                        'company_id'       => Auth::user()->company_id
                     );
                     SystemMenuMapping::create($menumapping);
                 }

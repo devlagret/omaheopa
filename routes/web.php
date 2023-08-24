@@ -84,6 +84,7 @@ Route::get('/item-category/delete-category/{item_category_id}', [InvtItemCategor
 
 Route::get('/item',[InvtItemController::class, 'index'])->name('item');
 Route::post('/item/category',[InvtItemController::class, 'getCategory'])->name('get-item-category');
+Route::post('/merchant/item/',[InvtItemController::class, 'getMerchantItem'])->name('get-merchant-item');
 Route::get('/item/add-kemasan',[InvtItemController::class, 'addKemasan'])->name('add-kemasan');
 Route::get('/item/remove-kemasan',[InvtItemController::class, 'removeKemasan'])->name('remove-kemasan');
 Route::get('/item/add-item', [InvtItemController::class, 'addItem'])->name('add-item');
@@ -387,6 +388,17 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
     Route::get('/', [SalesMerchantController::class, 'index'])->name('index');
     Route::get('/add', [SalesMerchantController::class, 'add'])->name('add');
     Route::post('/process-add', [SalesMerchantController::class, 'processAdd'])->name('process-add');
+    Route::get('/edit/{merchant_id}', [SalesMerchantController::class, 'edit'])->name('edit');
+    Route::post('/process-edit', [SalesMerchantController::class, 'processEdit'])->name('process-edit');
+    Route::get('/delete/{merchant_id}', [SalesMerchantController::class, 'delete'])->name('delete');
+    Route::post('/elements-add', [SalesMerchantController::class, 'elementsAdd'])->name('elements-add');
+});
+ // Package pages
+ Route::prefix('package')->name('package.')->group(function () {
+    Route::get('/', [SalesMerchantController::class, 'index'])->name('index');
+    Route::get('/add', [SalesMerchantController::class, 'add'])->name('add');
+    Route::post('/process-add', [SalesMerchantController::class, 'processAdd'])->name('process-add');
+    Route::post('/add-item', [SalesMerchantController::class, 'processAddItem'])->name('process-add-item');
     Route::get('/edit/{merchant_id}', [SalesMerchantController::class, 'edit'])->name('edit');
     Route::post('/process-edit', [SalesMerchantController::class, 'processEdit'])->name('process-edit');
     Route::get('/delete/{merchant_id}', [SalesMerchantController::class, 'delete'])->name('delete');
