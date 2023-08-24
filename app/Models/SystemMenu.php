@@ -15,9 +15,7 @@ class SystemMenu extends Model
 
     protected $table        = 'system_menu'; 
     protected $primaryKey   = 'id_menu';
-    
-    protected $guarded = [
-    ];
+    protected $keyType = 'string';
 
     /**
      * The attributes that should be hidden for serialization.

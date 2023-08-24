@@ -27,4 +27,7 @@ class SystemMenuMapping extends Model
     protected $hidden = [
     ];
 
+    public function menu(){
+        return  $this->belongsTo(SystemMenu::class,'id_menu','id_menu');
+    }
 }
