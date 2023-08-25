@@ -25,6 +25,8 @@ class InvtItemController extends Controller
     public function index()
     {
         Session::forget('items');
+        Session::forget('paket');
+
         $data = InvtItem::with('merchant')->join('invt_item_category', 'invt_item_category.item_category_id', '=', 'invt_item.item_category_id')
             ->where('invt_item.data_state', '=', 0)
             ->where('invt_item.company_id', Auth::user()->company_id)
@@ -36,10 +38,16 @@ class InvtItemController extends Controller
     {
         $canAddCategory =0;
         $items      = Session::get('items');
+        $counts = collect(Session::get('paket'));
+        $paket = '';
+        $unit = InvtItemUnit::get(['item_unit_id','item_unit_name']);
+        dump($counts);
+        // exit;
+        $paket = InvtItem::with('category')->wherein('item_id',$counts->keys())->get() ;
         $itemunits  = InvtItemUnit::where('data_state', 0)
-            ->where('company_id', Auth::user()->company_id)
-            ->get()
-            ->pluck('item_unit_name', 'item_unit_id');
+        ->where('company_id', Auth::user()->company_id)
+        ->get()
+        ->pluck('item_unit_name', 'item_unit_id');
         $category   = InvtItemCategory::where('data_state', 0)
             ->where('company_id', Auth::user()->company_id)
             ->get()
@@ -51,7 +59,7 @@ class InvtItemController extends Controller
             ->get()
             ->pluck('item_name', 'item_id');
          $canAddCategory=!empty(User::with('group.maping.menu')->find(Auth::id())->group->maping->where('id_menu',SystemMenu::where('id','item-category')->first()->id_menu));
-        return view('content.InvtItem.FormAddInvtItem', compact('category', 'itemunits', 'items', 'merchant','invtitm','canAddCategory'));
+        return view('content.InvtItem.FormAddInvtItem', compact('category', 'itemunits', 'items', 'merchant','invtitm','canAddCategory','paket','counts','unit'));
     }
 
     public function addItemElements(Request $request)
@@ -278,14 +286,32 @@ class InvtItemController extends Controller
         if ($item->count() == 0) {
             $data = "<option>Wahana / Merchant Tidak Memiliki Barang</option>\n";
         }
-        error_log(strval($item));
-        error_log(strval("merchant id :".$request->merchant_id));
-        error_log(strval("merchant id :".$request->merchant_id));
         return response($data);
     }catch(\Exception $e){
-        error_log($e);
+        error_log(strval($e));
         return response($data);
 
     }
     }
+    
+    public function getItemUnit(Request $request){
+        $data = '';
+        $items = Session::get('items');
+        try{
+        $item = InvtItem::find($request->item_id);
+        $unit = InvtItemUnit::get();
+        $items['package_item_unit'] ?? $items['package_item_unit'] = 1;
+        for ( $a = 1 ; $a <= 4; $a++) {
+            if( $item['item_unit_id'.$a] != null){
+            $data .= "<option value='".$item['item_unit_id'.$a]."' " . ($items['package_item_unit'] == $item['item_unit_id'.$a] ? 'selected' : '') .">".$unit->where('item_unit_id',$item['item_unit_id'.$a])->pluck('item_unit_name')[0]."</option>\n";
+            }
+        }
+        return response($data);
+    }catch(\Exception $e){
+        error_log(strval($e));
+        return response($data);
+
+    }
+    }
+
 }

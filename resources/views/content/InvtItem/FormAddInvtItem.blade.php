@@ -12,6 +12,9 @@ if (empty($items)) {
     $items['kemasan'] = 1;
     $items['max_kemasan'] = 4;
 }
+if (empty($paket)) {
+    $paket = [];
+}
 ?>
 @section('title', "MOZAIC Omah'e Opa")
 @section('js')
@@ -25,7 +28,10 @@ if (empty($items)) {
                     'value': value,
                     '_token': '{{ csrf_token() }}'
                 },
-                success: function(msg) {}
+                success: function(msg) {},
+                error: function(data) {
+                    console.log(data);
+                }
             });
         }
 
@@ -52,7 +58,7 @@ if (empty($items)) {
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function(return_data) {
-                    $('#item_category_id').val('');
+                    $('#item_category_id').val(1);
                     $('#item_category_id').html(return_data);
                     function_elements_add('merchant_id', merchant_id);
                 },
@@ -61,24 +67,28 @@ if (empty($items)) {
                 }
             });
         }
-        function changeItem() {
-            var package_merchant_id = $("#package_merchant_id").val();
 
+        function changeItem() {
+            var id = $("#package_merchant_id").val();
+            var no = $('.pkg-itm').length;
             $.ajax({
                 type: "POST",
                 url: "{{ route('get-merchant-item') }}",
+                dataType: "html",
                 data: {
-                    'merchant_id': package_merchant_id,
+                    'no': no,
+                    'merchant_id': id,
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function(return_data) {
+                    $('#package_item_id').val(1);
                     $('#package_item_id').html(return_data);
-                    $('#package_item_id').val('');
-                    function_elements_add('package_merchant_id', merchant_id);
+                    changeSatuan();
+                    function_elements_add('package_merchant_id', id);
                 }
             });
         }
-
+        //* salah nama (sebaiknya dianti ke 'checkKemasan', jangan lupa ubah kode yg lain)
         function checkCategory() {
             const max = {{ $items['max_kemasan'] }};
             var no = $('.input-kemasan').length;
@@ -129,32 +139,129 @@ if (empty($items)) {
         function addCategory() {
             location.href = '{{ route('add-item-category') }}' + '/' + $('#merchant_id').val();
         }
-        function addPackageItem(){
+
+        function addPackageItem(qty = 1) {
             var package_item_id = $('#package_item_id').val();
-                $.ajax({
-                    type: "get",
-                    url: "{{ route('package.process-add-item') }}",
-                    dataType: "html",
-                    data: {
+            var package_item_unit = $('#package_item_unit').val();
+            var package_item_id = $("#package_item_id").val();
+            if ($('#item_package_' + package_item_id+'_'+package_item_unit+'_quantity').length) {
+                $('#item_package_' + package_item_id+'_'+package_item_unit+'_quantity').val(function(i, oldval) {
+                    var newval = ++oldval;
+                    function_change_quantity(package_item_id, newval);
+                    return ++newval;
+                });
+                return 0;
+            }
+            $.ajax({
+                type: "post",
+                url: "{{ route('package.process-add-item') }}",
+                dataType: "html",
+                data: {
                     'item_id': package_item_id,
+                    'item_unit': package_item_unit,
+                    'qty': qty,
                     '_token': '{{ csrf_token() }}',
-                    },
-                    success: function(return_data) {
-                      console.log(return_data);
-                    },
-                    error: function(data) {
-                        console.log(data);
+                },
+                success: function(return_data) {
+                    if($('.pkg-itm').length==0){
+                        console.log(return_data);
+                    $('#package-table').html(return_data);}
+                    else{
+                    $('#package-table').append(return_data);
+                    }
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            });
+        }
+
+        function checkIsiPaket(){
+            var length = $('.pkg-itm').length;
+            if(length==null||length==0||length==''){
+                alert('Harap Tambah Barang dalam Paket');
+                return 0;
+            }
+            $('#form-paket').submit();
+        }
+
+        function clearIsiPaket(){
+            $.ajax({
+                type: "get",
+                url: "{{ route('package.clear-item') }}",
+                dataType: "html",
+                success: function(return_data) {
+                    $('.pkg-itm').each(function( index ) {
+                       $(this).remove();
+                    });
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            });
+        }
+
+        function deleteIsiPaket(item_id){
+            $.ajax({
+                type: "get",
+                url: "{{ url('package/delete-item/') }}"+'/'+item_id,
+                dataType: "html",
+                success: function(return_data) {
+                    $('#col-package-item-'+item_id).remove();
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            });
+        }
+
+        function function_change_quantity(item_packge_id, unit_id,value) {
+            if (value != '') {
+                $.ajax({
+                    url: "{{ url('package/item/change-qty') }}" + '/' + item_packge_id + '/' + unit_id + '/'+ value,
+                    type: "GET",
+                    dataType: "json",
+                    success: function(data) {
+
                     }
                 });
+            }
+        }
+
+        function changeSatuan(){
+            var package_item_id = $("#package_item_id").val();
+
+            $.ajax({
+                type: "POST",
+                url: "{{ route('get-item-unit') }}",
+                dataType: "html",
+                data: {
+                    'item_id': package_item_id,
+                    '_token': '{{ csrf_token() }}',
+                },
+                success: function(return_data) {
+                    $('#package_item_unit').val(1);
+                    $('#package_item_unit').html(return_data);
+                    function_elements_add('package_item_id', package_item_id);
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            });
+        }
+
+        function formatRp(){
+            var harga = $('#package_price_view').val();
+            function_elements_add('package_price_view', harga);
+            $('#package_price_view').val(toRp(harga));
+            $('#package_price').val(harga);
         }
         $(document).ready(function() {
             changeCategory();
             checkCategory();
-            addPackageItem();
             changeItem();
-            $('#add-package-item').on("click", function() {
-                addPackageItem();
-             } );
+            if($('#package_price_view').val()!=''){
+            formatRp();}
         });
     </script>
 @stop
@@ -195,257 +302,337 @@ if (empty($items)) {
                 Form Tambah
             </h5>
             <div class="float-right">
-                <button onclick="location.href='{{ url('item') }}'" name="Find" class="btn btn-sm btn-info" title="Back"><i class="fa fa-angle-left"></i> Kembali</button>
+                <button onclick="location.href='{{ url('item') }}'" name="Find" class="btn btn-sm btn-info"
+                    title="Back"><i class="fa fa-angle-left"></i> Kembali</button>
             </div>
         </div>
 
-        <form method="post" action="{{ route('process-add-item') }}" enctype="multipart/form-data">
+        <form method="post" id="form-barang" action="{{ route('process-add-item') }}" enctype="multipart/form-data">
             @csrf
-            <div class="card-body">
-                <ul class="nav nav-tabs" role="tablist">
-                    <li class="nav-item">
-                        <a class="nav-link {{ $items['kemasan'] == 1 ? 'active' : '' }}" href="#barang" role="tab" data-toggle="tab">Data Barang</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ $items['kemasan'] > 1 ? 'active' : '' }}" href="#form-kemasan" role="tab" data-toggle="tab">Kemasan</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ $items['kemasan'] > 10 ? 'active' : '' }}" href="#form-paket" role="tab" data-toggle="tab">Paket</a>
-                    </li>
-                </ul>
-                <div class="tab-content">
-                    <div role="tabpanel" class="tab-pane fade {{ $items['kemasan'] == 1 ? 'show active' : '' }}" id="barang">
-                        @if ($canAddCategory)
-                            {{-- <button type="button" onclick="addCategory()" id="add-k" data-toggle="tooltip" data-placement="top" name="Add" class="btn float-right mt-4 btn-sm btn-info" title="Tambah Kategori"><i class="fa fa-plus"></i> Kategori</button> --}}
-                        @endif
-                        <div class="row form-group mt-5">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
-                                    {!! Form::select('merchant_id', $merchant, $items['merchant_id'] ?? '', ['class' => 'selection-search-clear required select-form','name' => 'merchant_id','id' => 'merchant_id','onchange' => 'changeCategory()']) !!}
-                                </div>
+        </form>
+        <form method="post" id="form-paket" action="{{ route('package.process-add') }}" enctype="multipart/form-data">
+            @csrf
+        </form>
+        <div class="card-body">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link {{ $items['kemasan'] == 1 && $counts->count() == 0 ? 'active' : '' }}"
+                        href="#barang" role="tab" data-toggle="tab">Data Barang</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ $items['kemasan'] > 1 && $counts->count() == 0 ? 'active' : '' }}"
+                        href="#form-kemasan" role="tab" data-toggle="tab">Kemasan</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ $items['kemasan'] >= 1 && $counts->count() ? 'active' : '' }}" href="#form-pkt"
+                        role="tab" data-toggle="tab">Paket</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div role="tabpanel"
+                    class="tab-pane fade {{ $items['kemasan'] == 1 && $counts->count() == 0 ? 'show active' : '' }}"
+                    id="barang">
+                    @if ($canAddCategory)
+                        <button type="button" onclick="addCategory()" id="add-k" data-toggle="tooltip"
+                            data-placement="top" name="Add" class="btn float-right mt-4 btn-sm btn-info"
+                            title="Tambah Kategori"><i class="fa fa-plus"></i> Kategori</button>
+                    @endif
+                    <div class="row form-group mt-5">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
+                                {!! Form::select('merchant_id', $merchant, $items['merchant_id'] ?? '', [
+                                    'class' => 'selection-search-clear required select-form',
+                                    'name' => 'merchant_id',
+                                    'id' => 'merchant_id',
+                                    'onchange' => 'changeCategory()',
+                                    'form'=>'form-barang',
+                                    'required'
+                                ]) !!}
                             </div>
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <a class="text-dark">Nama Kategori Barang<a class='red'> *</a></a>
-                                    <select class="selection-search-clear required select-form" placeholder="Masukan Kategori" name="item_category_id" id="item_category_id" onchange="function_elements_add(this.name, this.value)">
-                                    </select>
-                                </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <a class="text-dark">Nama Kategori Barang<a class='red'> *</a></a>
+                                <select class="selection-search-clear required select-form" required form="form-barang" placeholder="Masukan Kategori"
+                                    name="item_category_id" id="item_category_id"
+                                    onchange="function_elements_add(this.name, this.value)">
+                                </select>
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <a class="text-dark">Nama Barang<a class='red'> *</a></a>
-                                    <input class="form-control required input-bb" name="item_name" id="item_name" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value)" value="{{ $items['item_name'] }}" />
-                                </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <a class="text-dark">Nama Barang<a class='red'> *</a></a>
+                                <input class="form-control required input-bb" required form="form-barang" name="item_name" id="item_name" type="text"
+                                    autocomplete="off" onchange="function_elements_add(this.name, this.value)"
+                                    value="{{ $items['item_name'] }}" />
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <a class="text-dark">Kode Barang<a class='red'> *</a></a>
-                                    <input class="form-control required input-bb" name="item_code" id="item_code" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value)" value="{{ $items['item_code'] ?? '' }}" />
-                                </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <a class="text-dark">Kode Barang<a class='red'> *</a></a>
+                                <input class="form-control input-bb"  form="form-barang" name="item_code" id="item_code" type="text"
+                                    autocomplete="off" onchange="function_elements_add(this.name, this.value)"
+                                    value="{{ $items['item_code'] ?? '' }}" />
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <a class="text-dark">Barcode Barang<a class='red'> *</a></a>
-                                    <input class="form-control input-bb" name="item_barcode" id="item_barcode" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value)" value="{{ $items['item_barcode'] }}" />
-                                </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <a class="text-dark">Barcode Barang<a class='red'> *</a></a>
+                                <input class="form-control input-bb" form="form-barang" name="item_barcode" id="item_barcode"
+                                    type="text" autocomplete="off"
+                                    onchange="function_elements_add(this.name, this.value)"
+                                    value="{{ $items['item_barcode'] }}" />
                             </div>
-                            <div class="col-md-8 mt-3">
-                                <div class="form-group">
-                                    <a class="text-dark">Keterangan</a>
-                                    <textarea class="form-control input-bb" name="item_remark" id="item_remark" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value)">{{ $items['item_remark'] }}</textarea> 
-                                </div>
+                        </div>
+                        <div class="col-md-8 mt-3">
+                            <div class="form-group">
+                                <a class="text-dark">Keterangan</a>
+                                <textarea class="form-control input-bb" form="form-barang" name="item_remark" id="item_remark" type="text" autocomplete="off"
+                                    onchange="function_elements_add(this.name, this.value)">{{ $items['item_remark'] }}</textarea>
                             </div>
                         </div>
                     </div>
-                    <div role="tabpanel" class="tab-pane fade {{ $items['kemasan'] > 1 ? 'show active' : '' }}" id="form-kemasan">
-                        <button type="button" onclick="addKemasan()" id="add-kmsn" data-toggle="tooltip"
-                            data-placement="top" name="Add" class="btn mt-4 btn-sm btn-info"
-                            title="Tambah Kategori"><i class="fa fa-plus"></i> Tambah Kemasan</button>
-                        <div class="div-kemasan" id="div-kemasan">
-                            @for ($x = 1; $x <= $items['kemasan']; $x++)
-                                <div class="input-kemasan" id="input-kemasan-{{ $x }}">
-                                    @if ($x != 1)
-                                        <a class="float-right text-body" data-toggle="tooltip" data-placement="top"
-                                            title="Hapus Kemasan"
-                                            onclick="removeKemasan('input-kemasan-{{ $x }}')"><i
-                                                class="fa fa-times"></i></a>
-                                    @endif
-                                    <h5 class="mt-3"><b>Kemasan {{ $x }}</b></h5>
-                                    <div class="row form-group mt-2">
-                                        <div class="col-md-3">
-                                            <div class="form-group">
-                                                <a class="text-dark">Satuan Barang {{ $x }}<a class='red'>
-                                                        *</a></a>
-                                                {!! Form::select('item_unit_id', $itemunits, $items['item_unit_id' . $x] ?? 0, [
-                                                    'class' => 'selection-search-clear required select-form form-control',
-                                                    'name' => 'item_unit_id' . $x,
-                                                    'id' => 'item_unit_id_' . ($x - 1),
-                                                    'onchange' => 'function_elements_add(this.name, this.value)',
-                                                ]) !!}
-                                            </div>
+                    <div class="card-footer text-muted">
+                        <div class="form-actions float-right">
+                            <button type="reset" form="form-barang" name="Reset" class="btn btn-danger" onclick="reset_add();"><i
+                                    class="fa fa-times"></i> Batal</button>
+                            <button type="submit" form="form-barang" name="Save" class="btn btn-primary"
+                                title="Save"><i class="fa fa-check"></i>
+                                Simpan</button>
+                        </div>
+                    </div>
+                </div>
+                <div role="tabpanel"
+                    class="tab-pane fade {{ $items['kemasan'] > 1 && $counts->count() == 0 ? 'show active' : '' }}"
+                    id="form-kemasan">
+                    <button type="button" onclick="addKemasan()" id="add-kmsn" data-toggle="tooltip"
+                        data-placement="top" name="Add" class="btn mt-4 btn-sm btn-info" title="Tambah Kategori"><i
+                            class="fa fa-plus"></i> Tambah Kemasan</button>
+                    <div class="div-kemasan" id="div-kemasan">
+                        @for ($x = 1; $x <= $items['kemasan']; $x++)
+                            <div class="input-kemasan" id="input-kemasan-{{ $x }}">
+                                @if ($x != 1)
+                                    <a class="float-right text-body" data-toggle="tooltip" data-placement="top"
+                                        title="Hapus Kemasan"
+                                        onclick="removeKemasan('input-kemasan-{{ $x }}')"><i
+                                            class="fa fa-times"></i></a>
+                                @endif
+                                <h5 class="mt-3"><b>Kemasan {{ $x }}</b></h5>
+                                <div class="row form-group mt-2">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <a class="text-dark">Satuan Barang {{ $x }}<a class='red'>
+                                                    *</a></a>
+                                            {!! Form::select('item_unit_id', $itemunits, $items['item_unit_id' . $x] ?? 0, [
+                                                'class' => 'selection-search-clear required select-form form-control',
+                                                'name' => 'item_unit_id' . $x,
+                                                'id' => 'item_unit_id_' . ($x - 1),
+                                                'onchange' => 'function_elements_add(this.name, this.value)',
+                                                'form'=>'form-barang'
+                                            ]) !!}
                                         </div>
-                                        <div class="col-md-3">
-                                            <div class="form-group">
-                                                <a class="text-dark">Kuantitas Standar {{ $x }}<a
-                                                        class='red'> *</a></a>
-                                                <input class="form-control input-bb required" required
-                                                    name="item_default_quantity{{ $x }}"
-                                                    id="item_default_quantity_{{ $x - 1 }}" type="text"
-                                                    autocomplete="off"
-                                                    onchange="function_elements_add(this.name, this.value)"
-                                                    value="{{ $items['item_default_quantity' . $x] ?? '' }}" />
-                                            </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <a class="text-dark">Kuantitas Standar {{ $x }}<a class='red'>
+                                                    *</a></a>
+                                            <input class="form-control input-bb required" required form="form-barang"
+                                                name="item_default_quantity{{ $x }}"
+                                                id="item_default_quantity_{{ $x - 1 }}" type="text"
+                                                autocomplete="off" onchange="function_elements_add(this.name, this.value)"
+                                                value="{{ $items['item_default_quantity' . $x] ?? '' }}" />
                                         </div>
-                                        <div class="col-md-3">
-                                            <div class="form-group">
-                                                <a class="text-dark">Harga Jual {{ $x }}<a class='red'>
-                                                        *</a></a>
-                                                <input class="form-control input-bb required" required
-                                                    name="item_unit_price{{ $x }}"
-                                                    id="item_unit_price_{{ $x - 1 }}" type="text"
-                                                    autocomplete="off"
-                                                    onchange="function_elements_add(this.name, this.value)"
-                                                    value="{{ $items['item_unit_price' . $x] ?? '' }}" />
-                                            </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <a class="text-dark">Harga Jual {{ $x }}<a class='red'>
+                                                    *</a></a>
+                                            <input class="form-control input-bb required" required form="form-barang"
+                                                name="item_unit_price{{ $x }}"
+                                                id="item_unit_price_{{ $x - 1 }}" type="text"
+                                                autocomplete="off" onchange="function_elements_add(this.name, this.value)"
+                                                value="{{ $items['item_unit_price' . $x] ?? '' }}" />
                                         </div>
-                                        <div class="col-md-3">
-                                            <div class="form-group">
-                                                <a class="text-dark">Harga Beli {{ $x }}<a class='red'>
-                                                        *</a></a>
-                                                <input class="form-control input-bb required" required
-                                                    name="item_unit_cost{{ $x }}"
-                                                    id="item_unit_cost_{{ $x - 1 }}" type="text"
-                                                    autocomplete="off"
-                                                    onchange="function_elements_add(this.name, this.value)"
-                                                    value="{{ $items['item_unit_cost' . $x] ?? '' }}" />
-                                            </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <a class="text-dark">Harga Beli {{ $x }}<a class='red'>
+                                                    *</a></a>
+                                            <input class="form-control input-bb required" required form="form-barang"
+                                                name="item_unit_cost{{ $x }}"
+                                                id="item_unit_cost_{{ $x - 1 }}" type="text"
+                                                autocomplete="off" onchange="function_elements_add(this.name, this.value)"
+                                                value="{{ $items['item_unit_cost' . $x] ?? '' }}" />
                                         </div>
                                     </div>
                                 </div>
-                            @endfor
+                            </div>
+                        @endfor
+                    </div>
+                    <div class="card-footer text-muted">
+                        <div class="form-actions float-right">
+                            <button type="reset" form="form-barang" name="Reset" class="btn btn-danger" onclick="reset_add();"><i
+                                    class="fa fa-times"></i> Batal</button>
+                            <button type="submit" form="form-barang" name="Save" class="btn btn-primary" title="Save"><i
+                                    class="fa fa-check"></i>
+                                Simpan</button>
                         </div>
                     </div>
-                    <div role="tabpanel" class="tab-pane fade {{ $items['kemasan'] == 10 ? 'show active' : '' }}" id="form-paket">
-                        <div class="row form-group">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
-                                    {!! Form::select('package_merchant_id', $merchant, $items['package_merchant_id'] ?? '', [
-                                        'class' => 'selection-search-clear required select-form',
-                                        'name' => 'package_merchant_id',
-                                        'id' => 'package_merchant_id',
-                                        'onchange' => 'changeItem()',
-                                    ]) !!}
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <a class="text-dark">Nama Paket<a class='red'> *</a></a>
-                                    <input class="form-control required input-bb" name="package_name" id="package_name"
-                                        type="text" autocomplete="off"
-                                        onchange="function_elements_add(this.name, this.value)"
-                                        value="{{ $items['package_name'] ?? '' }}" />
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <a class="text-dark">Kode Paket<a class='red'> *</a></a>
-                                    <input class="form-control required input-bb" name="package_item_code"
-                                        id="package_item_code" type="text" autocomplete="off"
-                                        onchange="function_elements_add(this.name, this.value)"
-                                        value="{{ $items['package_item_code'] ?? '' }}" />
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <a class="text-dark">Barcode Paket</a>
-                                    <input class="form-control input-bb" name="item_barcode" id="item_barcode"
-                                        type="text" autocomplete="off"
-                                        onchange="function_elements_add(this.name, this.value)"
-                                        value="{{ $items['item_barcode'] }}" />
-                                </div>
-                            </div>
-                            <div class="col-md-8 mt-3">
-                                <div class="form-group">
-                                    <a class="text-dark">Keterangan</a>
-                                    <textarea class="form-control input-bb" name="item_remark" id="item_remark" type="text" autocomplete="off"
-                                        onchange="function_elements_add(this.name, this.value)">{{ $items['item_remark'] }}</textarea>
-                                </div>
+                </div>
+                <div role="tabpanel"
+                    class="tab-pane fade {{ $items['kemasan'] >= 1 && $counts->count() ? 'show active' : '' }}"
+                    id="form-pkt">
+                    <div class="row form-group">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
+                                {!! Form::select('package_merchant_id', $merchant, $items['package_merchant_id'] ?? '', [
+                                    'class' => 'selection-search-clear required select-form',
+                                    'name' => 'package_merchant_id',
+                                    'id' => 'package_merchant_id',
+                                    'onchange' => 'changeItem()',
+                                    'form' => 'form-paket',
+                                ]) !!}
                             </div>
                         </div>
-                        <div class="row form-group">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <a class="text-dark">Nama Barang<a class='red'> *</a></a>
-                                    {{-- {!! Form::select('item_id', $invtitm, $items['item_id'] ?? '', [
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <a class="text-dark">Nama Paket<a class='red'> *</a></a>
+                                <input class="form-control required input-bb" form="form-paket" name="package_name"
+                                    id="package_name" type="text" autocomplete="off" required
+                                    onchange="function_elements_add(this.name, this.value)"
+                                    value="{{ $items['package_name'] ?? '' }}" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <a class="text-dark">Kode Paket<a class='red'> *</a></a>
+                                <input class="form-control required input-bb" form="form-paket" name="package_item_code"
+                                    id="package_item_code" type="text" autocomplete="off"
+                                    onchange="function_elements_add(this.name, this.value)"
+                                    value="{{ $items['package_item_code'] ?? '' }}" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <a class="text-dark">Barcode Paket</a>
+                                <input class="form-control input-bb" form="form-paket" name="package_item_barcode"
+                                    id="package_item_barcode" type="text" autocomplete="off"
+                                    onchange="function_elements_add(this.name, this.value)"
+                                    value="{{ $items['package_item_barcode'] ?? '' }}" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <a class="text-dark">Harga Paket<a class='red'> *</a></a>
+                                <input class="form-control input-bb required" onchange="formatRp()" required form="form-paket" name="package_price_view" id="package_price_view" type="text" autocomplete="off" value="{{ $items['package_price_view'] ?? '' }}" />
+                                <input form="form-paket" name="package_price" id="package_price" type="hidden" autocomplete="off" />
+                            </div>
+                        </div>
+                        <div class="col-md-8 mt-3">
+                            <div class="form-group">
+                                <a class="text-dark">Keterangan</a>
+                                <textarea class="form-control input-bb" form="form-paket" name="package_item_remark" id="package_item_remark"
+                                    type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value)">{{ $items['package_item_remark'] ?? '' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <a class="text-dark">Nama Barang<a class='red'> *</a></a>
+                                {{-- {!! Form::select('item_id', $invtitm, $items['item_id'] ?? '', [
                                         'class' => 'selection-search-clear required select-form',
                                         'name' => 'package_item_id',
                                         'id' => 'package_item_id',
                                     ]) !!} --}}
-                                    <select class="selection-search-clear required select-form" placeholder="Masukan Nama Barang" name="package_item_id" id="package_item_id" onchange="function_elements_add(this.name, this.value)">
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-auto justify-content-center">
-                                <button class="btn btn-sm btn-primary mt-4" type="button"><i class="fa fa-plus" id="add-package-item"></i>Tambah Barang</button>
+                                <select class="selection-search-clear required select-form"
+                                    placeholder="Masukan Nama Barang" name="package_item_id" id="package_item_id"
+                                    onchange="function_elements_add(this.name, this.value)" onchange="changeSatuan()">
+                                </select>
                             </div>
                         </div>
-                        <div class="card border border-dark">
-                            <div class="card-header bg-dark clearfix">
-                                <h5 class="mb-0 float-left">
-                                    Daftar Isi Paket
-                                </h5>
-                                <div class="form-actions float-right">
-                                </div>
+                        <div class="col-auto justify-content-center">
+                            <button class="btn btn-sm btn-primary mt-4" type="button" onclick="addPackageItem()"><i
+                                class="fa fa-plus" id="add-package-item"></i>Tambah Barang</button>
+                        </div>
+                        <div class="col-md-4 ml-5">
+                            <div class="form-group">
+                                <a class="text-dark">Satuan<a class='red'> *</a></a>
+                                <select class="selection-search-clear required select-form"
+                                    placeholder="Masukan Kategori Barang" name="package_item_unit" id="package_item_unit"
+                                    onchange="function_elements_add(this.name, this.value)">
+                                </select>
                             </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table id="example" style="width:100%" class="table table-striped table-bordered table-hover table-full-width">
-                                        <thead>
-                                            <tr>
-                                                <th width="2%" style='text-align:center'>No</th>
-                                                <th width="20%" style='text-align:center'>Nama Kategori Barang</th>
-                                                <th width="20%" style='text-align:center'>Kode Barang</th>
-                                                <th width="20%" style='text-align:center'>Wahana / Merchant</th>
-                                                <th width="20%" style='text-align:center'>Nama Barang</th>
-                                                <th width="20%" style='text-align:center'>Jumlah</th>
-                                                <th width="10%" style='text-align:center'>Aksi</th>
+                        </div>
+                    </div>
+                    <div class="card border border-dark">
+                        <div class="card-header bg-dark clearfix">
+                            <h5 class="mb-0 float-left">
+                                Daftar Isi Paket
+                            </h5>
+                            <div class="form-actions float-right">
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table id="example" style="width:100%"
+                                    class="table table-striped table-bordered table-hover table-full-width">
+                                    <thead>
+                                        <tr>
+                                            <th width="2%" style='text-align:center'>No</th>
+                                            <th width="20%" style='text-align:center'>Nama Kategori Barang</th>
+                                            <th width="20%" style='text-align:center'>Kode Barang</th>
+                                            <th width="20%" style='text-align:center'>Wahana / Merchant</th>
+                                            <th width="20%" style='text-align:center'>Nama Barang</th>
+                                            <th width="20%" style='text-align:center'>Jumlah</th>
+                                            <th width="10%" style='text-align:center'>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="package-table">
+                                        <?php $no = 1; ?>
+                                        @foreach ($paket as $row)
+                                            <tr class='pkg-itm' id="col-package-item-{{$row->item_id}}">
+                                                <td style='text-align:center'>{{ $no++ }}</td>
+                                                <td>{{ $row->category->item_category_name }}</td>
+                                                <td>{{ $row['item_code'] }}</td>
+                                                <td>{{ $row->merchant->merchant_name }}</td>
+                                                <td>{{ $row['item_name'] }}</td>
+                                                <td>
+                                                    <div class="row">
+                                                    <input
+                                                        oninput="function_change_quantity({{ $row->item_id }},{{$counts[$row->item_id][1]}}, this.value)"
+                                                        type="number" name="item_package_{{ $row->item_id }}_{{$counts[$row->item_id][1]}}_quantity"
+                                                        id="item_package_{{ $row->item_id }}_{{$counts[$row->item_id][1]}}_quantity"
+                                                        style="width: 100%; text-align: center; height: 30px; font-weight: bold; font-size: 15px"
+                                                        class="form-control col input-bb"
+                                                        value="{{ $counts[$row->item_id][0] }}" autocomplete="off">
+                                                       <div class="col-auto">{{$unit->where('item_unit_id',$counts[$row->item_id][1])->pluck('item_unit_name')[0]}}</col>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <button type="button" class="btn btn-outline-danger btn-sm"  onclick="deleteIsiPaket('{{$row->item_id}}')">Hapus</button>
+                                                </td>
                                             </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php $no = 1; ?>
-                                            {{-- @foreach ($data as $row)
-                                                        <tr>
-                                                            <td style='text-align:center'>{{ $no++ }}</td>
-                                                            <td>{{ $row['item_category_name'] }}</td>
-                                                            <td>{{ $row['item_code'] }}</td>
-                                                            <td>{{ $row->merchant->merchant_name }}</td>
-                                                            <td>{{ $row['item_name'] }}</td>
-                                                            <td class="text-center">
-                                                                <a type="button" class="btn btn-outline-warning btn-sm" href="{{ url('/item/edit-item/'.$row['item_id']) }}">Edit</a>
-                                                                <a type="button" class="btn btn-outline-danger btn-sm" href="{{ url('/item/delete-item/'.$row['item_id']) }}">Hapus</a>
-                                                            </td>
-                                                        </tr>
-                                                        @endforeach --}}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             </div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-muted">
+                        <div class="form-actions float-right">
+                            <button form="form-paket" type="reset" name="Reset" class="btn btn-danger"
+                                onclick="reset_add();"><i class="fa fa-times"></i> Batal</button>
+                            <button form="form-paket" type="button" onclick="checkIsiPaket()" type="submit" name="Save" class="btn btn-primary"
+                                title="Save"><i class="fa fa-check"></i>
+                                Simpan</button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="card-footer text-muted">
-                <div class="form-actions float-right">
-                    <button type="reset" name="Reset" class="btn btn-danger" onclick="reset_add();"><i
-                            class="fa fa-times"></i> Batal</button>
-                    <button type="submit" name="Save" class="btn btn-primary" title="Save"><i
-                            class="fa fa-check"></i>
-                        Simpan</button>
-                </div>
-            </div>
-        </form>
+        </div>
     </div>
 @stop
 

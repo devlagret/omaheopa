@@ -26,6 +26,7 @@ use App\Http\Controllers\SystemUserController;
 use App\Http\Controllers\SystemUserGroupController;
 use App\Http\Controllers\InvtItemCategoryController;
 use App\Http\Controllers\InvtItemController;
+use App\Http\Controllers\InvtItemPackgeController;
 use App\Http\Controllers\InvtItemUnitController;
 use App\Http\Controllers\InvtStockAdjustmentController;
 use App\Http\Controllers\InvtStockAdjustmentReportController;
@@ -83,6 +84,7 @@ Route::post('/item-category/process-edit-item-category', [InvtItemCategoryContro
 Route::get('/item-category/delete-category/{item_category_id}', [InvtItemCategoryController::class, 'deleteItemCategory'])->name('delete-item-category');
 
 Route::get('/item',[InvtItemController::class, 'index'])->name('item');
+Route::post('/item/unit',[InvtItemController::class, 'getItemUnit'])->name('get-item-unit');
 Route::post('/item/category',[InvtItemController::class, 'getCategory'])->name('get-item-category');
 Route::post('/merchant/item/',[InvtItemController::class, 'getMerchantItem'])->name('get-merchant-item');
 Route::get('/item/add-kemasan',[InvtItemController::class, 'addKemasan'])->name('add-kemasan');
@@ -395,12 +397,15 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
 });
  // Package pages
  Route::prefix('package')->name('package.')->group(function () {
-    Route::get('/', [SalesMerchantController::class, 'index'])->name('index');
-    Route::get('/add', [SalesMerchantController::class, 'add'])->name('add');
-    Route::post('/process-add', [SalesMerchantController::class, 'processAdd'])->name('process-add');
-    Route::post('/add-item', [SalesMerchantController::class, 'processAddItem'])->name('process-add-item');
-    Route::get('/edit/{merchant_id}', [SalesMerchantController::class, 'edit'])->name('edit');
-    Route::post('/process-edit', [SalesMerchantController::class, 'processEdit'])->name('process-edit');
-    Route::get('/delete/{merchant_id}', [SalesMerchantController::class, 'delete'])->name('delete');
-    Route::post('/elements-add', [SalesMerchantController::class, 'elementsAdd'])->name('elements-add');
+    Route::get('/', [InvtItemPackgeController::class, 'index'])->name('index');
+    Route::get('/add', [InvtItemPackgeController::class, 'add'])->name('add');
+    Route::post('/process-add', [InvtItemPackgeController::class, 'processAdd'])->name('process-add');
+    Route::post('/add-item', [InvtItemPackgeController::class, 'processAddItem'])->name('process-add-item');
+    Route::get('/delete-item/{item_id}', [InvtItemPackgeController::class, 'processDeleteItem'])->name('delete-item');
+    Route::get('/item/change-qty/{item_id}/{value}', [InvtItemPackgeController::class, 'changeItemQty'])->name('change-qty');
+    Route::get('/edit/{merchant_id}', [InvtItemPackgeController::class, 'edit'])->name('edit');
+    Route::post('/process-edit', [InvtItemPackgeController::class, 'processEdit'])->name('process-edit');
+    Route::get('/delete/{merchant_id}', [InvtItemPackgeController::class, 'delete'])->name('delete');
+    Route::get('/clear-item', [InvtItemPackgeController::class, 'clearItem'])->name('clear-item');
+    Route::post('/elements-add', [InvtItemPackgeController::class, 'elementsAdd'])->name('elements-add');
 });
