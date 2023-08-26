@@ -52,6 +52,19 @@
                 </thead>
                 <tbody>
                     <?php $no = 1; ?>
+                    @foreach($paket as $val)
+                    <tr>
+                        <td style='text-align:center'>{{ $no++ }}</td>
+                        <td>PAKET</td>
+                        <td>{{ $val->package_code }}</td>
+                        <td>{{ $val->merchant->merchant_name }}</td>
+                        <td>{{ $val->package_name }}</td>
+                        <td class="text-center">
+                            <a type="button" class="btn btn-outline-warning btn-sm" href="{{ route('package.edit',$val->item_package_id) }}">Edit</a>
+                            <a type="button" class="btn btn-outline-danger btn-sm" href="{{ route('package.delete',$val->item_package_id) }}">Hapus</a>
+                        </td>
+                    </tr>
+                    @endforeach
                     @foreach($data as $row)
                     <tr>
                         <td style='text-align:center'>{{ $no++ }}</td>

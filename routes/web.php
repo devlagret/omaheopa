@@ -397,15 +397,12 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
 });
  // Package pages
  Route::prefix('package')->name('package.')->group(function () {
-    Route::get('/', [InvtItemPackgeController::class, 'index'])->name('index');
-    Route::get('/add', [InvtItemPackgeController::class, 'add'])->name('add');
-    Route::post('/process-add', [InvtItemPackgeController::class, 'processAdd'])->name('process-add');
     Route::post('/add-item', [InvtItemPackgeController::class, 'processAddItem'])->name('process-add-item');
     Route::get('/delete-item/{item_id}', [InvtItemPackgeController::class, 'processDeleteItem'])->name('delete-item');
-    Route::get('/item/change-qty/{item_id}/{value}', [InvtItemPackgeController::class, 'changeItemQty'])->name('change-qty');
-    Route::get('/edit/{merchant_id}', [InvtItemPackgeController::class, 'edit'])->name('edit');
+    Route::get('/item/change-qty/{item_id}/{unit_id}/{value}', [InvtItemPackgeController::class, 'changeItemQty'])->name('change-qty');
+    Route::post('/process-add', [InvtItemPackgeController::class, 'processAdd'])->name('process-add');
+    Route::get('/edit/{item_package_id}', [InvtItemPackgeController::class, 'edit'])->name('edit');
     Route::post('/process-edit', [InvtItemPackgeController::class, 'processEdit'])->name('process-edit');
-    Route::get('/delete/{merchant_id}', [InvtItemPackgeController::class, 'delete'])->name('delete');
     Route::get('/clear-item', [InvtItemPackgeController::class, 'clearItem'])->name('clear-item');
-    Route::post('/elements-add', [InvtItemPackgeController::class, 'elementsAdd'])->name('elements-add');
+    Route::get('/delete/{item_package_id}', [InvtItemPackgeController::class, 'delete'])->name('delete');
 });

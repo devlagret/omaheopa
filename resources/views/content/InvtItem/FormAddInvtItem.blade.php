@@ -68,7 +68,7 @@ if (empty($paket)) {
             });
         }
 
-        function changeItem() {
+        function changeItem(from = 1) {
             var id = $("#package_merchant_id").val();
             var no = $('.pkg-itm').length;
             $.ajax({
@@ -81,6 +81,7 @@ if (empty($paket)) {
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function(return_data) {
+                    if(from){clearIsiPaket();}
                     $('#package_item_id').val(1);
                     $('#package_item_id').html(return_data);
                     changeSatuan();
@@ -147,7 +148,7 @@ if (empty($paket)) {
             if ($('#item_package_' + package_item_id+'_'+package_item_unit+'_quantity').length) {
                 $('#item_package_' + package_item_id+'_'+package_item_unit+'_quantity').val(function(i, oldval) {
                     var newval = ++oldval;
-                    function_change_quantity(package_item_id, newval);
+                    function_change_quantity(package_item_id,package_item_unit,newval);
                     return ++newval;
                 });
                 return 0;
@@ -164,7 +165,6 @@ if (empty($paket)) {
                 },
                 success: function(return_data) {
                     if($('.pkg-itm').length==0){
-                        console.log(return_data);
                     $('#package-table').html(return_data);}
                     else{
                     $('#package-table').append(return_data);
@@ -194,6 +194,7 @@ if (empty($paket)) {
                     $('.pkg-itm').each(function( index ) {
                        $(this).remove();
                     });
+                    $('#package-table').html('<td valign="top" colspan="7" class="dataTables_empty">No data available in table</td>');
                 },
                 error: function(data) {
                     console.log(data);
@@ -259,7 +260,7 @@ if (empty($paket)) {
         $(document).ready(function() {
             changeCategory();
             checkCategory();
-            changeItem();
+            changeItem(0);
             if($('#package_price_view').val()!=''){
             formatRp();}
         });
@@ -292,7 +293,7 @@ if (empty($paket)) {
     @if (count($errors) > 0)
         <div class="alert alert-danger" role="alert">
             @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
+                {{ $error }}
             @endforeach
         </div>
     @endif
@@ -508,19 +509,19 @@ if (empty($paket)) {
                         <div class="col-md-6">
                             <div class="form-group">
                                 <a class="text-dark">Kode Paket<a class='red'> *</a></a>
-                                <input class="form-control required input-bb" form="form-paket" name="package_item_code"
-                                    id="package_item_code" type="text" autocomplete="off"
+                                <input class="form-control required input-bb" form="form-paket" name="package_code"
+                                    id="package_code" type="text" autocomplete="off"
                                     onchange="function_elements_add(this.name, this.value)"
-                                    value="{{ $items['package_item_code'] ?? '' }}" />
+                                    value="{{ $items['package_code'] ?? '' }}" />
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <a class="text-dark">Barcode Paket</a>
-                                <input class="form-control input-bb" form="form-paket" name="package_item_barcode"
-                                    id="package_item_barcode" type="text" autocomplete="off"
+                                <input class="form-control input-bb" form="form-paket" name="package_barcode"
+                                    id="package_barcode" type="text" autocomplete="off"
                                     onchange="function_elements_add(this.name, this.value)"
-                                    value="{{ $items['package_item_barcode'] ?? '' }}" />
+                                    value="{{ $items['package_barcode'] ?? '' }}" />
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -533,8 +534,8 @@ if (empty($paket)) {
                         <div class="col-md-8 mt-3">
                             <div class="form-group">
                                 <a class="text-dark">Keterangan</a>
-                                <textarea class="form-control input-bb" form="form-paket" name="package_item_remark" id="package_item_remark"
-                                    type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value)">{{ $items['package_item_remark'] ?? '' }}</textarea>
+                                <textarea class="form-control input-bb" form="form-paket" name="package_remark" id="package_remark"
+                                    type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value)">{{ $items['package_remark'] ?? '' }}</textarea>
                             </div>
                         </div>
                     </div>
@@ -591,10 +592,10 @@ if (empty($paket)) {
                                         </tr>
                                     </thead>
                                     <tbody id="package-table">
-                                        <?php $no = 1; ?>
-                                        @foreach ($paket as $row)
+                                        @for ($no=1;$no<=$pktitem->count();$no++)
+                                        @php $row = $paket->where('item_id',array_keys($pktitem[$no-1])[0])->first(); @endphp
                                             <tr class='pkg-itm' id="col-package-item-{{$row->item_id}}">
-                                                <td style='text-align:center'>{{ $no++ }}</td>
+                                                <td style='text-align:center'>{{ $no }}</td>
                                                 <td>{{ $row->category->item_category_name }}</td>
                                                 <td>{{ $row['item_code'] }}</td>
                                                 <td>{{ $row->merchant->merchant_name }}</td>
@@ -602,20 +603,20 @@ if (empty($paket)) {
                                                 <td>
                                                     <div class="row">
                                                     <input
-                                                        oninput="function_change_quantity({{ $row->item_id }},{{$counts[$row->item_id][1]}}, this.value)"
-                                                        type="number" name="item_package_{{ $row->item_id }}_{{$counts[$row->item_id][1]}}_quantity"
-                                                        id="item_package_{{ $row->item_id }}_{{$counts[$row->item_id][1]}}_quantity"
+                                                        oninput="function_change_quantity({{ $row->item_id }},{{$pktitem[$no-1][$row->item_id][1]}}, this.value)"
+                                                        type="number" name="item_package_{{ $row->item_id }}_{{$pktitem[$no-1][$row->item_id][1]}}_quantity"
+                                                        id="item_package_{{ $row->item_id }}_{{$pktitem[$no-1][$row->item_id][1]}}_quantity"
                                                         style="width: 100%; text-align: center; height: 30px; font-weight: bold; font-size: 15px"
-                                                        class="form-control col input-bb"
-                                                        value="{{ $counts[$row->item_id][0] }}" autocomplete="off">
-                                                       <div class="col-auto">{{$unit->where('item_unit_id',$counts[$row->item_id][1])->pluck('item_unit_name')[0]}}</col>
+                                                        class="form-control col input-bb" min='1'
+                                                        value="{{ $pktitem[$no-1][$row->item_id][0] }}" autocomplete="off">
+                                                       <div class="col-auto">{{$unit->where('item_unit_id',$pktitem[$no-1][$row->item_id][1])->pluck('item_unit_name')[0]}}</col>
                                                     </div>
                                                 </td>
                                                 <td class="text-center">
                                                     <button type="button" class="btn btn-outline-danger btn-sm"  onclick="deleteIsiPaket('{{$row->item_id}}')">Hapus</button>
                                                 </td>
                                             </tr>
-                                        @endforeach
+                                        @endfor
                                     </tbody>
                                 </table>
                             </div>

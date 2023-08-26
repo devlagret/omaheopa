@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\InvtItem;
 use App\Models\InvtItemCategory;
-use App\Models\InvtItemPackge;
+use App\Models\InvtItemPackage;
 use App\Models\InvtItemUnit;
 use App\Models\SalesMerchant;
 use App\Models\SystemMenu;
@@ -31,19 +31,27 @@ class InvtItemController extends Controller
             ->where('invt_item.data_state', '=', 0)
             ->where('invt_item.company_id', Auth::user()->company_id)
             ->get();
-        return view('content.InvtItem.ListInvtItem', compact('data'));
+        $paket = InvtItemPackage::with('merchant')->where('data_state','0')
+                ->where('company_id', Auth::user()->company_id)
+                ->  get();
+        return view('content.InvtItem.ListInvtItem', compact('data','paket'));
     }
 
     public function addItem()
     {
         $canAddCategory =0;
-        $items      = Session::get('items');
-        $counts = collect(Session::get('paket'));
-        $paket = '';
+        $counts = collect();
+        $items = Session::get('items');
+        $pktitem = collect(Session::get('paket'));
         $unit = InvtItemUnit::get(['item_unit_id','item_unit_name']);
-        dump($counts);
+        foreach($pktitem as $key => $val){
+          if(! $counts->contains(collect($val)->keys()[0])){
+              $counts->push(collect($val)->keys()[0]);
+          }
+        }
+        // dump($itemnya[1]);
+        $paket = InvtItem::with('category','merchant')->wherein('item_id',$counts)->get();
         // exit;
-        $paket = InvtItem::with('category')->wherein('item_id',$counts->keys())->get() ;
         $itemunits  = InvtItemUnit::where('data_state', 0)
         ->where('company_id', Auth::user()->company_id)
         ->get()
@@ -59,7 +67,7 @@ class InvtItemController extends Controller
             ->get()
             ->pluck('item_name', 'item_id');
          $canAddCategory=!empty(User::with('group.maping.menu')->find(Auth::id())->group->maping->where('id_menu',SystemMenu::where('id','item-category')->first()->id_menu));
-        return view('content.InvtItem.FormAddInvtItem', compact('category', 'itemunits', 'items', 'merchant','invtitm','canAddCategory','paket','counts','unit'));
+        return view('content.InvtItem.FormAddInvtItem', compact('category','pktitem', 'itemunits', 'items', 'merchant','invtitm','canAddCategory','paket','counts','unit'));
     }
 
     public function addItemElements(Request $request)
@@ -132,6 +140,7 @@ class InvtItemController extends Controller
 
     public function editItem($item_id)
     {
+        $ubahpaket=0;
         $items = Session::get('items');
         $itemunits    = InvtItemUnit::where('data_state', '=', 0)
             ->where('company_id', Auth::user()->company_id)
@@ -149,7 +158,7 @@ class InvtItemController extends Controller
         for($n=1;$n<=4;$n++){
             $data['item_unit_id'.$n] != null ? $base_kemasan++ : '';
         }
-        return view('content.InvtItem.FormEditInvtItem', compact('data', 'itemunits', 'category', 'items', 'merchant', 'base_kemasan'));
+        return view('content.InvtItem.FormEditInvtItem', compact('data', 'itemunits', 'category', 'items', 'merchant', 'base_kemasan','ubahpaket'));
     }
 
     public function processEditItem(Request $request)
@@ -293,7 +302,7 @@ class InvtItemController extends Controller
 
     }
     }
-    
+
     public function getItemUnit(Request $request){
         $data = '';
         $items = Session::get('items');
