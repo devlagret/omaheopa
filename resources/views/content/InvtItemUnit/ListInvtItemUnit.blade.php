@@ -33,7 +33,7 @@
         Daftar
     </h5>
     <div class="form-actions float-right">
-        <button onclick="location.href='{{ url('/item-unit/add') }}'" name="Find" class="btn btn-sm btn-info" title="Add Data"><i class="fa fa-plus"></i> Tambah Barang Satuan </button>
+        <button onclick="location.href='{{ url('/item-unit/add') }}'" autofocus="autofocus" name="Find" class="btn btn-sm btn-info" title="Add Data"><i class="fa fa-plus"></i> Tambah Barang Satuan </button>
     </div>
   </div>
 

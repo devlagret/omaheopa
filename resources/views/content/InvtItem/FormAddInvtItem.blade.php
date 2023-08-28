@@ -348,6 +348,7 @@ if (empty($paket)) {
                                     'id' => 'merchant_id',
                                     'onchange' => 'changeCategory()',
                                     'form'=>'form-barang',
+                                    'autofocus'=>'autofocus',
                                     'required'
                                 ]) !!}
                             </div>
@@ -363,18 +364,18 @@ if (empty($paket)) {
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <a class="text-dark">Nama Barang<a class='red'> *</a></a>
-                                <input class="form-control required input-bb" required form="form-barang" name="item_name" id="item_name" type="text"
-                                    autocomplete="off" onchange="function_elements_add(this.name, this.value)"
-                                    value="{{ $items['item_name'] }}" />
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
                                 <a class="text-dark">Kode Barang<a class='red'> *</a></a>
                                 <input class="form-control input-bb"  form="form-barang" name="item_code" id="item_code" type="text"
                                     autocomplete="off" onchange="function_elements_add(this.name, this.value)"
                                     value="{{ $items['item_code'] ?? '' }}" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <a class="text-dark">Nama Barang<a class='red'> *</a></a>
+                                <input class="form-control required input-bb" required form="form-barang" name="item_name" id="item_name" type="text"
+                                    autocomplete="off" onchange="function_elements_add(this.name, this.value)"
+                                    value="{{ $items['item_name'] }}" />
                             </div>
                         </div>
                         <div class="col-md-6">

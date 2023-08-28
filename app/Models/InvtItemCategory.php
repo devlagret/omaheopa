@@ -12,6 +12,9 @@ class InvtItemCategory extends Model
     public function merchant() {
         return $this->belongsTo(SalesMerchant::class, "merchant_id");
     }
+    public function item() {
+        return $this->hasMany(InvtItem::class,'item_category_id','item_category_id');
+    }
     protected $guarded = [
         'updated_at',
         'created_at'

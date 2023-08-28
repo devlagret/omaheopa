@@ -3,9 +3,38 @@
 @extends('adminlte::page')
 
 @section('title',  "MOZAIC Omah'e Opa")
+@section('js')
+<script>
+ function deleteItem(id,name){
+    $.ajax({
+				type: "GET",
+				url : "{{url('/item/check-delete-item/')}}"+'/'+id,
+				success: function(msg){
+                    console.log(msg);
+                    if(msg!=0){
+                        if(confirm('Barang "'+name+'" dipakai di paket. Anda yakin ingin tetap menghapus?')){
+                         window.location.href = "{{ url('/item/delete-item/') }}"+'/'+id;
+                        }
+                        return 0;
+                    }
+                    if(confirm(`Yakin Ingin Menghapus Item dengan nama '`+name+`' ?`)){
+                      window.location.href = "{{ url('/item/delete-item/') }}"+'/'+id;
+                    }
+                    return 0;
+			}
 
+		});
+ }
+
+function check(name,uri){
+ if(confirm(`Yakin Ingin Menghapus Paket dengan nama '`+name+`' ?`)){
+   window.location.href = uri;
+ }
+}
+</script>
+@stop
 @section('content_header')
-    
+
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="{{ url('home') }}">Beranda</a></li>
@@ -26,7 +55,7 @@
 <div class="alert alert-info" role="alert">
     {{session('msg')}}
 </div>
-@endif 
+@endif
 <div class="card border border-dark">
   <div class="card-header bg-dark clearfix">
     <h5 class="mb-0 float-left">
@@ -61,7 +90,7 @@
                         <td>{{ $val->package_name }}</td>
                         <td class="text-center">
                             <a type="button" class="btn btn-outline-warning btn-sm" href="{{ route('package.edit',$val->item_package_id) }}">Edit</a>
-                            <a type="button" class="btn btn-outline-danger btn-sm" href="{{ route('package.delete',$val->item_package_id) }}">Hapus</a>
+                            <a type="button" class="btn btn-outline-danger btn-sm"  onclick="check('{{$val->package_name}}','{{ route('package.delete',$val->item_package_id) }}')">Hapus</a>
                         </td>
                     </tr>
                     @endforeach
@@ -74,7 +103,7 @@
                         <td>{{ $row['item_name'] }}</td>
                         <td class="text-center">
                             <a type="button" class="btn btn-outline-warning btn-sm" href="{{ url('/item/edit-item/'.$row['item_id']) }}">Edit</a>
-                            <a type="button" class="btn btn-outline-danger btn-sm" href="{{ url('/item/delete-item/'.$row['item_id']) }}">Hapus</a>
+                            <a type="button" class="btn btn-outline-danger btn-sm" onclick="deleteItem('{{$row['item_id']}}','{{$row['item_name']}}')">Hapus</a>
                         </td>
                     </tr>
                     @endforeach
@@ -88,13 +117,13 @@
 @stop
 
 @section('footer')
-    
+
 @stop
 
 @section('css')
-    
+
 @stop
 
 @section('js')
-    
+
 @stop

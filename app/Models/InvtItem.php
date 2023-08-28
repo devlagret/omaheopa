@@ -13,7 +13,10 @@ class InvtItem extends Model
         return $this->belongsTo(SalesMerchant::class,'merchant_id');
     }
     public function category() {
-        return $this->belongsTo(InvtItemCategory::class,'item_category_id', 'item_category_id')->withDefault();
+        return $this->belongsTo(InvtItemCategory::class,'item_category_id', 'item_category_id')->withDefault();;
+    }
+    public function package() {
+        return $this->hasMany(InvtItemPackageItem::class,'item_id','item_id');
     }
     protected $guarded = [
         'updated_at',

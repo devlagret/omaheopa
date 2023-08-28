@@ -59,7 +59,7 @@
                         <td>{{ $row->merchant->merchant_name }}</td>
                         <td class="">
                             <a type="button" class="btn btn-outline-warning btn-sm" href="{{ url('/item-category/edit-category/'.$row['item_category_id']) }}">Edit</a>
-                            <button type="button" onclick="$('this').attr('disabled');check('{{$row->item_category_name}}','{{ route('delete-item-category',$row->item_category_id) }}')" class="btn btn-outline-danger btn-sm" >Hapus</button>
+                            <button type="button" onclick="$('this').attr('disabled');check('{{$row->item_category_name}}','{{ route('delete-item-category',$row->item_category_id) }}','{{$row->item_category_id}}')" class="btn btn-outline-danger btn-sm" >Hapus</button>
                         </td>
                     </tr>
                     @endforeach
@@ -82,10 +82,22 @@
 
 @section('js')
     <script>
-        function check(name,uri){
-  if(confirm(`Yakin Ingin Menghapus Kategori dengan Nama '`+name+`' ?`)){
-    window.location.href = uri;
-  }
+        function check(name,uri,id){
+            $.ajax({
+				type: "GET",
+				url : "{{url('/item-category/check-delete-category/')}}"+'/'+id,
+				success: function(msg){
+                    console.log(msg);
+                    if(msg!=0){
+                        alert('Kategori ini memiliki barang');
+                        return 0;
+                    }
+                    if(confirm(`Yakin Ingin Menghapus Kategori dengan Nama '`+name+`' ?`)){
+                         window.location.href = uri;
+                       }
+			}
+
+		});
 }
     </script>
 @stop

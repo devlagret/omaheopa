@@ -51,7 +51,11 @@
     {{session('msg')}}
 </div>
 @endif
-
+@if(!empty($msg))
+    <div class="alert alert-warning" role="alert">
+      <i class="fa fa-exclamation"></i> &nbsp;  {{ $msg }}
+    </div>
+@endif
 @if(count($errors) > 0)
 <div class="alert alert-danger" role="alert">
     @foreach ($errors->all() as $error)
@@ -103,6 +107,7 @@
                                 'name' => 'merchant_id',
                                 'id' => 'merchant_id',
                                 'onchange' => 'function_elements_add(this.name, this.value)',
+                                !empty($pkg)?'disabled':''
                             ]) !!}
                         </div>
                     </div>

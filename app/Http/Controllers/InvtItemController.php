@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\InvtItem;
 use App\Models\InvtItemCategory;
 use App\Models\InvtItemPackage;
+use App\Models\InvtItemPackageItem;
 use App\Models\InvtItemUnit;
 use App\Models\SalesMerchant;
 use App\Models\SystemMenu;
@@ -94,10 +95,10 @@ class InvtItemController extends Controller
     public function processAddItem(Request $request)
     {
         $fields = $request->validate([
-            'item_category_id'  => 'required',
+            'item_category_id'  => 'required|integer',
             'item_code'         => 'required',
             'item_name'         => 'required',
-        ]);
+        ],['item_category_id.integer'=>'Wahana / Merchant Tidak Memiliki Kategori']);
         DB::beginTransaction();
         try {
             $data = InvtItem::create([
@@ -140,8 +141,15 @@ class InvtItemController extends Controller
 
     public function editItem($item_id)
     {
+        $counts = collect();
         $ubahpaket=0;
         $items = Session::get('items');
+        //* check if item is in package
+        $msg = '';
+        $pkg = InvtItemPackageItem::where('item_id',$item_id)->get()->count();
+        if($pkg){
+            $msg ='Ada paket yang menggunakan item ini';
+        }
         $itemunits    = InvtItemUnit::where('data_state', '=', 0)
             ->where('company_id', Auth::user()->company_id)
             ->get()
@@ -158,19 +166,16 @@ class InvtItemController extends Controller
         for($n=1;$n<=4;$n++){
             $data['item_unit_id'.$n] != null ? $base_kemasan++ : '';
         }
-        return view('content.InvtItem.FormEditInvtItem', compact('data', 'itemunits', 'category', 'items', 'merchant', 'base_kemasan','ubahpaket'));
+        return view('content.InvtItem.FormEditInvtItem', compact('data', 'itemunits', 'category', 'items', 'merchant', 'base_kemasan','ubahpaket','counts','msg','pkg'));
     }
-
     public function processEditItem(Request $request)
     {
-
         $fields = $request->validate([
-            'item_category_id'  => 'required',
+            'item_category_id'  => 'required|integer',
             'item_code'         => 'required',
             'item_name'         => 'required',
             'item_id'         => 'required',
-        ]);
-
+        ],['item_category_id.integer'=>'Wahana / Merchant Tidak Memiliki Kategori']);
         $table                          = InvtItem::findOrFail($fields['item_id']);
         $table->item_category_id        = $fields['item_category_id'];
         $table->item_code               = $fields['item_code'];
@@ -323,4 +328,12 @@ class InvtItemController extends Controller
     }
     }
 
+    public function checkDeleteItem($item_id) {
+
+        $pkg = InvtItemPackageItem::where('data_state','0')->where('item_id',$item_id)->get()->count();
+        if($pkg){
+           return response(1);
+        }
+        return response(0);
+    }
 }

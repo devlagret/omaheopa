@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\InvtItem;
 use App\Models\InvtItemCategory;
+use App\Models\InvtItemPackageItem;
 use App\Models\SalesMerchant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -93,10 +95,16 @@ class InvtItemCategoryController extends Controller
 
     public function editItemCategory($item_category_id)
     {
+         //* check if item is in package
+         $msg = '';
+         $pkg = InvtItem::with('package')->where('item_category_id',$item_category_id)->get()->count();
+         if($pkg){
+             $msg ='Ada item yang menggunakan kategori ini';
+         }
         $datacategory = Session::get('datacategory');
         $data = InvtItemCategory::where('item_category_id',$item_category_id)->first();
         $merchant = SalesMerchant::get()->pluck('merchant_name','merchant_id');
-        return view('content.InvtItemCategory.FormEditInvtItemCategory', compact('data','datacategory','merchant'));
+        return view('content.InvtItemCategory.FormEditInvtItemCategory', compact('data','datacategory','merchant','msg','pkg'));
     }
 
     public function processEditItemCategory(Request $request)
@@ -138,5 +146,13 @@ class InvtItemCategoryController extends Controller
             $msg = "Hapus Kategori Barang Gagal";
             return redirect('/item-category')->with('msg', $msg);
         }
+    }
+    
+    public function checkDeleteItemCategory($item_category_id) {
+        $pkg = InvtItem::where('data_state','0')->where('item_category_id',$item_category_id)->get()->count();
+        if($pkg){
+           return response(1);
+        }
+        return response(0);
     }
 }

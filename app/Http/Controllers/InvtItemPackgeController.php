@@ -17,6 +17,10 @@ use Illuminate\Support\Str;
 
 class InvtItemPackgeController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     public function processAddItem(Request $request) {
         $data ='';
         $no = $request->no + 1;
@@ -32,7 +36,7 @@ class InvtItemPackgeController extends Controller
                         <td>
                         <div class='row'>
                             <input
-                                oninput='function_change_quantity(".$request->item_id.",".$request->item_id.", this.value)'
+                                oninput='function_change_quantity(".$request->item_id.",".$request->item_id.", this.value,'".url('package/item/change-qty')."')'
                                 type='number' name='item_package_".$request->item_id."_".$request->item_unit."_quantity'
                                 id='item_package_".$request->item_id."_".$request->item_unit."_quantity'
                                 style='width: 100%; text-align: center; height: 30px; font-weight: bold; font-size: 15px'
@@ -42,7 +46,7 @@ class InvtItemPackgeController extends Controller
                             </div>
                         </td>
                         <td class='text-center'>
-                        <a type='button' class='btn btn-outline-danger btn-sm' href='". url('/item/delete-item/'.$request->item_id)."'>Hapus</a>
+                        <button type='button' class='btn btn-outline-danger btn-sm'  onclick='deleteIsiPaket('".$request->item_id."','".$request->item_unit."','". url('package/delete-item/')."')'>Hapus</button>
                         </td><tr>
                     ";
             $arr=[$request->item_id=>[$qty,$request->item_unit]];
@@ -51,21 +55,27 @@ class InvtItemPackgeController extends Controller
         }
         return $data;
     }
-    public function processDeleteItem($item_id) {
-        $item = collect(Session::get('paket'));
-        Session::put('paket',$item->forget($item_id)->toArray());
+    public function processDeleteItem($item_id,$item_unit) {
+        $pktitem = collect(Session::get('paket'));
+        $item = collect(Session::get('paket'))->toArray();
+        Session::forget('paket');
+        for($i=0;$i<=$pktitem->count()-1;$i++){
+            if($pktitem[$i][array_keys($pktitem[$i])[0]][1]!=$item_unit||array_keys($pktitem[$i])[0]!=$item_id){
+               Session::push('paket',$item[$i]);
+            }
+        }
         return 1;
     }
     public function changeItemQty($item_id,$unit_id, $value) {
         $pktitem = collect(Session::get('paket'));
         $item = collect(Session::get('paket'))->toArray();
         for($i=0;$i<=$pktitem->count()-1;$i++){
-        if(array_keys($pktitem[$i])[0]==$item_id){
-            if($pktitem[$i][$item_id][1]==$unit_id){
-                $item[$i][$item_id][0]=$value;
+            if(array_keys($pktitem[$i])[0]==$item_id){
+                if($pktitem[$i][$item_id][1]==$unit_id){
+                    $item[$i][$item_id][0]=$value;
+                }
             }
         }
-    }
         // Session::forget('paket');
         Session::put('paket',$item);
         return 1;
@@ -111,19 +121,35 @@ class InvtItemPackgeController extends Controller
         }
     }
     public function edit($item_package_id){
+        // * define that we want to update package
         $ubahpaket=1;
+        //* session (last inputed data)
         $items = Session::get('items');
+        //* create count var as collection
         $counts = collect();
+        //* get package (mendapatkan data paket)
+        $invtpaket = InvtItemPackage::with(['item'=>function ($query) {
+            return $query->where('data_state', '0');
+        }])->where('data_state', '0')->find($item_package_id);
+        //* mengecek apakah (session) paket kosong
+        if(empty(Session::get('paket'))){
+        //* mengisi data paket dari db jika session kosong
+        foreach ($invtpaket->item as $itm){
+        $arr=[$itm->item_id=>[$itm->item_quantity,$itm->item_unit_id]];
+        Session::push('paket',$arr);
+        }}
+        //* set package item data for view
         $pktitem = collect(Session::get('paket'));
-        // return empty(Session::get('paket'));
-        $invtpaket = InvtItemPackage::with('item')->find($item_package_id);
-        dump($invtpaket);exit;
+        //* set unit item data for view
         $unit = InvtItemUnit::get(['item_unit_id','item_unit_name']);
+        //* get all package item id (using sesion so that the last input saved)
         foreach($pktitem as $key => $val){
             if(! $counts->contains(collect($val)->keys()[0])){
                 $counts->push(collect($val)->keys()[0]);
             }
           }
+        $pktitem = collect(Session::get('paket'));
+        //* get item data for package item
         $paket = InvtItem::with('category','merchant')->wherein('item_id',$counts)->get();
         $itemunits    = InvtItemUnit::where('data_state', '=', 0)
             ->where('company_id', Auth::user()->company_id)
@@ -141,7 +167,7 @@ class InvtItemPackgeController extends Controller
         for($n=1;$n<=4;$n++){
             $data['item_unit_id'.$n] != null ? $base_kemasan++ : '';
         }
-        return view('content.InvtItem.FormEditInvtItem', compact('data','pktitem','counts','itemunits', 'category', 'items', 'merchant', 'base_kemasan','ubahpaket'));
+        return view('content.InvtItem.FormEditInvtItem', compact('data','pktitem','counts','itemunits','unit', 'category', 'items','paket', 'merchant','base_kemasan','ubahpaket','invtpaket'));
     }
     public function processEdit(Request $request){
         $fields = $request->validate([
@@ -163,15 +189,16 @@ class InvtItemPackgeController extends Controller
                 $package->package_remark = $request->package_remark;
                 $package->company_id = Auth::user()->company_id;
                 $package->updated_id = Auth::id();
-
-            foreach($paket as $val){
-                InvtItemPackageItem::where('item_packge_id',$request->item_package_id)->delete();
-                InvtItemPackageItem::create([
-                    'item_packge_id' => $package->item_package_id,
-                    'item_id' => array_keys($val)[0],
-                    'item_quantity' => $val[array_keys($val)[0]][0],
-                    'item_unit_id' => $val[array_keys($val)[0]][1],
-                ]);
+            if($package->save()){
+                InvtItemPackageItem::where('item_package_id',$request->item_package_id)->delete();
+                foreach($paket as $val){
+                    InvtItemPackageItem::create([
+                        'item_package_id' => $package->item_package_id,
+                        'item_id' => array_keys($val)[0],
+                        'item_quantity' => $val[array_keys($val)[0]][0],
+                        'item_unit_id' => $val[array_keys($val)[0]][1],
+                    ]);
+                }
             }
             DB::commit();
             $msg    = "Edit Paket Berhasil";

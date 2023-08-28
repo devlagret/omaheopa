@@ -16,7 +16,7 @@ class InvtItemPackage extends Model
         return $this->belongsTo(SalesMerchant::class,'merchant_id','merchant_id');
     }
     public function item() {
-        return $this->hasMany(InvtItemPackageItem::class,'item_packge_id','item_packge_id');
+        return $this->hasMany(InvtItemPackageItem::class,'item_package_id','item_package_id');
     }
     protected $guarded = [
         'updated_at',
