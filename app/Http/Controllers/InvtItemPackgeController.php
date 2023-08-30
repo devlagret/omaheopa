@@ -159,9 +159,11 @@ class InvtItemPackgeController extends Controller
             ->where('company_id', Auth::user()->company_id)
             ->get()
             ->pluck('item_category_name', 'item_category_id');
-        $merchant   = SalesMerchant::where('data_state', 0)
-            ->get()
-            ->pluck('merchant_name', 'merchant_id');
+        $merchant   = SalesMerchant::where('data_state', 0);
+            if(Auth::id()!=1||Auth::user()->merchant_id!=null){
+                $merchant->where('merchant_id',Auth::user()->merchant_id);
+            }
+        $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
         $data  = InvtItem::where('item_id', 0)->first();
         $base_kemasan=0;
         for($n=1;$n<=4;$n++){
@@ -215,10 +217,13 @@ class InvtItemPackgeController extends Controller
         return response(1);
     }
     public function delete($item_package_id){
+        $packageItem=InvtItemPackageItem::find($item_package_id);
+        $packageItem->data_state = '1';
+        $packageItem->deleted_id = Auth::id();
         $package=InvtItemPackage::find($item_package_id);
         $package->data_state = '1';
         $package->deleted_id = Auth::id();
-        if($package->save()){if($package->delete()){
+        if($package->save()&&$packageItem->save()){if($package->delete()&&$packageItem->delete()){
            return redirect()->route('item')->with(['type'=>'success','msg'=>'Hapus Paket Berhasil']);
         };}
         return redirect()->route('item')->with(['type'=>'danger','msg'=>'Hapus Paket Gagal']);

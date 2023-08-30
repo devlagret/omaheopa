@@ -551,7 +551,7 @@ if (empty($paket)) {
                                     ]) !!} --}}
                                 <select class="selection-search-clear required select-form"
                                     placeholder="Masukan Nama Barang" name="package_item_id" id="package_item_id"
-                                    onchange="function_elements_add(this.name, this.value)" onchange="changeSatuan()">
+                                    onchange="changeSatuan()">
                                 </select>
                             </div>
                         </div>

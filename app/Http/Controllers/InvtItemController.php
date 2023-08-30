@@ -30,8 +30,11 @@ class InvtItemController extends Controller
 
         $data = InvtItem::with('merchant')->join('invt_item_category', 'invt_item_category.item_category_id', '=', 'invt_item.item_category_id')
             ->where('invt_item.data_state', '=', 0)
-            ->where('invt_item.company_id', Auth::user()->company_id)
-            ->get();
+            ->where('invt_item.company_id', Auth::user()->company_id);
+        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
+                $data->where('invt_item.merchant_id',Auth::user()->merchant_id);
+        }
+            $data =$data->get();
         $paket = InvtItemPackage::with('merchant')->where('data_state','0')
                 ->where('company_id', Auth::user()->company_id)
                 ->  get();
@@ -61,13 +64,15 @@ class InvtItemController extends Controller
             ->where('company_id', Auth::user()->company_id)
             ->get()
             ->pluck('item_category_name', 'item_category_id');
-        $merchant   = SalesMerchant::where('data_state', 0)
-            ->get()
-            ->pluck('merchant_name', 'merchant_id');
+            $merchant   = SalesMerchant::where('data_state', 0);
+            if(Auth::id()!=1||Auth::user()->merchant_id!=null){
+                $merchant->where('merchant_id',Auth::user()->merchant_id);
+            }
+            $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
         $invtitm   = InvtItem::where('data_state', 0)
             ->get()
             ->pluck('item_name', 'item_id');
-         $canAddCategory=!empty(User::with('group.maping.menu')->find(Auth::id())->group->maping->where('id_menu',SystemMenu::where('id','item-category')->first()->id_menu));
+        $canAddCategory=!empty(User::with('group.maping.menu')->find(Auth::id())->group->maping->where('id_menu',SystemMenu::where('id','item-category')->first()->id_menu));
         return view('content.InvtItem.FormAddInvtItem', compact('category','pktitem', 'itemunits', 'items', 'merchant','invtitm','canAddCategory','paket','counts','unit'));
     }
 
@@ -158,9 +163,11 @@ class InvtItemController extends Controller
             ->where('company_id', Auth::user()->company_id)
             ->get()
             ->pluck('item_category_name', 'item_category_id');
-        $merchant   = SalesMerchant::where('data_state', 0)
-            ->get()
-            ->pluck('merchant_name', 'merchant_id');
+            $merchant   = SalesMerchant::where('data_state', 0);
+            if(Auth::id()!=1||Auth::user()->merchant_id!=null){
+                $merchant->where('merchant_id',Auth::user()->merchant_id);
+            }
+            $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
         $data  = InvtItem::where('item_id', $item_id)->first();
         $base_kemasan=0;
         for($n=1;$n<=4;$n++){
@@ -176,7 +183,24 @@ class InvtItemController extends Controller
             'item_name'         => 'required',
             'item_id'         => 'required',
         ],['item_category_id.integer'=>'Wahana / Merchant Tidak Memiliki Kategori']);
-        $table                          = InvtItem::findOrFail($fields['item_id']);
+        $table       = InvtItem::findOrFail($fields['item_id']);
+
+        $unit = collect();
+        $packageitem = InvtItemPackageItem::with('unit')->where('item_id',$fields['item_id']);
+        for($l=1;$l<=4;$l++){
+            if($table['item_unit_id'.$l] != $request['item_unit_id'.$l]){
+                if($table['item_unit_id'.$l]!=null && $request['item_unit_id'.$l]==null){
+                    if($packageitem->where('data_state',0)->where('item_unit_id',$table['item_unit_id'.$l])->get()->count()){
+                       return redirect()->back()->withErrors('Ada Paket yang Menggunankan Item "'.$table->item_name.'" Dengan Satuan "'.$packageitem->where('data_state',0)->where('item_unit_id',$table['item_unit_id'.$l])->first()->unit->item_unit_name.'". Harap Tidak Menghapus Satuan Tersebut.' );
+                   }
+                }
+                /*if($table['item_unit_id'.$l]!=null&&$request->used_in_package){
+                    $itmpackage = InvtItemPackageItem::where('item_id',$fields['item_id'])->where('item_unit_id',$table['item_unit_id'.$l]);
+                    $itmpackage->update(['item_unit_id'=> $request['item_unit_id'.$l]]);
+                }*/
+            }
+        }
+
         $table->item_category_id        = $fields['item_category_id'];
         $table->item_code               = $fields['item_code'];
         $table->item_name               = $fields['item_name'];

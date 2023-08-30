@@ -13,9 +13,9 @@ class InvtWarehouseController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        
+
     }
-    
+
     public function index()
     {
         Session::forget('warehouses');
@@ -65,10 +65,10 @@ class InvtWarehouseController extends Controller
 
         if($data->save()){
             $msg = "Tambah Gudang Berhasil";
-            return redirect('/warehouse/add-warehouse')->with('msg', $msg);
+            return redirect('/warehouse/')->with('msg', $msg);
         } else {
             $msg = "Tambah Gudang Gagal";
-            return redirect('/warehouse/add-warehouse')->with('msg', $msg);
+            return redirect('/warehouse/')->with('msg', $msg);
         }
     }
 
@@ -82,7 +82,7 @@ class InvtWarehouseController extends Controller
     {
         $fields = $request->validate([
             'warehouse_id'      => '',
-            'warehouse_code'    => 'required',    
+            'warehouse_code'    => 'required',
             'warehouse_name'    => 'required',
             'warehouse_phone'   => 'required',
             'warehouse_address' => 'required'

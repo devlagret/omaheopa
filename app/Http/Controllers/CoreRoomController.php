@@ -17,6 +17,9 @@ class CoreRoomController extends Controller
         $this->middleware('auth');
     }
     public function index() {
+        if(Auth::user()->merchant_id !=1||Auth::id()!=1){
+            return redirect()->back();
+           }
         Session::forget('room-data');
         $room = CoreRoom::with(['roomType','building'])->get();
         return view('content.CoreRoom.ListRoom')->with(['room'=>$room]);

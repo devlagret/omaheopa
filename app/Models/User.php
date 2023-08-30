@@ -53,7 +53,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
     public function group() {
-        return $this->hasOne(SystemUserGroup::class,'user_group_id');
+        return $this->hasOne(SystemUserGroup::class,'user_group_id','user_group_id');
     }
     public function merchant(){
         return $this->belongsTo(SalesMerchant::class,'merchant_id','merchant_id');

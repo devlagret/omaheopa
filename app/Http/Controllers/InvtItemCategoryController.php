@@ -24,8 +24,11 @@ class InvtItemCategoryController extends Controller
         Session::forget('datacategory');
         $data = InvtItemCategory::where('data_state', 0)
         ->where('company_id', Auth::user()->company_id)
-        ->with('merchant')
-        ->get();
+        ->with('merchant');
+        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
+            $data->where('merchant_id',Auth::user()->merchant_id);
+        }
+        $data =$data->get();
         return view('content.InvtItemCategory.ListInvtItemCategory', compact('data'));
     }
 
@@ -33,7 +36,11 @@ class InvtItemCategoryController extends Controller
     {
         $datacategory = Session::get('datacategory');
         $url = 'item-category';
-        $merchant = SalesMerchant::get()->pluck('merchant_name','merchant_id');
+        $merchant = SalesMerchant::where('data_state','0');
+        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
+            $merchant->where('merchant_id',Auth::user()->merchant_id);
+        }
+        $merchant = $merchant->get()->pluck('merchant_name','merchant_id');
         if($merchant_id != null){
             $datacategory['item_category_code']  = '';
             $datacategory['item_category_name']    = '';

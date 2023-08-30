@@ -126,6 +126,9 @@ if(empty($pktitem)){
                                             !empty($pkg)?'disabled':''
                                         ],
                                     ) !!}
+                                     @if (!empty($pkg))
+                                     <input type="hidden" name="merchant_id" value="{{$data['merchant_id']}}"/>
+                                 @endif
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -142,29 +145,30 @@ if(empty($pktitem)){
                                     <a class="text-dark">Kode Barang<a class='red'> *</a></a>
                                     <input class="form-control input-bb" name="item_code" id="item_code" type="text" form="form-barang"
                                         autocomplete="off" onchange="function_elements_add(this.name, this.value)"
-                                        value="{{ isset($items['item_code']) ? $items['item_code'] : $data['item_code'] }}" />
+                                        value="{{ isset($items['item_code']) ? $items['item_code']!=''? $items['item_code']: $data['item_code'] : $data['item_code'] }}" />
                                     <input class="form-control input-bb" name="item_id" id="item_id" type="text" form="form-barang"
                                         autocomplete="off" value="{{ $data['item_id'] }}" hidden />
+                                    <input type="hidden" form="form-barang" name="used_in_package" value="{{!empty($pkg)?1:0}}"/>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <a class="text-dark">Nama Barang<a class='red'> *</a></a>
                                     <input class="form-control input-bb" name="item_name" id="item_name" form="form-barang" type="text" onchange="function_elements_add(this.name, this.value)"
-                                        autocomplete="off" value="{{  isset($items['item_name']) ? $items['item_name'] : $data['item_name'] }}" />
+                                        autocomplete="off" value="{{  isset($items['item_name']) ? $items['item_name'] != '' ? $items['item_name'] : $data['item_name'] : $data['item_name'] }}" />
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <a class="text-dark">Barcode Barang<a class='red'> *</a></a>
                                     <input class="form-control input-bb" name="item_barcode" id="item_barcode" form="form-barang" onchange="function_elements_add(this.name, this.value)"
-                                        type="text" autocomplete="off" value="{{isset($items['item_barcode']) ? $items['item_barcode'] : $data['item_barcode'] }}" />
+                                        type="text" autocomplete="off" value="{{ isset($items['item_barcode']) ? $items['item_barcode'] != '' ? $items['item_barcode'] : $data['item_barcode'] : $data['item_barcode'] }}" />
                                 </div>
                             </div>
                             <div class="col-md-8 mt-3">
                                 <div class="form-group">
                                     <a class="text-dark">Keterangan<a class='red'> *</a></a>
-                                    <textarea class="form-control input-bb" name="item_remark" id="item_remark" form="form-barang" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value)">{{ isset($items['item_remark']) ? $items['item_remark'] :$data['item_remark'] }}</textarea>
+                                    <textarea class="form-control input-bb" name="item_remark" id="item_remark" form="form-barang" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value)">{{ isset($items['item_remark']) ? $items['item_remark'] != '' ? $items['item_remark'] :$data['item_remark']:$data['item_remark'] }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -332,7 +336,7 @@ if(empty($pktitem)){
                                         ]) !!} --}}
                                     <select class="selection-search-clear required select-form"
                                         placeholder="Masukan Nama Barang" name="package_item_id" id="package_item_id"
-                                        onchange="function_elements_add(this.name, this.value)" onchange="changeSatuan('{{ route('get-item-unit') }}','{{ csrf_token() }}')">
+                                       onchange="changeSatuan('{{ route('get-item-unit') }}','{{ csrf_token() }}')">
                                     </select>
                                 </div>
                             </div>
