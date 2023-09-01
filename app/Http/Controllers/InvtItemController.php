@@ -64,11 +64,11 @@ class InvtItemController extends Controller
             ->where('company_id', Auth::user()->company_id)
             ->get()
             ->pluck('item_category_name', 'item_category_id');
-            $merchant   = SalesMerchant::where('data_state', 0);
-            if(Auth::id()!=1||Auth::user()->merchant_id!=null){
-                $merchant->where('merchant_id',Auth::user()->merchant_id);
-            }
-            $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
+        $merchant   = SalesMerchant::where('data_state', 0);
+        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
+            $merchant->where('merchant_id',Auth::user()->merchant_id);
+        }
+        $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
         $invtitm   = InvtItem::where('data_state', 0)
             ->get()
             ->pluck('item_name', 'item_id');
@@ -110,7 +110,6 @@ class InvtItemController extends Controller
                 'item_category_id'      => $fields['item_category_id'],
                 'item_code'             => $fields['item_code'],
                 'item_name'             => $fields['item_name'],
-                'item_barcode'          => $request->item_barcode,
                 'merchant_id'           => $request->merchant_id,
                 'item_remark'           => $request->item_remark,
                 // * Kemasan
@@ -163,11 +162,11 @@ class InvtItemController extends Controller
             ->where('company_id', Auth::user()->company_id)
             ->get()
             ->pluck('item_category_name', 'item_category_id');
-            $merchant   = SalesMerchant::where('data_state', 0);
-            if(Auth::id()!=1||Auth::user()->merchant_id!=null){
-                $merchant->where('merchant_id',Auth::user()->merchant_id);
-            }
-            $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
+        $merchant   = SalesMerchant::where('data_state', 0);
+        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
+            $merchant->where('merchant_id',Auth::user()->merchant_id);
+        }
+        $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
         $data  = InvtItem::where('item_id', $item_id)->first();
         $base_kemasan=0;
         for($n=1;$n<=4;$n++){
@@ -204,7 +203,6 @@ class InvtItemController extends Controller
         $table->item_category_id        = $fields['item_category_id'];
         $table->item_code               = $fields['item_code'];
         $table->item_name               = $fields['item_name'];
-        $table->item_barcode            = $request->item_barcode;
         $table->merchant_id             = $request->merchant_id;
         $table->item_remark             = $request->item_remark;
         // * Kemasan
@@ -315,6 +313,7 @@ class InvtItemController extends Controller
         try{
         $item = InvtItem::select('item_id', 'item_name')
             ->where('merchant_id', $request->merchant_id)
+            ->where('item_category_id', $request->item_category_id)
             ->where('data_state', 0)
             ->get();
         $items['package_item_id'] ?? $items['package_item_id'] = 1;
@@ -331,7 +330,6 @@ class InvtItemController extends Controller
 
     }
     }
-
     public function getItemUnit(Request $request){
         $data = '';
         $items = Session::get('items');
@@ -351,7 +349,6 @@ class InvtItemController extends Controller
 
     }
     }
-
     public function checkDeleteItem($item_id) {
 
         $pkg = InvtItemPackageItem::where('data_state','0')->where('item_id',$item_id)->get()->count();
@@ -359,5 +356,13 @@ class InvtItemController extends Controller
            return response(1);
         }
         return response(0);
+    }
+    public function getItemCost(Request $request) {
+        $itm = InvtItem::where('data_state','0')->where('item_id',$request->item_id)->first();
+        for ( $a = 1 ; $a <= 4; $a++) {
+            if( $itm['item_unit_id'.$a] != null && $itm['item_unit_id'.$a]==$request->item_unit){
+                return  $itm['item_unit_cost'.$a];
+            }
+        }
     }
 }

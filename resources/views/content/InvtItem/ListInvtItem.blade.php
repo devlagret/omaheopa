@@ -72,11 +72,12 @@ function check(name,uri){
                 <thead>
                     <tr>
                         <th width="2%" style='text-align:center'>No</th>
-                        <th width="20%" style='text-align:center'>Nama Kategori Barang</th>
-                        <th width="20%" style='text-align:center'>Kode Barang</th>
+                        <th width="15%" style='text-align:center'>Nama Kategori Barang</th>
+                        <th width="15%" style='text-align:center'>Kode Barang</th>
                         <th width="20%" style='text-align:center'>Wahana / Merchant</th>
                         <th width="20%" style='text-align:center'>Nama Barang</th>
-                        <th width="10%" style='text-align:center'>Aksi</th>
+                        <th width="12%" style='text-align:center'>Barcode Barang</th>
+                        <th width="15%" style='text-align:center'>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -88,6 +89,7 @@ function check(name,uri){
                         <td>{{ $val->package_code }}</td>
                         <td>{{ $val->merchant->merchant_name }}</td>
                         <td>{{ $val->package_name }}</td>
+                        <td class='text-center'>{{ $val->package_barcode }}</td>
                         <td class="text-center">
                             <a type="button" class="btn btn-outline-warning btn-sm" href="{{ route('package.edit',$val->item_package_id) }}">Edit</a>
                             <a type="button" class="btn btn-outline-danger btn-sm"  onclick="check('{{$val->package_name}}','{{ route('package.delete',$val->item_package_id) }}')">Hapus</a>
@@ -101,6 +103,7 @@ function check(name,uri){
                         <td>{{ $row['item_code'] }}</td>
                         <td>{{ $row->merchant->merchant_name }}</td>
                         <td>{{ $row['item_name'] }}</td>
+                        <td class='text-center'><a type='button' class='btn btn-outline-dark btn-sm' href="{{route('item-barcode.index', $row['item_id'])}}"><i class='fa fa-barcode'></i> Barcode</a></td>
                         <td class="text-center">
                             <a type="button" class="btn btn-outline-warning btn-sm" href="{{ url('/item/edit-item/'.$row['item_id']) }}">Edit</a>
                             <a type="button" class="btn btn-outline-danger btn-sm" onclick="deleteItem('{{$row['item_id']}}','{{$row['item_name']}}')">Hapus</a>

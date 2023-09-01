@@ -46,9 +46,9 @@ if (empty($paket)) {
             });
         }
 
-        function changeCategory() {
-            var merchant_id = $("#merchant_id").val();
-
+        function changeCategory(id,el,change_itm = 0,from = 0) {
+            var merchant_id = $("#"+id).val();
+            console.log(id);
             $.ajax({
                 type: "POST",
                 url: "{{ route('get-item-category') }}",
@@ -58,8 +58,13 @@ if (empty($paket)) {
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function(return_data) {
-                    $('#item_category_id').val(1);
-                    $('#item_category_id').html(return_data);
+                    if(from){clearIsiPaket();}
+                    console.log(el)
+                    $('#'+el).html(return_data);
+                    if(change_itm){
+                        changeItem($('#'+el).val());
+                        return 0;
+                    }
                     function_elements_add('merchant_id', merchant_id);
                 },
                 error: function(data) {
@@ -68,7 +73,7 @@ if (empty($paket)) {
             });
         }
 
-        function changeItem(from = 1) {
+        function changeItem(category) {
             var id = $("#package_merchant_id").val();
             var no = $('.pkg-itm').length;
             $.ajax({
@@ -78,14 +83,15 @@ if (empty($paket)) {
                 data: {
                     'no': no,
                     'merchant_id': id,
+                    'item_category_id': category,
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function(return_data) {
-                    if(from){clearIsiPaket();}
                     $('#package_item_id').val(1);
                     $('#package_item_id').html(return_data);
                     changeSatuan();
                     function_elements_add('package_merchant_id', id);
+                    function_elements_add('package_item_category', category);
                 }
             });
         }
@@ -258,9 +264,9 @@ if (empty($paket)) {
             $('#package_price').val(harga);
         }
         $(document).ready(function() {
-            changeCategory();
+            changeCategory('merchant_id','item_category_id');
+            changeCategory('package_merchant_id','package_item_category',1);
             checkCategory();
-            changeItem(0);
             if($('#package_price_view').val()!=''){
             formatRp();}
         });
@@ -346,7 +352,7 @@ if (empty($paket)) {
                                     'class' => 'selection-search-clear required select-form',
                                     'name' => 'merchant_id',
                                     'id' => 'merchant_id',
-                                    'onchange' => 'changeCategory()',
+                                    'onchange' => 'changeCategory(this.id,`item_category_id`)',
                                     'form'=>'form-barang',
                                     'autofocus'=>'autofocus',
                                     'required'
@@ -376,15 +382,6 @@ if (empty($paket)) {
                                 <input class="form-control required input-bb" required form="form-barang" name="item_name" id="item_name" type="text"
                                     autocomplete="off" onchange="function_elements_add(this.name, this.value)"
                                     value="{{ $items['item_name'] }}" />
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <a class="text-dark">Barcode Barang<a class='red'> *</a></a>
-                                <input class="form-control input-bb" form="form-barang" name="item_barcode" id="item_barcode"
-                                    type="text" autocomplete="off"
-                                    onchange="function_elements_add(this.name, this.value)"
-                                    value="{{ $items['item_barcode'] }}" />
                             </div>
                         </div>
                         <div class="col-md-8 mt-3">
@@ -493,7 +490,7 @@ if (empty($paket)) {
                                     'class' => 'selection-search-clear required select-form',
                                     'name' => 'package_merchant_id',
                                     'id' => 'package_merchant_id',
-                                    'onchange' => 'changeItem()',
+                                    'onchange' => 'changeCategory(this.id,`package_item_category`,1,1)',
                                     'form' => 'form-paket',
                                 ]) !!}
                             </div>
@@ -543,6 +540,15 @@ if (empty($paket)) {
                     <div class="row form-group">
                         <div class="col-md-6">
                             <div class="form-group">
+                                <a class="text-dark">Kategori<a class='red'> *</a></a>
+                                <select class="selection-search-clear required select-form"
+                                    placeholder="Masukan Kategori Barang" name="package_item_category" id="package_item_category"
+                                    onchange="changeItem(this.value)">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
                                 <a class="text-dark">Nama Barang<a class='red'> *</a></a>
                                 {{-- {!! Form::select('item_id', $invtitm, $items['item_id'] ?? '', [
                                         'class' => 'selection-search-clear required select-form',
@@ -555,11 +561,7 @@ if (empty($paket)) {
                                 </select>
                             </div>
                         </div>
-                        <div class="col-auto justify-content-center">
-                            <button class="btn btn-sm btn-primary mt-4" type="button" onclick="addPackageItem()"><i
-                                class="fa fa-plus" id="add-package-item"></i>Tambah Barang</button>
-                        </div>
-                        <div class="col-md-4 ml-5">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <a class="text-dark">Satuan<a class='red'> *</a></a>
                                 <select class="selection-search-clear required select-form"
@@ -567,6 +569,10 @@ if (empty($paket)) {
                                     onchange="function_elements_add(this.name, this.value)">
                                 </select>
                             </div>
+                        </div>
+                        <div class="col-auto justify-content-center">
+                            <button class="btn btn-sm btn-primary mt-4" type="button" onclick="addPackageItem()"><i
+                                class="fa fa-plus" id="add-package-item"></i>Tambah Barang</button>
                         </div>
                     </div>
                     <div class="card border border-dark">

@@ -158,13 +158,6 @@ if(empty($pktitem)){
                                         autocomplete="off" value="{{  isset($items['item_name']) ? $items['item_name'] != '' ? $items['item_name'] : $data['item_name'] : $data['item_name'] }}" />
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <a class="text-dark">Barcode Barang<a class='red'> *</a></a>
-                                    <input class="form-control input-bb" name="item_barcode" id="item_barcode" form="form-barang" onchange="function_elements_add(this.name, this.value)"
-                                        type="text" autocomplete="off" value="{{ isset($items['item_barcode']) ? $items['item_barcode'] != '' ? $items['item_barcode'] : $data['item_barcode'] : $data['item_barcode'] }}" />
-                                </div>
-                            </div>
                             <div class="col-md-8 mt-3">
                                 <div class="form-group">
                                     <a class="text-dark">Keterangan<a class='red'> *</a></a>
