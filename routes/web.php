@@ -22,6 +22,7 @@ use App\Http\Controllers\SalesMerchantController;
 use App\Http\Controllers\SalesRoomMenuController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\InvtItemBarcodeController;
 use App\Http\Controllers\SystemUserController;
 use App\Http\Controllers\SystemUserGroupController;
 use App\Http\Controllers\InvtItemCategoryController;
@@ -86,6 +87,7 @@ Route::get('/item-category/check-delete-category/{item_category_id}', [InvtItemC
 
 Route::get('/item',[InvtItemController::class, 'index'])->name('item');
 Route::post('/item/unit',[InvtItemController::class, 'getItemUnit'])->name('get-item-unit');
+Route::post('/item/cost',[InvtItemController::class, 'getItemCost'])->name('get-item-cost');
 Route::post('/item/category',[InvtItemController::class, 'getCategory'])->name('get-item-category');
 Route::post('/merchant/item/',[InvtItemController::class, 'getMerchantItem'])->name('get-merchant-item');
 Route::get('/item/add-kemasan',[InvtItemController::class, 'addKemasan'])->name('add-kemasan');
@@ -396,6 +398,13 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
     Route::post('/process-edit', [SalesMerchantController::class, 'processEdit'])->name('process-edit');
     Route::get('/delete/{merchant_id}', [SalesMerchantController::class, 'delete'])->name('delete');
     Route::post('/elements-add', [SalesMerchantController::class, 'elementsAdd'])->name('elements-add');
+});
+ // Item barcode pages
+ Route::prefix('item-barcode')->name('item-barcode.')->group(function () {
+    Route::get('/{item_id}', [InvtItemBarcodeController::class, 'index'])->name('index');
+    Route::post('/process-add', [InvtItemBarcodeController::class, 'processAdd'])->name('process-add');
+    Route::get('/delete/{item_id}/{item_barcode_id}', [InvtItemBarcodeController::class, 'delete'])->name('delete');
+    Route::post('/elements-add', [InvtItemBarcodeController::class, 'elementsAdd'])->name('elements-add');
 });
  // Package pages
  Route::prefix('package')->name('package.')->group(function () {
