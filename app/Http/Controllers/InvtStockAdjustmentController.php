@@ -12,6 +12,7 @@ use App\Models\InvtStockAdjustmentItem;
 use App\Models\InvtWarehouse;
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseInvoiceItem;
+use App\Models\SalesMerchant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -32,6 +33,7 @@ class InvtStockAdjustmentController extends Controller
         Session::forget('warehouse_id');
         Session::forget('date');
         Session::forget('datases');
+        Session::forget('items');
         if(!$start_date = Session::get('start_date')){
             $start_date = date('Y-m-d');
         } else {
@@ -53,32 +55,17 @@ class InvtStockAdjustmentController extends Controller
 
     public function addStockAdjustment()
     {
-        if(!$category_id = Session::get('category_id')){
-            $category_id = '';
-        } else {
-            $category_id = Session::get('category_id');
-        }
-        if(!$item_id = Session::get('item_id')){
-            $item_id = '';
-        } else {
-            $item_id = Session::get('item_id');
-        }
-        if(!$unit_id = Session::get('unit_id')){
-            $unit_id = '';
-        } else {
-             $unit_id = Session::get('unit_id');
-        }
+        $data_item = Session::get('data_item');
         if(!$date = Session::get('date')){
             $date = date('Y-m-d');
         } else {
              $date = Session::get('date');
         }
-        if(!$warehouse_id = Session::get('warehouse_id')){
-            $warehouse_id = '';
-        } else {
-             $warehouse_id = Session::get('warehouse_id');
+        $merchant = SalesMerchant::where("data_state",0);
+        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
+            $merchant->where('merchant_id',Auth::user()->merchant_id);
         }
-
+        $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
         $categorys  = InvtItemCategory::where('data_state',0)
         ->where('company_id', Auth::user()->company_id)
         ->get()
@@ -96,15 +83,22 @@ class InvtStockAdjustmentController extends Controller
         ->get()
         ->pluck('item_name','item_id');
         $datasess   = Session::get('datases');
-        $data       = PurchaseInvoice::join('purchase_invoice_item','purchase_invoice.purchase_invoice_id','=','purchase_invoice_item.purchase_invoice_id')
-        ->where('purchase_invoice_item.item_id', $item_id)
-        ->where('purchase_invoice_item.item_category_id', $category_id)
-        ->where('purchase_invoice_item.item_unit_id', $unit_id)
-        ->where('purchase_invoice.warehouse_id',$warehouse_id)
-        ->where('purchase_invoice.company_id', Auth::user()->company_id)
-        ->where('purchase_invoice.data_state',0)
-        ->get();
-        return view('content.InvtStockAdjustment.FormAddInvtStockAdjustment', compact('categorys', 'units', 'items', 'datasess', 'data', 'date','warehouse','category_id','warehouse_id','item_id','unit_id'));
+        // $data       = PurchaseInvoice::join('purchase_invoice_item','purchase_invoice.purchase_invoice_id','=','purchase_invoice_item.purchase_invoice_id')
+        // ->where('purchase_invoice_item.item_id', $item_id)
+        // ->where('purchase_invoice_item.item_category_id', $category_id)
+        // ->where('purchase_invoice_item.item_unit_id', $unit_id)
+        // ->where('purchase_invoice.warehouse_id',$warehouse_id)
+        // ->where('purchase_invoice.company_id', Auth::user()->company_id)
+        // ->where('purchase_invoice.data_state',0)
+        // ->get();
+        dump($data_item);
+        $data = InvtItemStock::with(['item','unit','category','warehouse'])->where('data_state',0)
+        ->where('item_id', $data_item['item_id']??'')
+        ->where('item_category_id', $data_item['item_category']??'')
+        ->where('item_unit_id', $data_item['item_unit']??'')
+        ->where('warehouse_id',$data_item['warehouse_id']??'')->first();
+        dump($data);exit;
+        return view('content.InvtStockAdjustment.FormAddInvtStockAdjustment', compact('merchant', 'items', 'datasess', 'data', 'date','warehouse','data_item'));
     }
 
     public function addElementsStockAdjustment(Request $request)
@@ -119,22 +113,21 @@ class InvtStockAdjustmentController extends Controller
         }
 
         $datasess[$request->name] = $request->value;
-        $datasess = Session::put('datases',$datasess);
+         Session::put('datases',$datasess);
+        $item = Session::put('items',$datasess);
+        return 1;
     }
 
     public function filterAddStockAdjustment(Request $request)
     {
-        $category_id = $request->item_category_id;
-        $item_id     = $request->item_id;
-        $unit_id     = $request->item_unit_id;
-        $warehouse_id = $request->warehouse_id;
-        $date        = $request->stock_adjustment_date;
-
-        Session::put('category_id', $category_id);
-        Session::put('item_id', $item_id);
-        Session::put('unit_id', $unit_id);
-        Session::put('warehouse_id', $warehouse_id);
-        Session::put('date',$date);
+        $data = [
+            "item_category"         =>$request->item_category,
+            "item_id"               =>$request->item_id,
+            "item_unit"             =>$request->item_unit,
+            "warehouse_id"          =>$request->warehouse_id,
+            "stock_adjustment_date" =>$request->stock_adjustment_date,
+        ];
+        Session::put('data_item', $data);
 
         return redirect('/stock-adjustment/add');
     }

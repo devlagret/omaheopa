@@ -5,8 +5,6 @@
 @section('js')
 <script>
       function function_elements_add(name, value){
-        console.log("name " + name);
-        console.log("value " + value);
 		$.ajax({
 				type: "POST",
 				url : "{{route('add-elements-purchase-return')}}",
@@ -20,24 +18,12 @@
 		});
 	}
 
-    function function_last_balance_physical(kunci,value){
-        last_data =  document.getElementById((kunci)+"_last_balance_data").value;
-        last_adjustment =  document.getElementById((kunci)+"_last_balance_adjustment").value;
-        
-        var last_physical = parseInt(last_data) - parseInt(last_adjustment);
-        $('#'+kunci+"_last_balance_physical").val(last_physical);
+    function function_last_balance_physical(value){
+        last_data =  document.getElementById("last_balance_data").value;
+        last_adjustment =  document.getElementById("last_balance_adjustment").value;
+        var last_physical =  parseInt(last_adjustment) -parseInt(last_data) ;
+        $("#last_balance_physical").val(last_physical);
     }
-    // nostr = $("#no").val();
-    // no = parseInt(nostr)+1;
-    // for(var i = 1; i < no; i++){
-    //     $('#'+i+"_last_balance_adjustment").change(function(){
-    //         var last_data = $('#'+i+"_last_balance_data").val();
-    //         var last_adjustment = $('#'+i+"_last_balance_adjustment").val();
-    //         var last_physical = last_data - last_adjustment;
-    
-    //         $('#'+i+"_last_balance_physical").val(last_physical);
-    //     });
-    // }
     function reset_add(){
 		$.ajax({
 				type: "GET",
@@ -48,7 +34,74 @@
 
 		});
 	}
+    function changeSatuan(){
+            var item_id = $("#item_id").val();
 
+            $.ajax({
+                type: "POST",
+                url: "{{ route('get-item-unit') }}",
+                dataType: "html",
+                data: {
+                    'item_id': item_id,
+                    '_token': '{{ csrf_token() }}',
+                },
+                success: function(return_data) {
+                    $('#item_unit').val(1);
+                    $('#item_unit').html(return_data);
+                    function_elements_add('item_id', item_id);
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            });
+    }
+    function changeCategory() {
+            var merchant_id = $("#merchant_id").val();
+            $.ajax({
+                type: "POST",
+                url: "{{ route('get-item-category') }}",
+                dataType: "html",
+                data: {
+                    'merchant_id': merchant_id,
+                    '_token': '{{ csrf_token() }}',
+                },
+                success: function(return_data) {
+                    $('#item_category').html(return_data);
+                    changeItem($('#item_category').val());
+                    function_elements_add('merchant_id', merchant_id);
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            });
+    }
+
+    function changeItem(category) {
+        var id = $("#merchant_id").val();
+        var no = $('.pkg-itm').length;
+        $.ajax({
+            type: "POST",
+            url: "{{ route('get-merchant-item') }}",
+            dataType: "html",
+            data: {
+                'no': no,
+                'merchant_id': id,
+                'item_category_id': category,
+                '_token': '{{ csrf_token() }}',
+            },
+            success: function(return_data) {
+                $('#item_id').val(1);
+                $('#item_id').html(return_data);
+                changeSatuan();
+                function_elements_add('merchant_id', id);
+                function_elements_add('item_category', category);
+            }
+        });
+    }
+    $(document).ready(function() {
+        changeCategory();
+        $('#last_balance_physical').val('');
+    });
 </script>
 @stop
 @section('content_header')
@@ -103,26 +156,48 @@
             <div class="row form-group">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <a class="text-dark">Nama Kategori Barang<a class='red'> *</a></a>
-                        {!! Form::select('item_category_id',  $categorys, $category_id, ['class' => 'selection-search-clear select-form', 'id' => 'item_category_id', 'name' => 'item_category_id', 'onchange' => 'function_elements_add(this.name, this.value)']) !!}
+                        <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
+                        {!! Form::select('merchant_id', $merchant, $items['merchant_id'] ?? '', [
+                            'class' => 'selection-search-clear required select-form',
+                            'name' => 'merchant_id',
+                            'id' => 'merchant_id',
+                            'onchange' => 'changeCategory()',
+                            'form' => 'form-paket',
+                            'autofocus'=>'autofocus',
+                        ]) !!}
                     </div>
                 </div>
+                <div class="col-md-6">
+                            <div class="form-group">
+                                <a class="text-dark">Kategori<a class='red'> *</a></a>
+                                <select class="selection-search-clear required select-form"
+                                    placeholder="Masukan Kategori Barang" name="item_category" id="item_category"
+                                    onchange="changeItem(this.value)">
+                                </select>
+                            </div>
+                        </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">Nama Barang<a class='red'> *</a></a>
-                        {!! Form::select('item_id',  $items, $item_id, ['class' => 'selection-search-clear select-form', 'id' => 'item_id', 'name' => 'item_id', 'onchange' => 'function_elements_add(this.name, this.value)']) !!}
+                        <select class="selection-search-clear required select-form"
+                        placeholder="Masukan Nama Barang" name="item_id" id="item_id"
+                        onchange="changeSatuan()">
+                    </select>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <a class="text-dark">Kode Satuan<a class='red'> *</a></a>
-                        {!! Form::select('item_unit_id',  $units, $unit_id, ['class' => 'selection-search-clear select-form', 'id' => 'item_unit_id', 'name' => 'item_unit_id', 'onchange' => 'function_elements_add(this.name, this.value)']) !!}
+                        <a class="text-dark">Satuan<a class='red'> *</a></a>
+                        <select class="selection-search-clear required select-form"
+                        placeholder="Masukan Kategori Barang" name="item_unit" id="item_unit"
+                        onchange="function_elements_add(this.name, this.value)">
+                        </select>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">Nama Gudang<a class='red'> *</a></a>
-                        {!! Form::select('warehouse_id',  $warehouse, $warehouse_id, ['class' => 'selection-search-clear select-form', 'id' => 'warehouse_id', 'name' => 'warehouse_id', 'onchange' => 'function_elements_add(this.name, this.value)']) !!}
+                        {!! Form::select('warehouse_id',  $warehouse, $data_item['warehouse_id']??'', ['class' => 'selection-search-clear select-form', 'id' => 'warehouse_id', 'name' => 'warehouse_id', 'onchange' => 'function_elements_add(this.name, this.value)']) !!}
                     </div>
                 </div>
                 <div class="col-md-3">
@@ -156,6 +231,7 @@
                     <table class="table table-bordered table-advance table-hover">
                         <thead class="thead-light">
                             <tr>
+                                <th style='text-align:center'>Kategori Barang</th>
                                 <th style='text-align:center'>Nama Barang</th>
                                 <th style='text-align:center'>Satuan Barang</th>
                                 <th style='text-align:center'>Gudang</th>
@@ -167,38 +243,38 @@
                         </thead>
                         <tbody>
                           <?php $no = 1; ?>
-                            @foreach ($data as $row)
                               <?php $no++ ?>
                                 <tr>
                                   <td>
-                                      {{ $ISAC->getItemName($row['item_id']) }}
-                                      <input type="text" name="{{ $row['purchase_invoice_item_id'] }}no" id="no" value="{{ $row['purchase_invoice_item_id'] }}" hidden>
-                                      <input type="text" name="{{ $row['purchase_invoice_item_id'] }}_item_id" id="{{ $no }}_item_id" value="{{ $row['item_id'] }}" hidden>
-                                      <input type="text" name="{{ $row['purchase_invoice_item_id'] }}_item_category_id" id="{{ $no }}_item_category_id" value="{{ $row['item_category_id'] }}" hidden>
+                                      {{ $data->category->item_category_code }}
+                                      <input type="text" name="item_category_id" id="item_category_id" value="{{ $data['item_category_id'] }}" hidden>
                                   </td>
                                   <td>
-                                      {{ $ISAC->getItemUnitName($row['item_unit_id']) }}
-                                      <input type="text" name="{{ $row['purchase_invoice_item_id'] }}_item_unit_id" id="{{ $no }}_item_unit_id" value="{{ $row['item_unit_id'] }}" hidden>
+                                      {{ $data->item->item_name }}
+                                      <input type="text" name="item_stock_id" id="item_stock_id" value="{{ $data['item_stock_id'] }}" hidden>
                                   </td>
                                   <td>
-                                      {{ $ISAC->getWarehouseName($row['warehouse_id']) }}
-                                      <input type="text" name="{{ $row['purchase_invoice_item_id'] }}_warehouse_id" id="{{ $no }}_warehouse_id" value="{{ $row['item_unit_id'] }}" hidden>
+                                      {{ $data->unit->item_unit_code }}
+                                      <input type="text" name="item_unit_id" id="item_unit_id" value="{{ $data['item_unit_id'] }}" hidden>
                                   </td>
                                   <td>
-                                      {{ $ISAC->getItemStock($row['item_id'],$row['item_unit_id'],$row['item_category_id'],$row['warehouse_id']) }}
-                                      <input type="text" name="{{ $row['purchase_invoice_item_id'] }}_last_balance_data" id="{{ $no }}_last_balance_data" onchange="function_last_balance_physical({{ $no }}, this.value)" value="{{ $ISAC->getItemStock($row['item_id'],$row['item_unit_id'],$row['item_category_id'],$row['warehouse_id']) }}" hidden >
+                                      {{ $data->warehouse->warehouse_name }}
+                                      <input type="text" name="warehouse_id" id="warehouse_id" value="{{ $data['warehouse_id'] }}" hidden>
+                                  </td>
+                                  <td>
+                                      {{ $data->last_balance }}
+                                      <input type="text" name="last_balance_data" id="last_balance_data" value="{{ $data['last_balance'] }}" hidden>
                                   </td>
                                   <td style="text-align: center">
-                                      <input class="form-control input-bb" type="text" name="{{ $row['purchase_invoice_item_id'] }}_last_balance_adjustment" id="{{ $no }}_last_balance_adjustment" onchange="function_last_balance_physical({{ $no }}, this.value)" autocomplete="off">
+                                      <input class="form-control input-bb" type="text" name="last_balance_adjustment" id="last_balance_adjustment" onchange="function_last_balance_physical(this.value)" autocomplete="off">
                                   </td>
                                   <td style="text-align: center">
-                                      <input class="form-control input-bb" type="text" name="{{ $row['purchase_invoice_item_id'] }}_last_balance_physical" id="{{ $no }}_last_balance_physical" readonly>
+                                      <input class="form-control input-bb" type="text" name="last_balance_physical" id="last_balance_physical" readonly>
                                   </td>
                                   <td style="text-align: center">
-                                      <input class="form-control input-bb" type="text" name="{{ $row['purchase_invoice_item_id'] }}_stock_adjustment_item_remark" id="{{ $no }}_stock_adjustment_item_remark" autocomplete="off">
+                                      <input class="form-control input-bb" type="text" name="stock_adjustment_item_remark" id="stock_adjustment_item_remark" autocomplete="off" />
                                   </td>
                                 </tr>
-                            @endforeach
                         </tbody>
                     </table>
                 </div>
