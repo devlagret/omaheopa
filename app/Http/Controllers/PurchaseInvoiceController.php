@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\AcctAccount;
 use App\Models\AcctAccountSetting;
+use App\Models\CoreSupplier;
 use App\Models\InvtItem;
 use App\Models\InvtItemCategory;
 use App\Models\InvtItemStock;
@@ -15,6 +16,7 @@ use App\Models\JournalVoucherItem;
 use App\Models\PreferenceTransactionModule;
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseInvoiceItem;
+use App\Models\SalesMerchant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -69,9 +71,18 @@ class PurchaseInvoiceController extends Controller
         ->where('company_id', Auth::user()->company_id)
         ->get()
         ->pluck('warehouse_name','warehouse_id');
+        $suppliers = CoreSupplier::where('data_state',0)
+        ->where('company_id', Auth::user()->company_id)
+        ->get()
+        ->pluck('supplier_name','supplier_id');
+        $merchant   = SalesMerchant::where('data_state', 0);
+        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
+            $merchant->where('merchant_id',Auth::user()->merchant_id);
+        }
+        $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
         $datases = Session::get('datases');
         $arraydatases = Session::get('arraydatases');
-        return view('content.PurchaseInvoice.FormAddPurchaseInvoice', compact('categorys', 'items', 'units','warehouses','datases','arraydatases'));
+        return view('content.PurchaseInvoice.FormAddPurchaseInvoice', compact('categorys', 'merchant','suppliers','items', 'units','warehouses','datases','arraydatases'));
     }
 
     public function detailPurchaseInvoice($purchase_invoice_id)
@@ -93,6 +104,7 @@ class PurchaseInvoiceController extends Controller
             $datases['warehouse_id']                = '';
             $datases['purchase_invoice_date']       = '';
             $datases['purchase_invoice_remark']     = '';
+            $datases['supplier_id']     = '';
         }
         $datases[$request->name] = $request->value;
         $datases = Session::put('datases', $datases);
