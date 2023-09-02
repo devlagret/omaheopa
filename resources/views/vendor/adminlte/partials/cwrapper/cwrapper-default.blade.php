@@ -24,5 +24,11 @@
             @yield('content')
         </div>
     </div>
-
+    {{-- Loading Modal --}}
+    <div class="modal fade" id="loading" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="loadingLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="loading mx-auto">
+            </div>
+        </div>
+    </div>
 </div>

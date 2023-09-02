@@ -82,11 +82,33 @@
 
 </head>
 <style>
-    .pull-left{
+.pull-left{
 float: left !important;
 }
 .content-wrapper{
     overflow-x: hidden;
+}
+.loading {
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #e05c03;
+  border-right: 16px solid #d8b407;
+  border-bottom: 16px solid #e05c03;
+  border-left: 16px solid #d8b407;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>
 <body class="@yield('classes_body')" @yield('body_data')>
@@ -96,16 +118,28 @@ float: left !important;
 
     {{-- Base Scripts --}}
     @if(!config('adminlte.enabled_laravel_mix'))
+        <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
         <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
         <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
         <script src="{{ asset('vendor/overlayScrollbars/js/jquery.overlayScrollbars.min.js') }}"></script>
         
-        <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
         <script src="https://cdn.datatables.net/1.11.1/js/jquery.dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/1.11.1/js/dataTables.bootstrap4.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
         {{-- <script src="{{ asset('resources/js/select2.min.js') }}"></script> --}}
         <script>
+            /**
+             * Show loading modal
+             * @param  {Number} status Use 0 to close modal
+             * @return {Void}   Nothing
+             */
+            function loading(status = 1){
+                if (status){
+                    $('#loading').modal('show');
+                }else{
+                    $('#loading').modal('hide');
+                }
+            }
             function toRp(number) {
                 var number = number.toString(), 
                 rupiah = number.split(',')[0], 
