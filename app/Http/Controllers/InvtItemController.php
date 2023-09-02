@@ -261,6 +261,7 @@ class InvtItemController extends Controller
             ->where('merchant_id', $request->merchant_id)
             ->where('data_state', 0)
             ->get();
+        $items['item_category_id'] ?? $items['item_category_id'] = 1;
         foreach ($category as $val) {
             $data .= "<option value='$val[item_category_id]' " . ($items['item_category_id'] == $val['item_category_id'] ? 'selected' : '') . ">$val[item_category_name]</option>\n";
         }
@@ -361,7 +362,7 @@ class InvtItemController extends Controller
         $itm = InvtItem::where('data_state','0')->where('item_id',$request->item_id)->first();
         for ( $a = 1 ; $a <= 4; $a++) {
             if( $itm['item_unit_id'.$a] != null && $itm['item_unit_id'.$a]==$request->item_unit){
-                return  $itm['item_unit_cost'.$a];
+                return  ['cost'=>$itm['item_unit_cost'.$a],'price'=>$itm['item_unit_price'.$a]];
             }
         }
     }
