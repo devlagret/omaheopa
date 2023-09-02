@@ -88,6 +88,7 @@ Route::get('/item-category/check-delete-category/{item_category_id}', [InvtItemC
 Route::get('/item',[InvtItemController::class, 'index'])->name('item');
 Route::post('/item/unit',[InvtItemController::class, 'getItemUnit'])->name('get-item-unit');
 Route::post('/item/cost',[InvtItemController::class, 'getItemCost'])->name('get-item-cost');
+Route::post('/item/cost/process-edit',[InvtItemController::class, 'processEditCost'])->name('process-edit-cost-item');
 Route::post('/item/category',[InvtItemController::class, 'getCategory'])->name('get-item-category');
 Route::post('/merchant/item/',[InvtItemController::class, 'getMerchantItem'])->name('get-merchant-item');
 Route::get('/item/add-kemasan',[InvtItemController::class, 'addKemasan'])->name('add-kemasan');

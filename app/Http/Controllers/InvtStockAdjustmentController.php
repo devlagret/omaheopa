@@ -83,21 +83,11 @@ class InvtStockAdjustmentController extends Controller
         ->get()
         ->pluck('item_name','item_id');
         $datasess   = Session::get('datases');
-        // $data       = PurchaseInvoice::join('purchase_invoice_item','purchase_invoice.purchase_invoice_id','=','purchase_invoice_item.purchase_invoice_id')
-        // ->where('purchase_invoice_item.item_id', $item_id)
-        // ->where('purchase_invoice_item.item_category_id', $category_id)
-        // ->where('purchase_invoice_item.item_unit_id', $unit_id)
-        // ->where('purchase_invoice.warehouse_id',$warehouse_id)
-        // ->where('purchase_invoice.company_id', Auth::user()->company_id)
-        // ->where('purchase_invoice.data_state',0)
-        // ->get();
-        dump($data_item);
         $data = InvtItemStock::with(['item','unit','category','warehouse'])->where('data_state',0)
         ->where('item_id', $data_item['item_id']??'')
         ->where('item_category_id', $data_item['item_category']??'')
         ->where('item_unit_id', $data_item['item_unit']??'')
         ->where('warehouse_id',$data_item['warehouse_id']??'')->first();
-        dump($data);exit;
         return view('content.InvtStockAdjustment.FormAddInvtStockAdjustment', compact('merchant', 'items', 'datasess', 'data', 'date','warehouse','data_item'));
     }
 
@@ -128,8 +118,15 @@ class InvtStockAdjustmentController extends Controller
             "stock_adjustment_date" =>$request->stock_adjustment_date,
         ];
         Session::put('data_item', $data);
-
-        return redirect('/stock-adjustment/add');
+        $data = InvtItemStock::with(['item','unit','category','warehouse'])->where('data_state',0)
+        ->where('item_id', $data['item_id']??'')
+        ->where('item_category_id', $data['item_category']??'')
+        ->where('item_unit_id', $data['item_unit']??'')
+        ->where('warehouse_id',$data['warehouse_id']??'')->first();
+        if($data==null){
+            return redirect()->route('add-stock-adjustment')->with('msg',"Barang yang Dicari Tidak Memiliki Stok");
+        }
+        return redirect()->route('add-stock-adjustment');
     }
 
     public function filterListStockAdjustment(Request $request)

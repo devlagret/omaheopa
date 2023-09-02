@@ -44,6 +44,7 @@ class PurchaseInvoiceController extends Controller
             $end_date = Session::get('end_date');
         }
         Session::forget('datases');
+        Session::forget('items');
         Session::forget('arraydatases');
         $data = PurchaseInvoice::where('data_state',0)
         ->where('company_id', Auth::user()->company_id)
@@ -59,14 +60,7 @@ class PurchaseInvoiceController extends Controller
         ->where('company_id', Auth::user()->company_id)
         ->get()
         ->pluck('item_category_name', 'item_category_id');
-        $items     = InvtItem::where('data_state',0)
-        ->where('company_id', Auth::user()->company_id)
-        ->get()
-        ->pluck('item_name', 'item_id');
-        $units     = InvtItemUnit::where('data_state',0)
-        ->where('company_id', Auth::user()->company_id)
-        ->get()
-        ->pluck('item_unit_name','item_unit_id');
+        $items     = Session::get('items');
         $warehouses = InvtWarehouse::where('data_state',0)
         ->where('company_id', Auth::user()->company_id)
         ->get()
@@ -82,7 +76,7 @@ class PurchaseInvoiceController extends Controller
         $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
         $datases = Session::get('datases');
         $arraydatases = Session::get('arraydatases');
-        return view('content.PurchaseInvoice.FormAddPurchaseInvoice', compact('categorys', 'merchant','suppliers','items', 'units','warehouses','datases','arraydatases'));
+        return view('content.PurchaseInvoice.FormAddPurchaseInvoice', compact('merchant','suppliers','items','warehouses','datases','arraydatases'));
     }
 
     public function detailPurchaseInvoice($purchase_invoice_id)
@@ -107,6 +101,7 @@ class PurchaseInvoiceController extends Controller
             $datases['supplier_id']     = '';
         }
         $datases[$request->name] = $request->value;
+        Session::put('items',$datases);
         $datases = Session::put('datases', $datases);
     }
 
