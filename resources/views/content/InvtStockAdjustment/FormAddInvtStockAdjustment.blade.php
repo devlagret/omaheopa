@@ -17,7 +17,7 @@
 			}
 		});
 	}
-
+    
     function function_last_balance_physical(value){
         last_data =  document.getElementById("last_balance_data").value;
         last_adjustment =  document.getElementById("last_balance_adjustment").value;
@@ -36,7 +36,7 @@
 	}
     function changeSatuan(){
             var item_id = $("#item_id").val();
-
+            $('#loading').modal('show');
             $.ajax({
                 type: "POST",
                 url: "{{ route('get-item-unit') }}",
@@ -57,6 +57,7 @@
     }
     function changeCategory() {
             var merchant_id = $("#merchant_id").val();
+            $('#loading').modal('show');
             $.ajax({
                 type: "POST",
                 url: "{{ route('get-item-category') }}",
@@ -67,16 +68,18 @@
                 },
                 success: function(return_data) {
                     $('#item_category').html(return_data);
+                    $('#loading').modal('hide');
                     changeItem($('#item_category').val());
                     function_elements_add('merchant_id', merchant_id);
                 },
                 error: function(data) {
+                    $('#loading').modal('hide');
                     console.log(data);
                 }
             });
     }
-
     function changeItem(category) {
+        $('#loading').modal('show');
         var id = $("#merchant_id").val();
         var no = $('.pkg-itm').length;
         $.ajax({
@@ -168,14 +171,14 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                            <div class="form-group">
-                                <a class="text-dark">Kategori<a class='red'> *</a></a>
-                                <select class="selection-search-clear required select-form"
-                                    placeholder="Masukan Kategori Barang" name="item_category" id="item_category"
-                                    onchange="changeItem(this.value)">
-                                </select>
-                            </div>
+                        <div class="form-group">
+                            <a class="text-dark">Kategori<a class='red'> *</a></a>
+                            <select class="selection-search-clear required select-form"
+                                placeholder="Masukan Kategori Barang" name="item_category" id="item_category"
+                                onchange="changeItem(this.value)">
+                            </select>
                         </div>
+                </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">Nama Barang<a class='red'> *</a></a>
@@ -244,6 +247,7 @@
                         <tbody>
                           <?php $no = 1; ?>
                               <?php $no++ ?>
+                              @if ($data != null)                                  
                                 <tr>
                                   <td>
                                       {{ $data->category->item_category_code }}
@@ -275,6 +279,9 @@
                                       <input class="form-control input-bb" type="text" name="stock_adjustment_item_remark" id="stock_adjustment_item_remark" autocomplete="off" />
                                   </td>
                                 </tr>
+                                @else
+                                <tr class="odd"><td valign="top" colspan="8" style="text-align: center" class="dataTables_empty">No data available in table</td></tr>
+                            @endif
                         </tbody>
                     </table>
                 </div>
@@ -287,7 +294,6 @@
         </div>
     </form>
 </div>
-
 
 
 @stop
