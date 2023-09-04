@@ -4,16 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\SystemLogUser;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 
 class PublicController extends Controller
 {
-
     public function testing()
     {
         print_r('TES');
         exit;
     }
-    
 	public function set_log($user_id, $username, $id, $class, $pk, $remark){
 
 		date_default_timezone_set("Asia/Jakarta");
@@ -29,5 +28,9 @@ class PublicController extends Controller
 			'log_time'		=>	date("Y-m-d G:i:s")
 		);
 		return SystemLogUser::create($log);
+	}
+	public static function quote(){
+        $quotes = collect(json_decode(Storage::get('public/quotes.min.json')))->random();
+        return $quotes->quote.' - '.$quotes->by;
 	}
 }

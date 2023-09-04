@@ -33,6 +33,7 @@ use App\Http\Controllers\InvtStockAdjustmentController;
 use App\Http\Controllers\InvtStockAdjustmentReportController;
 use App\Http\Controllers\InvtWarehouseController;
 use App\Http\Controllers\JournalVoucherController;
+use App\Http\Controllers\PublicController;
 use App\Http\Controllers\PurchaseInvoicebyItemReportController;
 use App\Http\Controllers\PurchaseInvoiceController;
 use App\Http\Controllers\PurchaseInvoiceReportController;
@@ -65,6 +66,7 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
+Route::get('/quote', [PublicController::class, 'quote'])->name('quote');
 
 Route::get('/item-unit',[InvtItemUnitController::class, 'index'])->name('item-unit');
 Route::get('/item-unit/add',[InvtItemUnitController::class, 'addInvtItemUnit'])->name('add-item-unit');

@@ -28,7 +28,7 @@
         <link rel="stylesheet" href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}">
         <link rel="stylesheet" href="{{ asset('vendor/overlayScrollbars/css/OverlayScrollbars.min.css') }}">
 
-        
+
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
         <link rel="stylesheet" href="https://cdn.datatables.net/1.11.1/css/dataTables.bootstrap4.min.css">
         <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -122,7 +122,7 @@ float: left !important;
         <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
         <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
         <script src="{{ asset('vendor/overlayScrollbars/js/jquery.overlayScrollbars.min.js') }}"></script>
-        
+
         <script src="https://cdn.datatables.net/1.11.1/js/jquery.dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/1.11.1/js/dataTables.bootstrap4.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -141,15 +141,32 @@ float: left !important;
                 }
             }
             function toRp(number) {
-                var number = number.toString(), 
-                rupiah = number.split(',')[0], 
+                var number = number.toString(),
+                rupiah = number.split(',')[0],
                 cents = (number.split(',')[1] || '') +'00';
                 rupiah = rupiah.split('').reverse().join('')
                     .replace(/(\d{3}(?!$))/g, '$1,')
                     .split('').reverse().join('');
                 return rupiah + ',' + cents.slice(0, 2);
             }
-            
+            function quote(){
+                var data;
+
+                $.ajax({
+                    type: "GET",
+                    url: "{{ route('quote') }}",
+                    dataType: "html",
+                    async: false,
+                    success: function(return_data) {
+                    data = return_data;
+                    },
+                    error: function(data) {
+                        console.log(data);
+                        data ="Hanya seseorang yang takut yang bisa bertindak berani. Tanpa rasa takut itu tidak ada apa pun yang bisa disebut berani";
+                    }
+                });
+                return data;
+            }
             $(document).ready(function() {
                 $('#example').dataTable({
                     "aLengthMenu": [
@@ -171,14 +188,16 @@ float: left !important;
                     // ]
                 });
                 $('#example').addClass('pull-left');
-                
+
             } );
             $(document).ready(function() {
+                $("[data-toggle=popover]").popover({ trigger: 'focus', content:function(){
+                                                                       return quote();}});
                 $('.selection-search-clear').select2({
                     theme: "bootstrap",
                     placeholder: "Select",
                     allowClear: true,
-                    width: 'resolve', 
+                    width: 'resolve',
                 });
             });
             // $('#date').datepicker({ dateFormat: 'dd-mm-yy' }).val();
