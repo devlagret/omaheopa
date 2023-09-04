@@ -101,58 +101,70 @@
                 $('#discount_amount_view').val(toRp(discount_amount));
             });
             $("#item_unit_cost_view").change(function() {
-                    var item_unit = $("#item_unit").val();
-                    var item_id = $("#item_id").val();
-                    var cost_new = $("#item_unit_cost_view").val();
-                    var cost = $("#item_unit_cost").val();
-                    $.ajax({
-                           type: "POST",
-                            url: "{{ route('get-item-cost') }}",
-                            dataType: "json",
-                            data: {
-                                'item_id': item_id,
-                                'item_unit': item_unit,
-                                '_token': '{{ csrf_token() }}',
-                            },
-                            success: function(price) {
-                                console.log(price);return 0;
-                                if (price != '') {
-                                    if (cost != cost_new) {
-                                        $('#item_price_new_view').val(toRp(
-                                            cost_new));
-                                        $('#item_price_new').val(cost_new);
-                                        $('#modal').modal('show');
-                                        $('#item_price_old_view').val(toRp(price.price));
-                                        $('#item_price_new_view').val(toRp(cost_new));
-                                        $('#item_cost_old_view').val(toRp(cost));
-                                        $('#item_cost_new_view').val(toRp(cost_new));
-                                        $('#item_price_old').val(price.price);
-                                        $('#item_cost_old').val(cost);
-                                        $('#item_cost_new').val(cost_new);
-                                    }
-                                        $('#item_unit_cost_view').val(toRp(cost_new));
-                                }
+                var item_unit = $("#item_unit").val();
+                var item_id = $("#item_id").val();
+                var cost_new = $("#item_unit_cost_view").val();
+                var cost = $("#item_unit_cost").val();
+                $.ajax({
+                    type: "POST",
+                    url: "{{ route('get-item-cost') }}",
+                    dataType: "json",
+                    data: {
+                        'item_id': item_id,
+                        'item_unit': item_unit,
+                        '_token': '{{ csrf_token() }}',
+                    },
+                    success: function(price) {
+                        console.log(price);
+                        return 0;
+                        if (price != '') {
+                            if (cost != cost_new) {
+                                $('#item_price_new_view').val(toRp(
+                                    cost_new));
+                                $('#item_price_new').val(cost_new);
+                                $('#modal').modal('show');
+                                $('#item_price_old_view').val(toRp(price.price));
+                                $('#item_price_new_view').val(toRp(cost_new));
+                                $('#item_cost_old_view').val(toRp(cost));
+                                $('#item_cost_new_view').val(toRp(cost_new));
+                                $('#item_price_old').val(price.price);
+                                $('#item_cost_old').val(cost);
+                                $('#item_cost_new').val(cost_new);
                             }
-                        });
-            }); changeCategory();
+                            $('#item_unit_cost_view').val(toRp(cost_new));
+                        }
+                    }
+                });
+            });
+            changeCategory();
         });
 
         function processAddArrayPurchaseInvoice() {
-            var item_packge_id = document.getElementById("item_packge_id").value;
-            var item_unit_cost = document.getElementById("item_unit_cost").value;
-            var quantity = document.getElementById("quantity").value;
-            var discount_percentage = document.getElementById("discount_percentage").value;
-            var discount_amount = document.getElementById("discount_amount").value;
-            var subtotal_amount_after_discount = document.getElementById("subtotal_amount_after_discount")
-                .value;
-            var subtotal_amount = document.getElementById("subtotal_amount").value;
-            var item_expired_date = document.getElementById("item_expired_date").value;
-
+            $('.item-required').each(function() {
+            if($( this ).val()==''){
+                alert("Harap Semua Input Barang dengan Tanda Bintang Merah untuk Diisi!").
+                $(this).focus();
+            }
+            });
+            var merchant_id = $("#merchant_id").val();
+            var item_category = $("#item_category").val();
+            var item_id = $("#item_id").val();
+            var item_unit = $("#item_unit").val();
+            var quantity = $("#quantity").val();
+            var item_unit_cost = $("#item_unit_cost").val();
+            var subtotal_amount = $("#subtotal_amount").val();
+            var discount_percentage = $("#item_unit_cost").val();
+            var discount_amount = $("#discount_amount").val();
+            var subtotal_amount_after_discount = $("#subtotal_amount_after_discount").val();
+            var item_expired_date = $("#item_expired_date").val();
             $.ajax({
                 type: "POST",
                 url: "{{ route('add-array-purchase-invoice') }}",
                 data: {
-                    'item_packge_id': item_packge_id,
+                    'merchant_id': merchant_id,
+                    'item_category': item_category,
+                    'item_id': item_id,
+                    'item_unit': item_unit,
                     'item_unit_cost': item_unit_cost,
                     'quantity': quantity,
                     'discount_percentage': discount_percentage,
@@ -164,6 +176,9 @@
                 },
                 success: function(msg) {
                     location.reload();
+                },
+                error: function(data) {
+                    console.log(data);
                 }
             });
         }
@@ -268,7 +283,6 @@
                 },
                 success: function(return_data) {
                     loading(0);
-                    console.log(return_data);
                     $('#item_unit_cost_view').val(return_data == '' ? '' : toRp(return_data.cost));
                     $('#item_unit_cost').val(return_data.cost);
                     window.setTimeout(loading(0), 5000);
@@ -283,27 +297,27 @@
         }
 
         function process_change_cost() {
-        var item_packge_id		            = document.getElementById("item_packge_id").value;
-        var item_cost_new		            = document.getElementById("item_cost_new").value;
-        var item_price_new		            = document.getElementById("item_price_new").value;
-        var margin_percentage		        = document.getElementById("margin_percentage").value;
+            var item_packge_id = document.getElementById("item_packge_id").value;
+            var item_cost_new = document.getElementById("item_cost_new").value;
+            var item_price_new = document.getElementById("item_price_new").value;
+            var margin_percentage = document.getElementById("margin_percentage").value;
 
-        $.ajax({
-            type: "POST",
-            url : "{{route('process-edit-cost-item')}}",
-            data: {
-                'item_packge_id'    : item_packge_id,
-                'item_cost_new'     : item_cost_new,
-                'item_price_new'    : item_price_new,
-                'margin_percentage' : margin_percentage,
-                '_token'            : '{{csrf_token()}}'
-            },
-            success: function(msg){
-                $('#modal').modal('hide');
-                $('#alert').html("<div class='alert alert-info' role='alert'>"+msg+"</div>");
-            }
-        });
-    }
+            $.ajax({
+                type: "POST",
+                url: "{{ route('process-edit-cost-item') }}",
+                data: {
+                    'item_packge_id': item_packge_id,
+                    'item_cost_new': item_cost_new,
+                    'item_price_new': item_price_new,
+                    'margin_percentage': margin_percentage,
+                    '_token': '{{ csrf_token() }}'
+                },
+                success: function(msg) {
+                    $('#modal').modal('hide');
+                    $('#alert').html("<div class='alert alert-info' role='alert'>" + msg + "</div>");
+                }
+            });
+        }
     </script>
 @stop
 @section('content_header')
@@ -463,7 +477,7 @@
                         <div class="form-group">
                             <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
                             {!! Form::select('merchant_id', $merchant, $items['merchant_id'] ?? '', [
-                                'class' => 'selection-search-clear required select-form',
+                                'class' => 'selection-search-clear item-required select-form',
                                 'name' => 'merchant_id',
                                 'id' => 'merchant_id',
                                 'onchange' => 'changeCategory()',
@@ -474,7 +488,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <a class="text-dark">Kategori<a class='red'> *</a></a>
-                            <select class="selection-search-clear required select-form" required
+                            <select class="selection-search-clear item-required select-form" required
                                 placeholder="Masukan Kategori Barang" name="item_category" id="item_category"
                                 onchange="changeItem(this.value)">
                             </select>
@@ -483,7 +497,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <a class="text-dark">Nama Barang<a class='red'> *</a></a>
-                            <select class="selection-search-clear required select-form" required
+                            <select class="selection-search-clear item-required select-form" required
                                 placeholder="Masukan Nama Barang" name="item_id" id="item_id"
                                 onchange="changeSatuan()">
                             </select>
@@ -492,7 +506,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <a class="text-dark">Satuan<a class='red'> *</a></a>
-                            <select class="selection-search-clear required select-form"
+                            <select class="selection-search-clear item-required select-form"
                                 placeholder="Masukan Kategori Barang" required name="item_unit" id="item_unit"
                                 onchange="changeCost()">
                             </select>
@@ -501,8 +515,9 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <a class="text-dark">Jumlah<a class='red'> *</a></a>
-                            <input class="form-control input-bb required text-right" required name="quantity"
-                                id="quantity" type="text" autocomplete="off" value="" />
+                            <input class="form-control input-bb item-required text-right" name="quantity"
+                                placeholder="Masukan Jumlah" id="quantity" type="text" autocomplete="off"
+                                value="" />
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -603,7 +618,7 @@
                                                 <td style='text-align  : left !important;'>".$PurchaseInvoice->getItemName($val['item_id'])."</td>
                                                 <td style='text-align  : right !important;'>".$val['quantity']."</td>
                                                 <td style='text-align  : right !important;'>".number_format($val['item_unit_cost'],2,',','.')."</td>
-                                                <td style='text-align  : right !important;'>".number_format($val['subtotal_amount'],2,',','.')."</td>
+                                                <td style='text-align  : right !important;'>".number_format($val['subtotal_amount_after_discount'],2,',','.')."</td>
                                                 <td style='text-align  : right !important;'>".date('d-m-Y', strtotime($val['item_expired_date']))."</td>";
                                                 ?>
 
@@ -713,12 +728,12 @@
         </form>
     </div>
 
-    @stop
+@stop
 
-    @section('footer')
+@section('footer')
 
-    @stop
+@stop
 
-    @section('css')
+@section('css')
 
-    @stop
+@stop

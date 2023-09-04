@@ -107,24 +107,16 @@ class PurchaseInvoiceController extends Controller
 
     public function addArrayPurchaseInvoice(Request $request)
     {
-        $request->validate([
-            'item_category_id'  => 'required',
-            'item_id'           => 'required',
-            'item_unit_id'      => 'required',
-            'item_unit_cost'    => 'required',
-            'quantity'          => 'required',
-            'subtotal_amount'   => 'required',
-            'item_expired_date' => 'required'
-        ]);
-
         $arraydatases = array(
-            'item_category_id'  => $request->item_category_id,
+            'merchant_id'  => $request->merchant_id,
+            'item_category_id'  => $request->item_category,
             'item_id'           => $request->item_id,
-            'item_unit_id'      => $request->item_unit_id,
+            'item_unit_id'      => $request->item_unit,
             'item_unit_cost'    => $request->item_unit_cost,
             'quantity'          => $request->quantity,
             'subtotal_amount'   => $request->subtotal_amount,
-            'item_expired_date' => $request->item_expired_date
+            'item_expired_date' => $request->item_expired_date,
+            'subtotal_amount_after_discount' => $request->subtotal_amount_after_discount
         );
 
         $lastdatases = Session::get('arraydatases');
@@ -158,6 +150,7 @@ class PurchaseInvoiceController extends Controller
 
     public function processAddPurchaseInvoice(Request $request)
     {
+        return 0;
         $transaction_module_code = 'PBL';
         $transaction_module_id = $this->getTransactionModuleID($transaction_module_code);
         $fields = $request->validate([
@@ -356,7 +349,6 @@ class PurchaseInvoiceController extends Controller
     public function getTransactionModuleID($transaction_module_code)
     {
         $data = PreferenceTransactionModule::where('transaction_module_code',$transaction_module_code)->first();
-
         return $data['transaction_module_id'];
     }
 
