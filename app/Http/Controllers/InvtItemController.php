@@ -7,7 +7,9 @@ use App\Models\InvtItem;
 use App\Models\InvtItemCategory;
 use App\Models\InvtItemPackage;
 use App\Models\InvtItemPackageItem;
+use App\Models\InvtItemStock;
 use App\Models\InvtItemUnit;
+use App\Models\InvtWarehouse;
 use App\Models\SalesMerchant;
 use App\Models\SystemMenu;
 use App\Models\User;
@@ -133,6 +135,24 @@ class InvtItemController extends Controller
                 'company_id'            => Auth::user()->company_id,
                 'created_id'            => Auth::id(),
             ]);
+            $item = InvtItem::orderBy('created_at', 'DESC')->where('company_id',Auth::user()->company_id)->where('data_state',0)->first();
+            $warehouse = InvtWarehouse::where('data_state',0)->where('company_id',Auth::user()->company_id)->get();
+        foreach ($warehouse as $key => $val) {
+            for ($i=1; $i <= 4; $i++) { 
+                if($request['item_unit_id'.$i]!=null||!empty($request['item_unit_id'.$i])){
+                    InvtItemStock::create([
+                        'company_id'        => $item['company_id'],
+                        'warehouse_id'      => $val['warehouse_id'],
+                        'item_id'           => $item['item_id'],
+                        'item_unit_id'      => $request['item_unit_id'.$i],
+                        'item_category_id'  => $item['item_category_id'],
+                        'last_balance'      => 0,
+                        'updated_id'        => Auth::id(),
+                        'created_id'        => Auth::id(),      
+                    ]);
+                }
+            }
+        }
             DB::commit();
             $msg    = "Tambah Barang Berhasil";
             return redirect('/item')->with('msg', $msg);
