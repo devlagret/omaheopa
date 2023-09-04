@@ -235,7 +235,7 @@ return [
         'Html' => Collective\Html\HtmlFacade::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
         // 'PDF' => Elibyy\TCPDF\Facades\TCPDF::class,
-
+        'AppHelper' => App\Helpers\AppHelper::class,
     ],
     'db' =>env('DB_DATABASE'),
 
