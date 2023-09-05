@@ -495,7 +495,7 @@ if (empty($paket)) {
                                 ]) !!}
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        {{-- <div class="col-md-6">
                             <div class="form-group">
                                 <a class="text-dark">Nama Paket<a class='red'> *</a></a>
                                 <input class="form-control required input-bb" form="form-paket" name="package_name"
@@ -535,7 +535,7 @@ if (empty($paket)) {
                                 <textarea class="form-control input-bb" form="form-paket" name="package_remark" id="package_remark"
                                     type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value)">{{ $items['package_remark'] ?? '' }}</textarea>
                             </div>
-                        </div>
+                        </div> --}}
                     </div>
                     <div class="row form-group">
                         <div class="col-md-6">
