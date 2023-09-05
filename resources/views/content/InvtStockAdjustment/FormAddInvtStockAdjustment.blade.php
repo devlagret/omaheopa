@@ -9,7 +9,7 @@
 				type: "POST",
 				url : "{{route('add-elements-purchase-return')}}",
 				data : {
-                    'name'      : name, 
+                    'name'      : name,
                     'value'     : value,
                     '_token'    : '{{csrf_token()}}'
                 },
@@ -17,7 +17,7 @@
 			}
 		});
 	}
-    
+
     function function_last_balance_physical(value){
         last_data =  document.getElementById("last_balance_data").value;
         last_adjustment =  document.getElementById("last_balance_adjustment").value;
@@ -34,30 +34,9 @@
 
 		});
 	}
-    function changeSatuan(){
-            var item_id = $("#item_id").val();
-            $('#loading').modal('show');
-            $.ajax({
-                type: "POST",
-                url: "{{ route('get-item-unit') }}",
-                dataType: "html",
-                data: {
-                    'item_id': item_id,
-                    '_token': '{{ csrf_token() }}',
-                },
-                success: function(return_data) {
-                    $('#item_unit').val(1);
-                    $('#item_unit').html(return_data);
-                    function_elements_add('item_id', item_id);
-                },
-                error: function(data) {
-                    console.log(data);
-                }
-            });
-    }
     function changeCategory() {
             var merchant_id = $("#merchant_id").val();
-            $('#loading').modal('show');
+            loading();
             $.ajax({
                 type: "POST",
                 url: "{{ route('get-item-category') }}",
@@ -79,7 +58,8 @@
             });
     }
     function changeItem(category) {
-        $('#loading').modal('show');
+        loading();
+        setTimeout(function(){ loading(0); }, 1000);
         var id = $("#merchant_id").val();
         var no = $('.pkg-itm').length;
         $.ajax({
@@ -95,10 +75,10 @@
             success: function(return_data) {
                 $('#item_id').val(1);
                 $('#item_id').html(return_data);
-                changeSatuan();
+                loading(0);
                 function_elements_add('merchant_id', id);
                 function_elements_add('item_category', category);
-            }
+            },
         });
     }
     $(document).ready(function() {
@@ -108,7 +88,7 @@
 </script>
 @stop
 @section('content_header')
-    
+
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ url('home') }}">Beranda</a></li>
@@ -148,7 +128,7 @@
         </div>
     </div>
 
-    <?php 
+    <?php
             // if (empty($coresection)){
             //     $coresection['section_name'] = '';
             // }
@@ -190,15 +170,6 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <a class="text-dark">Satuan<a class='red'> *</a></a>
-                        <select class="selection-search-clear required select-form"
-                        placeholder="Masukan Kategori Barang" name="item_unit" id="item_unit"
-                        onchange="function_elements_add(this.name, this.value)">
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
                         <a class="text-dark">Nama Gudang<a class='red'> *</a></a>
                         {!! Form::select('warehouse_id',  $warehouse, $data_item['warehouse_id']??'', ['class' => 'selection-search-clear select-form', 'id' => 'warehouse_id', 'name' => 'warehouse_id', 'onchange' => 'function_elements_add(this.name, this.value)']) !!}
                     </div>
@@ -210,14 +181,14 @@
                     </div>
                 </div>
             </div>
-        </div> 
+        </div>
         <div class="card-footer text-muted">
             <div class="form-actions float-right">
                 <button type="reset" name="Reset" class="btn btn-danger" onclick="reset_add();"><i class="fa fa-times"></i> Batal</button>
                 <button type="submit" name="Find" class="btn btn-primary" title="Search Data"><i class="fa fa-search"></i> Cari</button>
             </div>
-        </div>       
-    </form>    
+        </div>
+    </form>
 </div>
 
 <div class="card border border-dark">
@@ -245,40 +216,42 @@
                             </tr>
                         </thead>
                         <tbody>
-                          <?php $no = 1; ?>
-                              <?php $no++ ?>
-                              @if ($data != null)                                  
+                          <?php $no = 0; ?>
+                          @if ($data != null)
+                              @foreach ($data as $val)
                                 <tr>
                                   <td>
-                                      {{ $data->category->item_category_code }}
-                                      <input type="text" name="item_category_id" id="item_category_id" value="{{ $data['item_category_id'] }}" hidden>
+                                      {{ $val->category->item_category_code }}
+                                      <input type="text" name="{{$no}}[item_category_id]" id="item_category_id" value="{{ $val['item_category_id'] }}" hidden>
                                   </td>
                                   <td>
-                                      {{ $data->item->item_name }}
-                                      <input type="text" name="item_stock_id" id="item_stock_id" value="{{ $data['item_stock_id'] }}" hidden>
+                                      {{ $val->item->item_name }}
+                                      <input type="text" name="{{$no}}[item_stock_id]" id="item_stock_id" value="{{ $val['item_stock_id'] }}" hidden>
                                   </td>
                                   <td>
-                                      {{ $data->unit->item_unit_code }}
-                                      <input type="text" name="item_unit_id" id="item_unit_id" value="{{ $data['item_unit_id'] }}" hidden>
+                                      {{ $val->unit->item_unit_code }}
+                                      <input type="text" name="{{$no}}[item_unit_id]" id="item_unit_id" value="{{ $val['item_unit_id'] }}" hidden>
                                   </td>
                                   <td>
-                                      {{ $data->warehouse->warehouse_name }}
-                                      <input type="text" name="warehouse_id" id="warehouse_id" value="{{ $data['warehouse_id'] }}" hidden>
+                                      {{ $val->warehouse->warehouse_name }}
+                                      <input type="text" name="{{$no}}[warehouse_id]" id="warehouse_id" value="{{ $val['warehouse_id'] }}" hidden>
                                   </td>
                                   <td>
-                                      {{ $data->last_balance }}
-                                      <input type="text" name="last_balance_data" id="last_balance_data" value="{{ $data['last_balance'] }}" hidden>
+                                      {{ $val->last_balance }}
+                                      <input type="text" name="{{$no}}[last_balance_data]" id="last_balance_data" value="{{ $val['last_balance'] }}" hidden>
                                   </td>
                                   <td style="text-align: center">
-                                      <input class="form-control input-bb" type="text" name="last_balance_adjustment" id="last_balance_adjustment" onchange="function_last_balance_physical(this.value)" autocomplete="off">
+                                      <input class="form-control input-bb" type="text" name="{{$no}}[last_balance_adjustment]" id="last_balance_adjustment" onchange="function_last_balance_physical(this.value)" autocomplete="off">
                                   </td>
                                   <td style="text-align: center">
-                                      <input class="form-control input-bb" type="text" name="last_balance_physical" id="last_balance_physical" readonly>
+                                      <input class="form-control input-bb" type="text" name="{{$no}}[last_balance_physical]" id="last_balance_physical" readonly>
                                   </td>
                                   <td style="text-align: center">
-                                      <input class="form-control input-bb" type="text" name="stock_adjustment_item_remark" id="stock_adjustment_item_remark" autocomplete="off" />
+                                      <input class="form-control input-bb" type="text" name="{{$no}}[stock_adjustment_item_remark]" id="stock_adjustment_item_remark" autocomplete="off" />
                                   </td>
                                 </tr>
+                          <?php $no++ ?>
+                          @endforeach
                                 @else
                                 <tr class="odd"><td valign="top" colspan="8" style="text-align: center" class="dataTables_empty">No data available in table</td></tr>
                             @endif
@@ -299,9 +272,9 @@
 @stop
 
 @section('footer')
-    
+
 @stop
 
 @section('css')
-    
+
 @stop
