@@ -147,6 +147,7 @@
             }
             });
             var merchant_id = $("#merchant_id").val();
+            var warehouse_id = $("#warehouse_id").val();
             var item_category = $("#item_category").val();
             var item_id = $("#item_id").val();
             var item_unit = $("#item_unit").val();
@@ -162,6 +163,7 @@
                 url: "{{ route('add-array-purchase-invoice') }}",
                 data: {
                     'merchant_id': merchant_id,
+                    'warehouse_id': warehouse_id,
                     'item_category': item_category,
                     'item_id': item_id,
                     'item_unit': item_unit,
@@ -209,6 +211,7 @@
                     $('#item_unit').val(1);
                     $('#item_unit').html(return_data);
                     function_elements_add('item_id', item_id);
+                    loading();
                     changeCost();
                 },
                 error: function(data) {
@@ -285,12 +288,14 @@
                     loading(0);
                     $('#item_unit_cost_view').val(return_data == '' ? '' : toRp(return_data.cost));
                     $('#item_unit_cost').val(return_data.cost);
-                    window.setTimeout(loading(0), 5000);
+                    // setTimeout(function(){ loading(0); }, 1000);
+
                 },
                 error: function(data) {
                     console.log(data);
                     loading(0);
-                    window.setTimeout(loading(0), 5000);
+                    // setTimeout(function(){ loading(0); }, 1000);
+
 
                 }
             });
