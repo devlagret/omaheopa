@@ -138,6 +138,7 @@ float: left !important;
                     $('#loading').modal('show');
                 }else{
                     $('#loading').modal('hide');
+                    setTimeout(function(){  $('#loading').modal('hide'); }, 3000);
                 }
             }
             function toRp(number) {
