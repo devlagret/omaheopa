@@ -10,12 +10,14 @@ use App\Http\Controllers\AcctProfitLossYearReportController;
 use App\Http\Controllers\AcctReceiptsController;
 use App\Http\Controllers\AcctReceiptsReportController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\CheckInCheckOutController;
 use App\Http\Controllers\CoreBuildingController;
 use App\Http\Controllers\CoreDivisionController;
 use App\Http\Controllers\CorePriceTypeController;
 use App\Http\Controllers\CoreRoomController;
 use App\Http\Controllers\CoreRoomTypeController;
 use App\Http\Controllers\CoreSupplierController;
+use App\Http\Controllers\DownPaymentController;
 use App\Http\Controllers\GeneralLedgerController;
 use App\Http\Controllers\RestoreDataController;
 use App\Http\Controllers\SalesMerchantController;
@@ -419,4 +421,34 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
     Route::post('/process-edit', [InvtItemPackgeController::class, 'processEdit'])->name('process-edit');
     Route::get('/clear-item', [InvtItemPackgeController::class, 'clearItem'])->name('clear-item');
     Route::get('/delete/{item_package_id}', [InvtItemPackgeController::class, 'delete'])->name('delete');
+});
+ // Booking pages
+ Route::prefix('booking')->name('booking.')->group(function () {
+    Route::get('/', [BookingController::class, 'index'])->name('index');
+    Route::get('/add', [BookingController::class, 'add'])->name('add');
+    Route::post('/process-add', [BookingController::class, 'processAdd'])->name('process-add');
+    Route::get('/edit/{merchant_id}', [BookingController::class, 'edit'])->name('edit');
+    Route::post('/process-edit', [BookingController::class, 'processEdit'])->name('process-edit');
+    Route::get('/delete/{merchant_id}', [BookingController::class, 'delete'])->name('delete');
+    Route::post('/elements-add', [BookingController::class, 'elementsAdd'])->name('elements-add');
+});
+ // Package pages
+ Route::prefix('down-payment')->name('dp.')->group(function () {
+    Route::get('/', [DownPaymentController::class, 'index'])->name('index');
+    Route::get('/add', [DownPaymentController::class, 'add'])->name('add');
+    Route::post('/process-add', [DownPaymentController::class, 'processAdd'])->name('process-add');
+    Route::get('/edit/{merchant_id}', [DownPaymentController::class, 'edit'])->name('edit');
+    Route::post('/process-edit', [DownPaymentController::class, 'processEdit'])->name('process-edit');
+    Route::get('/delete/{merchant_id}', [DownPaymentController::class, 'delete'])->name('delete');
+    Route::post('/elements-add', [DownPaymentController::class, 'elementsAdd'])->name('elements-add');
+});
+ // Package pages
+ Route::prefix('checkin-checkout')->name('cc.')->group(function () {
+    Route::get('/', [DownPaymentController::class, 'index'])->name('index');
+    Route::get('/add', [DownPaymentController::class, 'add'])->name('add');
+    Route::post('/process-add', [DownPaymentController::class, 'processAdd'])->name('process-add');
+    Route::get('/edit/{merchant_id}', [DownPaymentController::class, 'edit'])->name('edit');
+    Route::post('/process-edit', [DownPaymentController::class, 'processEdit'])->name('process-edit');
+    Route::get('/delete/{merchant_id}', [DownPaymentController::class, 'delete'])->name('delete');
+    Route::post('/elements-add', [DownPaymentController::class, 'elementsAdd'])->name('elements-add');
 });

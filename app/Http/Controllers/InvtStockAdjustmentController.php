@@ -22,7 +22,7 @@ class InvtStockAdjustmentController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        
+
     }
 
     public function index()
@@ -49,7 +49,7 @@ class InvtStockAdjustmentController extends Controller
         ->where('invt_stock_adjustment.stock_adjustment_date', '<=', $end_date)
         ->where('invt_stock_adjustment.company_id', Auth::user()->company_id)
         ->where('invt_stock_adjustment.data_state',0)
-        ->get(); 
+        ->get();
         return view('content.InvtStockAdjustment.ListInvtStockAdjustment',compact('data','start_date','end_date'));
     }
 
@@ -87,7 +87,8 @@ class InvtStockAdjustmentController extends Controller
         ->where('item_id', $data_item['item_id']??'')
         ->where('item_category_id', $data_item['item_category']??'')
         ->where('item_unit_id', $data_item['item_unit']??'')
-        ->where('warehouse_id',$data_item['warehouse_id']??'')->first();
+        ->where('warehouse_id',$data_item['warehouse_id']??'')->get();
+        // dump($data);exit;
         return view('content.InvtStockAdjustment.FormAddInvtStockAdjustment', compact('merchant', 'items', 'datasess', 'data', 'date','warehouse','data_item'));
     }
 
@@ -110,19 +111,18 @@ class InvtStockAdjustmentController extends Controller
 
     public function filterAddStockAdjustment(Request $request)
     {
-        $data = [
+        $datas = [
             "item_category"         =>$request->item_category,
             "item_id"               =>$request->item_id,
-            "item_unit"             =>$request->item_unit,
             "warehouse_id"          =>$request->warehouse_id,
             "stock_adjustment_date" =>$request->stock_adjustment_date,
+            "item_unit" => InvtItem::findOrFail($request->item_id)->item_unit_id1,
         ];
-        Session::put('data_item', $data);
+        Session::put('data_item', $datas);
         $data = InvtItemStock::with(['item','unit','category','warehouse'])->where('data_state',0)
-        ->where('item_id', $data['item_id']??'')
-        ->where('item_category_id', $data['item_category']??'')
-        ->where('item_unit_id', $data['item_unit']??'')
-        ->where('warehouse_id',$data['warehouse_id']??'')->first();
+        ->where('item_id', $datas['item_id']??'')
+        ->where('item_category_id', $datas['item_category']??'')
+        ->where('warehouse_id',$datas['warehouse_id']??'')->first();
         if($data==null){
             return redirect()->route('add-stock-adjustment')->with('msg',"Barang yang Dicari Tidak Memiliki Stok");
         }
@@ -201,7 +201,7 @@ class InvtStockAdjustmentController extends Controller
                     'created_id'                    => Auth::id(),
                     'updated_id'                    => Auth::id(),
                     );
-                    InvtStockAdjustmentItem::create($dataArray); 
+                    InvtStockAdjustmentItem::create($dataArray);
                     $stock_item = InvtItemStock::where('item_id',$dataArray['item_id'])
                     ->where('item_category_id',$dataArray['item_category_id'])
                     ->where('warehouse_id', $data_header['warehouse_id'])
@@ -213,7 +213,7 @@ class InvtStockAdjustmentController extends Controller
                         $table->updated_id = Auth::id();
                         $table->save();
 
-                    }               
+                    }
                 }
             }
         } else {
