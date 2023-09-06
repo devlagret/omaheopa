@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class SalesOrder extends Model
 {
     use HasFactory;
+    protected $table = 'sales_order';
+    protected $primaryKey = 'sales_order_id';
+    protected $guarded = [
+        'updated_at',
+        'created_at',
+        'deleted_at'
+    ];
 }
