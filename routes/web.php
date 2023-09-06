@@ -425,6 +425,7 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
  // Booking pages
  Route::prefix('booking')->name('booking.')->group(function () {
     Route::get('/', [BookingController::class, 'index'])->name('index');
+    Route::post('/filter', [BookingController::class, 'filter'])->name('filter');
     Route::get('/add', [BookingController::class, 'add'])->name('add');
     Route::post('/process-add', [BookingController::class, 'processAdd'])->name('process-add');
     Route::get('/edit/{merchant_id}', [BookingController::class, 'edit'])->name('edit');
