@@ -7,6 +7,7 @@ use App\Models\SalesRoomMenu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 
 class SalesRoomMenuController extends Controller
 {
@@ -42,7 +43,7 @@ class SalesRoomMenuController extends Controller
             'room_menu_name'=>$request->room_menu_name,
             'room_menu_type'=>$request->room_menu_type,
             'room_menu_price'=>$request->room_menu_price,
-            'room_menu_token'=>$request->_token,
+            'room_menu_token'=>Str::uuid(),
             'created_id'=>Auth::id()])){
            return redirect()->route('sales-room-menu.index')->with(['type'=>'success','msg'=>'Tambah Menu Kamar Berhasil']);
         }
