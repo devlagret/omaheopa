@@ -29,6 +29,19 @@
 
 		});
 	}
+    $(document).ready(function() {
+        $("#gp").click(function () {
+            if(this.checked){
+                $('#merchant_id').prop('disabled', true);
+                $('#input-merchant').hide();
+                $('#gp-input').addClass('col-md-6').removeClass('col-md-1');
+            }else{
+                $('#merchant_id').prop('disabled',false);
+                $('#input-merchant').show();
+                $('#gp-input').addClass('col-md-1').removeClass('col-md-6');
+            }
+        });
+    });
 </script>
 @stop
 @section('content_header')
@@ -80,8 +93,28 @@
 
     <form method="post" action="{{ route('process-add-warehouse') }}" enctype="multipart/form-data">
         @csrf
+        
         <div class="card-body">
             <div class="row form-group">
+                <div id="gp-input" class="col-md-1">
+                    <div class="form-check mt-4">
+                        <input type="checkbox" name="gp" class="form-check-input" id="gp">
+                        <label class="form-check-label" for="exampleCheck1">Gudang Pusat</label>
+                    </div>
+                </div>
+                <div class="col-md-5" id="input-merchant">
+                    <div class="form-group">
+                        <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
+                        {!! Form::select('merchant_id', $merchant, $warehouses['merchant_id'] ?? '', [
+                            'class' => 'selection-search-clear required select-form',
+                            'name' => 'merchant_id',
+                            'id' => 'merchant_id',
+                            'onchange' => 'function_elements_add(this.name, this.value)',
+                            'autofocus' => 'autofocus',
+                            'required',
+                        ]) !!}
+                    </div>
+                </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">Kode Gudang<a class='red'> *</a></a>

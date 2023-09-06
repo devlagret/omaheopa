@@ -43,6 +43,7 @@
                 <thead>
                     <tr>
                         <th width="2%" style='text-align:center'>No</th>
+                        <th width="20%" style='text-align:center'>Merchant</th>
                         <th width="20%" style='text-align:center'>Kode Gudang</th>
                         <th width="20%" style='text-align:center'>Nama Gudang</th>
                         <th width="20%" style='text-align:center'>Telp Gudang</th>
@@ -54,6 +55,7 @@
                     @foreach($data as $row)
                     <tr>
                         <td style='text-align:center'>{{ $no++ }}</td>
+                        <td>{{ $row->merchant == null ? 'Gudang Pusat':$row->merchant->merchant_name }}</td>
                         <td>{{ $row['warehouse_code'] }}</td>
                         <td>{{ $row['warehouse_name'] }}</td>
                         <td>{{ $row['warehouse_phone'] }}</td>

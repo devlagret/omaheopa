@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\InvtWarehouse;
+use App\Models\SalesMerchant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -19,7 +20,7 @@ class InvtWarehouseController extends Controller
     public function index()
     {
         Session::forget('warehouses');
-        $data = InvtWarehouse::where('data_state','=',0)
+        $data = InvtWarehouse::with('merchant')->where('data_state','=',0)
         ->where('company_id', Auth::user()->company_id)
         ->get();
         return view('content.InvtWarehouse.ListInvtWarehouse', compact('data'));
@@ -28,7 +29,12 @@ class InvtWarehouseController extends Controller
     public function addWarehouse()
     {
         $warehouses = Session::get('warehouses');
-        return view('content.InvtWarehouse.FormAddInvtWarehouse', compact('warehouses'));
+        $merchant   = SalesMerchant::where('data_state', 0);
+        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
+            $merchant->where('merchant_id',Auth::user()->merchant_id);
+        }
+        $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
+        return view('content.InvtWarehouse.FormAddInvtWarehouse', compact('warehouses','merchant'));
     }
 
     public function addElementsWarehouse(Request $request)
@@ -46,6 +52,7 @@ class InvtWarehouseController extends Controller
 
     public function processAddWarehouse(Request $request)
     {
+        dump($request->all());exit;
         $fields = $request->validate([
             'warehouse_code'    => 'required',
             'warehouse_name'    => 'required',
@@ -54,6 +61,7 @@ class InvtWarehouseController extends Controller
         ]);
 
         $data = InvtWarehouse::create([
+            'merchant_id'    => $request->merchant_id,
             'warehouse_code'    => $fields['warehouse_code'],
             'warehouse_name'    => $fields['warehouse_name'],
             'warehouse_phone'   => $fields['warehouse_phone'],
@@ -75,7 +83,12 @@ class InvtWarehouseController extends Controller
     public function editWarehouse($warehouse_id)
     {
         $data   = InvtWarehouse::where('warehouse_id',$warehouse_id)->first();
-        return view('content.InvtWarehouse.FormEditInvtWarehouse', compact('data'));
+        $merchant   = SalesMerchant::where('data_state', 0);
+        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
+            $merchant->where('merchant_id',Auth::user()->merchant_id);
+        }
+        $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
+        return view('content.InvtWarehouse.FormEditInvtWarehouse', compact('data','merchant'));
     }
 
     public function processEditWarehouse(Request $request)
@@ -89,6 +102,7 @@ class InvtWarehouseController extends Controller
         ]);
 
         $table                      = InvtWarehouse::findOrFail($fields['warehouse_id']);
+        $table->merchant_id      = $request->merchant_id;
         $table->warehouse_code      = $fields['warehouse_code'];
         $table->warehouse_name      = $fields['warehouse_name'];
         $table->warehouse_phone     = $fields['warehouse_phone'];

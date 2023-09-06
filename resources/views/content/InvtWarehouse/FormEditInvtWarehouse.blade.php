@@ -2,13 +2,14 @@
 
 @section('title',  "MOZAIC Omah'e Opa")
 @section('js')
-{{-- <script>
+<script>
+/*
     function function_elements_add(name, value){
 		$.ajax({
 				type: "POST",
 				url : "{{route('add-item-unit-elements')}}",
 				data : {
-                    'name'      : name, 
+                    'name'      : name,
                     'value'     : value,
                 },
 				success: function(msg){
@@ -26,7 +27,25 @@
 
 		});
 	}
-</script> --}}
+*/
+$(document).ready(function() {
+        if($("#gp").is(":checked")){
+            $('#input-merchant').hide();
+            $('#gp-input').addClass('col-md-6').removeClass('col-md-1');
+        }
+        $("#gp").click(function () {
+            if(this.checked){
+                $('#merchant_id').prop('disabled', true);
+                $('#input-merchant').hide();
+                $('#gp-input').addClass('col-md-6').removeClass('col-md-1');
+            }else{
+                $('#merchant_id').prop('disabled',false);
+                $('#input-merchant').show();
+                $('#gp-input').addClass('col-md-1').removeClass('col-md-6');
+            }
+        });
+    });
+</script>
 @stop
 @section('content_header')
     
@@ -79,6 +98,25 @@
         @csrf
         <div class="card-body">
             <div class="row form-group">
+                <div id="gp-input" class="col-md-1">
+                    <div class="form-check mt-4">
+                        <input type="checkbox" class="form-check-input" {{ $data['merchant_id']==null?'checked':''}} id="gp">
+                        <label class="form-check-label" for="exampleCheck1">Gudang Pusat</label>
+                    </div>
+                </div>
+                <div class="col-md-5" id="input-merchant">
+                    <div class="form-group">
+                        <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
+                        {!! Form::select('merchant_id', $merchant, $data['merchant_id'] ?? '', [
+                            'class' => 'selection-search-clear required select-form',
+                            'name' => 'merchant_id',
+                            'id' => 'merchant_id',
+                            'onchange' => 'function_elements_add(this.name, this.value)',
+                            'autofocus' => 'autofocus',
+                            'required',
+                        ]) !!}
+                    </div>
+                </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">Kode Gudang<a class='red'> *</a></a>
