@@ -141,7 +141,7 @@ float: left !important;
                     setTimeout(function(){  $('#loading').modal('hide'); }, 3000);
                 }
             }
-            function toRp(number) {
+            function toRp(number = 0) {
                 var number = number.toString(),
                 rupiah = number.split(',')[0],
                 cents = (number.split(',')[1] || '') +'00';
