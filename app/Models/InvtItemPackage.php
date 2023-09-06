@@ -11,12 +11,19 @@ class InvtItemPackage extends Model
     use HasFactory;
     use SoftDeletes;
     protected $table        = 'invt_item_package';
-    protected $primaryKey   = 'item_package_id';
+    protected $primaryKey   = 'invt_item_package_id';
     public function merchant() {
         return $this->belongsTo(SalesMerchant::class,'merchant_id','merchant_id');
     }
-    public function item() {
-        return $this->hasMany(InvtItemPackageItem::class,'item_package_id','item_package_id');
+    public function detail(){
+        return $this->belongsTo(InvtItem::class,'item_id','item_id');
+    }
+    public function unit(){
+        return $this->belongsTo(InvtItemUnit::class,'item_unit_id','item_unit_id');
+    }
+    public function items(){
+        return $this->belongsTo(InvtItem::class,'package_item_id','package_item_id');
+
     }
     protected $guarded = [
         'updated_at',

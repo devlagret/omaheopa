@@ -18,6 +18,9 @@ class InvtItem extends Model
     public function package() {
         return $this->hasMany(InvtItemPackageItem::class,'item_id','item_id');
     }
+    public function packets() {
+        return $this->hasMany(InvtItemPackage::class,'item_id','item_id');
+    }
     protected $guarded = [
         'updated_at',
         'created_at',

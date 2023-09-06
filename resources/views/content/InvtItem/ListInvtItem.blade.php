@@ -82,7 +82,7 @@ function check(name,uri){
                 </thead>
                 <tbody>
                     <?php $no = 1; ?>
-                    @foreach($paket as $val)
+                    {{-- @foreach($paket as $val)
                     <tr>
                         <td style='text-align:center'>{{ $no++ }}</td>
                         <td>PAKET</td>
@@ -95,7 +95,7 @@ function check(name,uri){
                             <a type="button" class="btn btn-outline-danger btn-sm"  onclick="check('{{$val->package_name}}','{{ route('package.delete',$val->item_package_id) }}')">Hapus</a>
                         </td>
                     </tr>
-                    @endforeach
+                    @endforeach --}}
                     @foreach($data as $row)
                     <tr>
                         <td style='text-align:center'>{{ $no++ }}</td>
