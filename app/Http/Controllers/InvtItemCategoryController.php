@@ -38,6 +38,7 @@ class InvtItemCategoryController extends Controller
         $url = 'item-category';
         $merchant = SalesMerchant::where('data_state','0');
         if(Auth::id()!=1||Auth::user()->merchant_id!=null){
+            $merchant_id = Auth::user()->merchant_id;
             $merchant->where('merchant_id',Auth::user()->merchant_id);
         }
         $merchant = $merchant->get()->pluck('merchant_name','merchant_id');

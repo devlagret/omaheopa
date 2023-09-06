@@ -108,10 +108,10 @@
                                 'name' => 'merchant_id',
                                 'id' => 'merchant_id',
                                 'onchange' => 'function_elements_add(this.name, this.value)',
-                                $merchant->count() == 1?'disabled':''
+                                $merchant->count() == 1||$datacategory['from_item']?'disabled':''
                             ]) !!}
-                            @if ($merchant->count() == 1)
-                                <input type="hidden" name="merchant_id" value="{{auth()->user()->merchant_id}}">
+                            @if ($merchant->count() == 1||$datacategory['from_item'])
+                                <input type="hidden" name="merchant_id" value="{{$datacategory['merchant_id'] }}">
                             @endif
                         </div>
                     </div>
