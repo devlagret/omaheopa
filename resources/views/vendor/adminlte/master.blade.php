@@ -100,7 +100,16 @@ float: left !important;
   -webkit-animation: spin 2s linear infinite;
   animation: spin 2s linear infinite;
 }
-
+.loading-widget{
+	position:fixed;
+    z-index: 50;
+	width:60px;
+	height:60px;
+	top:5em;
+	right:40px;
+	text-align:center;
+    display:none;
+}
 @-webkit-keyframes spin {
   0% { -webkit-transform: rotate(0deg); }
   100% { -webkit-transform: rotate(360deg); }
@@ -112,13 +121,14 @@ float: left !important;
 }
 </style>
 <body class="@yield('classes_body')" @yield('body_data')>
-
+    <div id="loading-widget" class="loading loading-widget mx-auto">
+    </div>
     {{-- Body Content --}}
     @yield('body')
 
     {{-- Base Scripts --}}
     @if(!config('adminlte.enabled_laravel_mix'))
-        <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
         <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
         <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
         <script src="{{ asset('vendor/overlayScrollbars/js/jquery.overlayScrollbars.min.js') }}"></script>
@@ -138,7 +148,18 @@ float: left !important;
                     $('#loading').modal('show');
                 }else{
                     $('#loading').modal('hide');
-                    setTimeout(function(){  $('#loading').modal('hide'); }, 3000);
+                }
+            }
+            /**
+             * Show loading Widget
+             * @param  {Number} status Use 0 to hida loading
+             * @return {Void}   Nothing
+             */
+            function loadingWidget(status = 1){
+                if (status){
+                    $('#loading-widget').show();
+                }else{
+                    $('#loading-widget').hide();
                 }
             }
             function toRp(number = 0) {
