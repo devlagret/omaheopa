@@ -32,21 +32,21 @@
 
         <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
             <div class="card-body">
-                <div class = "row">
+                <div class="row ">
                     <div class = "col-md-6">
                         <div class="form-group form-md-line-input">
-                            <section class="control-label">Tanggal Mulai
+                            <section class="control-label">Tanggal Check-In
                                 <span class="required text-danger">
                                     *
                                 </span>
                             </section>
-                            <input type ="date" class="form-control form-control-inline input-medium date-picker input-date" data-date-format="dd-mm-yyyy" type="text" name="start_date" id="start_date" value="{{ $start_date ?? date('Y-m-d')}}" style="width: 15rem;"/>
+                            <input type ="date" class="form-control form-control-inline input-medium date-picker input-date" data-date-format="dd-mm-yyyy" type="text" name="start_date" id="start_date" value="{{ $ ?? date('Y-m-d')}}" style="width: 15rem;"/>
                         </div>
                     </div>
 
                     <div class = "col-md-6">
                         <div class="form-group form-md-line-input">
-                            <section class="control-label">Tanggal Akhir
+                            <section class="control-label">Tanggal Check-Out
                                 <span class="required text-danger">
                                     *
                                 </span>

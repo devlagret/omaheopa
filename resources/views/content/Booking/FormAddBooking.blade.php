@@ -22,7 +22,7 @@ if (empty($paket)) {
         function function_elements_add(name, value) {
             $.ajax({
                 type: "POST",
-                url: "{{ route('add-item-elements') }}",
+                url: "{{ route('booking.elements-add') }}",
                 data: {
                     'name': name,
                     'value': value,
@@ -34,268 +34,176 @@ if (empty($paket)) {
                 }
             });
         }
-
-        function reset_add() {
-            $.ajax({
-                type: "GET",
-                url: "{{ route('add-reset-item') }}",
-                success: function(msg) {
-                    location.reload();
-                }
-
-            });
+        var index = {{ $sessiondata['tab-index'] ?? 1}};
+        function next(){
+            index++;
+            function_elements_add('tab-index',index)
+            $('#navigator-booking li:nth-child('+index+') a').tab('show');
         }
-
-        function changeCategory(id, el, from_paket = 0, from = 0) {
+        function preft(){
+            index--;
+            function_elements_add('tab-index',index)
+            $('#navigator-booking li:nth-child('+index+') a').tab('show');
+        }
+        function changeType(){
             loading();
-            var merchant_id = $("#" + id).val();
-            console.log(id);
+            var building_id = $("#building_id").val();
             $.ajax({
                 type: "POST",
-                url: "{{ route('get-item-category') }}",
+                url: "{{ route('booking.get-room-type') }}",
                 dataType: "html",
                 data: {
-                    'merchant_id': merchant_id,
-                    'from_paket': from_paket,
+                    'building_id': building_id,
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function(return_data) {
-                    if (from) {
-                        clearIsiPaket();
-                    }
-                    if (from_paket) {
-                        function_elements_add('package_merchant_id', merchant_id);
-                        $('#' + el).html(return_data);
-                        changeItem($('#' + el).val());
-                        return 0;
-                    } else {
+                        function_elements_add('building_id', building_id);
+                        $('#room_type_id').html(return_data);
+                        changeRoom($('#room_type_id').val());
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            });
+        }
+        function changeRoom(room_type_id){
+            loading();
+            var building_id = $("#building_id").val();
+            $.ajax({
+                type: "POST",
+                url: "{{ route('booking.get-room') }}",
+                dataType: "html",
+                data: {
+                    'room_type_id': room_type_id,
+                    'building_id': building_id,
+                    '_token': '{{ csrf_token() }}',
+                },
+                success: function(return_data) {
+                    console.log(return_data);
+                        function_elements_add('room_type_id', room_type_id);
+                        $('#room_id').html(return_data);
+                         loading(0);
+                    setTimeout(function() {
                         loading(0);
-                        setTimeout(function() {
-                            loading(0);
-                        }, 2000);
-                        $('#' + el).html(return_data);
-                        function_elements_add('merchant_id', merchant_id);
-                    }
+                    }, 20);
+                },complete: function() {
+                    loading(0);
+                    setTimeout(function() {
+                        loading(0);
+                    }, 200);
                 },
                 error: function(data) {
                     console.log(data);
+                    loading(0);
+                    setTimeout(function() {
+                        loading(0);
+                    }, 200);
                 }
             });
         }
-
-        function changeItem(category) {
+        function addRoom(){
             loading();
-            var id = $("#package_merchant_id").val();
-            var no = $('.pkg-itm').length;
-            $.ajax({
-                type: "POST",
-                url: "{{ route('get-merchant-item') }}",
-                dataType: "html",
-                data: {
-                    'no': no,
-                    'merchant_id': id,
-                    'item_category_id': category,
-                    '_token': '{{ csrf_token() }}',
-                },
-                success: function(return_data) {
-                    $('#package_item_id').val(1);
-                    $('#package_item_id').html(return_data);
-                    changeSatuan();
-                    function_elements_add('package_merchant_id', id);
-                    function_elements_add('package_item_category', category);
-                }
-            });
-        }
-        //* salah nama (sebaiknya dianti ke 'checkKemasan', jangan lupa ubah kode yg lain)
-        function checkCategory() {
-            const max = {{ $items['max_kemasan'] ?? 4 }};
-            var no = $('.input-kemasan').length;
-            while (no > max) {
-                removeKemasan('input-kemasan-' + no)
-            }
-            if (no >= max) {
-                $('#add-kmsn').addClass('disabled');
-            } else {
-                $('#add-kmsn').removeClass('disabled');
-            }
-        }
-
-        function addKemasan() {
-            const max = {{ $items['max_kemasan'] ?? 4 }};
-            var no = $('.input-kemasan').length;
-            var noa = $('.input-kemasan').length + 1;
-            if (no != max) {
-                $.ajax({
-                    type: "get",
-                    url: "{{ route('add-kemasan') }}",
-                    dataType: "html",
-                    success: function(return_data) {
-                        location.reload();
-                    },
-                    error: function(data) {
-                        console.log(data);
-                    }
-                });
-            }
-        }
-
-        function removeKemasan(el) {
-            $.ajax({
-                type: "get",
-                url: "{{ route('remove-kemasan') }}",
-                dataType: "html",
-                success: function(return_data) {
-                    $('#' + el).remove();
-                    checkCategory()
-                },
-                error: function(data) {
-                    console.log(data);
-                }
-            });
-        }
-
-        function addCategory() {
-            location.href = '{{ route('add-item-category') }}' + '/' + $('#merchant_id').val();
-        }
-
-        function addPackageItem(qty = 1) {
-            loading();
-            var package_item_id = $('#package_item_id').val();
-            var package_item_unit = $('#package_item_unit').val();
-            var package_item_id = $("#package_item_id").val();
-            if ($('#item_package_' + package_item_id + '_' + package_item_unit + '_quantity').length) {
-                $('#item_package_' + package_item_id + '_' + package_item_unit + '_quantity').val(function(i, oldval) {
+            var room_id = $("#room_id").val();
+            if ($('#item_package_'+room_id).length) {
+                $('#item_package_'+room_id).val(function(i, oldval) {
                     var newval = ++oldval;
-                    function_change_quantity(package_item_id, package_item_unit, newval);
-                    return ++newval;
+                    changeHowManyPerson(room_id,newval);
+                    return newval;
                 });
                 return 0;
             }
             $.ajax({
-                type: "post",
-                url: "{{ route('package.process-add-item') }}",
+                type: "POST",
+                url: "{{ route('booking.add-room') }}",
                 dataType: "html",
                 data: {
-                    'item_id': package_item_id,
-                    'item_unit': package_item_unit,
+                    'no' :$('.booked-room').length,
+                    'room_id': room_id,
+                    '_token': '{{ csrf_token() }}',
+                },
+                success: function(return_data) {
+                    if ($('.booked-room').length == 0) {
+                        $('#room-table').html(return_data);
+                    } else {
+                        $('#room-table').append(return_data);
+                    }
+                         loading(0);
+                    setTimeout(function() {
+                        loading(0);
+                    }, 20);
+                },complete: function() {
+                    loading(0);
+                    setTimeout(function() {
+                        loading(0);
+                    }, 200);
+                },
+                error: function(data) {
+                    console.log(data);
+                    loading(0);
+                    setTimeout(function() {
+                        loading(0);
+                    }, 200);
+                }
+            });
+        }
+        function clearBooked(){
+            $('.booked-room').each(function(index) {
+                $(this).remove();
+            });
+        }
+        function changeHowManyPerson(id,qty){
+            loadingWidget();
+            $("input").prop('disabled', true);
+            $("button").prop('disabled', true);
+            $.ajax({
+                type: "POST",
+                url: "{{ route('booking.add-person') }}",
+                dataType: "html",
+                data: {
+                    'id': id,
                     'qty': qty,
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function(return_data) {
-                    if ($('.pkg-itm').length == 0) {
-                        $('#package-table').html(return_data);
-                    } else {
-                        $('#package-table').append(return_data);
-                    }
-                    loading(0);
+                    loadingWidget(0);
                     setTimeout(function() {
-                        loading(0);
-                    }, 500);
-                },
-                error: function(data) {
-                    console.log(data);
-                }
-            });
-        }
-
-        function checkIsiPaket() {
-            var length = $('.pkg-itm').length;
-            if (length == null || length == 0 || length == '') {
-                alert('Harap Tambah Barang dalam Paket');
-                return 0;
-            }
-            $('#form-paket').submit();
-        }
-
-        function clearIsiPaket() {
-            $.ajax({
-                type: "get",
-                url: "{{ route('package.clear-item') }}",
-                dataType: "html",
-                success: function(return_data) {
-                    $('.pkg-itm').each(function(index) {
-                        $(this).remove();
-                    });
-                    $('#package-table').html(
-                        '<td valign="top" colspan="7" class="dataTables_empty">No data available in table</td>'
-                    );
-                },
-                error: function(data) {
-                    console.log(data);
-                }
-            });
-        }
-
-        function deleteIsiPaket(item_id) {
-            $.ajax({
-                type: "get",
-                url: "{{ url('package/delete-item/') }}" + '/' + item_id,
-                dataType: "html",
-                success: function(return_data) {
-                    $('#col-package-item-' + item_id).remove();
-                },
-                error: function(data) {
-                    console.log(data);
-                }
-            });
-        }
-
-        function function_change_quantity(item_packge_id, unit_id, value) {
-            if (value != '') {
-                $.ajax({
-                    url: "{{ url('package/item/change-qty') }}" + '/' + item_packge_id + '/' + unit_id + '/' +
-                        value,
-                    type: "GET",
-                    dataType: "json",
-                    success: function(data) {
-
-                    }
-                });
-            }
-        }
-
-        function changeSatuan() {
-            var package_item_id = $("#package_item_id").val();
-            loading();
-            $.ajax({
-                type: "POST",
-                url: "{{ route('get-item-unit') }}",
-                dataType: "html",
-                data: {
-                    'item_id': package_item_id,
-                    '_token': '{{ csrf_token() }}',
-                },
-                success: function(return_data) {
-                    $('#package_item_unit').val(1);
-                    $('#package_item_unit').html(return_data);
-                    function_elements_add('package_item_id', package_item_id);
+                        $("input").prop('disabled', false);
+                        $("button").prop('disabled', false);
+                        loadingWidget(0);
+                    }, 100);
+                    $("input").prop('disabled', false);
+                    $("button").prop('disabled', false);
                 },
                 complete: function() {
-                    loading(0);
+                    loadingWidget(0);
                     setTimeout(function() {
-                        loading(0);
-                    }, 2000);
+                        loadingWidget(0);
+                        $("input").prop('disabled', false);
+                        $("button").prop('disabled', false);
+                    }, 200);
+                    $("input").prop('disabled', false);
+                    $("button").prop('disabled', false);
                 },
                 error: function(data) {
                     console.log(data);
+                    loadingWidget(0);
+                    setTimeout(function() {
+                        loadingWidget(0);
+                        $("input").prop('disabled', false);
+                        $("button").prop('disabled', false);
+                    }, 200);
                 }
             });
         }
-
-        function formatRp() {
-            var harga = $('#package_price_view').val();
-            function_elements_add('package_price_view', harga);
-            $('#package_price_view').val(toRp(harga));
-            $('#package_price').val(harga);
-        }
         $(document).ready(function() {
-                    changeCategory('merchant_id', 'item_category_id');
-                    changeCategory('package_merchant_id', 'package_item_category', 1);
-                    checkCategory();
-                    if ($('#package_price_view').val() != '') {
-                        formatRp();
-                    }
-                    $(document).ready(function() {});
+            $('#navigator-booking li:nth-child('+index+') a').tab('show');
+            changeType();
+            $("input").each(function() {
+                $(this).change(function() {function_elements_add(this.name,this.value)});
+            });
+            $(".prev-btn").each(function() {$(this).click(function() {preft()})});
+            $(".next-btn").each(function() {$(this).click(function() {next()})});
+        });
     </script>
 @stop
 @section('content_header')
@@ -343,63 +251,72 @@ if (empty($paket)) {
         <form method="post" id="form-barang" action="{{ route('process-add-item') }}" enctype="multipart/form-data">
             @csrf
             <div class="card-body">
-                <div id="stepper2" class="bs-stepper">
-                    <div class="bs-stepper-header" role="tablist">
-                        <div class="step" data-target="#test-nl-1">
-                            <button type="button" class="step-trigger" role="tab" id="stepper2trigger1"
-                                aria-controls="test-nl-1">
-                                <span class="bs-stepper-circle">
-                                    <span class="fas fa-user" aria-hidden="true"></span>
-                                </span>
-                                <span class="bs-stepper-label">Name</span>
-                            </button>
-                        </div>
-                        <div class="bs-stepper-line"></div>
-                        <div class="step" data-target="#test-nl-2">
-                            <button type="button" class="step-trigger" role="tab" id="stepper2trigger2"
-                                aria-controls="test-nl-2">
-                                <span class="bs-stepper-circle">
-                                    <span class="fas fa-map-marked" aria-hidden="true"></span>
-                                </span>
-                                <span class="bs-stepper-label">Address</span>
-                            </button>
-                        </div>
-                        <div class="bs-stepper-line"></div>
-                        <div class="step" data-target="#test-nl-3">
-                            <button type="button" class="step-trigger" role="tab" id="stepper2trigger3"
-                                aria-controls="test-nl-3">
-                                <span class="bs-stepper-circle">
-                                    <span class="fas fa-save" aria-hidden="true"></span>
-                                </span>
-                                <span class="bs-stepper-label">Submit</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <ul class="nav nav-tabs" role="tablist">
+                <ul class="nav nav-tabs" id="navigator-booking" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link ? 'active' : '' }}" href="#barang" role="tab" data-toggle="tab">Data
-                            Barang</a>
+                        <a class="nav-link active" href="#tanggal" role="tab" data-toggle="tab">Tanggal</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link ? 'active' : '' }}" href="#form-kemasan" role="tab"
-                            data-toggle="tab">Kemasan</a>
+                        <a class="nav-link" href="#room" role="tab" data-toggle="tab">Kamar</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link : '' }}" href="#form-pkt" role="tab" data-toggle="tab">Paket</a>
+                        <a class="nav-link" href="#facility" role="tab" data-toggle="tab">Fasilitas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#menus" role="tab" data-toggle="tab">Menu</a>
                     </li>
                 </ul>
                 <div class="tab-content">
-                    <div role="tabpanel" class="tab-pane fade ? 'show active' : '' }}" id="barang">
-                        <div class="row form-group mt-5">
+                    <div role="tabpanel" class="tab-pane fade show active" id="tanggal">
+                        <div class = "row form-group mt-5">
+                            <div class = "col-md-6">
+                                <div class="form-group form-md-line-input">
+                                    <section class="control-label">Tanggal Check-In
+                                        <span class="required text-danger">
+                                            *
+                                        </span>
+                                    </section>
+                                    <input type ="date" class="form-control form-control-inline input-medium date-picker input-date" data-date-format="dd-mm-yyyy" type="text" name="start_date" id="start_date" value="{{ $sessiondata['start_date'] ?? date('Y-m-d')}}" style="width: 15rem;"/>
+                                </div>
+                            </div>
+                            <div class = "col-md-6">
+                                <div class="form-group form-md-line-input">
+                                    <section class="control-label">Tanggal Check-Out
+                                        <span class="required text-danger">
+                                            *
+                                        </span>
+                                    </section>
+                                    <input type ="date" class="form-control form-control-inline input-medium date-picker input-date" data-date-format="dd-mm-yyyy" type="text" name="end_date" id="end_date" value="{{ $sessiondata['end_date'] ?? date('Y-m-d')}}" style="width: 15rem;"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer text-muted">
+                            <div class="form-actions float-right">
+                                <button type="button" class="btn next-btn btn-primary">
+                                    Berikutnya <i class="fa fa-solid fa-arrow-right"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="room">
+                        <div class="row form-group">
+                            <div class="col">
+                                <div class="form-group">
+                                    <a class="text-dark">Atas Nama<a class='red'> *</a></a>
+                                    <input class="form-control required input-bb" required form="form-barang"
+                                        name="a.n" id="a.n" type="text" autocomplete="off"
+                                        onchange="function_elements_add(this.name, this.value)"
+                                        value="{{ $items['a.n'] ?? ''}}" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row form-group">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
-                                    {!! Form::select('merchant_id', $room, $items['merchant_id'] ?? '', [
+                                    <a class="text-dark">Bagunan<a class='red'> *</a></a>
+                                    {!! Form::select('building_id', $building, $sessiondata['building_id'] ?? '', [
                                         'class' => 'selection-search-clear required select-form',
-                                        'name' => 'merchant_id',
-                                        'id' => 'merchant_id',
-                                        'onchange' => 'changeCategory(this.id,`item_category_id`)',
+                                        'name' => 'building_id',
+                                        'id' => 'building_id',
+                                        'onchange' => 'changeType()',
                                         'form' => 'form-barang',
                                         'autofocus' => 'autofocus',
                                         'required',
@@ -408,43 +325,132 @@ if (empty($paket)) {
                             </div>
                             <div class="col-6">
                                 <div class="form-group">
-                                    <a class="text-dark">Nama Kategori Barang / Paket<a class='red'> *</a></a>
+                                    <a class="text-dark">Tipe Kamar<a class='red'> *</a></a>
                                     <select class="selection-search-clear required select-form" required form="form-barang"
-                                        placeholder="Masukan Kategori" name="item_category_id" id="item_category_id"
+                                        placeholder="Pilih Tipe" name="room_type_id" id="room_type_id"
+                                        onchange="changeRoom(this.value)">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <a class="text-dark">Nama Kamar<a class='red'> *</a></a>
+                                    <select class="selection-search-clear required select-form" required form="form-barang"
+                                        placeholder="Pilih Nama" name="room_id" id="room_id"
                                         onchange="function_elements_add(this.name, this.value)">
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <a class="text-dark">Kode Barang / Paket<a class='red'> *</a></a>
-                                    <input class="form-control input-bb" form="form-barang" name="item_code"
-                                        id="item_code" type="text" autocomplete="off"
-                                        onchange="function_elements_add(this.name, this.value)"
-                                        value="{{ $items['item_code'] ?? '' }}" />
+                             <div class="col-auto justify-content-center">
+                                <button class="btn btn-sm btn-primary mt-4" type="button" onclick="addRoom()"><i
+                                        class="fa fa-plus" id="add-package-item"></i> Tambah Kamar</button>
+                            </div>
+                        </div>
+                        <div class="card border border-dark">
+                            <div class="card-header bg-dark clearfix">
+                                <h5 class="mb-0 float-left">
+                                    Daftar Kamar yang Dipesan
+                                </h5>
+                                <div class="form-actions float-right">
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <a class="text-dark">Nama Barang / Paket<a class='red'> *</a></a>
-                                    <input class="form-control required input-bb" required form="form-barang"
-                                        name="item_name" id="item_name" type="text" autocomplete="off"
-                                        onchange="function_elements_add(this.name, this.value)"
-                                        value="{{ $items['item_name'] }}" />
-                                </div>
-                            </div>
-                            <div class="col-md-8 mt-3">
-                                <div class="form-group">
-                                    <a class="text-dark">Keterangan</a>
-                                    <textarea class="form-control input-bb" form="form-barang" name="item_remark" id="item_remark" type="text"
-                                        autocomplete="off" onchange="function_elements_add(this.name, this.value)">{{ $items['item_remark'] }}</textarea>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table id="example" style="width:100%" class="table table-striped table-bordered table-hover table-full-width">
+                                        <thead>
+                                            <tr>
+                                                <th width="2%" style='text-align:center'>No</th>
+                                                <th width="20%" style='text-align:center'>Nama Kamar</th>
+                                                <th width="20%" style='text-align:center'>Tipe Kamar</th>
+                                                <th width="20%" style='text-align:center'>Bangunan</th>
+                                                <th width="20%" style='text-align:center'>Jumlah Orang</th>
+                                                <th width="20%" style='text-align:center'>Harga Kamar</th>
+                                                <th width="10%" style='text-align:center'>Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="room-table">
+                                        @isset($room)
+                                        @php $no = 1; @endphp
+                                        @foreach ($room as $val)
+                                        <tr class='booked-room'>
+                                            <td>{{$no++}}</td>
+                                            <td>{{$val->room_name}}</td>
+                                            <td>{{$val->roomType->room_type_name}}</td>
+                                            <td>{{$val->building->building_name}}</td>
+                                            <td>
+                                            <div class='row'>
+                                            <input
+                                                oninput='changeHowManyPerson({{$val->room_id}}, this.value)'
+                                                type='number' name='room_qty_{{$val->room_id}}'
+                                                id='room_qty_{{$val->room_id}}'
+                                                style='text-align: center; height: 30px; font-weight: bold; font-size: 15px'
+                                                class='form-control col input-bb' min='1'
+                                                value='{{$booked[$val->room_id]??1}}' autocomplete='off'>
+                                                <div class='col-auto'>Orang</div>
+                                            </div>
+                                            </td>
+                                            <td>
+                                            <div class='row'>
+                                                <div class="col">
+                                                {!! Form::select('room_price_id', $val->price->pluck('type.price_type_name','room_price_id'), $sessiondata['room_price_id'] ?? '', [
+                                                    'class' => 'selection-search-clear required select-form',
+                                                    'name' => 'room_price_id',
+                                                    'id' => 'room_price_id',
+                                                    'onchange' => 'changeType()',
+                                                    'form' => 'form-barang',
+                                                    'autofocus' => 'autofocus',
+                                                    'required',
+                                                ]) !!} 
+                                                </div>
+                                                <div class="col-auto mt-2">
+                                                    Rp . 10000-
+                                                </div>
+                                            </div>
+                                            </td>
+                                            <td class='text-center'><button type='button' class='btn btn-outline-danger btn-sm' onclick='deleteItem({{$val->room_id}})'>Hapus</button></td>
+                                            </tr>
+                                        @endforeach
+                                        @endisset
+                                        <tr>
+                                            <td colspan="5" class="font-weight-bold text-center fs-4">Subtotal</td>
+                                            <td colspan="2" class="font-weight-bold text-center fs-4"><h5> Rp. 3920407834780 </h5></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
+                        <div class="card-footer text-muted">
+                            <div class="form-actions float-left">
+                                <button type="button" class="btn prev-btn btn-primary"> <i class="fa fa-solid fa-arrow-left"></i>
+                                    Kembali</button>
+                            </div>
+                            <div class="form-actions float-right">
+                                <button type="button" class="btn next-btn btn-primary">
+                                    Berikutnya <i class="fa fa-solid fa-arrow-right"></i></button>
+                            </div>
+                        </div>
                     </div>
-                    <div role="tabpanel" class="tab-pane fade ? 'show active' : '' }}" id="form-kemasan">
+                    <div role="tabpanel" class="tab-pane" id="facility">
+                        <div class="row form-group">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <a class="text-dark">Fasilitas<a class='red'> *</a></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer text-muted">
+                            <div class="form-actions float-left">
+                                <button type="button" class="btn prev-btn btn-primary"> <i class="fa fa-solid fa-arrow-left"></i>
+                                    Kembali</button>
+                            </div>
+                            <div class="form-actions float-right">
+                                <button type="button" class="btn next-btn btn-primary">
+                                    Berikutnya <i class="fa fa-solid fa-arrow-right"></i></button>
+                            </div>
+                        </div>
                     </div>
-                    <div role="tabpanel" class="tab-pane fade show active' : '' }}" id="form-pkt">
+                    <div role="tabpanel" class="tab-pane" id="menus">
                         <div class="row form-group">
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -508,26 +514,29 @@ if (empty($paket)) {
                                             </tr>
                                         </thead>
                                         <tbody id="package-table">
-                                        
+
                                         </tbody>
                                     </table>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="card-footer text-muted">
+                            <div class="form-actions float-left">
+                                <button type="button" class="btn prev-btn btn-primary"> <i class="fa fa-solid fa-arrow-left"></i>
+                                    Kembali</button>
+                            </div>
+                            <div class="form-actions float-right">
+                                <button type="button" class="btn next-btn btn-primary">
+                                    Berikutnya <i class="fa fa-solid fa-arrow-right"></i></button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </form>
-        <div class="card-footer text-muted">
-            <div class="form-actions float-right">
-                <button type="reset" form="form-barang" name="Reset" class="btn btn-danger"
-                    onclick="reset_add();"><i class="fa fa-times"></i> Batal</button>
-                <button type="submit" form="form-barang" name="Save" class="btn btn-primary" title="Save"><i
-                        class="fa fa-check"></i>
-                    Simpan</button>
-            </div>
-        </div>
+
     </div>
+
 @stop
 
 @section('footer')

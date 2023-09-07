@@ -13,7 +13,7 @@ class CoreBuilding extends Model
     protected $table = 'core_building';
     protected $primaryKey = 'building_id';
     public function rooms(){
-        return $this->hasMany(CoreRoomType::class,'building_id','building_id');
+        return $this->hasMany(CoreRoom::class,'building_id','building_id');
     }
     protected $guarded = [
         'created_at',
