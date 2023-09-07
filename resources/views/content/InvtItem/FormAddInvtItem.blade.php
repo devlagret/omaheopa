@@ -46,7 +46,7 @@ if (empty($paket)) {
             });
         }
 
-        function changeCategory(id, el, from_paket = 0, from = 0) {
+        function changeCategory(id, el, from_paket = 0) {
             loading();
             var merchant_id = $("#" + id).val();
             console.log(id);
@@ -56,23 +56,22 @@ if (empty($paket)) {
                 dataType: "html",
                 data: {
                     'merchant_id': merchant_id,
-                    'from_paket' :from_paket,
+                    'from_paket': from_paket,
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function(return_data) {
-                    if (from) {
-                        clearIsiPaket();
-                    }
                     if (from_paket) {
                         function_elements_add('package_merchant_id', merchant_id);
                         $('#' + el).html(return_data);
                         changeItem($('#' + el).val());
                         return 0;
-                    }else{
-                    loading(0);
-                    setTimeout(function(){ loading(0); }, 2000);
-                    $('#' + el).html(return_data);
-                    function_elements_add('merchant_id', merchant_id);
+                    } else {
+                        loading(0);
+                        setTimeout(function() {
+                            loading(0);
+                        }, 2000);
+                        $('#' + el).html(return_data);
+                        function_elements_add('merchant_id', merchant_id);
                     }
                 },
                 error: function(data) {
@@ -106,7 +105,7 @@ if (empty($paket)) {
         }
         //* salah nama (sebaiknya dianti ke 'checkKemasan', jangan lupa ubah kode yg lain)
         function checkCategory() {
-            const max = {{ $items['max_kemasan']??4 }};
+            const max = {{ $items['max_kemasan'] ?? 4 }};
             var no = $('.input-kemasan').length;
             while (no > max) {
                 removeKemasan('input-kemasan-' + no)
@@ -119,7 +118,7 @@ if (empty($paket)) {
         }
 
         function addKemasan() {
-            const max = {{ $items['max_kemasan']??4 }};
+            const max = {{ $items['max_kemasan'] ?? 4 }};
             var no = $('.input-kemasan').length;
             var noa = $('.input-kemasan').length + 1;
             if (no != max) {
@@ -165,7 +164,7 @@ if (empty($paket)) {
                 $('#item_package_' + package_item_id + '_' + package_item_unit + '_quantity').val(function(i, oldval) {
                     var newval = ++oldval;
                     function_change_quantity(package_item_id, package_item_unit, newval);
-                    return ++newval;
+                    return newval;
                 });
                 return 0;
             }
@@ -177,6 +176,7 @@ if (empty($paket)) {
                     'item_id': package_item_id,
                     'item_unit': package_item_unit,
                     'qty': qty,
+                    'no' :$('.pkg-itm').length ,
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function(return_data) {
@@ -186,7 +186,9 @@ if (empty($paket)) {
                         $('#package-table').append(return_data);
                     }
                     loading(0);
-                    setTimeout(function(){ loading(0); }, 500);
+                    setTimeout(function() {
+                        loading(0);
+                    }, 500);
                 },
                 error: function(data) {
                     console.log(data);
@@ -238,6 +240,7 @@ if (empty($paket)) {
 
         function function_change_quantity(item_packge_id, unit_id, value) {
             if (value != '') {
+                $("#simpan-brg").prop('disabled', true);
                 $.ajax({
                     url: "{{ url('package/item/change-qty') }}" + '/' + item_packge_id + '/' + unit_id + '/' +
                         value,
@@ -245,6 +248,12 @@ if (empty($paket)) {
                     dataType: "json",
                     success: function(data) {
 
+                    },
+                    complete: function() {
+                        $("#simpan-brg").prop('disabled', false);
+                        setTimeout(function() {
+                        $("#simpan-brg").prop('disabled', false);
+                        }, 20);
                     }
                 });
             }
@@ -265,9 +274,12 @@ if (empty($paket)) {
                     $('#package_item_unit').val(1);
                     $('#package_item_unit').html(return_data);
                     function_elements_add('package_item_id', package_item_id);
-                },complete:function(){
+                },
+                complete: function() {
                     loading(0);
-                    setTimeout(function(){ loading(0); }, 2000);
+                    setTimeout(function() {
+                        loading(0);
+                    }, 200);
                 },
                 error: function(data) {
                     console.log(data);
@@ -288,7 +300,6 @@ if (empty($paket)) {
             if ($('#package_price_view').val() != '') {
                 formatRp();
             }
-        $(document).ready(function() {
         });
     </script>
 @stop
@@ -603,8 +614,8 @@ if (empty($paket)) {
             <div class="form-actions float-right">
                 <button type="reset" form="form-barang" name="Reset" class="btn btn-danger"
                     onclick="reset_add();"><i class="fa fa-times"></i> Batal</button>
-                <button type="submit" form="form-barang" name="Save" class="btn btn-primary"
-                    title="Save"><i class="fa fa-check"></i>
+                <button type="submit" form="form-barang" id="simpan-brg" name="Save" class="btn btn-primary" title="Save"><i
+                        class="fa fa-check"></i>
                     Simpan</button>
             </div>
         </div>

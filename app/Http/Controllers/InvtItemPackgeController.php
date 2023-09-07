@@ -36,7 +36,7 @@ class InvtItemPackgeController extends Controller
                         <td>
                         <div class='row'>
                             <input
-                                oninput='function_change_quantity(".$request->item_id.",".$request->item_id.", this.value,'".url('package/item/change-qty')."')'
+                                oninput='function_change_quantity(".$request->item_id.",".$request->item_id.", this.value)'
                                 type='number' name='item_package_".$request->item_id."_".$request->item_unit."_quantity'
                                 id='item_package_".$request->item_id."_".$request->item_unit."_quantity'
                                 style='width: 100%; text-align: center; height: 30px; font-weight: bold; font-size: 15px'
