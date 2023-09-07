@@ -374,16 +374,6 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
     Route::get('/delete/{room_menu_id}', [SalesRoomMenuController::class, 'delete'])->name('delete');
     Route::post('/elements-add', [SalesRoomMenuController::class, 'elementsAdd'])->name('elements-add');
 });
- // Booking pages
- Route::prefix('booking')->name('booking.')->group(function () {
-    Route::get('/', [BookingController::class, 'index'])->name('index');
-    Route::get('/add', [BookingController::class, 'add'])->name('add');
-    Route::post('/process-add', [BookingController::class, 'processAdd'])->name('process-add');
-    Route::get('/edit/{booking_id}', [BookingController::class, 'edit'])->name('edit');
-    Route::post('/process-edit', [BookingController::class, 'processEdit'])->name('process-edit');
-    Route::get('/delete/{booking_id}', [BookingController::class, 'delete'])->name('delete');
-    Route::post('/elements-add', [BookingController::class, 'elementsAdd'])->name('elements-add');
-});
  // Suppplier pages
  Route::prefix('core-supplier')->name('supplier.')->group(function () {
     Route::get('/', [CoreSupplierController::class, 'index'])->name('index');
@@ -425,8 +415,12 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
  // Booking pages
  Route::prefix('booking')->name('booking.')->group(function () {
     Route::get('/', [BookingController::class, 'index'])->name('index');
-    Route::post('/filter', [BookingController::class, 'filter'])->name('filter');
     Route::get('/add', [BookingController::class, 'add'])->name('add');
+    Route::post('/add/room', [BookingController::class, 'addRoom'])->name('add-room');
+    Route::post('/add/person', [BookingController::class, 'addPersonBooked'])->name('add-person');
+    Route::post('/room', [BookingController::class, 'getRoom'])->name('get-room');
+    Route::post('/room-type', [BookingController::class, 'getType'])->name('get-room-type');
+    Route::post('/filter', [BookingController::class, 'filter'])->name('filter');
     Route::post('/process-add', [BookingController::class, 'processAdd'])->name('process-add');
     Route::get('/edit/{merchant_id}', [BookingController::class, 'edit'])->name('edit');
     Route::post('/process-edit', [BookingController::class, 'processEdit'])->name('process-edit');
