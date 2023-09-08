@@ -40,7 +40,7 @@
                                     *
                                 </span>
                             </section>
-                            <input type ="date" class="form-control form-control-inline input-medium date-picker input-date" data-date-format="dd-mm-yyyy" type="text" name="start_date" id="start_date" value="{{ $ ?? date('Y-m-d')}}" style="width: 15rem;"/>
+                            <input type ="date" class="form-control form-control-inline input-medium date-picker input-date" data-date-format="dd-mm-yyyy" type="text" name="start_date" id="start_date" value="{{ $start_date ?? date('Y-m-d')}}" style="width: 15rem;"/>
                         </div>
                     </div>
 

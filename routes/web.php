@@ -419,6 +419,11 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
     Route::post('/add/room', [BookingController::class, 'addRoom'])->name('add-room');
     Route::post('/add/person', [BookingController::class, 'addPersonBooked'])->name('add-person');
     Route::post('/room', [BookingController::class, 'getRoom'])->name('get-room');
+    Route::get('/delete-room/{room_id?}', [BookingController::class, 'deleteBookedRoom'])->name('delete-booked-room');
+    Route::post('/room-price', [BookingController::class, 'getRoomPrice'])->name('get-room-price');
+    Route::post('/room-menu', [BookingController::class, 'getRoomMenus'])->name('get-room-menu');
+    Route::post('/add-menu-item', [BookingController::class, 'addMenuItem'])->name('add-menu-item');
+    Route::post('/clear-booked', [BookingController::class, 'clearBooked'])->name('clear-booked');
     Route::post('/room-type', [BookingController::class, 'getType'])->name('get-room-type');
     Route::post('/filter', [BookingController::class, 'filter'])->name('filter');
     Route::post('/process-add', [BookingController::class, 'processAdd'])->name('process-add');
