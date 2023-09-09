@@ -36,6 +36,7 @@ class SalesRoomFacilityController extends Controller
         
         if(SalesRoomFacility::create([
             'facility_name'=>$request->facility_name,
+            'facility_remark'=>$request->facility_remark,
             'facility_price'=>$request->facility_price,
             'created_id'=>Auth::id()])){
            return redirect()->route('sales-room-facility.index')->with(['type'=>'success','msg'=>'Tambah Menu Kamar Berhasil']);
@@ -51,6 +52,7 @@ class SalesRoomFacilityController extends Controller
     public function processEdit(Request $request){
         $facility = SalesRoomFacility::find($request->room_facility_id);
         $facility->facility_name = $request->facility_name;
+        $facility->facility_remark = $request->facility_remark;
         $facility->facility_price = $request->facility_price;
         $facility->updated_id = Auth::id();
         if($facility->save()){

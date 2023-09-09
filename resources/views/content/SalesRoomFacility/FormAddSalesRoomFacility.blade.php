@@ -103,6 +103,13 @@
                                 <input class="form-control input-bb required" name="facility_price" id="facility_price" type="hidden" autocomplete="off"/>
                             </div>
                         </div>
+                        <div class="col-md-8 mt-3">
+                            <div class="form-group">
+                                <a class="text-dark">Keterangan</a>
+                                <textarea class="form-control input-bb" name="facility_remark" id="facility_remark" type="text"
+                                    autocomplete="off" onchange="function_elements_add(this.name, this.value)">{{ $sessiondata['facility_remark'] ?? ''}}</textarea>
+                            </div>
+                        </div>
                     </div>
                 </div>
               </div>

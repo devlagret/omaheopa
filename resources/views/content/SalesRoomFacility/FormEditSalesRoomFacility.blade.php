@@ -75,14 +75,6 @@
         </div>
     </div>
 
-    <?php
-            if (empty($sessiondata)){
-                $sessiondata['room_menu_name'] = '';
-                $sessiondata['room_menu_type'] = '';
-                $sessiondata['room_menu_price'] = '';
-            }
-        ?>
-
     <form method="post" action="{{ route('sales-room-facility.process-edit') }}" enctype="multipart/form-data">
         @csrf
         <div class="card-body">
@@ -96,7 +88,7 @@
                                 <input class="form-control required input-bb" required name="facility_name"
                                         id="facility_name" type="text" autocomplete="off"
                                         onchange="function_elements_add(this.name, this.value)"
-                                        value="{{ $items['facility_name'] ?? $facility->facility_name  }}" />
+                                        value="{{ $sessiondata['facility_name'] ?? $facility->facility_name  }}" />
                             </div>
                         </div>
                         <div class="col-6">
@@ -104,6 +96,13 @@
                                 <a class="text-dark">Harga<a class='red'> *</a></a>
                                 <input placeholder="Masukan harga menu" required class="form-control input-bb required" name="facility_price_view" id="facility_price_view" type="text" autocomplete="off" value="{{old('facility_price',$sessiondata['facility_price']??$facility->facility_price) }}" />
                                 <input class="form-control input-bb required" name="facility_price" id="facility_price" type="hidden" autocomplete="off"/>
+                            </div>
+                        </div>
+                        <div class="col-md-8 mt-3">
+                            <div class="form-group">
+                                <a class="text-dark">Keterangan</a>
+                                <textarea class="form-control input-bb" name="facility_remark" id="facility_remark" type="text"
+                                    autocomplete="off" onchange="function_elements_add(this.name, this.value)">{{ $items['facility_remark']  ?? '' }}</textarea>
                             </div>
                         </div>
                     </div>
