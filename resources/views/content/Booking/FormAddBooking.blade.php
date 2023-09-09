@@ -52,6 +52,7 @@ if (empty($paket)) {
             loadingWidget();
             $(".booking-nav").each(function() {
                 $(this).prop('disabled', true);
+                $(this).addClass('disabled');
             });
         }
 
@@ -59,6 +60,7 @@ if (empty($paket)) {
             loadingWidget(0);
             $(".booking-nav").each(function() {
                 $(this).prop('disabled', false);
+                $(this).removeClass('disabled');
             });
         }
 
@@ -229,6 +231,116 @@ if (empty($paket)) {
             });
         }
 
+        function changeFacilityQty(id, qty) {
+            loadingWidget();
+            disableNav();
+            $.ajax({
+                type: "POST",
+                url: "{{ route('booking.facility-qty') }}",
+                dataType: "html",
+                data: {
+                    'id': id,
+                    'qty': qty,
+                    '_token': '{{ csrf_token() }}',
+                },
+                success: function(return_data) {
+                    loadingWidget(0);
+                    setTimeout(function() {
+                        enableNav();
+                        loadingWidget(0);
+                    }, 100);
+                    enableNav();
+                },
+                complete: function() {
+                    subtotalFasilitas();
+                    loadingWidget(0);
+                    setTimeout(function() {
+                        loadingWidget(0);
+                        enableNav();
+                    }, 200);
+                    enableNav();
+                },
+                error: function(data) {
+                    console.log(data);
+                    loadingWidget(0);
+                    setTimeout(function() {
+                        loadingWidget(0);
+                        enableNav();
+                    }, 200);
+                }
+            });
+        }
+
+        function addFacility() {
+            var room_facility_id = $("#room_facility_id").val();
+            if ($('.facility-' + room_facility_id).length) {
+                $('#facility_qty_' + room_facility_id).val(function(i, oldval) {
+                    var newval = ++oldval;
+                    changeFacilityQty(room_facility_id, newval);
+                    return newval;
+                });
+                return 0;
+            }
+            loading();
+            $.ajax({
+                type: "POST",
+                url: "{{ route('booking.add-facility') }}",
+                dataType: "html",
+                data: {
+                    'no': $('.room-facility').length,
+                    'room_facility_id': room_facility_id,
+                    '_token': '{{ csrf_token() }}',
+                },
+                success: function(return_data) {
+                    if ($('.room-facility').length == 0) {
+                        $('#facility-table').html(return_data);
+                    } else {
+                        $('#facility-table').append(return_data);
+                    }
+                    $(".select-form").each(function() {
+                        $(this).select2();
+                    });
+                    loading(0);
+                    setTimeout(function() {
+                        loading(0);
+                    }, 20);
+                },
+                complete: function() {
+                    subtotalFasilitas();
+                    loading(0);
+                    setTimeout(function() {
+                        loading(0);
+                    }, 200);
+                },
+                error: function(data) {
+                    console.log(data);
+                    loading(0);
+                    setTimeout(function() {
+                        loading(0);
+                    }, 200);
+                }
+            });
+        }
+
+        function clearFacility() {
+            $.ajax({
+                type: "get",
+                url: "{{ route('booking.clear-facility') }}",
+                dataType: "html",
+                success: function(return_data) {
+                    $('.room-facility').each(function(index) {
+                        $(this).remove();
+                    });
+                    $('#facility-table').html(
+                        '<td valign="top" colspan="7" class="dataTables_empty">No data available in table</td>'
+                    );
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            });
+        }
+
         function changePrice(name, room_price_id = null) {
             disableNav();
             var room_id = name.charAt(14);
@@ -256,7 +368,8 @@ if (empty($paket)) {
                 }
             });
         }
-        function subtotal(){
+
+        function subtotal() {
             let total = 0;
             $(".room_price_price").each(function() {
                 total += Number($(this).val());
@@ -265,7 +378,32 @@ if (empty($paket)) {
             $("#sbs-room").val(total);
             return total;
         }
-        function changeMenu(){
+
+        function subtotalFasilitas() {
+            let total = 0;
+            $(".facility_price_price").each(function() {
+                $("#sbs-facility-itm-" + $(this).data('id')).html(toRp(Number($(this).val()) * Number($(
+                    "#facility_qty_" + $(this).data('id')).val())));
+                total += (Number($(this).val()) * Number($("#facility_qty_" + $(this).data('id')).val()));
+            });
+            $("#sbs-facility-view").html(toRp(total));
+            $("#subtotal_facility").val(total);
+            return total;
+        }
+
+        function subtotalMenu() {
+            let total = 0;
+            $(".menu_price_price").each(function() {
+                $("#sbs-menu-itm-" + $(this).data('id')).html(toRp(Number($(this).val()) * Number($(
+                    "#menu_qty_" + $(this).data('id')).val())));
+                total += (Number($(this).val()) * Number($("#menu_qty_" + $(this).data('id')).val()));
+            });
+            $("#sbs-menu-view").html(toRp(total));
+            $("#subtotal_menu").val(total);
+            return total;
+        }
+
+        function changeMenu() {
             loading();
             var room_menu_type = $("#room_menu_type").val();
             $.ajax({
@@ -277,7 +415,7 @@ if (empty($paket)) {
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function(return_data) {
-                    $('#room_menu_name').html(return_data);
+                    $('#room_menu_id').html(return_data);
                     loading(0);
                     return 0;
                 },
@@ -292,8 +430,27 @@ if (empty($paket)) {
                 }
             });
         }
-        function addMenuItem()
-        {
+
+        function clearMenu() {
+            $.ajax({
+                type: "get",
+                url: "{{ route('booking.clear-menu') }}",
+                dataType: "html",
+                success: function(return_data) {
+                    $('.room-menu-item').each(function(index) {
+                        $(this).remove();
+                    });
+                    $('#menu-table').html(
+                        '<td valign="top" colspan="7" class="dataTables_empty">No data available in table</td>'
+                    );
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            });
+        }
+
+        function addMenuItem() {
             loading();
             var room_menu_id = $("#room_menu_id").val();
             $.ajax({
@@ -306,12 +463,75 @@ if (empty($paket)) {
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function(return_data) {
-                    $('#menu-item-table').html(return_data);
                     if ($('.menu-item').length == 0) {
-                        $('#menu-item-table').html(return_data);
+                        $('#menu-itm-table').html(return_data);
                     } else {
-                        $('#menu-item-table').append(return_data);
+                        $('#menu-itm-table').append(return_data);
                     }
+                    loading(0);
+                    return 0;
+                },
+                complete: function() {
+                    loading(0);
+                    subtotalMenu();
+                    setTimeout(function() {
+                        loading(0);
+                    }, 200);
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            });
+        }
+
+        function changeMenuQty(id, qty) {
+            loadingWidget();
+            disableNav();
+            $.ajax({
+                type: "POST",
+                url: "{{ route('booking.facility-qty') }}",
+                dataType: "html",
+                data: {
+                    'id': id,
+                    'qty': qty,
+                    '_token': '{{ csrf_token() }}',
+                },
+                success: function(return_data) {
+                    loadingWidget(0);
+                    setTimeout(function() {
+                        enableNav();
+                        loadingWidget(0);
+                    }, 100);
+                    enableNav();
+                },
+                complete: function() {
+                    loadingWidget(0);
+                    subtotalMenu();
+                    setTimeout(function() {
+                        loadingWidget(0);
+                        enableNav();
+                    }, 200);
+                    enableNav();
+                },
+                error: function(data) {
+                    console.log(data);
+                    loadingWidget(0);
+                    setTimeout(function() {
+                        loadingWidget(0);
+                        enableNav();
+                    }, 200);
+                }
+            });
+        }
+
+        function deleteBooked(room_id) {
+            loading();
+            $.ajax({
+                type: "get",
+                url: "{{ route('booking.delete-booked-room') }}" + room_id,
+                dataType: "html",
+                success: function(return_data) {
+                    $("#booked-room-" + room_id).remove();
                     loading(0);
                     return 0;
                 },
@@ -326,20 +546,38 @@ if (empty($paket)) {
                 }
             });
         }
-        function deleteBooked(room_id){
+
+        function deleteFacilityItm(id) {
             loading();
             $.ajax({
                 type: "get",
-                url: "{{ route('booking.delete-booked-room') }}"+room_id,
+                url: "{{ route('booking.delete-facility') }}" + id,
                 dataType: "html",
-               
                 success: function(return_data) {
-                    $('#menu-item-table').html(return_data);
-                    if ($('.menu-item').length == 0) {
-                        $('#menu-item-table').html(return_data);
-                    } else {
-                        $('#menu-item-table').append(return_data);
-                    }
+                    $("#facility-" + id).remove();
+                    loading(0);
+                    return 0;
+                },
+                complete: function() {
+                    loading(0);
+                    setTimeout(function() {
+                        loading(0);
+                    }, 200);
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            });
+        }
+
+        function deleteMenuItm(id) {
+            loading();
+            $.ajax({
+                type: "get",
+                url: "{{ route('booking.delete-menu') }}" + id,
+                dataType: "html",
+                success: function(return_data) {
+                    $("#booked-room-" + id).remove();
                     loading(0);
                     return 0;
                 },
@@ -355,7 +593,10 @@ if (empty($paket)) {
             });
         }
         $(document).ready(function() {
-            subtotal();changeMenu();
+            subtotal();
+            changeMenu();
+            subtotalFasilitas();
+            subtotalMenu();
             $('#navigator-booking li:nth-child(' + index + ') a').tab('show');
             changeType();
             $("input").each(function() {
@@ -376,7 +617,6 @@ if (empty($paket)) {
             $(".room_price_price").each(function() {
                 var price = $(this);
                 $("#room_price_view_" + $(this).data('id')).val(toRp(price.val()));
-                // console.log();
                 $(".room_price_price_view").each(function() {
                     $(this).change(function() {
                         price.val($(this).val());
@@ -439,13 +679,13 @@ if (empty($paket)) {
                         <a class="nav-link booking-nav" onclick="function_elements_add('tab-index',2)" href="#room"
                             role="tab" data-toggle="tab">Kamar</a>
                     </li>
-                    <li class="nav-item booking-nav">
-                        <a class="nav-link" onclick="function_elements_add('tab-index',3)" href="#facility" role="tab"
-                            data-toggle="tab">Fasilitas</a>
+                    <li class="nav-item">
+                        <a class="nav-link booking-nav" onclick="function_elements_add('tab-index',3)" href="#facility"
+                            role="tab" data-toggle="tab">Fasilitas</a>
                     </li>
-                    <li class="nav-item booking-nav">
-                        <a class="nav-link" onclick="function_elements_add('tab-index',4)" href="#menus" role="tab"
-                            data-toggle="tab">Menu</a>
+                    <li class="nav-item">
+                        <a class="nav-link booking-nav" onclick="function_elements_add('tab-index',4)" href="#menus"
+                            role="tab" data-toggle="tab">Menu</a>
                     </li>
                 </ul>
                 <div class="tab-content">
@@ -507,7 +747,6 @@ if (empty($paket)) {
                                         'id' => 'building_id',
                                         'onchange' => 'changeType()',
                                         'form' => 'form-barang',
-                                        'autofocus' => 'autofocus',
                                         'required',
                                     ]) !!}
                                 </div>
@@ -543,7 +782,7 @@ if (empty($paket)) {
                                 <div class="form-actions float-right">
                                 </div>
                             </div>
-                            <div class="card-body-">
+                            <div class="card-body">
                                 <div class="table-responsive">
                                     <table id="example" style="width:100%"
                                         class="table table-striped table-bordered table-hover table-full-width">
@@ -563,9 +802,12 @@ if (empty($paket)) {
                                             @isset($room)
                                                 @php $no = 1; @endphp
                                                 @foreach ($room as $val)
-                                                    <tr class="booked-room room-{{ $val->room_id }}">
+                                                    <tr class="booked-room room-{{ $val->room_id }}"
+                                                        id="booked-room-{{ $val->room_id }}">
                                                         <td>{{ $no++ }}
-                                                            <input type='hidden' id="room_id_{{ $val->room_id }}" </td>
+                                                            <input type='hidden' id="room_id[]"
+                                                                value="{{ $val->room_id }}" />
+                                                        </td>
                                                         <td>{{ $val->room_name }}</td>
                                                         <td>{{ $val->roomType->room_type_name }}</td>
                                                         <td>{{ $val->building->building_name }}</td>
@@ -578,7 +820,8 @@ if (empty($paket)) {
                                                                         id='room_qty_{{ $val->room_id }}'
                                                                         style='text-align: center; height: 30px; font-weight: bold; font-size: 15px'
                                                                         class='form-control input-bb' min='1'
-                                                                        value='{{ $booked[$val->room_id] ?? 1 }}' autocomplete='off'>
+                                                                        value='{{ $booked[$val->room_id] ?? 1 }}'
+                                                                        autocomplete='off'>
                                                                 </div>
                                                                 <div class='col-auto'>Orang</div>
                                                             </div>
@@ -587,7 +830,7 @@ if (empty($paket)) {
                                                             {!! Form::select(
                                                                 'room_price_id',
                                                                 $val->price->pluck('type.price_type_name', 'room_price_id'),
-                                                                $sessiondata['room_price_id_'.$val->room_id] ?? '',
+                                                                $sessiondata['room_price_id_' . $val->room_id] ?? '',
                                                                 [
                                                                     'class' => 'selection-search-clear required select-form',
                                                                     'name' => 'room_price_id_' . $val->room_id,
@@ -615,16 +858,20 @@ if (empty($paket)) {
                                                     </tr>
                                                 @endforeach
                                             @endisset
-                                            @empty($menuItm)
-                                            <tr><td align="center" valign="top" colspan="7" class="dataTables_empty">No data available in table</td></tr>
+                                            @empty($room)
+                                                <tr>
+                                                    <td align="center" valign="top" colspan="7"
+                                                        class="dataTables_empty">No data available in table</td>
+                                                </tr>
                                             @endempty
                                         </tbody>
                                         <tfoot>
                                             <tr>
                                                 <td colspan="5" class="font-weight-bold text-center fs-4">Subtotal</td>
                                                 <td colspan="2" class="font-weight-bold text-center fs-4">
-                                                    <h5 id="subtotal"> Rp. <div class="sbs-room-view d-inline" id="sbs-room-view"></div> - </h5>
-                                                    <input type="hidden" name="subtotal_room" id="sbs-room"/>
+                                                    <h5 id="subtotal"> Rp. <div class="sbs-room-view d-inline"
+                                                            id="sbs-room-view"></div> - </h5>
+                                                    <input type="hidden" name="subtotal_room" id="sbs-room" />
                                                 </td>
                                             </tr>
                                         </tfoot>
@@ -649,17 +896,118 @@ if (empty($paket)) {
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <a class="text-dark">Fasilitas<a class='red'> *</a></a>
+                                    {!! Form::select('room_facility_id', $facility, $sessiondata['room_facility_id'] ?? '', [
+                                        'class' => 'selection-search-clear required select-form',
+                                        'name' => 'room_facility_id',
+                                        'id' => 'room_facility_id',
+                                        'required',
+                                    ]) !!}
+                                </div>
+                            </div>
+                            <div class="col-auto justify-content-center">
+                                <button class="btn btn-sm btn-primary mt-4" type="button" onclick="addFacility()"><i
+                                        class="fa fa-plus" id="add-facility-item"></i> Tambah Fasilitas</button>
+                            </div>
+                        </div>
+                        <div class="card border border-dark">
+                            <div class="card-header bg-dark clearfix">
+                                <h5 class="mb-0 float-left">
+                                    Daftar Fasilitas yang Dipesan
+                                </h5>
+                                <div class="form-actions float-right">
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table id="facility-table-parent" style="width:100%"
+                                        class="table table-striped table-bordered datatables table-hover table-full-width">
+                                        <thead>
+                                            <tr>
+                                                <th width="2%" style='text-align:center'>No</th>
+                                                <th width="15%" style='text-align:center'>Nama Fasilitas</th>
+                                                <th width="15%" style='text-align:center'>Keterangan</th>
+                                                <th width="15%" style='text-align:center'>Harga</th>
+                                                <th width="5%" style='text-align:center'>Jumlah</th>
+                                                <th width="10%" style='text-align:center'>Subtotal</th>
+                                                <th width="5%" style='text-align:center'>Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="facility-table">
+                                            @isset($facilityitm)
+                                                @php $nofas = 1; @endphp
+                                                @foreach ($facilityitm as $fas)
+                                                    <tr class="room-facility facility-{{ $fas->room_facility_id }}"
+                                                        id="facility-{{ $fas->room_facility_id }}">
+                                                        <td>{{ $nofas++ }}
+                                                            <input type='hidden' id="room_facility_id[]"
+                                                                value="{{ $fas->room_facility_id }}" />
+                                                        </td>
+                                                        <td>{{ $fas->facility_name }}</td>
+                                                        <td>{{ $fas->facility_remark }}</td>
+                                                        <td>
+                                                            <input type="text"
+                                                                class="form-control input-bb readonly facility_price_view"
+                                                                name="facility_price_view_{{ $fas->room_facility_id }}"
+                                                                id="facility_price_view_{{ $fas->room_facility_id }}"
+                                                                value="{{ number_format($fas->facility_price, 2, ',', '.') }}"
+                                                                readonly />
+                                                            <input type="hidden"
+                                                                class="form-control input-bb readonly facility_price_price"
+                                                                data-id="{{ $fas->room_facility_id }}"
+                                                                name="facility_price_{{$fas->room_facility_id}}"
+                                                                id="facility_price_{{ $fas->room_facility_id }}"
+                                                                value="{{ $fas->facility_price }}" readonly />
+                                                        </td>
+                                                        <td>
+                                                            <input
+                                                                oninput='changeFacilityQty({{ $fas->room_facility_id }}, this.value)'
+                                                                type='number'
+                                                                name='facility_qty_{{ $fas->room_facility_id }}'
+                                                                id='facility_qty_{{ $fas->room_facility_id }}'
+                                                                style='text-align: center; height: 30px; font-weight: bold; font-size: 15px'
+                                                                class='form-control input-bb' min='1'
+                                                                value='{{ $facilityqty[$fas->room_facility_id] ?? 1 }}'
+                                                                autocomplete='off' />
+                                                        </td>
+                                                        <td align="right"
+                                                            id="sbs-facility-itm-{{ $fas->room_facility_id }}">
+                                                        </td>
+                                                        <td class='text-center'><button type='button'
+                                                                class='btn btn-outline-danger btn-sm'
+                                                                onclick='deleteBooked({{ $fas->room_facility_id }})'>Hapus</button>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            @endisset
+                                            @empty($facilityitm)
+                                                <tr>
+                                                    <td align="center" valign="top" colspan="6"
+                                                        class="dataTables_empty">No data available in table</td>
+                                                </tr>
+                                            @endempty
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="4" class="font-weight-bold text-center fs-4">Subtotal</td>
+                                                <td colspan="2" class="font-weight-bold text-center fs-4">
+                                                    <h5 id="subtotal"> Rp. <div class="sbs-facility-view d-inline"
+                                                            id="sbs-facility-view"></div> - </h5>
+                                                    <input type="hidden" name="subtotal_facility" id="sbs-facility" />
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
                                 </div>
                             </div>
                         </div>
                         <div class="card-footer text-muted">
                             <div class="form-actions float-left">
-                                <button type="button" class="btn prev-btn btn-primary"> <i
+                                <button type="button" class="btn prev-btn booking-nav btn-primary"> <i
                                         class="fa fa-solid fa-arrow-left"></i>
                                     Kembali</button>
                             </div>
                             <div class="form-actions float-right">
-                                <button type="button" class="btn next-btn btn-primary">
+                                <button type="button" class="btn next-btn booking-nav btn-primary">
                                     Berikutnya <i class="fa fa-solid fa-arrow-right"></i></button>
                             </div>
                         </div>
@@ -669,32 +1017,27 @@ if (empty($paket)) {
                             <div class="col-md-5">
                                 <div class="form-group">
                                     <a class="text-dark">Tipe<a class='red'> *</a></a>
-                                    {!! Form::select(
-                                        'room_menu_type',
-                                        $menutype,
-                                        $sessiondata['room_menu_type'] ?? '',
-                                        [
-                                            'class' => 'selection-search-clear required select-form',
-                                            'name' => 'room_menu_type',
-                                            'id' => 'room_menu_type',
-                                            'onchange' => 'changeMenu()',
-                                            'required',
-                                        ],
-                                    ) !!}
+                                    {!! Form::select('room_menu_type', $menutype, $sessiondata['room_menu_type'] ?? '', [
+                                        'class' => 'selection-search-clear required select-form',
+                                        'name' => 'room_menu_type',
+                                        'id' => 'room_menu_type',
+                                        'onchange' => 'changeMenu()',
+                                        'required',
+                                    ]) !!}
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <a class="text-dark">Name<a class='red'> *</a></a>
                                     <select class="selection-search-clear required select-form"
-                                        placeholder="Masukan Kategori Barang" name="room_menu_id"
-                                        id="room_menu_id" onchange="function_elements_add(this.name, this.value)">
+                                        placeholder="Masukan Kategori Barang" name="room_menu_id" id="room_menu_id"
+                                        onchange="function_elements_add(this.name, this.value)">
                                     </select>
                                 </div>
                             </div>
                             <div class="col-auto">
                                 <button class="btn btn-sm btn-primary mt-4" type="button" onclick="addMenuItem()"><i
-                                        class="fa fa-plus" id="add-package-item"></i>Tambah</button>
+                                        class="fa fa-plus" id="add-menu-item"></i>Tambah</button>
                             </div>
                         </div>
                         <div class="card border border-dark">
@@ -705,37 +1048,81 @@ if (empty($paket)) {
                                 <div class="form-actions float-right">
                                 </div>
                             </div>
-                            <div class="menu-item-table">
+                            <div class="card-body">
                                 <div class="table-responsive">
                                     <table id="example" style="width:100%"
-                                        class="table table-striped table-bordered table-hover table-full-width">
+                                        class="table table-striped table-bordered datatables table-hover table-full-width">
                                         <thead>
                                             <tr>
                                                 <th width="2%" style='text-align:center'>No</th>
                                                 <th width="20%" style='text-align:center'>Tipe Menu</th>
                                                 <th width="20%" style='text-align:center'>Nama Menu</th>
-                                                <th width="20%" style='text-align:center'>Jumlah</th>
                                                 <th width="20%" style='text-align:center'>Harga</th>
+                                                <th width="20%" style='text-align:center'>Jumlah</th>
                                                 <th width="20%" style='text-align:center'>Subtotal</th>
                                                 <th width="10%" style='text-align:center'>Aksi</th>
                                             </tr>
                                         </thead>
-                                        <tbody id="package-table">
+                                        <tbody id="menu-itm-table">
                                             @isset($menuItm)
-                                                @php $no = 1; @endphp
-                                                @foreach ($menuItm as $val)
+                                                @php $nomen = 1; @endphp
+                                                @foreach ($menuItm as $men)
+                                                <tr class="menu-item menu-item-{{ $men->room_menu_id }}"
+                                                    id="facility-{{ $men->room_menu_id }}">
+                                                    <td>{{ $nomen++ }}
+                                                        <input type='hidden' id="room_menu_id[]"
+                                                            value="{{ $men->room_menu_id }}" />
+                                                    </td>
+                                                    <td>{{ $menutype[$men->room_menu_type] }}</td>
+                                                    <td>{{ $men->room_menu_name }}</td>
+                                                    <td>
+                                                        <input type="text"
+                                                            class="form-control input-bb readonly menu_price_view"
+                                                            name=" menu_price_view_{{ $men->room_menu_id }}"
+                                                            id=" menu_price_view_{{ $men->room_menu_id }}"
+                                                            value="{{ number_format($men->room_menu_price, 2, ',', '.') }}"
+                                                            readonly />
+                                                        <input type="hidden"
+                                                            class="form-control input-bb readonly menu_price_price"
+                                                            data-id="{{ $men->room_menu_id }}"
+                                                            name=" menu_price_{{$men->room_menu_id}}"
+                                                            id=" menu_price_{{ $men->room_menu_id }}"
+                                                            value="{{ $men->room_menu_price }}" readonly />
+                                                    </td>
+                                                    <td>
+                                                        <input
+                                                            oninput='changeMenuQty({{ $men->room_menu_id }}, this.value)'
+                                                            type='number'
+                                                            name='menu_qty_{{ $men->room_menu_id }}'
+                                                            id='menu_qty_{{ $men->room_menu_id }}'
+                                                            style='text-align: center; height: 30px; font-weight: bold; font-size: 15px'
+                                                            class='form-control input-bb' min='1'
+                                                            value='{{ $facilityqty[$men->room_menu_id] ?? 1 }}'
+                                                            autocomplete='off' />
+                                                    </td>
+                                                    <td align="right" id="sbs-menu-itm-{{ $men->room_menu_id }}">
+                                                    </td>
+                                                    <td class='text-center'><button type='button'
+                                                            class='btn btn-outline-danger btn-sm'
+                                                            onclick='deleteMenuItm({{ $men->room_menu_id }})'>Hapus</button>
+                                                    </td>
+                                                </tr>
                                                 @endforeach
                                             @endisset
                                             @empty($menuItm)
-                                            <tr><td align="center" valign="top" colspan="7" class="dataTables_empty">No data available in table</td></tr>
+                                                <tr>
+                                                    <td align="center" valign="top" colspan="7"
+                                                        class="dataTables_empty">No data available in table</td>
+                                                </tr>
                                             @endempty
                                         </tbody>
                                         <tfoot>
                                             <tr>
                                                 <td colspan="5" class="font-weight-bold text-center fs-4">Subtotal</td>
                                                 <td colspan="2" class="font-weight-bold text-center fs-4">
-                                                    <h5 id="subtotal"> Rp. <div class="sbs-menu-view d-inline" id="sbs-menu-view"></div> - </h5>
-                                                    <input type="hidden" name="subtotal_menu" id="sbs-menu"/>
+                                                    <h5 id="subtotal"> Rp. <div class="sbs-menu-view d-inline"
+                                                            id="sbs-menu-view"></div> - </h5>
+                                                    <input type="hidden" name="subtotal_menu" id="sbs-menu" />
                                                 </td>
                                             </tr>
                                         </tfoot>
@@ -745,7 +1132,7 @@ if (empty($paket)) {
                         </div>
                         <div class="card-footer text-muted">
                             <div class="form-actions float-left">
-                                <button type="button" class="btn prev-btn btn-primary"> <i
+                                <button type="button" class="btn prev-btn booking-nav btn-primary"> <i
                                         class="fa fa-solid fa-arrow-left"></i>
                                     Kembali</button>
                             </div>
