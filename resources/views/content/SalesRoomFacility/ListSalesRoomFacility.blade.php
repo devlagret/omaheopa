@@ -51,6 +51,7 @@ function check(name,uri){
                     <tr>
                         <th width="2%" style='text-align:center'>No</th>
                         <th width="20%" style='text-align:center'>Nama Fasilitas</th>
+                        <th width="20%" style='text-align:center'>Keterangan</th>
                         <th width="20%" style='text-align:center'>Harga</th>
                         <th width="10%" style='text-align:center'>Aksi</th>
                     </tr>
@@ -61,6 +62,7 @@ function check(name,uri){
                     <tr>
                         <td style='text-align:center'>{{ $no++ }}</td>
                         <td>{{ $row->facility_name }}</td>
+                        <td>{{ $row->facility_remark }}</td>
                         <td>{{ number_format($row->facility_price,2,',','.') }}</td>
                         <td class="text-center">
                             <a type="button" class="btn btn-outline-warning btn-sm" href="{{ route('sales-room-facility.edit',$row->room_facility_id) }}">Edit</a>
