@@ -180,40 +180,6 @@ function deleteIsiPaket(item_id,item_unit,url){
     });
 }
 
-function function_change_quantity(item_packge_id, unit_id,value,url) {
-    if (value != '') {
-        $.ajax({
-            url: url + '/' + item_packge_id + '/' + unit_id + '/'+ value,
-            type: "GET",
-            dataType: "json",
-            success: function(data) {
-
-            }
-        });
-    }
-}
-
-function changeSatuan(url,token){
-    var package_item_id = $("#package_item_id").val();
-
-    $.ajax({
-        type: "POST",
-        url: url,
-        dataType: "html",
-        data: {
-            'item_id': package_item_id,
-            '_token': token,
-        },
-        success: function(return_data) {
-            $('#package_item_unit').val(1);
-            $('#package_item_unit').html(return_data);
-            function_elements_add('package_item_id', package_item_id);
-        },
-        error: function(data) {
-            console.log(data);
-        }
-    });
-}
 
 function formatRp(){
     var harga = $('#package_price_view').val();

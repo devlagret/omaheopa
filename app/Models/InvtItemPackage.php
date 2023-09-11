@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class InvtItemPackage extends Model
 {
     use HasFactory;
-    use SoftDeletes;
     protected $table        = 'invt_item_package';
     protected $primaryKey   = 'invt_item_package_id';
     public function merchant() {

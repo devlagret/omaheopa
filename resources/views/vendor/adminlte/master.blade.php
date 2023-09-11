@@ -8,7 +8,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="icon" type="image/x-icon" href="{{ asset('resources/assets/img/logo_baru_mozaic/logo baru set-09.png') }}" />
+    <link rel="icon" type="image/x-icon"
+        href="{{ asset('resources/assets/img/logo_baru_mozaic/logo baru set-09.png') }}" />
 
     {{-- Custom Meta Tags --}}
     @yield('meta_tags')
@@ -24,7 +25,7 @@
     @yield('adminlte_css_pre')
 
     {{-- Base Stylesheets --}}
-    @if(!config('adminlte.enabled_laravel_mix'))
+    @if (!config('adminlte.enabled_laravel_mix'))
         <link rel="stylesheet" href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}">
         <link rel="stylesheet" href="{{ asset('vendor/overlayScrollbars/css/OverlayScrollbars.min.css') }}">
 
@@ -32,7 +33,8 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
         <link rel="stylesheet" href="https://cdn.datatables.net/1.11.1/css/dataTables.bootstrap4.min.css">
         <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-theme/0.1.0-beta.10/select2-bootstrap.min.css"/>
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-theme/0.1.0-beta.10/select2-bootstrap.min.css" />
         <link rel="stylesheet" href="{{ asset('resources/css/app.css') }}">
         {{-- <link rel="stylesheet" href="{{ asset('resources/css/select2.min.css') }}"> --}}
 
@@ -40,14 +42,15 @@
         @include('adminlte::plugins', ['type' => 'css'])
 
         <link rel="stylesheet" href="{{ asset('vendor/adminlte/dist/css/adminlte.min.css') }}">
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+        <link rel="stylesheet"
+            href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
     @else
         <link rel="stylesheet" href="{{ mix(config('adminlte.laravel_mix_css_path', 'css/app.css')) }}">
     @endif
 
     {{-- Livewire Styles --}}
-    @if(config('adminlte.livewire'))
-        @if(app()->version() >= 7)
+    @if (config('adminlte.livewire'))
+        @if (app()->version() >= 7)
             @livewireStyles
         @else
             <livewire:styles />
@@ -58,7 +61,7 @@
     @yield('adminlte_css')
 
     {{-- Favicon --}}
-    @if(config('adminlte.use_ico_only'))
+    @if (config('adminlte.use_ico_only'))
         <link rel="shortcut icon" href="{{ asset('favicons/favicon.ico') }}" />
     @elseif(config('adminlte.use_full_favicon'))
         <link rel="shortcut icon" href="{{ asset('favicons/favicon.ico') }}" />
@@ -74,7 +77,7 @@
         <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicons/favicon-16x16.png') }}">
         <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicons/favicon-32x32.png') }}">
         <link rel="icon" type="image/png" sizes="96x96" href="{{ asset('favicons/favicon-96x96.png') }}">
-        <link rel="icon" type="image/png" sizes="192x192"  href="{{ asset('favicons/android-icon-192x192.png') }}">
+        <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('favicons/android-icon-192x192.png') }}">
         <link rel="manifest" href="{{ asset('favicons/manifest.json') }}">
         <meta name="msapplication-TileColor" content="#ffffff">
         <meta name="msapplication-TileImage" content="{{ asset('favicon/ms-icon-144x144.png') }}">
@@ -82,43 +85,69 @@
 
 </head>
 <style>
-.pull-left{
-float: left !important;
-}
-.content-wrapper{
-    overflow-x: hidden;
-}
-.loading {
-  border: 16px solid #f3f3f3;
-  border-radius: 50%;
-  border-top: 16px solid #e05c03;
-  border-right: 16px solid #d8b407;
-  border-bottom: 16px solid #e05c03;
-  border-left: 16px solid #d8b407;
-  width: 120px;
-  height: 120px;
-  -webkit-animation: spin 2s linear infinite;
-  animation: spin 2s linear infinite;
-}
+    .pull-left {
+        float: left !important;
+    }
 
-@-webkit-keyframes spin {
-  0% { -webkit-transform: rotate(0deg); }
-  100% { -webkit-transform: rotate(360deg); }
-}
+    .content-wrapper {
+        overflow-x: hidden;
+    }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+    .loading {
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid #e05c03;
+        border-right: 16px solid #d8b407;
+        border-bottom: 16px solid #e05c03;
+        border-left: 16px solid #d8b407;
+        width: 120px;
+        height: 120px;
+        -webkit-animation: spin 2s linear infinite;
+        animation: spin 2s linear infinite;
+    }
+
+    .loading-widget {
+        position: fixed;
+        z-index: 50;
+        width: 60px;
+        height: 60px;
+        top: 5em;
+        right: 40px;
+        text-align: center;
+        display: none;
+    }
+
+    @-webkit-keyframes spin {
+        0% {
+            -webkit-transform: rotate(0deg);
+        }
+
+        100% {
+            -webkit-transform: rotate(360deg);
+        }
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
 </style>
-<body class="@yield('classes_body')" @yield('body_data')>
 
+<body class="@yield('classes_body')" @yield('body_data')>
+    <div id="loading-widget" class="loading loading-widget mx-auto">
+    </div>
     {{-- Body Content --}}
     @yield('body')
 
     {{-- Base Scripts --}}
-    @if(!config('adminlte.enabled_laravel_mix'))
-        <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    @if (!config('adminlte.enabled_laravel_mix'))
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
         <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
         <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
         <script src="{{ asset('vendor/overlayScrollbars/js/jquery.overlayScrollbars.min.js') }}"></script>
@@ -133,24 +162,37 @@ float: left !important;
              * @param  {Number} status Use 0 to close modal
              * @return {Void}   Nothing
              */
-            function loading(status = 1){
-                if (status){
+            function loading(status = 1) {
+                if (status) {
                     $('#loading').modal('show');
-                }else{
+                } else {
                     $('#loading').modal('hide');
-                    setTimeout(function(){  $('#loading').modal('hide'); }, 3000);
                 }
             }
+            /**
+             * Show loading Widget
+             * @param  {Number} status Use 0 to hida loading
+             * @return {Void}   Nothing
+             */
+            function loadingWidget(status = 1) {
+                if (status) {
+                    $('#loading-widget').show();
+                } else {
+                    $('#loading-widget').hide();
+                }
+            }
+
             function toRp(number = 0) {
                 var number = number.toString(),
-                rupiah = number.split(',')[0],
-                cents = (number.split(',')[1] || '') +'00';
+                    rupiah = number.split(',')[0],
+                    cents = (number.split(',')[1] || '') + '00';
                 rupiah = rupiah.split('').reverse().join('')
                     .replace(/(\d{3}(?!$))/g, '$1,')
                     .split('').reverse().join('');
                 return rupiah + ',' + cents.slice(0, 2);
             }
-            function quote(){
+
+            function quote() {
                 var data;
 
                 $.ajax({
@@ -159,11 +201,12 @@ float: left !important;
                     dataType: "html",
                     async: false,
                     success: function(return_data) {
-                    data = return_data;
+                        data = return_data;
                     },
                     error: function(data) {
                         console.log(data);
-                        data ="Hanya seseorang yang takut yang bisa bertindak berani. Tanpa rasa takut itu tidak ada apa pun yang bisa disebut berani";
+                        data =
+                            "Hanya seseorang yang takut yang bisa bertindak berani. Tanpa rasa takut itu tidak ada apa pun yang bisa disebut berani";
                     }
                 });
                 return data;
@@ -189,19 +232,40 @@ float: left !important;
                     // ]
                 });
                 $('#example').addClass('pull-left');
-
-            } );
+                // $(".datatables").each(function() {
+                //     $(this).dataTable({
+                //         "aLengthMenu": [
+                //             [5, 15, 20, -1],
+                //             [5, 15, 20, "All"]
+                //         ],
+                //         "iDisplayLength": 5,
+                //     });
+                //     $(this).addClass('pull-left');
+                // });
+            });
             $(document).ready(function() {
-                $("[data-toggle=popover]").popover({ trigger: 'focus', content:function(){
-                                                                       return quote();}});
+                $("[data-toggle=popover]").popover({
+                    trigger: 'focus',
+                    content: function() {
+                        return quote();
+                    }
+                });
                 $('.selection-search-clear').select2({
                     theme: "bootstrap",
                     placeholder: "Select",
                     allowClear: true,
                     width: 'resolve',
                 });
+                $('.datatables').dataTable({
+                        "aLengthMenu": [
+                            [5, 15, 20, -1],
+                            [5, 15, 20, "All"]
+                        ],
+                        "iDisplayLength": 5,
+                    });
+                $(".datatables").addClass('pull-left');
             });
-            // $('#date').datepicker({ dateFormat: 'dd-mm-yy' }).val();
+            // $('.date').datepicker({ dateFormat: 'dd-mm-yy' }).val();
         </script>
 
         {{-- Configured Scripts --}}
@@ -213,8 +277,8 @@ float: left !important;
     @endif
 
     {{-- Livewire Script --}}
-    @if(config('adminlte.livewire'))
-        @if(app()->version() >= 7)
+    @if (config('adminlte.livewire'))
+        @if (app()->version() >= 7)
             @livewireScripts
         @else
             <livewire:scripts />

@@ -42,6 +42,8 @@ class RestoreDataController extends Controller
             'acct_journal_voucher_item',
             'acct_account_balance_detail',
             'acct_account_balance',
+            'invt_stock_adjustment',
+            'invt_stock_adjustment_item',
             ])
         ->pluck('Tables_in_'.$dbName)->flatten();
         foreach($tables as $val){

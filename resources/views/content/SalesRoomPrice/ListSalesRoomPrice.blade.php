@@ -68,8 +68,8 @@ function check(name,uri){
                         <td>{{ $row->room->roomType->room_type_name }}</td>
                         <td>{{ $row->type->price_type_name }}</td>
                         <td>{{ number_format($row->room_price_price,2,',','.') }}</td>
-                        <td>{{ $row->room_price_start_date }}</td>
-                        <td>{{ $row->room_price_end_date }}</td>
+                        <td>{{ date('d-m-Y',strtotime($row->room_price_start_date)) }}</td>
+                        <td>{{ date('d-m-Y',strtotime($row->room_price_end_date)) }}</td>
                         <td class="text-center">
                             <a type="button" class="btn btn-outline-warning btn-sm" href="{{ route('room-price.edit',$row->room_price_id) }}">Edit</a>
                             <button type="button" onclick="$('this').attr('disabled');check('{{$row->room->room_name}}','{{ route('room-price.delete',$row->room_price_id) }}')" class="btn btn-outline-danger btn-sm" >Hapus</button>

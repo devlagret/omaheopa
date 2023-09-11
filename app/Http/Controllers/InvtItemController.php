@@ -190,14 +190,36 @@ class InvtItemController extends Controller
     public function editItem($item_id)
     {
         $counts = collect();
-        $ubahpaket=0;
         $items = Session::get('items');
-        //* check if item is in package
         $msg = '';
+        $invtpaket = InvtItemPackage::where('data_state', '0')->where('item_id',$item_id)->get();
         $pkg = InvtItemPackage::where('package_item_id',$item_id)->get()->count();
         if($pkg){
             $msg ='Ada paket yang menggunakan item ini';
         }
+
+        if($invtpaket->count()){
+            //* mengecek apakah (session) paket kosong
+            if(empty(Session::get('paket'))){
+            //* mengisi data paket dari db jika session kosong
+            foreach ($invtpaket as $itm){
+            $arr=[$itm->package_item_id=>[$itm->item_quantity,$itm->item_unit_id]];
+            Session::push('paket',$arr);
+            }}
+            //* set package item data for view
+            $pktitem = collect(Session::get('paket'));
+            //* set unit item data for view
+            $unit = InvtItemUnit::get(['item_unit_id','item_unit_name']);
+            //* get all package item id (using sesion so that the last input saved)
+            foreach($pktitem as $key => $val){
+                if(! $counts->contains(collect($val)->keys()[0])){
+                    $counts->push(collect($val)->keys()[0]);
+                }
+              }
+              $paket = InvtItem::with('category','merchant')->wherein('item_id',$counts)->get();
+        }
+              $unit = InvtItemUnit::get(['item_unit_id','item_unit_name']);
+
         $itemunits    = InvtItemUnit::where('data_state', '=', 0)
             ->where('company_id', Auth::user()->company_id)
             ->get()
@@ -216,10 +238,11 @@ class InvtItemController extends Controller
         for($n=1;$n<=4;$n++){
             $data['item_unit_id'.$n] != null ? $base_kemasan++ : '';
         }
-        return view('content.InvtItem.FormEditInvtItem', compact('data', 'itemunits', 'category', 'items', 'merchant', 'base_kemasan','ubahpaket','counts','msg','pkg'));
+        return view('content.InvtItem.FormEditInvtItem', compact('data','unit', 'itemunits', 'paket','pktitem','category', 'items', 'merchant', 'base_kemasan','counts','msg','pkg'));
     }
     public function processEditItem(Request $request)
     {
+        dump($request->all());
         $itm="Barang";
         $warehouse = InvtWarehouse::where('data_state',0)
             ->where('company_id',Auth::user()->company_id)
@@ -240,7 +263,7 @@ class InvtItemController extends Controller
         $table       = InvtItem::findOrFail($fields['item_id']);
         $packageitem = InvtItemPackage::with('unit')->where('package_item_id',$fields['item_id']);
         foreach ($warehouse as $key => $val) {
-           $stok = InvtItemStock::where('company_id')
+           $stok = InvtItemStock::where('company_id',Auth::user()->company_id)
             ->where('item_id',$table['item_id'])
             ->where('item_category_id',$table['item_category_id'])
             ->where('warehouse_id',$val['warehouse_id'])
@@ -293,12 +316,11 @@ class InvtItemController extends Controller
             $paket->delete();
         }else if($paket->count()&&!empty(Session::get('paket'))){
             $itm = "Paket";
+            $paket->delete();
         foreach($paketarr as $vala){
-            InvtItemPackage::updateOrCreate([
-                'data_state ' => 0,
+            InvtItemPackage::create([
                 'item_id' => $fields['item_id'],
                 'package_item_id' => array_keys($vala)[0],
-            ],[
                 'item_quantity' => $vala[array_keys($vala)[0]][0],
                 'item_unit_id' => $vala[array_keys($vala)[0]][1],
             ]);
@@ -320,10 +342,11 @@ class InvtItemController extends Controller
             $msg = "Ubah ".$itm." Berhasil";
             return redirect('/item')->with('msg', $msg);
         } else {
-            $msg = "Ubah ".$itm." Gagal";
+            $msg = "Ubah ".$itm." Gagal.";
             return redirect('/item')->with('msg', $msg);
         }}catch(\Exception $e){
             report($e);
+            dump($e);exit;
             DB::rollBack();
             $msg = "Ubah ".$itm." Gagal";
             return redirect('/item')->with('msg', $msg);

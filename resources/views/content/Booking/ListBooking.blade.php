@@ -32,10 +32,10 @@
 
         <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
             <div class="card-body">
-                <div class = "row">
+                <div class="row ">
                     <div class = "col-md-6">
                         <div class="form-group form-md-line-input">
-                            <section class="control-label">Tanggal Mulai
+                            <section class="control-label">Tanggal Check-In
                                 <span class="required text-danger">
                                     *
                                 </span>
@@ -46,7 +46,7 @@
 
                     <div class = "col-md-6">
                         <div class="form-group form-md-line-input">
-                            <section class="control-label">Tanggal Akhir
+                            <section class="control-label">Tanggal Check-Out
                                 <span class="required text-danger">
                                     *
                                 </span>
