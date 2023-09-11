@@ -39,12 +39,22 @@ if (empty($paket)) {
         function next() {
             index++;
             function_elements_add('tab-index', index)
+            $("#card-total-all").hide();
+            if(index = 4){
+                $("#card-total-all").show();
+            }
+            (index > 4)?index=4:(index<1)?index=1:'';
             $('#navigator-booking li:nth-child(' + index + ') a').tab('show');
         }
 
         function preft() {
             index--;
             function_elements_add('tab-index', index)
+            $("#card-total-all").hide();
+            if(index = 4){
+                $("#card-total-all").show();
+            }
+            (index > 4)?index=4:(index<1)?index=1:'';
             $('#navigator-booking li:nth-child(' + index + ') a').tab('show');
         }
 
@@ -104,7 +114,7 @@ if (empty($paket)) {
                     loading(0);
                     setTimeout(function() {
                         loading(0);
-                    }, 20);
+                    }, 100);
                 },
                 complete: function() {
                     loading(0);
@@ -124,12 +134,8 @@ if (empty($paket)) {
 
         function addRoom() {
             var room_id = $("#room_id").val();
+            var days_booked = $("#days_booked").val();
             if ($('.room-' + room_id).length) {
-                // $('#item_package_' + room_id).val(function(i, oldval) {
-                //     var newval = ++oldval;
-                //     changeHowManyPerson(room_id, newval);
-                //     return newval;
-                // });
                 return 0;
             }
             loading();
@@ -140,6 +146,7 @@ if (empty($paket)) {
                 data: {
                     'no': $('.booked-room').length,
                     'room_id': room_id,
+                    'days_booked' : days_booked,
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function(return_data) {
@@ -154,7 +161,7 @@ if (empty($paket)) {
                     loading(0);
                     setTimeout(function() {
                         loading(0);
-                    }, 20);
+                    }, 100);
                 },
                 complete: function() {
                     subtotal()
@@ -303,7 +310,7 @@ if (empty($paket)) {
                     loading(0);
                     setTimeout(function() {
                         loading(0);
-                    }, 20);
+                    }, 100);
                 },
                 complete: function() {
                     subtotalFasilitas();
@@ -341,20 +348,27 @@ if (empty($paket)) {
             });
         }
 
-        function changePrice(name, room_price_id = null) {
+        function changePrice(id, room_price_id = null, save = 1) {
             disableNav();
-            var room_id = name.charAt(14);
+            save_id = null;
+            if(save){
+                save_id = id;
+            }
             $.ajax({
                 type: "post",
                 url: "{{ route('booking.get-room-price') }}",
                 dataType: "html",
                 data: {
                     'room_price_id': room_price_id,
+                    'room_id': save_id,
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function(return_data) {
-                    $("#room_price_" + room_id).val(return_data);
-                    $("#room_price_view_" + room_id).val(toRp(return_data));
+                    $("#room_price_" + id).val(return_data);
+                    if(save){
+                    function_elements_add('room_price_id_'+id,room_price_id)
+                    }
+                    $("#room_price_view_" + id).val(toRp(return_data));
                 },
                 complete: function() {
                     subtotal()
@@ -370,12 +384,19 @@ if (empty($paket)) {
         }
 
         function subtotal() {
+            let sbstotal = 0;
             let total = 0;
+            var days = $("#days_booked").val();
             $(".room_price_price").each(function() {
-                total += Number($(this).val());
+                sbstotal = Number($(this).val()) * days;
+                $("#sbs-room-booked-"+$(this).data('id')).html(toRp(sbstotal));
+                $("#sbs-rbook-input--"+$(this).data('id')).val(sbstotal);
+                total += sbstotal;
             });
             $("#sbs-room-view").html(toRp(total));
+            $("#subtotal_all_room").val(toRp(total));
             $("#sbs-room").val(total);
+            count_total();
             return total;
         }
 
@@ -387,7 +408,9 @@ if (empty($paket)) {
                 total += (Number($(this).val()) * Number($("#facility_qty_" + $(this).data('id')).val()));
             });
             $("#sbs-facility-view").html(toRp(total));
-            $("#subtotal_facility").val(total);
+            $("#subtotal_all_facility").val(toRp(total));
+            $("#sbs-facility").val(total);
+            count_total();
             return total;
         }
 
@@ -399,7 +422,9 @@ if (empty($paket)) {
                 total += (Number($(this).val()) * Number($("#menu_qty_" + $(this).data('id')).val()));
             });
             $("#sbs-menu-view").html(toRp(total));
-            $("#subtotal_menu").val(total);
+            $("#subtotal_all_menu").val(toRp(total));
+            $("#sbs-menu").val(total);
+            count_total();
             return total;
         }
 
@@ -592,11 +617,58 @@ if (empty($paket)) {
                 }
             });
         }
-        $(document).ready(function() {
+
+        function count_total(){
+            var subtotal_room    = $("#sbs-room").val();
+            var subtotal_facility= $("#sbs-facility").val();
+            var subtotal_menu    = $("#sbs-menu").val();
+            var discount_percentage = $("#discount_percentage_total").val();
+            if(discount_percentage>100){
+                discount_percentage = 100;
+                $("#discount_percentage_total").val(discount_percentage);
+            }
+            sbsAll = Number(subtotal_room)+Number(subtotal_facility)+Number(subtotal_menu);
+            $("#subtotal_all_view").val(toRp(sbsAll));
+            $("#subtotal_all").val(sbsAll);
+            diskon =  (sbsAll * discount_percentage) / 100;
+            $("#discount_amount_view").val(toRp(diskon));
+            $("#discount_amount").val(diskon);
+            $("#total_amount_view").val(toRp(sbsAll - diskon));
+            $("#total_amount").val(sbsAll - diskon);
+        }
+        function reset_add(){
+            clearBooked();
+            clearFacility();
+            clearMenu();
+            loading();
+            $.ajax({
+				type: "GET",
+				url : "{{route('booking.reset')}}",
+				complete: function(msg){
+                    location.reload();
+			}
+
+		    });
+        }
+        function changeDate(){
+            var start_date = moment($("#start_date").val());
+            var end_date = moment($("#end_date").val());
+            var days = end_date.diff(start_date,'days');
+            $("#end_date").attr('min',start_date.add(1,'d').format('Y-MM-DD'));
+            if(days <= 0){
+                // alert("Tanggal Check-Out Tidak Boleh Sebelum Tanggal Check-In");
+                $("#end_date").val(start_date.format('Y-MM-DD'));
+                days = 1;
+            }
+            $("#days_booked").val(days);
             subtotal();
+        }
+        $(document).ready(function() {
+            (index > 4)?index=4:(index<1)?index=1:'';
             changeMenu();
             subtotalFasilitas();
             subtotalMenu();
+            changeDate();
             $('#navigator-booking li:nth-child(' + index + ') a').tab('show');
             changeType();
             $("input").each(function() {
@@ -614,17 +686,30 @@ if (empty($paket)) {
                     next()
                 })
             });
-            $(".room_price_price").each(function() {
-                var price = $(this);
-                $("#room_price_view_" + $(this).data('id')).val(toRp(price.val()));
-                $(".room_price_price_view").each(function() {
-                    $(this).change(function() {
-                        price.val($(this).val());
-                        $(this).val(toRp($(this).val()))
-                    })
-                });
-
+            $(".nav-tabs-booking").each(function() {
+                $(this).click(function() {
+                    $("#card-total-all").hide();
+                    function_elements_add('tab-index', $(this).data('id'))
+                    index =  $(this).data('id');
+                    if($(this).data('id') >= 4){
+                        $("#card-total-all").show();
+                    }
+                })
             });
+            $(".room-price-select").each(function() {
+                id=$(this).data('id');
+                changePrice(id,$(this).val(),0);
+            });
+            $("#discount_amount_view").change(function() {
+            var discount_percentage = (parseInt($(this).val()) / parseInt($("#total_amount").val())) * 100;
+            $("#discount_percentage_total").val(discount_percentage);
+            });
+            if(index >= 4){
+                $("#card-total-all").show();
+            }
+            setTimeout(function () {
+                $(".modal-backdrop .fade").remove();
+            },5000);
         });
     </script>
 @stop
@@ -656,7 +741,8 @@ if (empty($paket)) {
             @endforeach
         </div>
     @endif
-    <div class="card border border-dark">
+    <form method="post" id="form-booking" action="{{ route('booking.process-add') }}" enctype="multipart/form-data">
+        <div class="card border border-dark">
         <div class="card-header border-dark bg-dark">
             <h5 class="mb-0 float-left">
                 Form Tambah
@@ -666,25 +752,23 @@ if (empty($paket)) {
                     title="Back"><i class="fa fa-angle-left"></i> Kembali</button>
             </div>
         </div>
-
-        <form method="post" id="form-barang" action="{{ route('booking.process-add') }}" enctype="multipart/form-data">
             @csrf
             <div class="card-body">
                 <ul class="nav nav-tabs" id="navigator-booking" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link active booking-nav" onclick="function_elements_add('tab-index',1)"
+                        <a class="nav-link nav-tabs-booking active booking-nav" data-id="1"
                             href="#tanggal" role="tab" data-toggle="tab">Tanggal</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link booking-nav" onclick="function_elements_add('tab-index',2)" href="#room"
+                        <a class="nav-link nav-tabs-booking booking-nav" data-id="2"  href="#room"
                             role="tab" data-toggle="tab">Kamar</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link booking-nav" onclick="function_elements_add('tab-index',3)" href="#facility"
+                        <a class="nav-link nav-tabs-booking booking-nav" data-id="3"  href="#facility"
                             role="tab" data-toggle="tab">Fasilitas</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link booking-nav" onclick="function_elements_add('tab-index',4)" href="#menus"
+                        <a class="nav-link nav-tabs-booking booking-nav" data-id="4"  href="#menus"
                             role="tab" data-toggle="tab">Menu</a>
                     </li>
                 </ul>
@@ -701,7 +785,7 @@ if (empty($paket)) {
                                     <input type="date"
                                         class="form-control form-control-inline input-medium date-picker input-date"
                                         data-date-format="dd-mm-yyyy" type="text" name="start_date" id="start_date"
-                                        value="{{ $sessiondata['start_date'] ?? date('Y-m-d') }}" style="width: 15rem;" />
+                                        value="{{ $sessiondata['start_date'] ?? date('Y-m-d') }}" onchange="changeDate()" style="width: 15rem;" />
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -714,7 +798,17 @@ if (empty($paket)) {
                                     <input type="date"
                                         class="form-control form-control-inline input-medium date-picker input-date"
                                         data-date-format="dd-mm-yyyy" type="text" name="end_date" id="end_date"
-                                        value="{{ $sessiondata['end_date'] ?? date('Y-m-d') }}" style="width: 15rem;" />
+                                        value="{{ $sessiondata['end_date'] ?? date('Y-m-d') }}" onchange="changeDate()" style="width: 15rem;" />
+                                    <input type="text" name="days_booked" id="days_booked" hidden/>
+                                </div>
+                            </div>
+                            <div class="col d-none">
+                                <div class="form-group">
+                                    <a class="text-dark">Malam<a class='red'> *</a></a>
+                                    <input class="form-control required input-bb" required form="form-barang" name="night"
+                                        id="night" type="number" min="0" autocomplete="off"
+                                        onchange="function_elements_add(this.name, this.value)"
+                                        value="{{ $sessiondata['night'] ?? '' }}" />
                                 </div>
                             </div>
                         </div>
@@ -733,7 +827,7 @@ if (empty($paket)) {
                                     <input class="form-control required input-bb" required form="form-barang" name="a.n"
                                         id="a.n" type="text" autocomplete="off"
                                         onchange="function_elements_add(this.name, this.value)"
-                                        value="{{ $items['a.n'] ?? '' }}" />
+                                        value="{{ $sessiondata['a.n'] ?? '' }}" />
                                 </div>
                             </div>
                         </div>
@@ -795,6 +889,8 @@ if (empty($paket)) {
                                                 <th width="13%" style='text-align:center'>Jumlah Orang</th>
                                                 <th colspan="2" width="30%" style='text-align:center'>Harga Kamar
                                                 </th>
+                                                <th width="20%" style='text-align:center'>Subtotal
+                                                </th>
                                                 <th width="10%" style='text-align:center'>Aksi</th>
                                             </tr>
                                         </thead>
@@ -830,12 +926,13 @@ if (empty($paket)) {
                                                             {!! Form::select(
                                                                 'room_price_id',
                                                                 $val->price->pluck('type.price_type_name', 'room_price_id'),
-                                                                $sessiondata['room_price_id_' . $val->room_id] ?? '',
+                                                                $price[$val->room_id] ?? '',
                                                                 [
-                                                                    'class' => 'selection-search-clear required select-form',
+                                                                    'class' => 'selection-search-clear room-price-select required select-form',
                                                                     'name' => 'room_price_id_' . $val->room_id,
                                                                     'id' => 'room_price_id_' . $val->room_id,
-                                                                    'onchange' => 'changePrice(this.name,this.value)',
+                                                                    'data-id' =>  $val->room_id,
+                                                                    'onchange' => 'changePrice('.$val->room_id.',this.value)',
                                                                     'required',
                                                                 ],
                                                             ) !!}
@@ -849,7 +946,10 @@ if (empty($paket)) {
                                                                 name="room_price_{{ $val->room_id }}"
                                                                 id="room_price_{{ $val->room_id }}"
                                                                 data-id="{{ $val->room_id }}"
-                                                                value="{{ $sessiondata['room_price'] ?? $val->price->first()->room_price_price }}" />
+                                                                />
+                                                            <input type="hidden" class="sbs-room-booked" id="sbs-rbook-input-{{ $val->room_id}}"/>
+                                                        </td>
+                                                        <td id="sbs-room-booked-{{ $val->room_id }}">
                                                         </td>
                                                         <td class='text-center'><button type='button'
                                                                 class='btn btn-outline-danger btn-sm'
@@ -1140,9 +1240,115 @@ if (empty($paket)) {
                     </div>
                 </div>
             </div>
-        </form>
-
     </div>
+    <div class="row justify-content-end">
+    <div style="display: none;" class="card col-sm-auto col-md-6 align-self-end border border-dark h-100" id="card-total-all">
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-3">
+                    <a class="text-dark col-form-label">Sub Total Kamar</a>
+                </div>
+                <div class="col-auto">
+                    :
+                </div>
+                <div class="col-8">
+                    <input class="form-control input-bb" id="subtotal_all_room" name="subtotal_all_room" autocomplete="off" readonly/>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-3">
+                    <a class="text-dark col-form-label">Sub Total Fasilitas</a>
+                </div>
+                <div class="col-auto">
+                    :
+                </div>
+                <div class="col-8">
+                    <input class="form-control input-bb" id="subtotal_all_facility" name="subtotal_all_facility" autocomplete="off" readonly/>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-3">
+                    <a class="text-dark col-form-label">Sub Total Menu</a>
+                </div>
+                <div class="col-auto">
+                    :
+                </div>
+                <div class="col-8 pr-0 border-bottom border-secondary">
+                    <input class="form-control input-bb" id="subtotal_all_menu" name="subtotal_all_menu" autocomplete="off" readonly/>
+                </div>
+                <div class="col-auto pt-3 pl-1">
+                    <i class="fa fa-solid fa-plus fa-xs"></i>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-3">
+                    <a class="text-dark col-form-label">Sub Total</a>
+                </div>
+                <div class="col-auto">
+                    :
+                </div>
+                <div class="col-8">
+                    <input class="form-control input-bb" id="subtotal_all_view" name="subtotal_all_view" autocomplete="off" readonly/>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-3">
+                    <a class="text-dark col-form-label">Diskon (%)</a>
+                </div>
+                <div class="col-auto">
+                    :
+                </div>
+                <div class="col-8">
+                    <input type="number" min="0" max="100" class="form-control input-bb" id="discount_percentage_total" name="discount_percentage_total" autocomplete="off" onchange="count_total()"/>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-3">
+                    <a class="text-dark col-form-label">Jumlah Diskon</a>
+                </div>
+                <div class="col-auto">
+                    :
+                </div>
+                <div class="col-8">
+                    <input type="text" class="form-control input-bb" id="discount_amount_view" name="discount_amount_view" autocomplete="off" />
+                    <input type="hidden" class="form-control input-bb" id="discount_amount" name="discount_amount" autocomplete="off" />
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-3">
+                    <a class="text-dark col-form-label">Total</a><a class='red'> *</a></a>
+                </div>
+                <div class="col-auto">
+                    :
+                </div>
+                <div class="col-8">
+                    <input class="form-control input-bb" id="total_amount_view" name="total_amount_view" autocomplete="off" onchange="count_total()"/>
+                    <input class="form-control input-bb" id="total_amount" type="hidden" name="total_amount" autocomplete="off" onchange="count_total()"/>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-3">
+                    <a id="label-payment" class="text-dark col-form-label">Uang Muka</a><a class='red'> *</a></a>
+                </div>
+                <div class="col-auto">
+                    :
+                </div>
+                <div class="col-8">
+                    <input class="form-control input-bb text-right" id="change_amount_view" name="change_amount_view" disabled/>
+                    <input class="form-control input-bb" id="change_amount" name="change_amount" hidden/>
+                </div>
+            </div>
+            <br>
+            <div class="">
+                <div class="form-actions float-right">
+                    <button type="reset" name="Reset" class="btn btn-danger" id="form-reset" onclick="reset_add();"><i class="fa fa-times"></i> Batal</button>
+                    <button type="button" name="Save" class="btn btn-success button-prevent" onclick="$(this).addClass('disabled');$('#form-booking').submit();" title="Save"><i class="fa fa-check"></i> Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</form>
 
 @stop
 

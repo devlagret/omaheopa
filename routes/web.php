@@ -448,6 +448,7 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
     Route::post('/process-edit', [BookingController::class, 'processEdit'])->name('process-edit');
     Route::get('/delete/{merchant_id}', [BookingController::class, 'delete'])->name('delete');
     Route::post('/elements-add', [BookingController::class, 'elementsAdd'])->name('elements-add');
+    Route::get('/reset', [BookingController::class, 'resetSession'])->name('reset');
 });
  // DP (Down Paymwnt) pages
  Route::prefix('down-payment')->name('dp.')->group(function () {

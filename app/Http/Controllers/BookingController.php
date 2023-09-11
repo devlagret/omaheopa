@@ -47,6 +47,7 @@ class BookingController extends Controller
         $roomData = collect(Session::get('booked-room-data'));
         $booked = Session::get('booked-room-data-qty');
         $menuData = collect(Session::get('booked-room-menu'));
+        $price=collect(Session::get('booked-room-price'));
         $menuqty = Session::get('booked-room-menu-qty');
         $facilityData = collect(Session::get('booked-facility-data'));
         $facilityqty = Session::get('booked-facility-data-qty');
@@ -59,7 +60,7 @@ class BookingController extends Controller
         $room = CoreRoom::with('building','roomType','price.type')->whereIn('room_id',$roomData->flatten())->get();
         $facilityitm = SalesRoomFacility::whereIn('room_facility_id',$facilityData->flatten())->get();
         $menuItm = SalesRoomMenu::whereIn('room_menu_id',$menuData->flatten())->get();
-        return view('content.Booking.FormAddBooking',compact('sessiondata','menutype','facility','booked','room','building','menuqty','facilityqty','facilityitm','menuItm'));
+        return view('content.Booking.FormAddBooking',compact('sessiondata','price','menutype','facility','booked','room','building','menuqty','facilityqty','facilityitm','menuItm'));
     }
     public function elementsAdd(Request $request){
         $sessiondata = Session::get('booking-data');
@@ -139,14 +140,16 @@ class BookingController extends Controller
         </div>
         </td>
         <td width='15%'> <select class='selection-search-clear required select-form' required placeholder='Pilih Harga' name='room_price_id_".$request->room_id."' id='room_price_id_".$request->room_id."'
-        onchange='changePrice(  this.value)' required>
+        onchange='changePrice(".$request->room_id."  ,this.value)' required>
         ".$dropdown."
         </select>
         </td>
         <td width='10%'>
         <input type='text' class='form-control input-bb readonly room_price_price_view' name='room_price_view_".$val->room_id."' id='room_price_view_".$val->room_id."' value='".number_format($room->price->first()->room_price_price,2,',','.')."' readonly/>
-        <input type='hidden' class='form-control input-bb readonly room_price_price' name='room_price_".$val->room_id."' id='room_price_".$val->room_id."' value='".$room->price->first()->room_price_price."' readonly/>
+        <input type='hidden' class='form-control input-bb readonly room_price_price' name='room_price_".$val->room_id."' id='room_price_".$val->room_id."' data-id='".$val->room_id."' value='".$room->price->first()->room_price_price."' readonly/>
+        <input type='hidden' class='sbs-room-booked' id='sbs-rbook-input-".$val->room_id."' value='".($room->price->first()->room_price_price * $request->days_booked)."'/>
         </td>
+        <td id='sbs-room-booked-".$val->room_id."'>".number_format(($room->price->first()->room_price_price * $request->days_booked),2,',','.')."</td>
         <td class='text-center'><button type='button' class='btn btn-outline-danger btn-sm' onclick='deleteBooked(".$room->room_id.")'>Hapus</button></td>
         </tr>
         ";
@@ -192,6 +195,11 @@ class BookingController extends Controller
     }
     public function getRoomPrice(Request $request) {
         $price = SalesRoomPrice::find($request->room_price_id);
+        if($request->room_id!=null){
+        $pr=collect(Session::get('booked-room-price'));
+        $pr->put($request->room_id,$request->room_price_id);
+        Session::put('booked-room-price',$pr->toArray());
+        }
         return response($price->room_price_price);
     }
     public function addFacility(Request $request) {
@@ -204,6 +212,7 @@ class BookingController extends Controller
         <input type='hidden' id='room_facility_id[]' value='".$request->room_facility_id."'/> </td>
         </td>
         <td>".$facility->facility_name."</td>
+        <td>".$facility->facility_remark."</td>
         <td>
         <input type='text' class='form-control input-bb readonly facility_price_view' name='room_price_view_".$facility->room_facility_id."' id='room_price_view_".$facility->room_facility_id."' value='".number_format($facility->facility_price,2,',','.')."' readonly/>
         <input type='hidden' class='form-control input-bb readonly facility_price_price' data-id='".$request->room_facility_id."' name='room_price_".$facility->room_facility_id."' id='room_price_".$facility->room_facility_id."' value='".$facility->facility_price."' readonly/>
@@ -284,5 +293,20 @@ class BookingController extends Controller
         Session::put('booked-room-menu-qty',$qty->toArray());
         Session::push('booked-room-menu',$request->room_menu_id);
         return response($data);
+    }
+    public function processAdd(Request $request) {
+        $roomData = collect(Session::get('booked-room-data'));
+        $booked = Session::get('booked-room-data-qty');
+        $menuData = collect(Session::get('booked-room-menu'));
+        $menuqty = Session::get('booked-room-menu-qty');
+        $facilityData = collect(Session::get('booked-facility-data'));
+        $facilityqty = Session::get('booked-facility-data-qty');
+        dump($request->all());
+        dump($roomData);
+        return 0;
+    }
+    public function resetSession() {
+        Session::forget('booking-data');
+        return 1;
     }
 }
