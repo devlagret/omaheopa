@@ -48,7 +48,7 @@ class PurchaseReturnController extends Controller
         $data = PurchaseReturn::where('data_state',0)
         ->where('purchase_return_date', '>=', $start_date)
         ->where('purchase_return_date', '<=', $end_date)
-        ->where('company_id', Auth::user()->company_id)
+        // ->where('company_id', Auth::user()->company_id)
         ->where('data_state',0)
         ->get();
         return view('content.PurchaseReturn.ListPurchaseReturn', compact('data', 'start_date', 'end_date'));

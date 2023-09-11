@@ -17,6 +17,7 @@ use App\Models\SalesInvoice;
 use App\Models\SalesInvoiceItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 
 class SalesInvoiceController extends Controller
@@ -44,6 +45,7 @@ class SalesInvoiceController extends Controller
         ->where('sales_invoice_date','>=',$start_date)
         ->where('sales_invoice_date','<=',$end_date)
         ->where('company_id', Auth::user()->company_id)
+
         ->get();
         return view('content.SalesInvoice.ListSalesInvoice',compact('data', 'start_date', 'end_date'));
     }
@@ -60,12 +62,14 @@ class SalesInvoiceController extends Controller
         ->where('company_id', Auth::user()->company_id)
         ->get()
         ->pluck('item_unit_name','item_unit_id');
-        $categorys      = InvtItemCategory::where('data_state',0)
+        $categorys      = InvtItemCategory::select('invt_item_category.*',DB::raw('CONCAT(invt_item_category.item_category_name, " ", sales_merchant.merchant_name) AS item_name') )
+        ->join('sales_merchant','sales_merchant.merchant_id','invt_item_category.merchant_id')
+         ->where('invt_item_category.data_state',0)
         ->where('company_id', Auth::user()->company_id)
         ->get()
-        ->pluck('item_category_name','item_category_id');
+        ->pluck('item_name','item_category_id');
         $customers      = SalesCustomer::where('data_state',0)
-        ->where('company_id', Auth::user()->company_id)
+        // ->where('company_id', Auth::user()->company_id)
         ->get()
         ->pluck('customer_name','customer_id');
         return view('content.SalesInvoice.FormAddSalesInvoice',compact('date','categorys','items','units','arraydatases','customers'));

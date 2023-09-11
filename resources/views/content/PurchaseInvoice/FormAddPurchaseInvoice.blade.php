@@ -1,4 +1,4 @@
-@inject('PurchaseInvoice', 'App\Http\Controllers\PurchaseInvoiceController')
+    @inject('PurchaseInvoice', 'App\Http\Controllers\PurchaseInvoiceController')
 @extends('adminlte::page')
 
 @section('title', "MOZAIC Omah'e Opa")
@@ -178,6 +178,7 @@
                 },
                 success: function(msg) {
                     location.reload();
+                    console.log(data);
                 },
                 error: function(data) {
                     console.log(data);
@@ -438,7 +439,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <a class="text-dark">Nama Pemasok<a class='red'> *</a></a>
-                            {!! Form::select('supplier_id', $suppliers, $datases['supplier_id'], [
+                            {!! Form::select('supplier_id', $suppliers, $datases['supplier_id']??'', [
                                 'class' => 'selection-search-clear select-form',
                                 'id' => 'supplier_id',
                                 'name' => 'supplier_id',
@@ -449,7 +450,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <a class="text-dark">Nama Gudang<a class='red'> *</a></a>
-                            {!! Form::select('warehouse_id', $warehouses, $datases['warehouse_id'], [
+                            {!! Form::select('warehouse_id', $warehouses, $datases['warehouse_id']??'   ', [
                                 'class' => 'selection-search-clear select-form',
                                 'id' => 'warehouse_id',
                                 'name' => 'warehouse_id',
@@ -463,7 +464,7 @@
                             <input class="form-control input-bb" name="purchase_invoice_date" id="purchase_invoice_date"
                                 type="date" data-date-format="dd-mm-yyyy" autocomplete="off"
                                 onchange="function_elements_add(this.name, this.value)"
-                                value="{{ $datases['purchase_invoice_date'] == '' ? date('Y-m-d') : $datases['purchase_invoice_date'] }}" />
+                                value="{{ !isset($datases['purchase_invoice_date']) ? date('Y-m-d') : $datases['purchase_invoice_date'] }}" />
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -473,7 +474,7 @@
                         <div class="form-group">
                             <a class="text-dark">Keterangan<a class='red'> *</a></a>
                             <textarea class="form-control input-bb" name="purchase_invoice_remark" id="purchase_invoice_remark" type="text"
-                                autocomplete="off" onchange="function_elements_add(this.name, this.value)">{{ $datases['purchase_invoice_remark'] }}</textarea>
+                                autocomplete="off" onchange="function_elements_add(this.name, this.value)">{{ $datases['purchase_invoice_remark'] ??''}}</textarea>
                         </div>
                     </div>
 
@@ -602,6 +603,7 @@
                     <table class="table table-bordered table-advance table-hover">
                         <thead class="thead-light">
                             <tr>
+                                <th style='text-align:center'>Merchant</th>
                                 <th style='text-align:center'>Barang</th>
                                 <th style='text-align:center'>Jumlah</th>
                                 <th style='text-align:center'>Harga Satuan</th>
@@ -620,6 +622,7 @@
                                 foreach ($arraydatases AS $key => $val){
                                     echo"
                                     <tr>
+                                                <td style='text-align  : center !important;'>".$PurchaseInvoice->getMerchantName($val['merchant_id'])."</td>
                                                 <td style='text-align  : left !important;'>".$PurchaseInvoice->getItemName($val['item_id'])."</td>
                                                 <td style='text-align  : right !important;'>".$val['quantity']."</td>
                                                 <td style='text-align  : right !important;'>".number_format($val['item_unit_cost'],2,',','.')."</td>

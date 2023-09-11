@@ -13,4 +13,6 @@ npm-debug.log
 yarn-error.log
 /.idea
 /.vscode
+vendor/phpoffice
+
 /.vs

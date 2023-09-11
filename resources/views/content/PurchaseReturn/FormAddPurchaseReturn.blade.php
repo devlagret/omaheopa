@@ -133,19 +133,19 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">Nama Pemasok<a class='red'> *</a></a>
-                        <input class="form-control input-bb" name="purchase_return_supplier" id="purchase_return_supplier" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value)" value="{{ $datases['purchase_return_supplier'] }}"/>
+                        <input class="form-control input-bb" name="purchase_return_supplier" id="purchase_return_supplier" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value)" value="{{ $datases['purchase_return_supplier'] ?? '' }}"/>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">Nama Gudang<a class='red'> *</a></a>
-                        {!! Form::select('warehouse_id',  $warehouses, $datases['warehouse_id'], ['class' => 'selection-search-clear select-form', 'id' => 'warehouse_id', 'name' => 'warehouse_id', 'onchange' => 'function_elements_add(this.name, this.value)']) !!}
+                        {!! Form::select('warehouse_id',  $warehouses, $datases['warehouse_id']?? '' , ['class' => 'selection-search-clear select-form', 'id' => 'warehouse_id', 'name' => 'warehouse_id', 'onchange' => 'function_elements_add(this.name, this.value)']) !!}
                     </div>
                 </div>
                 <div class="col-md-2">
                     <div class="form-group">
                         <a class="text-dark">Tanggal Retur Pembelian<a class='red'> *</a></a>
-                        <input class="form-control input-bb" name="purchase_return_date" id="purchase_return_date" type="date" data-date-format="dd-mm-yyyy" autocomplete="off" onchange="function_elements_add(this.name, this.value)" value="{{ $datases['purchase_return_date'] }}"/>
+                        <input class="form-control input-bb" name="purchase_return_date" id="purchase_return_date" type="date" data-date-format="dd-mm-yyyy" autocomplete="off" onchange="function_elements_add(this.name, this.value)" value="{{ $datases['purchase_return_date']?? ''}}"/>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -154,7 +154,7 @@
                 <div class="col-md-9 mt-3">
                     <div class="form-group">
                         <a class="text-dark">Keterangan<a class='red'> *</a></a>
-                        <textarea class="form-control input-bb" name="purchase_return_remark" id="purchase_return_remark" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value)">{{ $datases['purchase_return_remark'] }}</textarea>
+                        <textarea class="form-control input-bb" name="purchase_return_remark" id="purchase_return_remark" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value)">{{ $datases['purchase_return_remark'] ?? '' }}</textarea>
                     </div>
                 </div>
 
@@ -169,7 +169,7 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">Nama Barang<a class='red'> *</a></a>
-                        {!! Form::select('item_id',  $items, 0, ['class' => 'selection-search-clear select-form', 'id' => 'item_id', 'name' => 'item_id']) !!}
+                        {!! Form::select('item_id',  $items, 0, ['class' => 'selection-search-clear selec   t-form', 'id' => 'item_id', 'name' => 'item_id']) !!}
                     </div>
                 </div>
                 <div class="col-md-6">

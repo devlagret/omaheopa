@@ -60,7 +60,7 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">Nama Pemasok<a class='red'> *</a></a>
-                        <input class="form-control input-bb" name="purchase_invoice_supplier" id="purchase_invoice_supplier" type="text" autocomplete="off" value="{{ $purchaseinvoice['purchase_invoice_supplier'] }}" readonly/>
+                        <input class="form-control input-bb" name="purchase_invoice_supplier" id="purchase_invoice_supplier" type="text" autocomplete="off" value="{{ $PurchaseInvoice->getSupplierName($purchaseinvoice['supplier_id']) }}" readonly/>
                     </div>
                 </div>
                 <div class="col-md-6">

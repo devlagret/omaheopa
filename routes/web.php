@@ -24,6 +24,7 @@ use App\Http\Controllers\SalesMerchantController;
 use App\Http\Controllers\SalesRoomMenuController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\InvGoodsReceivedNoteController;
 use App\Http\Controllers\InvtItemBarcodeController;
 use App\Http\Controllers\SystemUserController;
 use App\Http\Controllers\SystemUserGroupController;
@@ -470,3 +471,19 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
     Route::get('/delete/{merchant_id}', [DownPaymentController::class, 'delete'])->name('delete');
     Route::post('/elements-add', [DownPaymentController::class, 'elementsAdd'])->name('elements-add');
 });
+
+
+
+//penerimaan barang / invgoods received
+
+Route::get('/goods-received-note', [InvGoodsReceivedNoteController::class, 'index'])->name('goods-received-note');
+Route::get('/goods-received-note/search-purchase-order', [InvGoodsReceivedNoteController::class, 'searchPurchaseOrder'])->name('search-po-goods-received-note');
+Route::get('/goods-received-note/add/{purchase_invoice_id}', [InvGoodsReceivedNoteController::class, 'addInvGoodsReceivedNote'])->name('add-goods-received-note');
+Route::get('/goods-received-note/detail/{goods_received_note_id}', [InvGoodsReceivedNoteController::class, 'detailInvGoodsReceivedNote'])->name('detail-goods-received-note');
+Route::post('/goods-received-note/process-add-goods-received-note', [InvGoodsReceivedNoteController::class, 'processAddInvGoodsReceivedNote'])->name('process-add-goods-received-note');
+Route::get('/goods-received-note/delete-goods-received-note/{goods_received_note_id}', [InvGoodsReceivedNoteController::class, 'voidInvGoodsReceivedNote'])->name('delete-goods-received-note');
+Route::get('/goods-received-note/process-delete/{goods_received_note_id}', [InvGoodsReceivedNoteController::class, 'processVoidInvGoodsReceivedNote'])->name('process-delete-goods-received-note');
+Route::post('/goods-received-note/filter', [InvGoodsReceivedNoteController::class, 'filterInvGoodsReceivedNote'])->name('filter-goods-received-note');
+Route::get('/goods-received-note/filter-reset', [InvGoodsReceivedNoteController::class, 'resetFilterInvGoodsReceivedNote'])->name('filter-reset-goods-received-note');
+Route::post('/goods-received-note/add-new-purchase-order-item/{purchase_invoice_id}', [InvGoodsReceivedNoteController::class, 'addNewPurchaseOrderItem'])->name('add-new-purchase-order-item');
+Route::get('/goods-received-note/delete-new_purchase_order_item/{purchase_invoice_id}', [InvGoodsReceivedNoteController::class, 'deleteNewPurchaseOrderItem'])->name('delete-new-purchase-order-item');
