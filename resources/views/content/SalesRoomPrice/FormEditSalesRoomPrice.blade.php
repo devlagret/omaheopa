@@ -31,6 +31,17 @@
             $('#room_price_price').val(price);
             $('#room_price_price_view').val(toRp(price));
         });
+        $("#limited-price").click(function () {
+            if(this.checked){
+                $('#room_price_start_date').prop('disabled', true);
+                $('#room_price_end_date').prop('disabled', true);
+                $('#price_date').show();
+            }else{
+                $('#room_price_start_date').prop('disabled', true);
+                $('#room_price_end_date').prop('disabled', true);
+                $('#price_date').hide();
+            }
+        });
     });
 </script>
 @stop
@@ -126,25 +137,27 @@
                             </div>
                         </div>
                     </div>
-                    <div class = "row form-group mt-5">
+                    <div class="row form-group">
+                        <div class="col">
+                            <div class="form-check">
+                                <input class="form-check-input" id="limited-price" type="checkbox" >
+                                <label class="form-check-label">Set Waktu Tersedia</label>
+                             </div>
+                        </div>
+                    </div>
+                    <div id="price_date" class = "row form-group mt-5" style="display: none;">
                         <div class = "col-md-6">
                             <div class="form-group form-md-line-input">
                                 <section class="control-label">Tanggal Mulai
-                                    <span class="required text-danger">
-                                        *
-                                    </span>
                                 </section>
-                                <input type ="date" class="form-control form-control-inline input-medium date-picker required input-date" required data-date-format="dd-mm-yyyy" type="text" name="room_price_start_date" id="room_price_start_date" value="{{ old('room_price_start_date',$sessiondata['room_price_start_date']?$sessiondata['room_price_start_date']:$roomprice->room_price_start_date) }}" style="width: 15rem;" onchange="function_elements_add(this.name, this.value)"/>
+                                <input type ="date" class="form-control form-control-inline input-medium date-picker input-date" data-date-format="dd-mm-yyyy" type="text" name="room_price_start_date" id="room_price_start_date" value="{{ old('room_price_start_date',$sessiondata['room_price_start_date']?$sessiondata['room_price_start_date']:$roomprice->room_price_start_date) }}" style="width: 15rem;" onchange="function_elements_add(this.name, this.value)"/>
                             </div>
                         </div>
                         <div class = "col-md-6">
                             <div class="form-group form-md-line-input">
                                 <section class="control-label">Tanggal Akhir
-                                    <span class="required text-danger">
-                                        *
-                                    </span>
                                 </section>
-                                <input type ="date" class="form-control form-control-inline input-medium date-picker input-date required" required data-date-format="dd-mm-yyyy" type="text" name="room_price_end_date" id="room_price_end_date" value="{{ old('room_price_end_date',$sessiondata['room_price_end_date']?$sessiondata['room_price_end_date']:$roomprice->room_price_end_date) }}" style="width: 15rem;" onchange="function_elements_add(this.name, this.value)"/>
+                                <input type ="date" class="form-control form-control-inline input-medium date-picker input-date" data-date-format="dd-mm-yyyy" type="text" name="room_price_end_date" id="room_price_end_date" value="{{ old('room_price_end_date',$sessiondata['room_price_end_date']?$sessiondata['room_price_end_date']:$roomprice->room_price_end_date) }}" style="width: 15rem;" onchange="function_elements_add(this.name, this.value)"/>
                             </div>
                         </div>
                     </div>

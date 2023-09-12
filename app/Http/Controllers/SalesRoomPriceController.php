@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\CoreBuilding;
 use App\Models\CorePriceType;
 use App\Models\CoreRoom;
 use App\Models\SalesRoomPrice;
@@ -23,9 +24,9 @@ class SalesRoomPriceController extends Controller
     }
     public function add() {
         $sessiondata = Session::get('room-price-data');
-        $room= CoreRoom::get()->pluck('room_name','room_id');
+        $building= CoreBuilding::get()->pluck('building_name','building_id');
         $pricetype = CorePriceType::get()->pluck('price_type_name','price_type_id');
-        return view('content.SalesRoomPrice.FormAddSalesRoomPrice',compact('sessiondata','room','pricetype'));
+        return view('content.SalesRoomPrice.FormAddSalesRoomPrice',compact('sessiondata','building','pricetype'));
     }
     public function elementsAdd(Request $request){
         $sessiondata = Session::get('room-price-data');
@@ -80,5 +81,44 @@ class SalesRoomPriceController extends Controller
            return redirect()->route('room-price.index')->with(['type'=>'success','msg'=>'Hapus Harga Kamar Berhasil']);
         };}
         return redirect()->route('room-price.index')->with(['type'=>'danger','msg'=>'Hapus Harga Kamar Gagal']);
+    }
+    public function getType(Request $request) {
+        $data = '';
+        $sessiondata = Session::get('booking-data');
+        try{
+        $building = CoreBuilding::with('rooms:building_id,room_type_id','rooms.roomType')->find($request->building_id);
+        $sessiondata['room_type_id'] ?? $sessiondata['room_type_id'] = 1;
+        if ($building->rooms->count() == 0) {
+            $data = "<option>Bangunan Tidak Memiliki Kamar</option>\n";
+        }
+        foreach ( $building->rooms as $val) {
+            $data .= "<option value='".$val->roomType->room_type_id."' " . ($sessiondata['room_type_id'] == $val->roomType->room_type_id ? 'selected' : '') .">".$val->roomType->room_type_name."</option>\n";
+        }
+        return response($data);
+    }catch(\Exception $e){
+        error_log(strval($e));
+        return response($data);
+
+    }
+    }
+    public function getRoom(Request $request) {
+        $data = '';
+        $sessiondata = Session::get('booking-data');
+        try{
+        $room = CoreRoom::where('room_type_id',$request->room_type_id)
+        ->where('building_id',$request->building_id)->get();
+        $sessiondata['room_id'] ?? $sessiondata['room_id'] = 1;
+        if ($room->count() == 0) {
+            $data = "<option>Bangunan Tidak Memiliki Kamar</option>\n";
+        }
+        foreach ( $room as $val) {
+            $data .= "<option value='".$val->room_id."' " . ($sessiondata['room_id'] == $val->room_id ? 'selected' : '') .">".$val->room_name."</option>\n";
+        }
+        return response($data);
+    }catch(\Exception $e){
+        error_log(strval($e));
+        return response($data);
+
+    }
     }
 }
