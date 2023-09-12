@@ -4,13 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\CoreBuilding;
+use App\Models\CorePriceType;
 use App\Models\CoreRoom;
 use App\Models\SalesOrder;
+use App\Models\SalesOrderFacility;
+use App\Models\SalesOrderMenu;
+use App\Models\SalesOrderRoom;
 use App\Models\SalesRoomFacility;
 use App\Models\SalesRoomMenu;
 use App\Models\SalesRoomPrice;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 
@@ -112,7 +118,7 @@ class BookingController extends Controller
     public function addRoom(Request $request) {
         $data = '';$dropdown = '';$i=1;
         $no = $request->no + 1;
-        $room = CoreRoom::with('building','roomType','price.type')->find($request->room_id);
+        $room = CoreRoom::with('building','roomType','price.type')->orderBy('price_type_id')->find($request->room_id);
         foreach ($room->price as $val){
             $dropdown .= "<option value='". $val->room_price_id."' " . ($i == 1 ? 'selected' : '') .">".$val->type->price_type_name."</option>\n";
             $i++;
@@ -183,13 +189,39 @@ class BookingController extends Controller
     public function deleteBookedRoom($room_id){
         $data=collect(Session::get('booked-room-data'));
         foreach($data as $key => $val){
-            if($val = $room_id){
-                $data->forget($room_id);
+            if($val == $room_id){
+                $data->forget($key);
             }
         }
         Session::put('booked-room-data',$data->toArray());
         $qty=collect(Session::get('booked-room-data-qty'));
         $qty->forget($room_id);
+        Session::put('booked-room-data-qty',$qty->toArray());
+        return 1;
+    }
+    public function deleteFacility($room_facility_id){
+        $data=collect(Session::get('booked-room-facility'));
+        foreach($data as $key => $val){
+            if($val == $room_facility_id){
+                $data->forget($key);
+            }
+        }
+        Session::put('booked-room-data',$data->toArray());
+        $qty=collect(Session::get('booked-room-facility-qty'));
+        $qty->forget($room_facility_id);
+        Session::put('booked-room-data-qty',$qty->toArray());
+        return 1;
+    }
+    public function deleteMenu($room_menu_id){
+        $data=collect(Session::get('booked-room-menu'));
+        foreach($data as $key => $val){
+            if($val == $room_menu_id){
+                $data->forget($key);
+            }
+        }
+        Session::put('booked-room-menu',$data->toArray());
+        $qty=collect(Session::get('booked-room-menu-qty'));
+        $qty->forget($room_menu_id);
         Session::put('booked-room-data-qty',$qty->toArray());
         return 1;
     }
@@ -297,13 +329,87 @@ class BookingController extends Controller
     public function processAdd(Request $request) {
         $roomData = collect(Session::get('booked-room-data'));
         $booked = Session::get('booked-room-data-qty');
+        $price = Session::get('booked-room-price');
         $menuData = collect(Session::get('booked-room-menu'));
         $menuqty = Session::get('booked-room-menu-qty');
         $facilityData = collect(Session::get('booked-facility-data'));
         $facilityqty = Session::get('booked-facility-data-qty');
+        $token = Session::get('booking-token');
+        $pricetype = CorePriceType::get();
+        $prices = SalesRoomPrice::get();
+        if(!$roomData->count()){
+            return redirect()->route('booking.add')->with(['msg'=>'Harap Tambahkan Kamar Yang Dibooking','type'=>'warning','tab-index' =>2]);
+        }
+        if(empty($token)){
+            return redirect()->route('booking.index')->with('msg','Tambah Booking Kamar Berhasil -');
+        }
         dump($request->all());
-        dump($roomData);
+        $field = $request->validate([
+            'atas_nama' => 'required',
+            'down_payment' => 'required',
+        ],['atas_nama.required' => 'Nama Pemesan Diperlukan','down_payment.required'=>'Uang Muka Harus Diisi']);
+        foreach($roomData as $roomval){
+        dump($roomval);}
+        dump($booked);
+        dump(['price',$prices->find($price[2])->pluck('room_price_price')]);
+        dump($facilityData);
+        dump($facilityqty);
+        dump($menuData);
+        dump($menuqty);
+        dump(Carbon::now());
+        dump($token);
         return 0;
+        try{
+            DB::beginTransaction();
+            SalesOrder::create([
+                'checkin_date' =>$request->start_date,
+                'checkout_date' =>$request->end_date,
+                'sales_order_price' =>$request->total_amount,
+                'down_payment' =>$field['down_payment'],
+                'order_date' => Carbon::now()->format('Y-m-d'),
+                'sales_order_name' => $field['atas_nama'],
+                'created_id'    => Auth::id(),
+                'company_id'    => Auth::user()->company_id,
+                'sales_order_token' => $token->toString(),
+            ]);
+            $order = SalesOrder::where('sales_order_token',$token->toString())->first();
+        foreach($roomData as $roomval){
+            if(empty($price[$roomval])){
+                $price;
+            }
+            SalesOrderRoom::create([
+                'sales_order_id'=> $order->sales_order_id,
+                'room_id'       => $roomval,
+                'people'        => $booked[$roomval],
+                'room_price'    => $booked[$roomval],
+                'price_type_name_old' => $booked[$roomval],
+                'created_id'    => Auth::id(),
+                'company_id'    => Auth::user()->company_id,
+            ]);
+        }
+        foreach($facilityData as $facval){
+            SalesOrderFacility::create([
+                'sales_order_id'=> $order->sales_order_id,
+                'created_id'    => Auth::id(),
+                'company_id'    => Auth::user()->company_id,
+            ]);
+        }
+        foreach($menuData as $menuval){
+            SalesOrderMenu::create([
+                'sales_order_id'=> $order->sales_order_id,
+                'created_id'    => Auth::id(),
+                'company_id'    => Auth::user()->company_id,
+            ]);
+        }
+            DB::rollBack();
+            // Session::forget('booking-token');
+            return redirect()->route('booking.add')->with(['msg'=>'Tambah Booking Kamar Berhasil','type'=>'success']);
+        }catch(\Exception $e){
+            Session::forget('booking-token');
+            DB::rollBack();
+            report($e);
+            return redirect()->route('booking.add')->with(['msg'=>'Tambah Booking Kamar Gagal','type'=>'danger']);
+        }
     }
     public function resetSession() {
         Session::forget('booking-data');

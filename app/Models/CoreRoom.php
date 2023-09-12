@@ -19,7 +19,7 @@ class CoreRoom extends Model
         return $this->belongsTo(CoreRoomType::class,'room_type_id','room_type_id');
     }
     public function price(){
-        return $this->hasMany(SalesRoomPrice::class,'room_id','room_id');
+        return $this->hasMany(SalesRoomPrice::class,'room_id','room_id')->orderBy('price_type_id');
     }
     protected $guarded = [
         'created_at',

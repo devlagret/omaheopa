@@ -168,6 +168,10 @@
                     $('#loading').modal('show');
                 } else {
                     $('#loading').modal('hide');
+                    $('.modal-backdrop .fade').remove();
+                    setTimeout(() => {
+                        $('.modal-backdrop .fade').remove();
+                    }, 1000);
                 }
             }
             /**

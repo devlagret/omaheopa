@@ -34,28 +34,31 @@ if (empty($paket)) {
                 }
             });
         }
-        var index = {{ $sessiondata['tab-index'] ?? 1 }};
+        var index = {{ session('tab-index') ?? $sessiondata['tab-index'] ?? 1 }};
 
         function next() {
             index++;
             function_elements_add('tab-index', index)
             $("#card-total-all").hide();
-            if(index = 4){
+            if(index == 4){
                 $("#card-total-all").show();
             }
             (index > 4)?index=4:(index<1)?index=1:'';
             $('#navigator-booking li:nth-child(' + index + ') a').tab('show');
+            return index;
         }
 
         function preft() {
             index--;
             function_elements_add('tab-index', index)
             $("#card-total-all").hide();
-            if(index = 4){
+            if(index == 4){
                 $("#card-total-all").show();
             }
             (index > 4)?index=4:(index<1)?index=1:'';
             $('#navigator-booking li:nth-child(' + index + ') a').tab('show');
+            return index;
+
         }
 
         function disableNav() {
@@ -77,12 +80,16 @@ if (empty($paket)) {
         function changeType() {
             loading();
             var building_id = $("#building_id").val();
+            var start_date = $("#start_date").val();
+            var end_date = $("#end_date").val();
             $.ajax({
                 type: "POST",
                 url: "{{ route('booking.get-room-type') }}",
                 dataType: "html",
                 data: {
                     'building_id': building_id,
+                    'start_date': start_date,
+                    'end_date': end_date,
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function(return_data) {
@@ -99,6 +106,8 @@ if (empty($paket)) {
         function changeRoom(room_type_id) {
             loading();
             var building_id = $("#building_id").val();
+            var start_date = $("#start_date").val();
+            var end_date = $("#end_date").val();
             $.ajax({
                 type: "POST",
                 url: "{{ route('booking.get-room') }}",
@@ -106,6 +115,8 @@ if (empty($paket)) {
                 data: {
                     'room_type_id': room_type_id,
                     'building_id': building_id,
+                    'start_date': start_date,
+                    'end_date': end_date,
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function(return_data) {
@@ -704,6 +715,10 @@ if (empty($paket)) {
             var discount_percentage = (parseInt($(this).val()) / parseInt($("#total_amount").val())) * 100;
             $("#discount_percentage_total").val(discount_percentage);
             });
+            $("#down_payment_view").change(function() {
+                $("#down_payment").val(this.value);
+                $("#down_payment_view").val(toRp(this.value));
+            });
             if(index >= 4){
                 $("#card-total-all").show();
             }
@@ -730,7 +745,7 @@ if (empty($paket)) {
     </h3>
     <br />
     @if (session('msg'))
-        <div class="alert alert-info" role="alert">
+        <div class="alert alert-{{session('type')??'info'}}" role="alert">
             {{ session('msg') }}
         </div>
     @endif
@@ -824,10 +839,10 @@ if (empty($paket)) {
                             <div class="col">
                                 <div class="form-group">
                                     <a class="text-dark">Atas Nama<a class='red'> *</a></a>
-                                    <input class="form-control required input-bb" required form="form-barang" name="a.n"
-                                        id="a.n" type="text" autocomplete="off"
+                                    <input class="form-control required input-bb" required name="atas_nama"
+                                        id="atas_nama" type="text" autocomplete="off"
                                         onchange="function_elements_add(this.name, this.value)"
-                                        value="{{ $sessiondata['a.n'] ?? '' }}" />
+                                        value="{{ $sessiondata['atas_nama'] ?? '' }}" />
                                 </div>
                             </div>
                         </div>
@@ -1334,14 +1349,14 @@ if (empty($paket)) {
                     :
                 </div>
                 <div class="col-8">
-                    <input class="form-control input-bb text-right" id="change_amount_view" name="change_amount_view" disabled/>
-                    <input class="form-control input-bb" id="change_amount" name="change_amount" hidden/>
+                    <input class="form-control required input-bb" required autocomplete="off" id="down_payment_view" name="down_payment_view" />
+                    <input class="form-control input-bb" id="down_payment" name="down_payment" hidden/>
                 </div>
             </div>
             <br>
             <div class="">
                 <div class="form-actions float-right">
-                    <button type="reset" name="Reset" class="btn btn-danger" id="form-reset" onclick="reset_add();"><i class="fa fa-times"></i> Batal</button>
+                    <button type="reset" name="Reset" class="btn btn-danger" autocomplete="off" id="form-reset" onclick="reset_add();"><i class="fa fa-times"></i> Batal</button>
                     <button type="button" name="Save" class="btn btn-success button-prevent" onclick="$(this).addClass('disabled');$('#form-booking').submit();" title="Save"><i class="fa fa-check"></i> Simpan</button>
                 </div>
             </div>
