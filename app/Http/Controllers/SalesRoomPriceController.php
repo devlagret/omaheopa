@@ -41,6 +41,10 @@ class SalesRoomPriceController extends Controller
         Session::put('room-price-data', $sessiondata);
     }
     public function processAdd(Request $request) {
+        $request->validate([
+            'room_id' => 'integer',
+        ],['room_id.integer'=>'Bangunan Tidak Memiliki Kamar']);
+        dump($request->all());return 1;
         if(SalesRoomPrice::create([
             'room_id'=>$request->room_id,
             'price_type_id'=>$request->price_type_id,
@@ -84,7 +88,7 @@ class SalesRoomPriceController extends Controller
     }
     public function getType(Request $request) {
         $data = '';
-        $sessiondata = Session::get('booking-data');
+        $sessiondata = Session::get('room-price-data');
         try{
         $building = CoreBuilding::with('rooms:building_id,room_type_id','rooms.roomType')->find($request->building_id);
         $sessiondata['room_type_id'] ?? $sessiondata['room_type_id'] = 1;
@@ -103,7 +107,7 @@ class SalesRoomPriceController extends Controller
     }
     public function getRoom(Request $request) {
         $data = '';
-        $sessiondata = Session::get('booking-data');
+        $sessiondata = Session::get('room-price-data');
         try{
         $room = CoreRoom::where('room_type_id',$request->room_type_id)
         ->where('building_id',$request->building_id)->get();

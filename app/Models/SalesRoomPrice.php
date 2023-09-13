@@ -12,6 +12,7 @@ class SalesRoomPrice extends Model
     use SoftDeletes;
     protected $table = 'sales_room_price';
     protected $primaryKey = 'room_price_id';
+    protected $with = ['type'];
     public function room(){
         return $this->belongsTo(CoreRoom::class,'room_id','room_id');
     }

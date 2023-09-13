@@ -91,8 +91,8 @@
         });
         $("#limited-price").click(function () {
             if(this.checked){
-                $('#room_price_start_date').prop('disabled', true);
-                $('#room_price_end_date').prop('disabled', true);
+                $('#room_price_start_date').prop('disabled', false);
+                $('#room_price_end_date').prop('disabled', false);
                 $('#price_date').show();
             }else{
                 $('#room_price_start_date').prop('disabled', true);
@@ -225,14 +225,14 @@
                             <div class="form-group form-md-line-input">
                                 <section class="control-label">Tanggal Mulai
                                 </section>
-                                <input type ="date" class="form-control form-control-inline input-medium date-picker input-date" data-date-format="dd-mm-yyyy" type="text" name="room_price_start_date" id="room_price_start_date" value="{{ old('room_price_start_date',$sessiondata['room_price_start_date']??'') }}" style="width: 15rem;" onchange="function_elements_add(this.name, this.value)"/>
+                                <input type ="date" disabled class="form-control form-control-inline input-medium date-picker input-date" data-date-format="dd-mm-yyyy" type="text" name="room_price_start_date" id="room_price_start_date" value="{{ old('room_price_start_date',$sessiondata['room_price_start_date']??date('Y-m-d')) }}" style="width: 15rem;" onchange="function_elements_add(this.name, this.value)"/>
                             </div>
                         </div>
                         <div class = "col-md-6">
                             <div class="form-group form-md-line-input">
                                 <section class="control-label">Tanggal Akhir
                                 </section>
-                                <input type ="date" class="form-control form-control-inline input-medium date-picker input-date" data-date-format="dd-mm-yyyy" type="text" name="room_price_end_date" id="room_price_end_date" value="{{ old('room_price_end_date',$sessiondata['room_price_end_date']??'') }}" style="width: 15rem;" onchange="function_elements_add(this.name, this.value)"/>
+                                <input type ="date" disabled class="form-control form-control-inline input-medium date-picker input-date" data-date-format="dd-mm-yyyy" type="text" name="room_price_end_date" id="room_price_end_date" value="{{ old('room_price_end_date',$sessiondata['room_price_end_date']??date('Y-m-d')) }}" style="width: 15rem;" onchange="function_elements_add(this.name, this.value)"/>
                             </div>
                         </div>
                     </div>
