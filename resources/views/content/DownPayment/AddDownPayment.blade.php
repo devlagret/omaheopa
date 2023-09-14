@@ -84,7 +84,7 @@
         Daftar
     </h5>
     <div class="form-actions float-right">
-        <button onclick="location.href='{{ route('dp.add') }}'" name="Find" class="btn btn-sm btn-info" title="Add Data"><i class="fa fa-plus"></i> Bayar</button>
+        <button onclick="location.href='{{ route('booking.add') }}'" name="Find" class="btn btn-sm btn-info" title="Add Data"><i class="fa fa-plus"></i> Tambah Penyesuaian Stok</button>
     </div>
   </div>
 
@@ -113,8 +113,7 @@
                         <td>{{ $row->rooms->count() }}</td>
                         <td>{{ number_format($row->down_payment) }}</td>
                         <td style="text-align: center">
-                          <a type="button" class="btn btn-outline-info btn-sm" href="{{ url('/stock-adjustment/detail/'.$row['stock_adjustment_id']) }}">Detail</a>
-                          
+                          <a type="button" class="btn btn-outline-success btn-sm" onclick="proses('{{ $row->sales_order_name}}','{{route('dp.process-add',$row->sales_order_id)}}')">Bayar</a>
                         </td>
                       </tr>
                   @endforeach
@@ -136,5 +135,11 @@
 @stop
 
 @section('js')
-
+<script>
+    function proses(name,uri){
+      if(confirm(`Yakin Ingin Memproses Booking Atas Nama '`+name+`' ?`)){
+        window.location.href = uri;
+      }
+    }
+</script>
 @stop
