@@ -35,6 +35,7 @@ use App\Http\Controllers\InvtItemUnitController;
 use App\Http\Controllers\InvtStockAdjustmentController;
 use App\Http\Controllers\InvtStockAdjustmentReportController;
 use App\Http\Controllers\InvtWarehouseController;
+use App\Http\Controllers\InvWarehouseTransferController;
 use App\Http\Controllers\JournalVoucherController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\PurchaseInvoicebyItemReportController;
@@ -486,3 +487,26 @@ Route::post('/goods-received-note/filter', [InvGoodsReceivedNoteController::clas
 Route::get('/goods-received-note/filter-reset', [InvGoodsReceivedNoteController::class, 'resetFilterInvGoodsReceivedNote'])->name('filter-reset-goods-received-note');
 Route::post('/goods-received-note/add-new-purchase-order-item/{purchase_invoice_id}', [InvGoodsReceivedNoteController::class, 'addNewPurchaseOrderItem'])->name('add-new-purchase-order-item');
 Route::get('/goods-received-note/delete-new_purchase_order_item/{purchase_invoice_id}', [InvGoodsReceivedNoteController::class, 'deleteNewPurchaseOrderItem'])->name('delete-new-purchase-order-item');
+
+
+
+//warehouse transfer
+
+Route::get('/warehouse-transfer', [InvWarehouseTransferController::class, 'index'])->name('warehouse-transfer');
+Route::get('/warehouse-transfer/add', [InvWarehouseTransferController::class, 'addInvWarehouseTransfer'])->name('add-warehouse-transfer');
+Route::post('/warehouse-transfer/process-add-warehouse-transfer', [InvWarehouseTransferController::class, 'processAddInvWarehouseTransfer'])->name('process-add-warehouse-transfer');
+Route::get('/warehouse-transfer/detail/{product_type_id}', [InvWarehouseTransferController::class, 'detailInvWarehouseTransfer'])->name('edit-warehouse-transfer');
+Route::post('/warehouse-transfer/process-edit-warehouse-transfer', [InvWarehouseTransferController::class, 'processEditInvWarehouseTransfer'])->name('process-edit-warehouse-transfer');
+Route::get('/warehouse-transfer/void/{product_type_id}', [InvWarehouseTransferController::class, 'voidInvWarehouseTransfer'])->name('void-warehouse-transfer');
+Route::post('/warehouse-transfer/process-void', [InvWarehouseTransferController::class, 'processVoidInvWarehouseTransfer'])->name('process-void-warehouse-transfer');
+Route::post('/warehouse-transfer/filter', [InvWarehouseTransferController::class, 'filterInvWarehouseTransfer'])->name('filter-warehouse-transfer');
+Route::get('/warehouse-transfer/filter-reset', [InvWarehouseTransferController::class, 'resetFilterInvWarehouseTransfer'])->name('filter-reset-warehouse-transfer');
+Route::post('/warehouse-transfer/city', [InvWarehouseTransferController::class, 'getInvCity'])->name('warehouse-transfer-city');
+Route::post('/warehouse-transfer/item', [InvWarehouseTransferController::class, 'getCoreItem'])->name('warehouse-transfer-item');
+Route::post('/warehouse-transfer/add-array', [InvWarehouseTransferController::class, 'processAddArrayWarehouseTransferItem'])->name('warehouse_transfer-add-array');
+Route::get('/warehouse-transfer/delete-array/{record_id}', [InvWarehouseTransferController::class, 'deleteArrayWarehouseTransferItem'])->name('warehouse-transfer-delete-array');
+Route::get('/warehouse-transfer/search-purchase-invoice', [InvWarehouseTransferController::class, 'search'])->name('warehouse-transfer-search-purchase-invoice');
+Route::post('/warehouse-transfer/elements-add', [InvWarehouseTransferController::class, 'elements_add'])->name('elements-add-warehouse-transfer');
+Route::post('/warehouse-transfer/add-transfer-type', [InvWarehouseTransferController::class, 'addWarehouseTransferType'])->name('add-transfer-type-warehouse-transfer');
+Route::post('/warehouse-transfer/select-data-unit', [InvWarehouseTransferController::class, 'getSelectDataUnit'])->name('select-data-unit');
+Route::post('/warehouse-transfer/select-data-item', [InvWarehouseTransferController::class, 'getQtyStock'])->name('select-data-item');

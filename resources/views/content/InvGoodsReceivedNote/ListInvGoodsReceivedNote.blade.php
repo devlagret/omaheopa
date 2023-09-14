@@ -124,7 +124,7 @@ function check(name,uri){
                         <th width="15%" style='text-align:center'>Nama Supplier</th>
                         <th width="15%" style='text-align:center'>No PO</th>
                         <th width="15%" style='text-align:center'>Tanggal PO</th>
-                        <th width="15%" style='text-align:center'>No Faktur</th>
+                        {{-- <th width="15%" style='text-align:center'>No Faktur</th> --}}
                         <th width="10%" style='text-align:center'>Aksi</th>
                     </tr>
                 </thead>
@@ -137,9 +137,9 @@ function check(name,uri){
                         <td>{{date('d/m/Y', strtotime($item['goods_received_note_date']))}}</td>
                         <td>{{$InvGoodsReceivedNote->getInvWarehouseName($item['warehouse_id'])}}</td>
                         <td>{{$InvGoodsReceivedNote->getCoreSupplierName($item['supplier_id'])}}</td>
-                        <td>{{$InvGoodsReceivedNote->getPurchaseOrderNo($item['purchase_order_id'])}}</td>
-                        <td>{{date('d/m/Y', strtotime($InvGoodsReceivedNote->getPurchaseOrderDate($item['purchase_order_id'])))}}</td>
-                        <td>{{$item['faktur_no']}}</td>
+                        <td>{{$InvGoodsReceivedNote->getPurchaseinvoiceNo($item['purchase_invoice_id'])}}</td>
+                        <td>{{date('d/m/Y', strtotime($InvGoodsReceivedNote->getPurchaseInvoiceDate($item['purchase_invoice_id'])))}}</td>
+                        {{-- <td>{{$item['faktur_no']}}</td> --}}
                         <td class="" style='text-align:center'>
                             <a type="button" class="btn btn-outline-success btn-sm" href="{{ url('/goods-received-note/detail/'.$item['goods_received_note_id']) }}">Detail</a>
                             <a type="button" class="btn btn-outline-danger btn-sm" href="{{ url('/goods-received-note/delete-goods-received-note/'.$item['goods_received_note_id']) }}">Hapus</a>
