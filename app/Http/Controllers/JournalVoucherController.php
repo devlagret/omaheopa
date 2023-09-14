@@ -42,8 +42,8 @@ class JournalVoucherController extends Controller
         ->where('acct_journal_voucher.journal_voucher_date', '>=', $start_date)
         ->where('acct_journal_voucher.journal_voucher_date', '<=', $end_date)
         ->where('acct_journal_voucher.data_state',0)
-        ->where('acct_journal_voucher.transaction_module_code', 'JU')
-        ->where('acct_journal_voucher.company_id', Auth::user()->company_id)
+        // ->where('acct_journal_voucher.transaction_module_code', 'JU')
+        // ->where('acct_journal_voucher.company_id', Auth::user()->company_id)
         ->get();
         return view('content.JournalVoucher.ListJournalVoucher', compact('data','start_date','end_date'));
     }

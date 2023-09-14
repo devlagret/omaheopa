@@ -249,9 +249,12 @@
                                                 <td style='text-align  : right !important;'>
                                                     <input class='form-control' style='text-align:right;' type='number' name='quantity_received_".$no."' id='quantity_received_".$no."' value='".$val['quantity']."' onchange='quantityReceivedChange(".$no.",this.value);' autocomplete='off'/>
 
+
+                                                    <input class='form-control' style='text-align:right;'type='hidden' name='merchant_id_".$no."' id='merchant_id_".$no."' value='".$val['merchant_id']."'/>
+
                                                     <input class='form-control' style='text-align:right;'type='hidden' name='item_category_id_".$no."' id='item_category_id_".$no."' value='".$val['item_category_id']."'/>
 
-                                                    <input class='form-control' style='text-align:right;'type='hidden' name='item_type_id_".$no."' id='item_type_id_".$no."' value='".$val['item_id']."'/>
+                                                    <input class='form-control' style='text-align:right;'type='hidden' name='item_id_".$no."' id='item_id_".$no."' value='".$val['item_id']."'/>
 
                                                     <input class='form-control' style='text-align:right;'type='hidden' name='item_unit_id_".$no."' id='item_unit_id_".$no."' value='".$val['item_unit_id']."'/>
 
@@ -278,7 +281,7 @@
 
                                                     <input class='form-control' style='text-align:right;'type='hidden' name='item_category_id_".$no."' id='item_category_id_".$no."' value='".$val['item_category_id']."'/>
 
-                                                    <input class='form-control' style='text-align:right;'type='hidden' name='item_type_id_".$no."' id='item_type_id_".$no."' value='".$val['item_type_id']."'/>
+                                                    <input class='form-control' style='text-align:right;'type='hidden' name='item_id_".$no."' id='item_id_".$no."' value='".$val['item_type_id']."'/>
 
                                                     <input class='form-control' style='text-align:right;'type='hidden' name='item_unit_id_".$no."' id='item_unit_id_".$no."' value='".$val['item_unit_id']."'/>
 
