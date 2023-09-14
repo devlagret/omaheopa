@@ -18,7 +18,65 @@
 			}
 		});
 	}
+     function changeType() {
+            loading();
+            var building_id = $("#building_id").val();
+            $.ajax({
+                type: "POST",
+                url: "{{ route('room-price.get-room-type') }}",
+                dataType: "html",
+                data: {
+                    'building_id': building_id,
+                    '_token': '{{ csrf_token() }}',
+                },
+                success: function(return_data) {
+                    function_elements_add('building_id', building_id);
+                    $('#room_type_id').html(return_data);
+                    changeRoom($('#room_type_id').val());
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            });
+        }
+
+        function changeRoom(room_type_id) {
+            loading();
+            var building_id = $("#building_id").val();
+            $.ajax({
+                type: "POST",
+                url: "{{ route('room-price.get-room') }}",
+                dataType: "html",
+                data: {
+                    'room_type_id': room_type_id,
+                    'building_id': building_id,
+                    '_token': '{{ csrf_token() }}',
+                },
+                success: function(return_data) {
+                    function_elements_add('room_type_id', room_type_id);
+                    $('#room_id').html(return_data);
+                    loading(0);
+                    setTimeout(function() {
+                        loading(0);
+                    }, 100);
+                },
+                complete: function() {
+                    loading(0);
+                    setTimeout(function() {
+                        loading(0);
+                    }, 200);
+                },
+                error: function(data) {
+                    console.log(data);
+                    loading(0);
+                    setTimeout(function() {
+                        loading(0);
+                    }, 200);
+                }
+            });
+        }
     $(document).ready(function(){
+        changeType();
         if($('#room_price_price_view').val()!=''){
             var price = parseInt($('#room_price_price_view').val());
             $('#room_price_price').val(price);
@@ -30,6 +88,17 @@
             console.log(price);
             $('#room_price_price').val(price);
             $('#room_price_price_view').val(toRp(price));
+        });
+        $("#limited-price").click(function () {
+            if(this.checked){
+                $('#room_price_start_date').prop('disabled', false);
+                $('#room_price_end_date').prop('disabled', false);
+                $('#price_date').show();
+            }else{
+                $('#room_price_start_date').prop('disabled', true);
+                $('#room_price_end_date').prop('disabled', true);
+                $('#price_date').hide();
+            }
         });
     });
 </script>
@@ -91,20 +160,38 @@
               <div class="tab-content">
                 <div role="tabpanel" class="tab-pane fade show active" id="room-price">
                     <div class="row form-group mt-5">
-                        <div class="col">
+                        <div class="col-md-6 col-sm-12">
                             <div class="form-group">
-                                <a class="text-dark">Nama Kamar<a class='red'> *</a></a>
-                                {!! Form::select('room_id', $room, $sessiondata['room_id']??'', [
-                                    'class' => 'form-control selection-search-clear select-form required',
-                                    'name' => 'room_id',
-                                    'id' => 'room_id',
-                                    'onchange' => 'function_elements_add(this.name, this.value)',
+                                <a class="text-dark">Bagunan<a class='red'> *</a></a>
+                                {!! Form::select('building_id', $building, $sessiondata['building_id'] ?? '', [
+                                    'class' => 'selection-search-clear required select-form',
+                                    'name' => 'building_id',
+                                    'id' => 'building_id',
+                                    'onchange' => 'changeType()',
+                                    'form' => 'form-barang',
+                                    'required',
                                 ]) !!}
                             </div>
                         </div>
-                    </div>
-                    <div class="row form-group mt-5">
-                        <div class="col">
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <a class="text-dark">Tipe Kamar<a class='red'> *</a></a>
+                                <select class="selection-search-clear required select-form" required
+                                    form="form-barang" placeholder="Pilih Tipe" name="room_type_id"
+                                    id="room_type_id" onchange="changeRoom(this.value)">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
+                            <div class="form-group">
+                                <a class="text-dark">Nama Kamar<a class='red'> *</a></a>
+                                <select class="selection-search-clear required select-form" required
+                                    placeholder="Pilih Nama" name="room_id" id="room_id"
+                                    onchange="function_elements_add(this.name, this.value)">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12">
                             <div class="form-group">
                                 <a class="text-dark">Tipe Harga<a class='red'> *</a></a>
                                 {!! Form::select('price_type_id', $pricetype, $sessiondata['price_type_id']??'', [
@@ -125,25 +212,27 @@
                             </div>
                         </div>
                     </div>
-                    <div class = "row form-group mt-5">
+                    <div class="row form-group">
+                        <div class="col">
+                            <div class="form-check">
+                                <input class="form-check-input" id="limited-price" type="checkbox" >
+                                <label class="form-check-label">Set Waktu Tersedia</label>
+                             </div>
+                        </div>
+                    </div>
+                    <div id="price_date" class="row form-group mt-5" style="display: none;">
                         <div class = "col-md-6">
                             <div class="form-group form-md-line-input">
                                 <section class="control-label">Tanggal Mulai
-                                    <span class="required text-danger">
-                                        *
-                                    </span>
                                 </section>
-                                <input type ="date" class="form-control form-control-inline input-medium date-picker required input-date" required data-date-format="dd-mm-yyyy" type="text" name="room_price_start_date" id="room_price_start_date" value="{{ old('room_price_start_date',$sessiondata['room_price_start_date']??'') }}" style="width: 15rem;" onchange="function_elements_add(this.name, this.value)"/>
+                                <input type ="date" disabled class="form-control form-control-inline input-medium date-picker input-date" data-date-format="dd-mm-yyyy" type="text" name="room_price_start_date" id="room_price_start_date" value="{{ old('room_price_start_date',$sessiondata['room_price_start_date']??date('Y-m-d')) }}" style="width: 15rem;" onchange="function_elements_add(this.name, this.value)"/>
                             </div>
                         </div>
                         <div class = "col-md-6">
                             <div class="form-group form-md-line-input">
                                 <section class="control-label">Tanggal Akhir
-                                    <span class="required text-danger">
-                                        *
-                                    </span>
                                 </section>
-                                <input type ="date" class="form-control form-control-inline input-medium date-picker input-date required" required data-date-format="dd-mm-yyyy" type="text" name="room_price_end_date" id="room_price_end_date" value="{{ old('room_price_end_date',$sessiondata['room_price_end_date']??'') }}" style="width: 15rem;" onchange="function_elements_add(this.name, this.value)"/>
+                                <input type ="date" disabled class="form-control form-control-inline input-medium date-picker input-date" data-date-format="dd-mm-yyyy" type="text" name="room_price_end_date" id="room_price_end_date" value="{{ old('room_price_end_date',$sessiondata['room_price_end_date']??date('Y-m-d')) }}" style="width: 15rem;" onchange="function_elements_add(this.name, this.value)"/>
                             </div>
                         </div>
                     </div>
