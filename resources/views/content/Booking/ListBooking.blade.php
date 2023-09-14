@@ -1,4 +1,3 @@
-@inject('ISAC','App\Http\Controllers\InvtStockAdjustmentController')
 @extends('adminlte::page')
 
 @section('title',  "MOZAIC Omah'e Opa")
@@ -21,7 +20,7 @@
 </h3>
 <br/>
 <div id="accordion">
-    <form  method="post" action="{{ route('booking.filter') }}" enctype="multipart/form-data">
+    <form  method="post" action="{{ route('dp.filter') }}" enctype="multipart/form-data">
     @csrf
         <div class="card border border-dark">
         <div class="card-header bg-dark" id="headingOne" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
@@ -35,7 +34,7 @@
                 <div class="row ">
                     <div class = "col-md-6">
                         <div class="form-group form-md-line-input">
-                            <section class="control-label">Tanggal Check-In
+                            <section class="control-label">Tanggal Mulai
                                 <span class="required text-danger">
                                     *
                                 </span>
@@ -46,7 +45,7 @@
 
                     <div class = "col-md-6">
                         <div class="form-group form-md-line-input">
-                            <section class="control-label">Tanggal Check-Out
+                            <section class="control-label">Tanggal Akhir
                                 <span class="required text-danger">
                                     *
                                 </span>
@@ -79,9 +78,16 @@
     </form>
 </div>
 <br/>
-@if(session('msg'))
-<div class="alert alert-info" role="alert">
-    {{session('msg')}}
+@if (session('msg'))
+<div class="alert alert-{{session('type')??'info'}}" role="alert">
+    {{ session('msg') }}
+</div>
+@endif
+@if (count($errors) > 0)
+<div class="alert alert-danger" role="alert">
+    @foreach ($errors->all() as $error)
+        {{ $error }}
+    @endforeach
 </div>
 @endif
 <div class="card border border-dark">
@@ -99,28 +105,36 @@
             <table id="example" style="width:100%" class="table table-striped table-bordered table-hover table-full-width">
                 <thead>
                     <tr>
-                        <th style="text-align: center; width: 5%">No </th>
-                        <th style="text-align: center; width: 15%">Tanggal </th>
-                        <th style="text-align: center; width: 20%">Nama Gudang</th>
-                        <th style="text-align: center; width: 20%">Nama Barang</th>
-                        <th style="text-align: center; width: 20%">Penyesuaian Stok</th>
+                        <th style="text-align: center; width: 3%">No </th>
+                        <th style="text-align: center; width: 10%">Tanggal Check-In</th>
+                        <th style="text-align: center; width: 10%">Tanggal Check-Out</th>
+                        <th style="text-align: center; width: 20%">Atas Nama</th>
+                        <th style="text-align: center; width: 10%">Kamar Dipesan</th>
+                        <th style="text-align: center; width: 10%">Harga</th>
+                        <th style="text-align: center; width: 10%">Uang Muka</th>
                         <th style="text-align: center; width: 10%">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php $no = 1; ?>
-                  {{-- @foreach ($data as $row)
+                  @foreach ($booking as $row)
                       <tr>
-                        <td>{{ $no++ }}</td>
-                        <td>{{ $row['stock_adjustment_date'] }}</td>
-                        <td>{{ $ISAC->getWarehouseName($row['warehouse_id']) }}</td>
-                        <td>{{ $ISAC->getItemName($row['item_id']) }}</td>
-                        <td>{{ $row['last_balance_adjustment'] }}</td>
+                        <td class="text-center">{{ $no++ }}</td>
+                        <td class="text-center">{{ $row->checkin_date }}</td>
+                        <td class="text-center">{{ $row->checkout_date }}</td>
+                        <td>{{ $row->sales_order_name }}</td>
+                        <td>{{ $row->rooms->count() }}</td>
+                        <td>{{ number_format($row->sales_order_price) }}</td>
+                        <td>{{ number_format($row->down_payment) }}</td>
                         <td style="text-align: center">
-                            <a type="button" class="btn btn-outline-warning btn-sm" href="{{ url('/stock-adjustment/detail/'.$row['stock_adjustment_id']) }}">Detail</a>
+                            @if (!$row->sales_order_status)
+                          <a type="button" class="btn btn-outline-warning btn-sm" href="{{ route('booking.edit',$row->sales_order_id) }}">Edit</a>
+                          <a type="button" class="btn btn-outline-danger btn-sm" href="{{ route('booking.delete',$row->sales_order_id) }}">Hapus</a>
+                          @endif
+                            <a type="button" class="btn btn-outline-info btn-sm" href="{{ route('booking.detail',$row->sales_order_id) }}">Detail</a>
                         </td>
                       </tr>
-                  @endforeach --}}
+                  @endforeach
                 </tbody>
             </table>
         </div>

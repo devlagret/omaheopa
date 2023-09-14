@@ -120,6 +120,7 @@ if (empty($paket)) {
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function(return_data) {
+                    console.log(return_data);
                     function_elements_add('room_type_id', room_type_id);
                     $('#room_id').html(return_data);
                     loading(0);
@@ -146,6 +147,9 @@ if (empty($paket)) {
         function addRoom() {
             var room_id = $("#room_id").val();
             var days_booked = $("#days_booked").val();
+            var start_date = $("#start_date").val();
+            var end_date = $("#end_date").val();
+            var no =$('.booked-room').length;
             if ($('.room-' + room_id).length) {
                 return 0;
             }
@@ -155,7 +159,9 @@ if (empty($paket)) {
                 url: "{{ route('booking.add-room') }}",
                 dataType: "html",
                 data: {
-                    'no': $('.booked-room').length,
+                    'no': no,
+                    'start_date' : start_date,
+                    'end_date' : end_date,
                     'room_id': room_id,
                     'days_booked' : days_booked,
                     '_token': '{{ csrf_token() }}',
@@ -512,10 +518,14 @@ if (empty($paket)) {
                     subtotalMenu();
                     setTimeout(function() {
                         loading(0);
-                    }, 200);
+                    }, 500);
                 },
                 error: function(data) {
                     console.log(data);
+                    loading(0);
+                    setTimeout(function() {
+                        loading(0);
+                    }, 500);
                 }
             });
         }
@@ -564,10 +574,15 @@ if (empty($paket)) {
             loading();
             $.ajax({
                 type: "get",
-                url: "{{ route('booking.delete-booked-room') }}" + room_id,
+                url: "{{ route('booking.delete-booked-room') }}" +'/'+ room_id,
                 dataType: "html",
                 success: function(return_data) {
                     $("#booked-room-" + room_id).remove();
+                    if ($('.booked-room').length == 0) {
+                        $('#room-table').html(
+                        '<td valign="top" colspan="7" class="dataTables_empty">No data available in table</td>'
+                    );
+                    }
                     loading(0);
                     return 0;
                 },
@@ -587,7 +602,7 @@ if (empty($paket)) {
             loading();
             $.ajax({
                 type: "get",
-                url: "{{ route('booking.delete-facility') }}" + id,
+                url: "{{ route('booking.delete-facility') }}" +'/' + id,
                 dataType: "html",
                 success: function(return_data) {
                     $("#facility-" + id).remove();
@@ -610,7 +625,7 @@ if (empty($paket)) {
             loading();
             $.ajax({
                 type: "get",
-                url: "{{ route('booking.delete-menu') }}" + id,
+                url: "{{ route('booking.delete-menu') }}" +'/' + id,
                 dataType: "html",
                 success: function(return_data) {
                     $("#booked-room-" + id).remove();
@@ -672,6 +687,93 @@ if (empty($paket)) {
                 days = 1;
             }
             $("#days_booked").val(days);
+            $(".room-id").each(function() {
+                id = $(this).val();
+                getRoomPriceList(id);
+            });
+            disableNav();
+            loadingWidget();
+            $.ajax({
+                type: "POST",
+                url: "{{ route('booking.check-room') }}",
+                data: {
+                    'start_date': start_date.format('Y-MM-DD'),
+                    'end_date': end_date.format('Y-MM-DD'),
+                    '_token': '{{ csrf_token() }}',
+                },
+                success: function(return_data) {
+                    return_data.forEach(element => {
+                        if($('#booked-room-'+element).length){
+                        deleteBooked(element);
+                        }
+                    });
+                    loadingWidget(0);
+                    setTimeout(function() {
+                        enableNav();
+                        loadingWidget(0);
+                    }, 100);
+                    enableNav();
+                },
+                complete: function() {
+                    loadingWidget(0);
+                    subtotalMenu();
+                    setTimeout(function() {
+                        loadingWidget(0);
+                        enableNav();
+                    }, 200);
+                    enableNav();
+                },
+                error: function(data) {
+                    console.log(data);
+                    loadingWidget(0);
+                    setTimeout(function() {
+                        loadingWidget(0);
+                        enableNav();
+                    }, 200);
+                }
+            });
+            changeType();
+            return subtotal();
+        }
+        function getRoomPriceList(id){
+            var start_date = $("#start_date").val();
+            var end_date = $("#end_date").val();
+            $.ajax({
+                type: "post",
+                url: "{{ route('booking.get-price-list') }}",
+                dataType: "html",
+                data: {
+                    'start_date' : start_date,
+                    'end_date' : end_date,
+                    'room_id': id,
+                    '_token': '{{ csrf_token() }}',
+                },
+                success: function(return_data) {
+                    $('#room_price_id_'+id).html(return_data);
+                    loading(0);
+                    return 0;
+                },
+                complete: function() {
+                    loading(0);
+                    setTimeout(function() {
+                        loading(0);
+                    }, 200);
+                    setRoomPrice();
+                },
+                error: function(data) {
+                    console.log(data);
+                    loading(0);
+                    setTimeout(function() {
+                        loading(0);
+                    }, 500);
+                }
+            });
+        }
+        function setRoomPrice(){
+            $(".room-price-select").each(function() {
+                        id=$(this).data('id');
+                        changePrice(id,$(this).val(),0);
+            });
             subtotal();
         }
         $(document).ready(function() {
@@ -707,9 +809,9 @@ if (empty($paket)) {
                     }
                 })
             });
-            $(".room-price-select").each(function() {
-                id=$(this).data('id');
-                changePrice(id,$(this).val(),0);
+            $(".room-id").each(function() {
+                id = $(this).val();
+                getRoomPriceList(id);
             });
             $("#discount_amount_view").change(function() {
             var discount_percentage = (parseInt($(this).val()) / parseInt($("#total_amount").val())) * 100;
@@ -733,7 +835,7 @@ if (empty($paket)) {
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ url('home') }}">Beranda</a></li>
-            <li class="breadcrumb-item"><a href="{{ url('item') }}">Daftar Booking</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('booking.index') }}">Daftar Booking</a></li>
             <li class="breadcrumb-item active" aria-current="page">Tambah Booking</li>
         </ol>
     </nav>
@@ -799,7 +901,7 @@ if (empty($paket)) {
                                     </section>
                                     <input type="date"
                                         class="form-control form-control-inline input-medium date-picker input-date"
-                                        data-date-format="dd-mm-yyyy" type="text" name="start_date" id="start_date"
+                                        data-date-format="dd-mm-yyyy" type="text" name="start_date" min="{{date('Y-m-d')}}" id="start_date"
                                         value="{{ $sessiondata['start_date'] ?? date('Y-m-d') }}" onchange="changeDate()" style="width: 15rem;" />
                                 </div>
                             </div>
@@ -902,10 +1004,8 @@ if (empty($paket)) {
                                                 <th width="15%" style='text-align:center'>Tipe Kamar</th>
                                                 <th width="15%" style='text-align:center'>Bangunan</th>
                                                 <th width="13%" style='text-align:center'>Jumlah Orang</th>
-                                                <th colspan="2" width="30%" style='text-align:center'>Harga Kamar
-                                                </th>
-                                                <th width="20%" style='text-align:center'>Subtotal
-                                                </th>
+                                                <th colspan="2" width="30%" style='text-align:center'>Harga Kamar</th>
+                                                <th width="20%" style='text-align:center'>Subtotal</th>
                                                 <th width="10%" style='text-align:center'>Aksi</th>
                                             </tr>
                                         </thead>
@@ -916,7 +1016,7 @@ if (empty($paket)) {
                                                     <tr class="booked-room room-{{ $val->room_id }}"
                                                         id="booked-room-{{ $val->room_id }}">
                                                         <td>{{ $no++ }}
-                                                            <input type='hidden' id="room_id[]"
+                                                            <input type='hidden' class="room-id" name="room_id[]"
                                                                 value="{{ $val->room_id }}" />
                                                         </td>
                                                         <td>{{ $val->room_name }}</td>
@@ -938,19 +1038,10 @@ if (empty($paket)) {
                                                             </div>
                                                         </td>
                                                         <td width="15%">
-                                                            {!! Form::select(
-                                                                'room_price_id',
-                                                                $val->price->pluck('type.price_type_name', 'room_price_id'),
-                                                                $price[$val->room_id] ?? '',
-                                                                [
-                                                                    'class' => 'selection-search-clear room-price-select required select-form',
-                                                                    'name' => 'room_price_id_' . $val->room_id,
-                                                                    'id' => 'room_price_id_' . $val->room_id,
-                                                                    'data-id' =>  $val->room_id,
-                                                                    'onchange' => 'changePrice('.$val->room_id.',this.value)',
-                                                                    'required',
-                                                                ],
-                                                            ) !!}
+                                                            <select class="selection-search-clear room-price-select required select-form" required
+                                                             placeholder="Pilih Nama" name="room_price_id[]" id="room_price_id_{{$val->room_id}}"
+                                                            onchange="changePrice({{$val->room_id}},this.value)" data-id="{{$val->room_id}}" >
+                                                            </select>
                                                         </td>
                                                         <td width="10%">
                                                             <input type="text"
@@ -982,8 +1073,8 @@ if (empty($paket)) {
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <td colspan="5" class="font-weight-bold text-center fs-4">Subtotal</td>
-                                                <td colspan="2" class="font-weight-bold text-center fs-4">
+                                                <td colspan="6" class="font-weight-bold text-center fs-4">Subtotal</td>
+                                                <td colspan="3" class="font-weight-bold text-center fs-4">
                                                     <h5 id="subtotal"> Rp. <div class="sbs-room-view d-inline"
                                                             id="sbs-room-view"></div> - </h5>
                                                     <input type="hidden" name="subtotal_room" id="sbs-room" />
@@ -1103,7 +1194,7 @@ if (empty($paket)) {
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <td colspan="4" class="font-weight-bold text-center fs-4">Subtotal</td>
+                                                <td colspan="5" class="font-weight-bold text-center fs-4">Subtotal</td>
                                                 <td colspan="2" class="font-weight-bold text-center fs-4">
                                                     <h5 id="subtotal"> Rp. <div class="sbs-facility-view d-inline"
                                                             id="sbs-facility-view"></div> - </h5>
