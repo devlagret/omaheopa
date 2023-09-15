@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\AppHelper;
 use App\Http\Controllers\Controller;
 use App\Models\SalesRoomMenu;
 use Illuminate\Http\Request;
@@ -15,17 +16,14 @@ class SalesRoomMenuController extends Controller
     {
         $this->middleware('auth');
     }
-    private function menuType():Iterable {
-        return collect([1 => 'Breakfast', 2 => 'Lunch', 3 => 'Dinner']);
-    }
     public function index() {
         Session::forget('sales-room-menu-data');
         $roommenu = SalesRoomMenu::get();
-        return view('content.SalesRoomMenu.ListSalesRoomMenu')->with(['roommenu'=>$roommenu,'tipemenu'=> $this->menuType()]);
+        return view('content.SalesRoomMenu.ListSalesRoomMenu')->with(['roommenu'=>$roommenu,'tipemenu'=> AppHelper::menuType()]);
     }
     public function add() {
         $sessiondata = Session::get('sales-room-menu-data');
-        $tipemenu = $this->menuType();
+        $tipemenu = AppHelper::menuType();
         return view('content.SalesRoomMenu.FormAddSalesRoomMenu',compact('sessiondata','tipemenu'));
     }
     public function elementsAdd(Request $request){
@@ -53,7 +51,7 @@ class SalesRoomMenuController extends Controller
     public function edit($room_menu_id) {
         $sessiondata = Session::get('sales-room-menu-data');
         $roommenu = SalesRoomMenu::find($room_menu_id);
-        $tipemenu = $this->menuType();
+        $tipemenu = AppHelper::menuType();
         return view('content.SalesRoomMenu.FormEditSalesRoomMenu',compact('sessiondata','tipemenu','roommenu'));
     }
     public function processEdit(Request $request){
