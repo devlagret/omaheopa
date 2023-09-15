@@ -121,7 +121,7 @@
                                                     {{$val->price_type_name_old}}
                                                 </td>
                                                 <td>
-                                                    {{$val->room_price}}
+                                                    {{number_format($val->room_price,2)}}
                                                 </td>
                                                 <td>
                                                     {{number_format($val->room_price*$days,2)}}
@@ -178,10 +178,10 @@
                                                 <td>{{ $no++ }}</td>
                                                 <td>{{ $fac->facility_name }}</td>
                                                 <td>{{ $fac->facility_remark }}</td>
-                                                <td>{{ $fac->facility_price }}</td>
+                                                <td>{{ number_format($fac->facility_price,2) }}</td>
                                                 <td>{{ $vasl->quantity }}</td>
                                                 <td>
-                                                    {{$vasl->quantity* $data->facility_price }}
+                                                    {{number_format($vasl->quantity * $fac->facility_price,2) }}
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -213,7 +213,7 @@
                         data-parent="#list-booked">
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table id="example" style="width:100%"
+                                <table  style="width:100%"
                                     class="table table-striped datatables table-bordered table-hover table-full-width">
                                     <thead>
                                         <tr>
@@ -236,10 +236,10 @@
                                                 <td>{{ $no++ }}</td>
                                                 <td>{{$menutype[$men->room_menu_type] }}</td>
                                                 <td>{{ $men->room_menu_name }}</td>
-                                                <td>{{ $men->room_menu_price }}</td>
+                                                <td>{{number_format($men->room_menu_price,2) }}</td>
                                                 <td>{{ $vals->quantity }}</td>
                                                 <td>
-                                                    {{$vals->quantity* $men->room_menu_price}}
+                                                    {{number_format($vals->quantity* $men->room_menu_price,2)}}
                                                 </td>
                                             </tr>
                                         @endforeach

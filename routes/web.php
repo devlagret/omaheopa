@@ -435,6 +435,7 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
     Route::post('/add-room', [BookingController::class, 'addRoom'])->name('add-room');
     Route::post('/add-facility', [BookingController::class, 'addFacility'])->name('add-facility');
     Route::post('/change-facility-qty', [BookingController::class, 'changeFacilityQty'])->name('facility-qty');
+    Route::post('/change-menu-qty', [BookingController::class, 'changeMenuQty'])->name('menu-qty');
     Route::post('/add-person', [BookingController::class, 'addPersonBooked'])->name('add-person');
     Route::post('/room', [BookingController::class, 'getRoom'])->name('get-room');
     Route::post('/check-room', [BookingController::class, 'checkRoom'])->name('check-room');
@@ -461,22 +462,24 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
  Route::prefix('down-payment')->name('dp.')->group(function () {
     Route::get('/', [DownPaymentController::class, 'index'])->name('index');
     Route::get('/add', [DownPaymentController::class, 'add'])->name('add');
-    Route::post('/process-add/{sales_order_id}', [DownPaymentController::class, 'processAdd'])->name('process-add');
+    Route::get('/process-add/{sales_order_id}/{source?}', [DownPaymentController::class, 'processAdd'])->name('process-add');
     Route::get('/edit/{sales_order_id}', [DownPaymentController::class, 'edit'])->name('edit');
     Route::post('/process-edit', [DownPaymentController::class, 'processEdit'])->name('process-edit');
     Route::get('/delete/{sales_order_id}', [DownPaymentController::class, 'delete'])->name('delete');
     Route::post('/elements-add', [DownPaymentController::class, 'elementsAdd'])->name('elements-add');
-    Route::post('/filter', [BookingController::class, 'filter'])->name('filter');   
+    Route::post('/filter', [DownPaymentController::class, 'filter'])->name('filter');
+    Route::post('/filter-add', [DownPaymentController::class, 'filterAdd'])->name('filter-add');
 });
  // Check-in Check-Out pages
  Route::prefix('checkin-checkout')->name('cc.')->group(function () {
-    Route::get('/', [DownPaymentController::class, 'index'])->name('index');
-    Route::get('/add', [DownPaymentController::class, 'add'])->name('add');
-    Route::post('/process-add', [DownPaymentController::class, 'processAdd'])->name('process-add');
-    Route::get('/edit/{merchant_id}', [DownPaymentController::class, 'edit'])->name('edit');
-    Route::post('/process-edit', [DownPaymentController::class, 'processEdit'])->name('process-edit');
-    Route::get('/delete/{merchant_id}', [DownPaymentController::class, 'delete'])->name('delete');
-    Route::post('/elements-add', [DownPaymentController::class, 'elementsAdd'])->name('elements-add');
+    Route::get('/', [CheckInCheckOutController::class, 'index'])->name('index');
+    Route::get('/add', [CheckInCheckOutController::class, 'add'])->name('add');
+    Route::post('/process-add', [CheckInCheckOutController::class, 'processAdd'])->name('process-add');
+    Route::get('/edit/{merchant_id}', [CheckInCheckOutController::class, 'edit'])->name('edit');
+    Route::post('/process-edit', [CheckInCheckOutController::class, 'processEdit'])->name('process-edit');
+    Route::get('/delete/{merchant_id}', [CheckInCheckOutController::class, 'delete'])->name('delete');
+    Route::post('/filter', [CheckInCheckOutController::class, 'filter'])->name('filter');
+    Route::post('/elements-add', [CheckInCheckOutController::class, 'elementsAdd'])->name('elements-add');
 });
 
 
