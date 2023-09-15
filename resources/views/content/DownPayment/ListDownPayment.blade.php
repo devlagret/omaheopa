@@ -99,7 +99,7 @@
                         <th style="text-align: center; width: 20%">Atas Nama</th>
                         <th style="text-align: center; width: 10%">Kamar Dipesan</th>
                         <th style="text-align: center; width: 10%">Uang Muka</th>
-                        <th style="text-align: center; width: 20%">Aksi</th>
+                        <th style="text-align: center; width: 10%">Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -113,8 +113,7 @@
                         <td>{{ $row->rooms->count() }}</td>
                         <td>{{ number_format($row->down_payment) }}</td>
                         <td style="text-align: center">
-                          <a type="button" class="btn btn-outline-info btn-sm" href="{{ url('/stock-adjustment/detail/'.$row['stock_adjustment_id']) }}">Detail</a>
-                          
+                          <div class="w-75 px-1 rounded-pill mx-auto bg-success">Sudah Dibayar</div>
                         </td>
                       </tr>
                   @endforeach
