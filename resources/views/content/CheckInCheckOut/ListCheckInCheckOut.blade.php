@@ -7,7 +7,7 @@
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="{{ url('home') }}">Beranda</a></li>
-      <li class="breadcrumb-item active" aria-current="page">Daftar Booking </li>
+      <li class="breadcrumb-item active" aria-current="page">Check-In dan Check-Out </li>
     </ol>
   </nav>
 
@@ -16,11 +16,11 @@
 @section('content')
 
 <h3 class="page-title">
-    <b>Daftar Booking </b> <small>Kelola Booking  </small>
+    <b>Check-In dan Check-Out </b> <small>Kelola Booking</small>
 </h3>
 <br/>
 <div id="accordion">
-    <form  method="post" action="{{ route('booking.filter') }}" enctype="multipart/form-data">
+    <form  method="post" action="{{ route('cc.filter') }}" enctype="multipart/form-data">
     @csrf
         <div class="card border border-dark">
         <div class="card-header bg-dark" id="headingOne" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
@@ -96,7 +96,7 @@
         Daftar
     </h5>
     <div class="form-actions float-right">
-        <button onclick="location.href='{{ route('booking.add') }}'" name="Find" class="btn btn-sm btn-info" title="Add Data"><i class="fa fa-plus"></i> Tambah Penyesuaian Stok</button>
+        {{-- <button onclick="location.href='{{ route('cc.add') }}'" name="Find" class="btn btn-sm btn-info" title="Add Data"><i class="fa fa-plus"></i> Tambah Check-In Baru</button> --}}
     </div>
   </div>
 
@@ -106,12 +106,13 @@
                 <thead>
                     <tr>
                         <th style="text-align: center; width: 5%">No </th>
-                        <th style="text-align: center; width: 15%">Tanggal Check-In</th>
-                        <th style="text-align: center; width: 20%">Tanggal Check-Out</th>
+                        <th style="text-align: center; width: 10%">Tanggal Check-In</th>
+                        <th style="text-align: center; width: 10%">Tanggal Check-Out</th>
                         <th style="text-align: center; width: 20%">Atas Nama</th>
-                        <th style="text-align: center; width: 20%">Kamar Dipesan</th>
-                        <th style="text-align: center; width: 20%">Uang Muka</th>
-                        <th style="text-align: center; width: 10%">Aksi</th>
+                        <th style="text-align: center; width: 10%">Kamar Dipesan</th>
+                        <th style="text-align: center; width: 10%">Uang Muka</th>
+                        <th style="text-align: center; width: 10%">Total</th>
+                        <th style="text-align: center; width: 20%">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -124,8 +125,15 @@
                         <td>{{ $row->sales_order_name }}</td>
                         <td>{{ $row->rooms->count() }}</td>
                         <td>{{ number_format($row->down_payment) }}</td>
+                        <td>{{ number_format($row->sales_order_price) }}</td>
                         <td style="text-align: center">
-                            <a type="button" class="btn btn-outline-warning btn-sm" href="{{ url('/stock-adjustment/detail/'.$row['stock_adjustment_id']) }}">Detail</a>
+                            @if ($row->sales_order_status==1)
+                            <a type="button" class="btn btn-outline-success btn-sm" onclick="proses('{{ $row->sales_order_name}}','{{route('dp.process-add',$row->sales_order_id)}}')">Check-in</a>
+                            @elseif ($row->sales_order_status==2)
+                            <a type="button" class="btn btn-outline-danger btn-sm" onclick="proses('{{ $row->sales_order_name}}','{{route('dp.process-add',$row->sales_order_id)}}')">Check-Out</a>
+                            @else
+                                <div class="w-75 px-1 rounded-pill mx-auto bg-info">Sudah Check-Out<div>
+                            @endif
                         </td>
                       </tr>
                   @endforeach
