@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\AppHelper;
 use App\Http\Controllers\Controller;
+use App\Models\SalesInvoice;
 use App\Models\SalesOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -44,7 +45,7 @@ class DownPaymentController extends Controller
         Session::put('filter-dp-add',$data);
         return redirect()->route('dp.add');
     }
-    public function processAdd($sales_order_id,$source){
+    public function processAdd($sales_order_id,$paid,$source){
         $token = Session::get('dp-token-si');
         if(empty(Session::get('dp-token-si'))){
             if($source == 'booking'){
@@ -58,12 +59,35 @@ class DownPaymentController extends Controller
         $order = SalesOrder::find($sales_order_id);
         try{
         DB::beginTransaction();
-
-
+            SalesInvoice::create([
+                'total_amount' => $order->sales_order_price,
+                'paid_amount' => $paid,
+                'change_amount' => $paid-$order->sales_order_price,
+                'sales_invoice_token' => $token,
+                'sales_invoice_date' => Carbon::now()->format('Y-m-d'),
+                'created_id' => Auth::id(),
+                'company_id' => Auth::user()->company_id,
+                'merchant_id' => empty(Auth::user()->merchant_id)??1,
+            ]);
+        $si = SalesInvoice::where('sales_invoice_token',$token)->first();
         // * Update sales order
+        $order->sales_invoice_id = $si->sales_invoice_id;
+        if($source == 'booking'){
+            $order->sales_order_status = 1;
+            $order->save();
+            DB::rollBack();
+            return redirect()->route('booking.index')->with('msg','Tambah Booking Gagal  -.');
+        }
+        elseif($source == 'direct'){
+            $order->sales_order_status = 2;
+            $order->save();
+            DB::rollBack();
+            return redirect()->route('cc.index')->with('msg','Tambah Check-In Gagal');
+        }
         $order->sales_order_status = 1;
         $order->save();
         DB::rollBack();
+        return redirect()->route('dp.index')->with('msg','Bayar Uang Muka Gagal');
     }catch(\Exception $e){
             DB::rollBack();
             if($source == 'booking'){
