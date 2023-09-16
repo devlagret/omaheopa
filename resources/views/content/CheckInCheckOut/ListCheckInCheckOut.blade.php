@@ -96,7 +96,7 @@
         Daftar
     </h5>
     <div class="form-actions float-right">
-        {{-- <button onclick="location.href='{{ route('cc.add') }}'" name="Find" class="btn btn-sm btn-info" title="Add Data"><i class="fa fa-plus"></i> Tambah Check-In Baru</button> --}}
+        <button onclick="location.href='{{ route('cc.add') }}'" name="Find" class="btn btn-sm btn-info" title="Add Data"><i class="fa fa-plus"></i> Tambah Check-In Baru</button>
     </div>
   </div>
 
@@ -131,6 +131,7 @@
                             <a type="button" class="btn btn-outline-success btn-sm" onclick="proses('{{ $row->sales_order_name}}','{{route('dp.process-add',$row->sales_order_id)}}')">Check-in</a>
                             @elseif ($row->sales_order_status==2)
                             <a type="button" class="btn btn-outline-danger btn-sm" onclick="proses('{{ $row->sales_order_name}}','{{route('dp.process-add',$row->sales_order_id)}}')">Check-Out</a>
+                            <a type="button" class="btn btn-outline-warning btn-sm" onclick="proses('{{ $row->sales_order_name}}','{{route('dp.process-add',$row->sales_order_id)}}')">Perpanjangan</a>
                             @else
                                 <div class="w-75 px-1 rounded-pill mx-auto bg-info">Sudah Check-Out<div>
                             @endif
