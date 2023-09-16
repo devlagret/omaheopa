@@ -49,15 +49,16 @@ class BookingController extends Controller
         return redirect()->route('booking.index');
     }
     public function add() {
+        Session::forget('check-in');
         Session::put('booking-token',Str::uuid());
         $sessiondata = Session::get('booking-data');
-        $roomData = collect(Session::get('booked-room-data'));
-        $booked = Session::get('booked-room-data-qty');
-        $menuData = collect(Session::get('booked-room-menu'));
-        $price=collect(Session::get('booked-room-price'));
-        $menuqty = Session::get('booked-room-menu-qty');
-        $facilityData = collect(Session::get('booked-room-facility'));
-        $facilityqty = Session::get('booked-room-facility-qty');
+        $roomData = collect(Session::get('checkin-room-data'));
+        $booked = Session::get('checkin-room-data-qty');
+        $menuData = collect(Session::get('checkin-room-menu'));
+        $price=collect(Session::get('checkin-room-price'));
+        $menuqty = Session::get('checkin-room-menu-qty');
+        $facilityData = collect(Session::get('checkin-room-facility'));
+        $facilityqty = Session::get('checkin-room-facility-qty');
         $building = CoreBuilding::get()->pluck('building_name','building_id');
         $facility = SalesRoomFacility::get()->pluck('facility_name','room_facility_id');
         $menu = SalesRoomMenu::get();
@@ -78,7 +79,7 @@ class BookingController extends Controller
     public function elementsAdd(Request $request){
         $sessiondata = Session::get('booking-data');
         if(!$sessiondata || $sessiondata == ''){
-            $sessiondata['building_name']   = '';
+            $sessiondata['atas_nama']   = '';
         }
         $sessiondata[$request->name] = $request->value;
         Session::put('booking-data', $sessiondata);
@@ -107,11 +108,10 @@ class BookingController extends Controller
         $sessiondata = Session::get('booking-data');
         try{
         $booking = SalesOrder::with('rooms')->where('data_state',0)
-        ->where('sales_order_status',0)
+        ->where('sales_order_status','!=',3)
         ->where('checkin_date','>=',$request->start_date)
         ->where('checkin_date','<=',$request->end_date)
-        ->orWhere('checkout_date','>',$request->start_date)
-        ->orWhere('sales_order_status',1)
+        ->where('checkout_date','>',$request->start_date)
         ->get()->pluck('rooms');
         $building = CoreBuilding::with('rooms:building_id,room_type_id','rooms.roomType')->find($request->building_id);
         $room = CoreRoom::where('room_type_id',$request->room_type_id)
@@ -536,7 +536,7 @@ class BookingController extends Controller
             'booked-room-data','booked-room-price',
             'booked-room-data-qty','booked-room-menu',
             'booked-room-menu-qty','booked-room-facility',
-            'booked-room-facility-qty']);
+            'booked-room-facility-qty','check-in']);
         return 1;
     }
     public function detail($sales_order_id){
@@ -549,11 +549,11 @@ class BookingController extends Controller
     }
     public function checkRoom(Request $request) {
         $booking = SalesOrder::with('rooms')->where('data_state',0)
-        ->where('sales_order_status',0)
+        ->where('sales_order_status','!=',3)
         ->where('checkin_date','>=',$request->start_date)
         ->where('checkin_date','<=',$request->end_date)
-        ->orWhere('checkout_date','>',$request->start_date)
-        ->orWhere('sales_order_status',1)
+        ->Where('checkout_date','>',$request->start_date)
+        ->Where('sales_order_status',1)
         ->get()->pluck('rooms');
         return response($booking->collapse()->pluck('room_id'));
     }

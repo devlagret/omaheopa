@@ -22,7 +22,7 @@ if (empty($paket)) {
         function function_elements_add(name, value) {
             $.ajax({
                 type: "POST",
-                url: "{{ route('booking.elements-add') }}",
+                url: "{{ isset($ci)?route('cc.elements-add'):route('booking.elements-add') }}",
                 data: {
                     'name': name,
                     'value': value,
@@ -165,6 +165,7 @@ if (empty($paket)) {
                 dataType: "html",
                 data: {
                     'no': no,
+                    'ci' : {{$ci??0}},
                     'start_date' : start_date,
                     'end_date' : end_date,
                     'room_id': room_id,
@@ -230,6 +231,7 @@ if (empty($paket)) {
                 dataType: "html",
                 data: {
                     'id': id,
+                    'ci' : {{$ci??0}},
                     'qty': qty,
                     '_token': '{{ csrf_token() }}',
                 },
@@ -269,6 +271,7 @@ if (empty($paket)) {
                 dataType: "html",
                 data: {
                     'id': id,
+                    'ci' : {{$ci??0}},
                     'qty': qty,
                     '_token': '{{ csrf_token() }}',
                 },
@@ -317,6 +320,7 @@ if (empty($paket)) {
                 dataType: "html",
                 data: {
                     'no': $('.room-facility').length,
+                    'ci' : {{$ci??0}},
                     'room_facility_id': room_facility_id,
                     '_token': '{{ csrf_token() }}',
                 },
@@ -513,6 +517,7 @@ if (empty($paket)) {
                 url: "{{ route('booking.add-menu-item') }}",
                 dataType: "html",
                 data: {
+                    'ci' : {{$ci??0}},
                     'room_menu_id': room_menu_id,
                     'no': $('.menu-item').length,
                     '_token': '{{ csrf_token() }}',
@@ -552,6 +557,7 @@ if (empty($paket)) {
                 dataType: "html",
                 data: {
                     'id': id,
+                    'ci' : {{$ci??0}},
                     'qty': qty,
                     '_token': '{{ csrf_token() }}',
                 },
@@ -684,6 +690,12 @@ if (empty($paket)) {
             $("#discount_amount").val(diskon);
             $("#total_amount_view").val(toRp(sbsAll - diskon));
             $("#total_amount").val(sbsAll - diskon);
+            $('#change_amount_view').attr('min',sbsAll - diskon);
+            if($("#payed_amount").val()!=''){
+                $("#change_amount_view").val(toRp($("#payed_amount").val()-$('#total_amount').val()));
+                $("#change_amount").val($("#payed_amount").val()-$('#total_amount').val());
+                $("#payed_amount_view").val(toRp($("#payed_amount").val()));
+            }
         }
         function reset_add(){
             clearBooked();
@@ -840,8 +852,11 @@ if (empty($paket)) {
                 getRoomPriceList(id);
             });
             $("#discount_amount_view").change(function() {
+            $("#discount_amount").val(this.value);
+            $("#discount_amount_view").val(toRp(this.value));
             var discount_percentage = (parseInt($(this).val()) / parseInt($("#total_amount").val())) * 100;
             $("#discount_percentage_total").val(discount_percentage);
+            count_total();
             });
             if($("#down_payment").val()!=''){
                 $("#down_payment_view").val(toRp($("#down_payment").val()));
@@ -850,6 +865,13 @@ if (empty($paket)) {
                 function_elements_add(this.name,this.value);
                 $("#down_payment").val(this.value);
                 $("#down_payment_view").val(toRp(this.value));
+            });
+            $("#payed_amount_view").change(function() {
+                function_elements_add(this.name,this.value);
+                $("#payed_amount").val(this.value);
+                $("#change_amount_view").val(toRp(this.value-$('#total_amount').val()));
+                $("#change_amount").val(this.value-$('#total_amount').val());
+                $("#payed_amount_view").val(toRp(this.value));
             });
             $("#no-dp").click(function () {
             if(this.checked){
@@ -881,15 +903,15 @@ if (empty($paket)) {
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ url('home') }}">Beranda</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('booking.index') }}">Daftar Booking</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Tambah Booking</li>
+            <li class="breadcrumb-item"><a href="{{ isset($ci)?route('cc.index'):route('booking.index') }}">Daftar {{isset($ci)?'Check-In':'Booking'}}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Tambah {{isset($ci)?'Check-In':'Booking'}}</li>
         </ol>
     </nav>
 
 @stop
 @section('content')
     <h3 class="page-title">
-        Form Tambah Booking
+        Form Tambah {{isset($ci)?'Check-In':'Booking'}}
     </h3>
     <br />
     @if (session('msg'))
@@ -904,7 +926,7 @@ if (empty($paket)) {
             @endforeach
         </div>
     @endif
-    <form method="post" id="form-booking" action="{{ route('booking.process-add') }}" enctype="multipart/form-data">
+    <form method="post" id="form-booking" action="{{  isset($ci)?route('cc.index'):route('booking.index')  }}" enctype="multipart/form-data">
         <div class="card border border-dark">
         <div class="card-header border-dark bg-dark">
             <h5 class="mb-0 float-left">
@@ -947,7 +969,7 @@ if (empty($paket)) {
                                     </section>
                                     <input type="date"
                                         class="form-control form-control-inline input-medium date-picker input-date"
-                                        data-date-format="dd-mm-yyyy" type="text" name="start_date" min="{{date('Y-m-d')}}" id="start_date"
+                                        data-date-format="dd-mm-yyyy" type="text" name="start_date" min="{{date('Y-m-d')}}" {{isset($ci)?'readonly':''}} id="start_date"
                                         value="{{ $sessiondata['start_date'] ?? date('Y-m-d') }}" onchange="changeDate()" style="width: 15rem;" />
                                 </div>
                             </div>
@@ -1041,8 +1063,8 @@ if (empty($paket)) {
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
-                                    <table id="example" style="width:100%"
-                                        class="table table-striped table-bordered table-hover table-full-width">
+                                    <table id="room-table-parent"
+                                        class="table table-striped table-bordered datatables table-hover table-full-width">
                                         <thead>
                                             <tr>
                                                 <th width="2%" style='text-align:center'>No</th>
@@ -1112,7 +1134,7 @@ if (empty($paket)) {
                                             @endisset
                                             @empty($room)
                                                 <tr>
-                                                    <td align="center" valign="top" colspan="7"
+                                                    <td align="center" valign="top" colspan="9"
                                                         class="dataTables_empty">No data available in table</td>
                                                 </tr>
                                             @endempty
@@ -1302,7 +1324,7 @@ if (empty($paket)) {
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
-                                    <table id="example" style="width:100%"
+                                    <table style="width:100%"
                                         class="table table-striped table-bordered datatables table-hover table-full-width">
                                         <thead>
                                             <tr>
@@ -1478,7 +1500,7 @@ if (empty($paket)) {
                     <input class="form-control input-bb" id="total_amount" type="hidden" name="total_amount" autocomplete="off" onchange="count_total()"/>
                 </div>
             </div>
-            <div class="row form-group">
+            <div class="row form-group {{isset($ci)?'d-none':''}}">
                 <div class="col-3"></div>
                 <div class="col-8">
                     <div class="form-check">
@@ -1488,7 +1510,7 @@ if (empty($paket)) {
                      </div>
                 </div>
             </div>
-            <div class="row mb-3" id="down-payment-el">
+            <div class="row mb-3 {{isset($ci)?'d-none':''}}" id="down-payment-el">
                 <div class="col-3">
                     <a id="label-payment" class="text-dark col-form-label">Uang Muka</a> *</a></a>
                 </div>
@@ -1500,7 +1522,7 @@ if (empty($paket)) {
                     <input class="form-control input-bb" id="down_payment" value="{{$sessiondata['down_payment_view']??''}}" name="down_payment" hidden/>
                 </div>
             </div>
-            <div id="without-dp" style="display: none;">
+            <div id="without-dp" style="display: {{isset($ci)?'':'none'}};">
             <div class="row mb-3">
                 <div class="col-3">
                     <a id="label-payment" class="text-dark col-form-label">Bayar</a><a class='red'> *</a></a>
@@ -1509,8 +1531,8 @@ if (empty($paket)) {
                     :
                 </div>
                 <div class="col-8">
-                    <input class="form-control required input-bb" required autocomplete="off" id="down_payment_view" name="down_payment_view" />
-                    <input class="form-control input-bb" id="down_payment" value="{{$sessiondata['down_payment_view']??''}}" name="down_payment" hidden/>
+                    <input class="form-control required input-bb" required autocomplete="off" id="payed_amount_view" name="payed_amount_view" />
+                    <input class="form-control input-bb" id="payed_amount" value="{{$sessiondata['payed_amount_view']??''}}" name="payed_amount" hidden/>
                 </div>
             </div>
             <div class="row mb-3">
@@ -1521,8 +1543,8 @@ if (empty($paket)) {
                     :
                 </div>
                 <div class="col-8">
-                    <input class="form-control required input-bb" required autocomplete="off" id="change_view" name="change_view" readonly />
-                    <input class="form-control input-bb" id="change" value="{{$sessiondata['down_payment_view']??''}}" name="down_payment" hidden/>
+                    <input class="form-control required input-bb" required autocomplete="off" id="change_amount_view" name="change_amount_view" readonly />
+                    <input class="form-control input-bb" id="change_amount" name="change_amount" hidden/>
                 </div>
             </div>
             </div>
