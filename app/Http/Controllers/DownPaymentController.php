@@ -11,6 +11,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 
 class DownPaymentController extends Controller
 {
@@ -45,7 +46,7 @@ class DownPaymentController extends Controller
         Session::put('filter-dp-add',$data);
         return redirect()->route('dp.add');
     }
-    public function processAdd($sales_order_id,$paid,$source){
+    public function processAdd($sales_order_id,$source=null){
         $token = Session::get('dp-token-si');
         if(empty(Session::get('dp-token-si'))){
             if($source == 'booking'){
@@ -61,8 +62,6 @@ class DownPaymentController extends Controller
         DB::beginTransaction();
             SalesInvoice::create([
                 'total_amount' => $order->sales_order_price,
-                'paid_amount' => $paid,
-                'change_amount' => $paid-$order->sales_order_price,
                 'sales_invoice_token' => $token,
                 'sales_invoice_date' => Carbon::now()->format('Y-m-d'),
                 'created_id' => Auth::id(),
@@ -76,20 +75,21 @@ class DownPaymentController extends Controller
             $order->sales_order_status = 1;
             $order->save();
             DB::rollBack();
-            return redirect()->route('booking.index')->with('msg','Tambah Booking Gagal  -.');
+            return redirect()->route('booking.index')->with('msg','Tambah Booking Berhasil  -.');
         }
         elseif($source == 'direct'){
             $order->sales_order_status = 2;
             $order->save();
             DB::rollBack();
-            return redirect()->route('cc.index')->with('msg','Tambah Check-In Gagal');
+            return redirect()->route('cc.index')->with('msg','Tambah Check-In Berhasil');
         }
         $order->sales_order_status = 1;
         $order->save();
-        DB::rollBack();
-        return redirect()->route('dp.index')->with('msg','Bayar Uang Muka Gagal');
+        DB::commit();
+        return redirect()->route('dp.index')->with('msg','Bayar Uang Muka Berhasil');
     }catch(\Exception $e){
             DB::rollBack();
+            report($e);
             if($source == 'booking'){
                 return redirect()->route('booking.index')->with('msg','Tambah Booking Gagal  -.');
             }
@@ -98,10 +98,9 @@ class DownPaymentController extends Controller
             }
             return redirect()->route('dp.index')->with('msg','Bayar Uang Muka Gagal');
         }
-        dump($order);
-        return redirect()->route('dp.index')->with('msg','Bayar Uang Muka Berhasil');
     }
     public function add() {
+        Session::put('dp-token-si',Str::uuid());
         $filter = Session::get('filter-dp-add');
         $booking = SalesOrder::with('rooms')->where('data_state',0)
         ->where('sales_order_status',0)
