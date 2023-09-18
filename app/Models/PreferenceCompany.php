@@ -12,6 +12,6 @@ class PreferenceCompany extends Model
     protected $primaryKey   = 'company_id';
     protected $guarded = [
         'updated_at',
-        'created_at'
+        'created_at',
     ];
 }
