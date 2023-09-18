@@ -6,12 +6,15 @@ use App\Helpers\AppHelper;
 use App\Http\Controllers\Controller;
 use App\Models\CoreBuilding;
 use App\Models\CoreRoom;
+use App\Models\PreferenceCompany;
+use App\Models\SalesInvoice;
 use App\Models\SalesOrder;
 use App\Models\SalesRoomFacility;
 use App\Models\SalesRoomMenu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 
@@ -22,6 +25,7 @@ class CheckInCheckOutController extends Controller
         $this->middleware('auth');
     }
     public function index() {
+        Session::put('cc-token',Str::uuid());
         $filter = Session::get('filter-cc');
         $booking = SalesOrder::with('rooms')->where('data_state',0)
         ->where('sales_order_status','!=',0)
@@ -34,13 +38,16 @@ class CheckInCheckOutController extends Controller
         $ci = 1;
         Session::put('booking-token',Str::uuid());
         $sessiondata = Session::get('checkin-data');
-        $roomData = collect(Session::get('booked-room-data'));
-        $booked = Session::get('booked-room-data-qty');
-        $menuData = collect(Session::get('booked-room-menu'));
-        $price=collect(Session::get('booked-room-price'));
-        $menuqty = Session::get('booked-room-menu-qty');
-        $facilityData = collect(Session::get('booked-room-facility'));
-        $facilityqty = Session::get('booked-room-facility-qty');
+        $roomData = collect(Session::get('checkin-room-data'));
+        $booked = Session::get('checkin-room-data-qty');
+        $price=collect(Session::get('checkin-room-price'));
+        //menu
+        $menuData = collect(Session::get('checkin-room-menu'));
+        $menuqty = Session::get('checkin-room-menu-qty');
+        //facility
+        $facilityData = collect(Session::get('checkin-room-facility'));
+        $facilityqty = Session::get('checkin-room-facility-qty');
+        //
         $building = CoreBuilding::get()->pluck('building_name','building_id');
         $facility = SalesRoomFacility::get()->pluck('facility_name','room_facility_id');
         $menu = SalesRoomMenu::get();
@@ -70,5 +77,61 @@ class CheckInCheckOutController extends Controller
         $sessiondata = Session::get('checkin-data');
         $sessiondata[$request->name] = $request->value;
         Session::put('checkin-data', $sessiondata);
+    }
+    public function extend($sales_order_id) {
+        $data = SalesOrder::with(['rooms','facilities','menus'])->find($sales_order_id);
+        $room = CoreRoom::with(['price','roomType','building'])->whereIn('room_id',$data->rooms->pluck('room_id'))->get();
+        $facility = SalesRoomFacility::whereIn('room_facility_id',$data->facilities->pluck('room_facility_id'))->get();
+        $menu = SalesRoomMenu::whereIn('room_menu_id',$data->menus->pluck('room_menu_id'))->get();
+        $menutype = AppHelper::menuType();
+        return  view('content.CheckInCheckOut.ExtendCheckIn',compact('data','room','facility','menu','menutype'));
+    }
+    public function processExtend(){
+
+    }
+    public function check(Request $request){
+        $pref = PreferenceCompany::find(Auth::user()->company_id,['checkin_time','checkout_time']);
+        $now = Carbon::now()->format('Y-m-d');
+        $order = SalesOrder::find($request->sales_order_id);
+        $sales = SalesInvoice::find($order->sales_invoice_id);
+        return response()->json(['status'=>Carbon::now()->format('H:i:s')>$pref->checkout_time,'late'=>$now>Carbon::parse($order->checkout_date),'diff'=>Carbon::parse($order->checkout_date)->diffInDays($now),'needtopay'=>$order->sales_order_price-$order->down_payment]);
+    }
+    public function processCheckOut(Request $request) {
+        $token = Session::get('cc-token');
+        if(empty(Session::get('cc-token'))){
+            return redirect()->back()->with('msg',"Check-Out Berhasil -");
+        }
+        $field = $request->validate(['payed_amount'=>'required','sales_order_id'=>'required'],['payed_amount.required'=>'Uang Yang dibayar Harus Dimasukan','sales_order_id.required'=>'Error']);
+        $order = SalesOrder::find($request->sales_order_id);
+        $invoice = SalesInvoice::find($order->sales_invoice_id);
+        try{
+            DB::beginTransaction();
+            $order->sales_order_status= 3;
+            $order->save();
+            if($request->use_penalty){
+                $invoice->penalty_amount = $request->pinalty;
+            }
+            $invoice->paid_amount = $field['paid_amount'];
+            $invoice->change_amount = $request->change_amount;
+            $invoice->update_id = Auth::id();
+
+            Session::forget('cc-token');
+            DB::commit();
+            return redirect()->back(200)->with('msg','Check-Out Berhasil');
+        }catch(\Exception $e){
+            DB::rollBack();
+            return dump($e);
+            // report($e);
+            // return redirect()->back(200)->with('msg','Check-Out Gagal');
+        }
+     
+    }
+    public function getPenalty(Request $request) {
+        $total = 0;
+        $order = SalesOrder::with('rooms')->find($request->sales_order_id);
+        foreach($order->rooms as $val) {
+            $total += $val->room_price;
+        }
+        return $total;
     }
 }
