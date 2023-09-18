@@ -19,6 +19,7 @@ use App\Http\Controllers\CoreRoomTypeController;
 use App\Http\Controllers\CoreSupplierController;
 use App\Http\Controllers\DownPaymentController;
 use App\Http\Controllers\GeneralLedgerController;
+use App\Http\Controllers\PreferenceCompanyController;
 use App\Http\Controllers\RestoreDataController;
 use App\Http\Controllers\SalesMerchantController;
 use App\Http\Controllers\SalesRoomMenuController;
@@ -51,6 +52,7 @@ use App\Http\Controllers\SalesInvoiceController;
 use App\Http\Controllers\SalesInvoiceReportController;
 use App\Http\Controllers\SalesRoomFacilityController;
 use App\Http\Controllers\SalesRoomPriceController;
+use App\Http\Controllers\SystemLogsController;
 use Illuminate\Support\Facades\Auth;
 
 /*
@@ -474,15 +476,27 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
  Route::prefix('checkin-checkout')->name('cc.')->group(function () {
     Route::get('/', [CheckInCheckOutController::class, 'index'])->name('index');
     Route::get('/add', [CheckInCheckOutController::class, 'add'])->name('add');
+    Route::post('/check', [CheckInCheckOutController::class, 'check'])->name('check');
+    Route::post('/get-penalty', [CheckInCheckOutController::class, 'getPenalty'])->name('get-penalty');
+    Route::get('/extend/{sales_order_id?}', [CheckInCheckOutController::class, 'extend'])->name('extend');
+    Route::post('/process-extend', [CheckInCheckOutController::class, 'processExtend'])->name('process-extend');
     Route::post('/process-add', [CheckInCheckOutController::class, 'processAdd'])->name('process-add');
-    Route::get('/edit/{merchant_id}', [CheckInCheckOutController::class, 'edit'])->name('edit');
+    Route::post('/process-checkout', [CheckInCheckOutController::class, 'processCheckOut'])->name('process-checkout');
+    Route::get('/edit/{sales_order_id}', [CheckInCheckOutController::class, 'edit'])->name('edit');
     Route::post('/process-edit', [CheckInCheckOutController::class, 'processEdit'])->name('process-edit');
-    Route::get('/delete/{merchant_id}', [CheckInCheckOutController::class, 'delete'])->name('delete');
+    Route::get('/delete/{sales_order_id}', [CheckInCheckOutController::class, 'delete'])->name('delete');
     Route::post('/filter', [CheckInCheckOutController::class, 'filter'])->name('filter');
     Route::post('/elements-add', [CheckInCheckOutController::class, 'elementsAdd'])->name('elements-add');
 });
+ Route::prefix('cc-time')->name('ct.')->group(function () {
+    Route::get('/', [PreferenceCompanyController::class, 'index'])->name('index');
+    Route::post('/process-edit', [PreferenceCompanyController::class, 'processEditCCTime'])->name('process-edit-cc-time');
+});
 
-
+Route::prefix('log')->name('log.')->group(function () {
+    Route::resource('system', SystemLogsController::class)->only(['index', 'destroy']);
+    Route::get('system/del', [SystemLogsController::class,'destroy'])->name('destroy');
+});
 
 //penerimaan barang / invgoods received
 
