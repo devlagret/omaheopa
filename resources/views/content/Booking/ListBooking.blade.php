@@ -20,7 +20,7 @@
 </h3>
 <br/>
 <div id="accordion">
-    <form  method="post" action="{{ route('dp.filter') }}" enctype="multipart/form-data">
+    <form  method="post" action="{{ route('booking.filter') }}" enctype="multipart/form-data">
     @csrf
         <div class="card border border-dark">
         <div class="card-header bg-dark" id="headingOne" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
@@ -131,6 +131,7 @@
                           <a type="button" class="btn btn-outline-warning btn-sm" href="{{ route('booking.edit',$row->sales_order_id) }}">Edit</a>
                           <a type="button" class="btn btn-outline-danger btn-sm" href="{{ route('booking.delete',$row->sales_order_id) }}">Hapus</a>
                           @endif
+                          <div class="px-1 rounded-pill mx-auto bg-info mb-2"> Sudah Bayar Uang Muka </div>
                             <a type="button" class="btn btn-outline-info btn-sm" href="{{ route('booking.detail',$row->sales_order_id) }}">Detail</a>
                         </td>
                       </tr>

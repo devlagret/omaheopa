@@ -98,6 +98,7 @@ if (empty($paket)) {
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function(return_data) {
+                    console.log(return_data);
                     function_elements_add('building_id', building_id);
                     $('#room_type_id').html(return_data);
                     changeRoom($('#room_type_id').val());
@@ -386,6 +387,7 @@ if (empty($paket)) {
                 dataType: "html",
                 data: {
                     'room_price_id': room_price_id,
+                    'ci' : {{$ci??0}},
                     'room_id': save_id,
                     '_token': '{{ csrf_token() }}',
                 },
@@ -782,6 +784,7 @@ if (empty($paket)) {
                 data: {
                     'start_date' : start_date,
                     'end_date' : end_date,
+                    'ci' : {{$ci??0}},
                     'room_id': id,
                     '_token': '{{ csrf_token() }}',
                 },
@@ -809,7 +812,6 @@ if (empty($paket)) {
         function setRoomPrice(){
             $(".room-price-select").each(function() {
                         id=$(this).data('id');
-                        console.log({'pprice_id':id})
                         changePrice(id,$(this).val(),0);
             });
             subtotal();
@@ -894,7 +896,7 @@ if (empty($paket)) {
             setTimeout(function () {
                 $(".modal-backdrop.fade").remove();
             },6000);
-           
+
         });
     </script>
 @stop
@@ -926,14 +928,14 @@ if (empty($paket)) {
             @endforeach
         </div>
     @endif
-    <form method="post" id="form-booking" action="{{  isset($ci)?route('cc.index'):route('booking.index')  }}" enctype="multipart/form-data">
+    <form method="post" id="form-booking" action="{{  isset($ci)?route('cc.process-add'):route('booking.process-add')  }}" enctype="multipart/form-data">
         <div class="card border border-dark">
         <div class="card-header border-dark bg-dark">
             <h5 class="mb-0 float-left">
                 Form Tambah
             </h5>
             <div class="float-right">
-                <button onclick="location.href='{{ route('booking.index') }}'" name="Find" class="btn btn-sm btn-info"
+                <button onclick="location.href='{{ isset($ci)?route('cc.index'):route('booking.index') }}'" name="Find" class="btn btn-sm btn-info"
                     title="Back"><i class="fa fa-angle-left"></i> Kembali</button>
             </div>
         </div>
@@ -1496,8 +1498,8 @@ if (empty($paket)) {
                     :
                 </div>
                 <div class="col-8">
-                    <input class="form-control input-bb" id="total_amount_view" name="total_amount_view" autocomplete="off" onchange="count_total()"/>
-                    <input class="form-control input-bb" id="total_amount" type="hidden" name="total_amount" autocomplete="off" onchange="count_total()"/>
+                    <input class="form-control input-bb" id="total_amount_view" name="total_amount_view" autocomplete="off" readonly/>
+                    <input class="form-control input-bb" id="total_amount" type="hidden" name="total_amount" autocomplete="off" />
                 </div>
             </div>
             <div class="row form-group {{isset($ci)?'d-none':''}}">
@@ -1522,31 +1524,31 @@ if (empty($paket)) {
                     <input class="form-control input-bb" id="down_payment" value="{{$sessiondata['down_payment_view']??''}}" name="down_payment" hidden/>
                 </div>
             </div>
-            <div id="without-dp" style="display: {{isset($ci)?'':'none'}};">
-            <div class="row mb-3">
-                <div class="col-3">
-                    <a id="label-payment" class="text-dark col-form-label">Bayar</a><a class='red'> *</a></a>
+            <div id="without-dp" style="display: none;">
+                <div class="row mb-3">
+                    <div class="col-3">
+                        <a id="label-payment" class="text-dark col-form-label">Bayar</a><a class='red'> *</a></a>
+                    </div>
+                    <div class="col-auto">
+                        :
+                    </div>
+                    <div class="col-8">
+                        <input class="form-control required input-bb" required autocomplete="off" id="payed_amount_view" name="payed_amount_view" />
+                        <input class="form-control input-bb" id="payed_amount" value="{{$sessiondata['payed_amount_view']??''}}" name="payed_amount" hidden/>
+                    </div>
                 </div>
-                <div class="col-auto">
-                    :
+                <div class="row mb-3">
+                    <div class="col-3">
+                        <a id="label-payment" class="text-dark col-form-label">Kembalian</a><a class='red'> *</a></a>
+                    </div>
+                    <div class="col-auto">
+                        :
+                    </div>
+                    <div class="col-8">
+                        <input class="form-control required input-bb" required autocomplete="off" id="change_amount_view" name="change_amount_view" readonly />
+                        <input class="form-control input-bb" id="change_amount" name="change_amount" hidden/>
+                    </div>
                 </div>
-                <div class="col-8">
-                    <input class="form-control required input-bb" required autocomplete="off" id="payed_amount_view" name="payed_amount_view" />
-                    <input class="form-control input-bb" id="payed_amount" value="{{$sessiondata['payed_amount_view']??''}}" name="payed_amount" hidden/>
-                </div>
-            </div>
-            <div class="row mb-3">
-                <div class="col-3">
-                    <a id="label-payment" class="text-dark col-form-label">Kembalian</a><a class='red'> *</a></a>
-                </div>
-                <div class="col-auto">
-                    :
-                </div>
-                <div class="col-8">
-                    <input class="form-control required input-bb" required autocomplete="off" id="change_amount_view" name="change_amount_view" readonly />
-                    <input class="form-control input-bb" id="change_amount" name="change_amount" hidden/>
-                </div>
-            </div>
             </div>
             <br>
             <div class="">
