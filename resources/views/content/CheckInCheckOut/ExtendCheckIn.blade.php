@@ -48,7 +48,10 @@
             <div class="card-body">
                 <div class="card">
                     <div class="card-body">
-                        <div class="row form-group mt-5">
+                        <form action="{{route('cc.process-extend')}}" method="post">
+                            @csrf
+                            <input type="hidden" name="sales_order_id" id="sales_order_id" value="{{$data->sales_order_id}}">
+                        <div class="row form-group">
                             <div class="col-md-6">
                                 <div class="form-group form-md-line-input">
                                     <section class="control-label">Tanggal Check-In
@@ -58,8 +61,8 @@
                                     </section>
                                     <input type="date"
                                         class="form-control form-control-inline input-medium date-picker input-date"
-                                        data-date-format="dd-mm-yyyy" type="text" name="start_date" min="{{date('Y-m-d')}}" {{isset($ci)?'readonly':''}} id="start_date"
-                                        value="{{ $sessiondata['start_date'] ?? date('Y-m-d') }}" onchange="changeDate()" style="width: 15rem;" />
+                                        data-date-format="dd-mm-yyyy" type="text" name="checkin_date" readonly id="checkin_date"
+                                        value="{{ $data->checkin_date ?? date('Y-m-d') }}" onchange="changeDate()" style="width: 15rem;" />
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -71,8 +74,8 @@
                                     </section>
                                     <input type="date"
                                         class="form-control form-control-inline input-medium date-picker input-date"
-                                        data-date-format="dd-mm-yyyy" type="text" name="end_date" id="end_date"
-                                        value="{{ $sessiondata['end_date'] ?? date('Y-m-d') }}" onchange="changeDate()" style="width: 15rem;" />
+                                        data-date-format="dd-mm-yyyy" type="text" name="checkout_date" id="checkout_date"
+                                        value="{{ $sessiondata['checkout_date'] ?? $data->checkout_date }}" min="{{$data->checkout_date}}" onchange="changeDate()" style="width: 15rem;" />
                                     <input type="text" name="days_booked" id="days_booked" hidden/>
                                 </div>
                             </div>
@@ -86,39 +89,43 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <h5 class="col">
-                                Atas Nama : {{ $data->sales_order_name }}
-                            </h5>
-                            <h5 class="col">
-                                Subtotal : Rp {{ number_format(empty($data->discount)?$data->sales_order_price:$data->sales_order_price/(100-$data->discount)*100,2)  }}
-                            </h5>
-                        </div>
-                        <div class="row">
-                            <h5 class="col">
-                                Tanggal Check-In : {{ date('d-m-Y', strtotime($data->checkin_date)) }}
-                            </h5>
-                            <h5 class="col">
-                                Diskon : {{ $data->discount??0 }} %
-                            </h5>
-                        </div>
-                        <div class="row">
-                            <h5 class="col">
-                                Tanggal Check-Out : Rp {{ date('d-m-Y', strtotime($data->checkout_date)) }}
-                            </h5>
-                            <h5 class="col">
-                                Total :  {{ number_format($data->sales_order_price,2) }}
-                            </h5>
-                        </div>
-                        <div class="row">
-                            <h5 class="col">
-                                Uang Muka : Rp {{ number_format($data->down_payment,2) }}
-                            </h5>
-                        </div>
-                        <div class="float-right">
-                            <button onclick="location.href='{{ route('cc.index') }}'" name="Find" class="btn btn-sm btn-info"
-                              title="Back"><i class="fa fa-angle-left"></i> Kembali</button>
-                        </div>
+
+                                <div class="row">
+                                    <h5 class="col">
+                                        Atas Nama : {{ $data->sales_order_name }}
+                                    </h5>
+                                    <h5 class="col">
+                                        Subtotal : Rp {{ number_format(empty($data->discount)?$data->sales_order_price:$data->sales_order_price/(100-$data->discount)*100,2)  }}
+                                    </h5>
+                                </div>
+                                <div class="row">
+                                    <h5 class="col">
+                                        Tanggal Check-In : {{ date('d-m-Y', strtotime($data->checkin_date)) }}
+                                    </h5>
+                                    <h5 class="col">
+                                        Diskon : {{ $data->discount??0 }} %
+                                    </h5>
+                                </div>
+                                <div class="row">
+                                    <h5 class="col">
+                                        Tanggal Check-Out : Rp {{ date('d-m-Y', strtotime($data->checkout_date)) }}
+                                    </h5>
+                                    <h5 class="col">
+                                        Total :  {{ number_format($data->sales_order_price,2) }}
+                                    </h5>
+                                </div>
+                                <div class="row">
+                                    <h5 class="col">
+                                        Uang Muka : Rp {{ number_format($data->down_payment,2) }}
+                                    </h5>
+                                </div>
+                                <div class="float-right">
+                                    <button type="reset" name="reset" class="btn btn-danger"
+                                    title="Reset"><i class="fa fa-times"></i> Reset</button>
+                                    <button type="submit" name="submit" class="btn btn-info"
+                                    title="Simpan"><i class="fa fa-save"></i> Simpan</button>
+                                </div>
+                        </form>
                     </div>
                 </div>
                 <div class="card border border-dark">

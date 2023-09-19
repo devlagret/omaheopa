@@ -4,6 +4,11 @@
 
 @section('js')
 <script>
+    function check(name,uri){
+        if(confirm(`Yakin Ingin Membatalkan Check-in atas nama '`+name+`' ?`)){
+        window.location.href = uri;
+        }
+    }
     function getPenalty(id){
         loadingWidget();
         $.ajax({
@@ -185,7 +190,7 @@
                 <div class="row ">
                     <div class = "col-md-6">
                         <div class="form-group form-md-line-input">
-                            <section class="control-label">Tanggal Check-In
+                            <section class="control-label">Tanggal Mulai
                                 <span class="required text-danger">
                                     *
                                 </span>
@@ -196,7 +201,7 @@
 
                     <div class = "col-md-6">
                         <div class="form-group form-md-line-input">
-                            <section class="control-label">Tanggal Check-Out
+                            <section class="control-label">Tanggal Akhir
                                 <span class="required text-danger">
                                     *
                                 </span>
@@ -275,16 +280,25 @@
                         <td>{{ $row->checkout_date }}</td>
                         <td>{{ $row->sales_order_name }}</td>
                         <td>{{ $row->rooms->count() }}</td>
-                        <td>{{ number_format($row->down_payment) }}</td>
+                        <td>
+                            @if($row->sales_order_type==0)
+                            {{  number_format($row->down_payment) }}
+                            @else
+                            <div class="text-center px-auto rounded-pill mx-auto bg-info" style="font-size:0.9rem;">Langsung Check-In<div>
+                            @endif
+                        </td>
                         <td>{{ number_format($row->sales_order_price) }}</td>
                         <td style="text-align: center">
                             @if ($row->sales_order_status==1)
                             <a type="button" class="btn btn-outline-success btn-sm" onclick="proses('{{ $row->sales_order_name}}','{{route('dp.process-add',$row->sales_order_id)}}')">Check-in</a>
                             @elseif ($row->sales_order_status==2)
                             <a type="button" class="btn btn-outline-danger btn-sm" onclick="checkout('{{ $row->sales_order_id}}',{{$row->sales_order_price}})">Check-Out</a>
-                            <a type="button" class="btn btn-outline-primary btn-sm" href="{{route('cc.extend')}}">Perpanjangan</a>
+                            <a type="button" class="btn btn-outline-primary btn-sm" href="{{route('cc.extend',$row->sales_order_id)}}">Perpanjangan</a>
                             @else
                                 <div class="w-75 px-1 rounded-pill mx-auto bg-info">Sudah Check-Out<div>
+                            @endif
+                            @if($row->sales_order_type==1&& $row->checkin_date == date('Y-m-d'))
+                            <a type="button" class="btn btn-outline-secondary btn-sm" onclick="check('{{ $row->sales_order_name}}','{{route('cc.delete',$row->sales_order_id)}}')">Batal</a>
                             @endif
                         </td>
                       </tr>
