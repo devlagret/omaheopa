@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CoreBuilding;
 use App\Models\CorePriceType;
 use App\Models\CoreRoom;
+use App\Models\CoreRoomType;
 use App\Models\SalesRoomPrice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -44,7 +45,7 @@ class SalesRoomPriceController extends Controller
         $request->validate([
             'room_id' => 'integer',
         ],['room_id.integer'=>'Bangunan Tidak Memiliki Kamar']);
-        dump($request->all());return 1;
+        // dump($request->all());return 1;
         if(SalesRoomPrice::create([
             'room_id'=>$request->room_id,
             'price_type_id'=>$request->price_type_id,
@@ -90,13 +91,14 @@ class SalesRoomPriceController extends Controller
         $data = '';
         $sessiondata = Session::get('room-price-data');
         try{
-        $building = CoreBuilding::with('rooms:building_id,room_type_id','rooms.roomType')->find($request->building_id);
+            $building = CoreRoom::where('building_id',$request->building_id)->groupBy('room_type_id')->get('room_type_id')->pluck('room_type_id');
+            $type = CoreRoomType::whereIn('room_type_id',$building)->get();
         $sessiondata['room_type_id'] ?? $sessiondata['room_type_id'] = 1;
-        if ($building->rooms->count() == 0) {
+        if ($building->count() == 0) {
             $data = "<option>Bangunan Tidak Memiliki Kamar</option>\n";
         }
-        foreach ( $building->rooms as $val) {
-            $data .= "<option value='".$val->roomType->room_type_id."' " . ($sessiondata['room_type_id'] == $val->roomType->room_type_id ? 'selected' : '') .">".$val->roomType->room_type_name."</option>\n";
+        foreach ( $type as $val) {
+            $data .= "<option value='".$val->room_type_id."' " . ($sessiondata['room_type_id'] == $val->room_type_id ? 'selected' : '') .">".$val->room_type_name."</option>\n";
         }
         return response($data);
     }catch(\Exception $e){

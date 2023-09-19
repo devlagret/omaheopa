@@ -66,7 +66,7 @@ class DownPaymentController extends Controller
                 'sales_invoice_date' => Carbon::now()->format('Y-m-d'),
                 'created_id' => Auth::id(),
                 'company_id' => Auth::user()->company_id,
-                'merchant_id' => empty(Auth::user()->merchant_id)??1,
+                'merchant_id' =>  empty(Auth::user()->merchant_id)?1:Auth::user()->merchant_id,
             ]);
         $si = SalesInvoice::where('sales_invoice_token',$token)->first();
         // * Update sales order
@@ -77,12 +77,6 @@ class DownPaymentController extends Controller
             DB::rollBack();
             return redirect()->route('booking.index')->with('msg','Tambah Booking Berhasil  -.');
         }
-        elseif($source == 'direct'){
-            $order->sales_order_status = 2;
-            $order->save();
-            DB::rollBack();
-            return redirect()->route('cc.index')->with('msg','Tambah Check-In Berhasil');
-        }
         $order->sales_order_status = 1;
         $order->save();
         DB::commit();
@@ -92,9 +86,6 @@ class DownPaymentController extends Controller
             report($e);
             if($source == 'booking'){
                 return redirect()->route('booking.index')->with('msg','Tambah Booking Gagal  -.');
-            }
-            elseif($source == 'direct'){
-                return redirect()->route('cc.index')->with('msg','Tambah Check-In Gagal');
             }
             return redirect()->route('dp.index')->with('msg','Bayar Uang Muka Gagal');
         }
