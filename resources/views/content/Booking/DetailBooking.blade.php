@@ -9,7 +9,7 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ url('home') }}">Beranda</a></li>
             <li class="breadcrumb-item"><a href="{{ route('booking.index') }}">Daftar Booking</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Detail Booking</li>
+            <li class="breadcrumb-item active" aria-current="page">{{isset($rsc)?'Rescedule':'Detail'}} Booking</li>
         </ol>
     </nav>
 
@@ -18,7 +18,7 @@
 @section('content')
 
     <h3 class="page-title">
-        <b>Detail Booking Booking </b> <small>Kelola Booking </small>
+        <b>{{isset($rsc)?'Rescedule':'Detail'}} Booking </b> <small>Kelola Booking </small>
     </h3>
 
     @if (session('msg'))
@@ -48,6 +48,51 @@
             <div class="card-body">
                 <div class="card">
                     <div class="card-body">
+                        @isset($rsc)
+                        <form action="{{route('cc.process-extend')}}" id="form-extend" method="post">
+                            @csrf
+                            <input type="hidden" name="sales_order_id" id="sales_order_id" value="{{$data->sales_order_id}}">
+                        <div class="row form-group" id="date-in">
+                            <div class="col-md-6">
+                                <div class="form-group form-md-line-input">
+                                    <section class="control-label">Tanggal Check-In
+                                        <span class="required text-danger">
+                                            *
+                                        </span>
+                                    </section>
+                                    <input type="date"
+                                        class="form-control form-control-inline input-medium date-picker input-date"
+                                        data-date-format="dd-mm-yyyy" type="text" name="checkin_date" id="checkin_date"
+                                        value="{{ $data->checkin_date ?? date('Y-m-d') }}" style="width: 15rem;" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group form-md-line-input">
+                                    <section class="control-label">Tanggal Check-Out
+                                        <span class="required text-danger">
+                                            *
+                                        </span>
+                                    </section>
+                                    <input type="date"
+                                        class="form-control form-control-inline input-medium date-picker input-date"
+                                        data-date-format="dd-mm-yyyy" type="text" name="checkout_date" id="checkout_date"
+                                        value="{{ $sessiondata['checkout_date'] ?? $data->checkout_date }}" min="{{$data->checkout_date}}" style="width: 15rem;" />
+                                    <input type="text" name="checkout_date_old" id="checkout_date_old" value="{{$data->checkout_date}}" hidden/>
+                                    <input type="text" name="days_booked" id="days_booked" hidden/>
+                                </div>
+                            </div>
+                            <div class="col d-none">
+                                <div class="form-group">
+                                    <a class="text-dark">Malam<a class='red'> *</a></a>
+                                    <input class="form-control required input-bb" required form="form-barang" name="night"
+                                        id="night" type="number" min="0" autocomplete="off"
+                                        onchange="function_elements_add(this.name, this.value)"
+                                        value="{{ $sessiondata['night'] ?? '' }}" />
+                                </div>
+                            </div>
+                        </div>
+                        @endisset
+
                         <div class="row">
                             <h5 class="col">
                                 Atas Nama : {{ $data->sales_order_name }}
@@ -77,6 +122,15 @@
                                 Uang Muka : Rp {{ number_format($data->down_payment,2) }}
                             </h5>
                         </div>
+                        @isset($rsc)
+                        <div class="float-right" id="form-btn">
+                            <button type="reset" name="reset" class="btn btn-danger"
+                            title="Reset"><i class="fa fa-times"></i> Reset</button>
+                            <button type="button" onclick="check('{{$data->sales_order_id}}')" name="simpan" class="btn btn-info"
+                            title="Simpan"><i class="fa fa-save"></i> Simpan</button>
+                        </div>
+                </form>
+                @endisset
                     </div>
                 </div>
                 <div class="card border border-dark">

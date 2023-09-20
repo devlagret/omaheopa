@@ -459,6 +459,8 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
     Route::get('/delete/{sales_order_id}', [BookingController::class, 'delete'])->name('delete');
     Route::post('/elements-add', [BookingController::class, 'elementsAdd'])->name('elements-add');
     Route::get('/reset', [BookingController::class, 'resetSession'])->name('reset');
+    Route::get('/rescedule/{sales_order_id}', [BookingController::class, 'rescedule'])->name('rescedule');
+    Route::post('/process-rescedule', [BookingController::class, 'processRescedule'])->name('process-rescedule');
 });
  // DP (Down Paymwnt) pages
  Route::prefix('down-payment')->name('dp.')->group(function () {
@@ -477,6 +479,7 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
     Route::get('/', [CheckInCheckOutController::class, 'index'])->name('index');
     Route::get('/add', [CheckInCheckOutController::class, 'add'])->name('add');
     Route::post('/check', [CheckInCheckOutController::class, 'check'])->name('check');
+    Route::post('/check-ext', [CheckInCheckOutController::class, 'checkExtend'])->name('check-extend');
     Route::post('/get-penalty', [CheckInCheckOutController::class, 'getPenalty'])->name('get-penalty');
     Route::get('/extend/{sales_order_id?}', [CheckInCheckOutController::class, 'extend'])->name('extend');
     Route::post('/process-extend', [CheckInCheckOutController::class, 'processExtend'])->name('process-extend');

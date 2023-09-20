@@ -8,6 +8,7 @@ use App\Models\CoreBuilding;
 use App\Models\CorePriceType;
 use App\Models\CoreRoom;
 use App\Models\CoreRoomType;
+use App\Models\SalesInvoice;
 use App\Models\SalesOrder;
 use App\Models\SalesOrderFacility;
 use App\Models\SalesOrderMenu;
@@ -74,9 +75,10 @@ class BookingController extends Controller
                   ->orWhereNull('room_price_end_date')
                   ->orderByDesc('price_type_id');
         }])->whereIn('room_id',$roomData->flatten())->get();
+        $ordertype= AppHelper::orderType();
         $facilityitm = SalesRoomFacility::whereIn('room_facility_id',$facilityData->flatten())->get();
         $menuItm = SalesRoomMenu::whereIn('room_menu_id',$menuData->flatten())->get();
-        return view('content.Booking.FormAddBooking',compact('sessiondata','price','menutype','facility','booked','room','building','menuqty','facilityqty','facilityitm','menuItm'));
+        return view('content.Booking.FormAddBooking',compact('sessiondata','price','menutype','facility','ordertype','booked','room','building','menuqty','facilityqty','facilityitm','menuItm'));
     }
     public function elementsAdd(Request $request){
         $sessiondata = Session::get('booking-data');
@@ -524,12 +526,33 @@ class BookingController extends Controller
         return 0;
         try{
             DB::beginTransaction();
+            $down_payment=null;$sales_invoice_id=null;$sales_order_status=0;
+            if($request->sales_order_type==0){
+                $down_payment = $request->down_payment;
+            }elseif($request->sales_order_type==3){
+                $sales_order_status = 2;
+            }elseif($request->sales_order_type==4){
+                $sales_order_status = 2;
+                SalesInvoice::create([
+                    'total_amount' => $request->total_amount,
+                    'sales_invoice_token' => $token,
+                    'sales_invoice_date' => Carbon::now()->format('Y-m-d'),
+                    'created_id' => Auth::id(),
+                    'company_id' => Auth::user()->company_id,
+                    'merchant_id' => empty(Auth::user()->merchant_id)?1:Auth::user()->merchant_id,
+                ]);
+                $si = SalesInvoice::where('sales_invoice_token',$token)->first();
+                $sales_invoice_id = $si->sales_invoice_id;
+            }
             SalesOrder::create([
                 'checkin_date' =>$start_date,
                 'checkout_date' =>$end_date,
+                'sales_invoice_id' =>$sales_invoice_id,
+                'sales_order_status' =>$sales_order_status,
                 'sales_order_price' =>$request->total_amount,
                 'discount' =>$request->discount_percentage_total,
-                'down_payment' =>$field['down_payment'],
+                'down_payment' =>$down_payment,
+                'sales_order_type' => $request->sales_order_type,
                 'order_date' => Carbon::now()->format('Y-m-d'),
                 'sales_order_name' => $field['atas_nama'],
                 'created_id'    => Auth::id(),
@@ -613,5 +636,17 @@ class BookingController extends Controller
         ->Where('sales_order_status',1)
         ->get()->pluck('rooms');
         return response($booking->collapse()->pluck('room_id'));
+    }
+    public function rescedule($sales_order_id) {
+        $rsc =1;
+        $data = SalesOrder::with(['rooms','facilities','menus'])->find($sales_order_id);
+        $room = CoreRoom::with(['price','roomType','building'])->whereIn('room_id',$data->rooms->pluck('room_id'))->get();
+        $facility = SalesRoomFacility::whereIn('room_facility_id',$data->facilities->pluck('room_facility_id'))->get();
+        $menu = SalesRoomMenu::whereIn('room_menu_id',$data->menus->pluck('room_menu_id'))->get();
+        $menutype = AppHelper::menuType();
+        return  view('content.Booking.DetailBooking',compact('data','room','facility','menu','menutype','rsc'));
+    }
+    public function processRescedule() {
+        
     }
 }

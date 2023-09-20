@@ -112,7 +112,7 @@
                         <th style="text-align: center; width: 10%">Kamar Dipesan</th>
                         <th style="text-align: center; width: 10%">Harga</th>
                         <th style="text-align: center; width: 10%">Uang Muka</th>
-                        <th style="text-align: center; width: 10%">Aksi</th>
+                        <th style="text-align: center; width: 15%">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -128,11 +128,13 @@
                         <td>{{ number_format($row->down_payment) }}</td>
                         <td style="text-align: center">
                             @if (!$row->sales_order_status)
+                          <a type="button" class="btn btn-outline-primary btn-sm" href="{{ route('booking.rescedule',$row->sales_order_id) }}">Rescedule</a>
                           <a type="button" class="btn btn-outline-warning btn-sm" href="{{ route('booking.edit',$row->sales_order_id) }}">Edit</a>
                           <a type="button" class="btn btn-outline-danger btn-sm" href="{{ route('booking.delete',$row->sales_order_id) }}">Hapus</a>
-                          @endif
+                          @else
                           <div class="px-1 rounded-pill mx-auto bg-info mb-2"> Sudah Bayar Uang Muka </div>
-                            <a type="button" class="btn btn-outline-info btn-sm" href="{{ route('booking.detail',$row->sales_order_id) }}">Detail</a>
+                          @endif
+                            <a type="button" class="btn btn-outline-dark btn-sm" href="{{ route('booking.detail',$row->sales_order_id) }}">Detail</a>
                         </td>
                       </tr>
                   @endforeach

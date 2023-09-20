@@ -875,19 +875,30 @@ if (empty($paket)) {
                 $("#change_amount").val(this.value-$('#total_amount').val());
                 $("#payed_amount_view").val(toRp(this.value));
             });
-            $("#no-dp").click(function () {
-            if(this.checked){
-                $('#down_payment').prop('disabled', false);
-                $('#change').prop('disabled', true);
-                $('#no-dp-input').val(1);
-                $('#without-dp').show();
-                $('#down-payment-el').hide();
-            }else{
-                $('#down_payment').prop('disabled', true);
-                $('#change').prop('disabled', false);
-                $('#no-dp-input').val(0);
-                $('#without-dp').hide();
+            if($('#sales_order_type').val()!=''){
+                var sot = $('#sales_order_type').val();
+                if(sot == 0){
                 $('#down-payment-el').show();
+                $('#without-dp').hide();
+            }else if(sot == 3){
+                $('#down-payment-el').hide();
+                $('#without-dp').hide();
+            }else if(sot == 4){
+                $('#down-payment-el').hide();
+                $('#without-dp').show();
+            }
+            }
+            $("#sales_order_type").change(function () {
+           console.log(this.value);
+            if(this.value == 0){
+                $('#down-payment-el').show();
+                $('#without-dp').hide();
+            }else if(this.value == 3){
+                $('#down-payment-el').hide();
+                $('#without-dp').hide();
+            }else if(this.value == 4){
+                $('#down-payment-el').hide();
+                $('#without-dp').show();
             }
         });
             if(index >= 4){
@@ -1503,18 +1514,23 @@ if (empty($paket)) {
                 </div>
             </div>
             <div class="row form-group {{isset($ci)?'d-none':''}}">
-                <div class="col-3"></div>
+                <div class="col-3">Tipe Booking</div>
+                <div class="col-auto">:</div>
                 <div class="col-8">
-                    <div class="form-check">
-                        <input class="form-check-input" id="no-dp" type="checkbox" >
-                        <input class="form-check-input" name="no-dp" value='0' id="no-dp-input" hidden />
-                        <label class="form-check-label">Tanpa Uang Muka</label>
-                     </div>
+                    @if (!isset($ci))
+                        {!! Form::select('sales_order_type', $ordertype, $sessiondata['sales_order_type'] ?? '', [
+                            'class' => 'selection-search-clear required select-form',
+                            'name' => 'sales_order_type',
+                            'id' => 'sales_order_type',
+                            'onchange' => 'function_elements_add(this.name,this.value)',
+                            'required',
+                        ]) !!}
+                    @endif
                 </div>
             </div>
             <div class="row mb-3 {{isset($ci)?'d-none':''}}" id="down-payment-el">
                 <div class="col-3">
-                    <a id="label-payment" class="text-dark col-form-label">Uang Muka</a> *</a></a>
+                    <a id="label-payment" class="text-dark col-form-label">Uang Muka</a class="red"> *</a></a>
                 </div>
                 <div class="col-auto">
                     :
@@ -1539,7 +1555,7 @@ if (empty($paket)) {
                 </div>
                 <div class="row mb-3">
                     <div class="col-3">
-                        <a id="label-payment" class="text-dark col-form-label">Kembalian</a><a class='red'> *</a></a>
+                        <a id="label-change" class="text-dark col-form-label">Kembalian</a><a class='red'> *</a></a>
                     </div>
                     <div class="col-auto">
                         :

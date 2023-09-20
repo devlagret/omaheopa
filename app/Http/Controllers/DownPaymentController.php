@@ -25,6 +25,7 @@ class DownPaymentController extends Controller
         $filter = Session::get('filter-dp');
         $booking = SalesOrder::with('rooms')->where('data_state',0)
         ->where('sales_order_status','!=',0)
+        ->where('sales_order_type','=',0)
         ->where('checkin_date','>=',$filter['start_date']??Carbon::now()->format('Y-m-d'))
         ->where('checkin_date','<=',$filter['end_date']??Carbon::now()->format('Y-m-d'))
         ->get();
