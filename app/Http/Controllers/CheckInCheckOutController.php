@@ -13,6 +13,7 @@ use App\Models\SalesOrder;
 use App\Models\SalesOrderFacility;
 use App\Models\SalesOrderMenu;
 use App\Models\SalesOrderRoom;
+use App\Models\SalesOrderRoomExtension;
 use App\Models\SalesRoomFacility;
 use App\Models\SalesRoomMenu;
 use App\Models\SalesRoomPrice;
@@ -86,6 +87,7 @@ class CheckInCheckOutController extends Controller
         error_log($request->name);
     }
     public function extend($sales_order_id) {
+        Session::put('extend-token');
         $data = SalesOrder::with(['rooms','facilities','menus'])->find($sales_order_id);
         $room = CoreRoom::with(['price','roomType','building'])->whereIn('room_id',$data->rooms->pluck('room_id'))->get();
         $facility = SalesRoomFacility::whereIn('room_facility_id',$data->facilities->pluck('room_facility_id'))->get();
@@ -93,11 +95,33 @@ class CheckInCheckOutController extends Controller
         $menutype = AppHelper::menuType();
         return  view('content.CheckInCheckOut.ExtendCheckIn',compact('data','room','facility','menu','menutype'));
     }
+    public function checkExtend(Request $request) {
+        $i=0;
+        $data = SalesOrder::with('rooms')->find($request->sales_order_id);
+        $dataroom = SalesOrderRoom::where('sales_order_id',$request->sales_order_id)
+        ->get()->pluck('room_id');
+        $so = SalesOrder::with('rooms')->where('sales_order_id','!=',$request->sales_order_id)->where('checkin_date','<',$request->checkout_date)
+        ->where('checkin_date','>',$request->checkin_date)
+        // ->where('checkout_date','>',$request->checkout_date)
+        ->get();
+        foreach ($data->rooms as $d){
+        }
+        foreach($so as $val){
+            foreach($val->rooms->whereIn('room_id',$dataroom) as $row){
+                $i++;
+            }
+        }
+        return response($i);
+    }
     public function processExtend(Request $request){
         $data = SalesOrder::with('rooms')->find($request->sales_order_id);
         $dataroom = SalesOrderRoom::where('sales_order_id',$request->sales_order_id)
         ->get()->pluck('room_id');
         dump($request->all());
+        if(Session::get('extend-token')){
+            report('['.Carbon::now().'] : Doubleclik at checkin extend');
+            return redirect()->route('cc.index')->with('msg','Perpanjangan Berhasil');
+        }
         $so = SalesOrder::with('rooms')->where('sales_order_id','!=',$request->sales_order_id)->where('checkin_date','<',$request->checkout_date)
         ->where('checkin_date','>',$request->checkin_date)
         // ->where('checkout_date','>',$request->checkout_date)
@@ -112,6 +136,24 @@ class CheckInCheckOutController extends Controller
         }
         dump($so);
         return response('',202);
+        try{
+            DB::beginTransaction();
+            SalesOrderRoomExtension::create([ 
+                'checkout_date'=>$request->checkout_date_old,
+                'checkout_date_new'=>$request->checkout_date,
+                'sales_order_id'=>$request->sales_order_id,
+                'created_id'=>Auth::id(),
+            ]);
+            $data->checkout_date;
+            $data->save();
+            DB::commit();
+            return redirect()->route('index')->with('msg','Data Berhasil Diinput');
+        }catch(\Exception $e){
+            DB::rollBack();
+            report($e);
+            dump($e);return 0;
+            return redirect()->route('index')->with('msg','Data Gagal Diinput');
+        }
     }
     public function check(Request $request){
         $pref = PreferenceCompany::find(Auth::user()->company_id,['checkin_time','checkout_time']);

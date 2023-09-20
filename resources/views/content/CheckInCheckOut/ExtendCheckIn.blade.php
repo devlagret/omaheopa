@@ -3,6 +3,55 @@
 
 @section('title', "MOZAIC Omah'e Opa")
 
+@section('js')
+<script>
+    function check(id){
+        loadingWidget();
+        var checkout_date = $('#checkout_date').val();
+        var checkout_date_old = $('#checkout_date_old').val();
+        var checkin_date = $('#checkin_date').val();
+        if(checkout_date==checkout_date_old){console.log({checkout_date,checkout_date_old});loadingWidget(0);return 0;}
+        $.ajax({
+                type: "POST",
+                url: "{{ route('cc.check-extend') }}",
+                data: {
+                    'sales_order_id': id,
+                    'checkin_date' : checkin_date,
+                    'checkout_date' : checkout_date,
+                    '_token': '{{ csrf_token() }}',
+                },
+                success: function(return_data) {
+                    console.log(return_data);
+                    if(return_data!=0){
+                        if(confirm('Kamar Sudah di Booking, Yakin Ingin Memperpanjang ?')){
+                            $('#form-extend').submit();
+                        }
+                        return 0;
+                    }
+                    $('#form-extend').submit();
+                   loadingWidget(0);
+                   setTimeout(function() {
+                    loadingWidget(0);
+                   }, 200);
+                },
+                complete: function() {
+                    loadingWidget(0);
+                    setTimeout(function() {
+                        loadingWidget(0);
+                    }, 200);
+                },
+                error: function(data) {
+                    console.log(data);
+                    loadingWidget(0);
+                    setTimeout(function() {
+                        loadingWidget(0);
+                    }, 200);
+                }
+            });
+    }
+</script>
+@stop
+
 @section('content_header')
 
     <nav aria-label="breadcrumb">
@@ -48,7 +97,7 @@
             <div class="card-body">
                 <div class="card">
                     <div class="card-body">
-                        <form action="{{route('cc.process-extend')}}" method="post">
+                        <form action="{{route('cc.process-extend')}}" id="form-extend" method="post">
                             @csrf
                             <input type="hidden" name="sales_order_id" id="sales_order_id" value="{{$data->sales_order_id}}">
                         <div class="row form-group">
@@ -62,7 +111,7 @@
                                     <input type="date"
                                         class="form-control form-control-inline input-medium date-picker input-date"
                                         data-date-format="dd-mm-yyyy" type="text" name="checkin_date" readonly id="checkin_date"
-                                        value="{{ $data->checkin_date ?? date('Y-m-d') }}" onchange="changeDate()" style="width: 15rem;" />
+                                        value="{{ $data->checkin_date ?? date('Y-m-d') }}" style="width: 15rem;" />
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -75,7 +124,8 @@
                                     <input type="date"
                                         class="form-control form-control-inline input-medium date-picker input-date"
                                         data-date-format="dd-mm-yyyy" type="text" name="checkout_date" id="checkout_date"
-                                        value="{{ $sessiondata['checkout_date'] ?? $data->checkout_date }}" min="{{$data->checkout_date}}" onchange="changeDate()" style="width: 15rem;" />
+                                        value="{{ $sessiondata['checkout_date'] ?? $data->checkout_date }}" min="{{$data->checkout_date}}" style="width: 15rem;" />
+                                    <input type="text" name="checkout_date_old" id="checkout_date_old" value="{{$data->checkout_date}}" hidden/>
                                     <input type="text" name="days_booked" id="days_booked" hidden/>
                                 </div>
                             </div>
@@ -122,7 +172,7 @@
                                 <div class="float-right">
                                     <button type="reset" name="reset" class="btn btn-danger"
                                     title="Reset"><i class="fa fa-times"></i> Reset</button>
-                                    <button type="submit" name="submit" class="btn btn-info"
+                                    <button type="button" onclick="check('{{$data->sales_order_id}}')" name="simpan" class="btn btn-info"
                                     title="Simpan"><i class="fa fa-save"></i> Simpan</button>
                                 </div>
                         </form>
@@ -324,9 +374,5 @@
 @stop
 
 @section('css')
-
-@stop
-
-@section('js')
 
 @stop
