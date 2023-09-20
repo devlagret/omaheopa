@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\AppHelper;
 use App\Http\Controllers\Controller;
 use App\Models\CoreBuilding;
 use App\Models\CorePriceType;
 use App\Models\CoreRoom;
+use App\Models\CoreRoomType;
 use App\Models\SalesOrder;
 use App\Models\SalesOrderFacility;
 use App\Models\SalesOrderMenu;
@@ -22,21 +24,23 @@ use Illuminate\Support\Str;
 
 class BookingController extends Controller
 {
+// * Note : ci = check-in
     public function __construct()
     {
         $this->middleware('auth');
     }
     public function index() {
-        $filter = Session::get('filter');
-        Session::forget('booking-data');
-        Session::forget('booking-token');
-        Session::forget('booked-room-data');
-        Session::forget('booked-room-data-qty');
-        Session::forget('booked-room-menu');
-        Session::forget('booked-room-menu-qty');
-        Session::forget('booked-room-facility');
-        Session::forget('booked-room-facility-qty');
-        $booking = SalesOrder::with(['BookingType','building'])->get();
+        $filter = Session::get('filter-booking');
+        Session::forget([
+            'booking-data','booking-token',
+            'booked-room-data','booked-room-price',
+            'booked-room-data-qty','booked-room-menu',
+            'booked-room-menu-qty','booked-room-facility',
+            'booked-room-facility-qty']);
+        $booking = SalesOrder::with('rooms')->where('data_state',0)
+        ->where('sales_order_type',0)
+        ->where('checkin_date','>=',$filter['start_date']??Carbon::now()->format('Y-m-d'))
+        ->where('checkin_date','<=',$filter['end_date']??Carbon::now()->format('Y-m-d'))->get();
         return view('content.Booking.ListBooking')->with(['booking'=>$booking,'start_date'=>$filter['start_date']??null,'end_date'=>$filter['end_date']??null]);
     }
     public function filter(Request $request) {
@@ -44,26 +48,32 @@ class BookingController extends Controller
             'start_date'=>$request->start_date,
             'end_date'=>$request->end_date
         ];
-        Session::put('filter',$data);
+        Session::put('filter-booking',$data);
         return redirect()->route('booking.index');
     }
     public function add() {
         Session::put('booking-token',Str::uuid());
         $sessiondata = Session::get('booking-data');
-        $roomData = collect(Session::get('booked-room-data'));
-        $booked = Session::get('booked-room-data-qty');
-        $menuData = collect(Session::get('booked-room-menu'));
-        $price=collect(Session::get('booked-room-price'));
-        $menuqty = Session::get('booked-room-menu-qty');
-        $facilityData = collect(Session::get('booked-facility-data'));
-        $facilityqty = Session::get('booked-facility-data-qty');
+        $roomData = collect(Session::get('booking-room-data'));
+        $booked = Session::get('booking-room-data-qty');
+        $menuData = collect(Session::get('booking-room-menu'));
+        $price=collect(Session::get('booking-room-price'));
+        $menuqty = Session::get('booking-room-menu-qty');
+        $facilityData = collect(Session::get('booking-room-facility'));
+        $facilityqty = Session::get('booking-room-facility-qty');
         $building = CoreBuilding::get()->pluck('building_name','building_id');
         $facility = SalesRoomFacility::get()->pluck('facility_name','room_facility_id');
         $menu = SalesRoomMenu::get();
-        $menutype = [
-            1 => 'Breakfast', 2 => 'Lunch', 3 => 'Dinner'
-        ];
-        $room = CoreRoom::with('building','roomType','price.type')->whereIn('room_id',$roomData->flatten())->get();
+        $start_date = $sessiondata['start_date'] ?? Carbon::now()->format('Y-m-d');
+        $end_date = $sessiondata['end_date'] ?? Carbon::now()->add(1,'day')->format('Y-m-d');
+        $menutype = AppHelper::menuType();
+        $room = CoreRoom::with(['building','roomType','price'=>function ($query) use($start_date,$end_date){
+            $query->where('room_price_start_date', '<=', $start_date)
+                  ->where('room_price_end_date', '>=', $end_date)
+                  ->orWhereNull('room_price_start_date')
+                  ->orWhereNull('room_price_end_date')
+                  ->orderByDesc('price_type_id');
+        }])->whereIn('room_id',$roomData->flatten())->get();
         $facilityitm = SalesRoomFacility::whereIn('room_facility_id',$facilityData->flatten())->get();
         $menuItm = SalesRoomMenu::whereIn('room_menu_id',$menuData->flatten())->get();
         return view('content.Booking.FormAddBooking',compact('sessiondata','price','menutype','facility','booked','room','building','menuqty','facilityqty','facilityitm','menuItm'));
@@ -71,7 +81,7 @@ class BookingController extends Controller
     public function elementsAdd(Request $request){
         $sessiondata = Session::get('booking-data');
         if(!$sessiondata || $sessiondata == ''){
-            $sessiondata['building_name']   = '';
+            $sessiondata['atas_nama']   = '';
         }
         $sessiondata[$request->name] = $request->value;
         Session::put('booking-data', $sessiondata);
@@ -80,18 +90,19 @@ class BookingController extends Controller
         $data = '';
         $sessiondata = Session::get('booking-data');
         try{
-        $building = CoreBuilding::with('rooms:building_id,room_type_id','rooms.roomType')->find($request->building_id);
+        $building = CoreRoom::where('building_id',$request->building_id)->groupBy('room_type_id')->get('room_type_id')->pluck('room_type_id');
+        $type = CoreRoomType::whereIn('room_type_id',$building)->get();
         $sessiondata['room_type_id'] ?? $sessiondata['room_type_id'] = 1;
-        if ($building->rooms->count() == 0) {
+        if ($building->count() == 0) {
             $data = "<option>Bangunan Tidak Memiliki Kamar</option>\n";
         }
-        foreach ( $building->rooms as $val) {
-            $data .= "<option value='".$val->roomType->room_type_id."' " . ($sessiondata['room_type_id'] == $val->roomType->room_type_id ? 'selected' : '') .">".$val->roomType->room_type_name."</option>\n";
+        foreach ( $type as $val) {
+            $data .= "<option value='".$val->room_type_id."' " . ($sessiondata['room_type_id'] == $val->room_type_id ? 'selected' : '') .">".$val->room_type_name."</option>\n";
         }
         return response($data);
     }catch(\Exception $e){
         error_log(strval($e));
-        return response($data);
+        return response('err');
 
     }
     }
@@ -99,18 +110,32 @@ class BookingController extends Controller
         $data = '';
         $sessiondata = Session::get('booking-data');
         try{
+        $booking = SalesOrder::with('rooms')->where('data_state',0)
+        ->where('sales_order_status','!=',3)
+        ->where('checkin_date','>=',$request->start_date)
+        ->where('checkin_date','<=',$request->end_date)
+        ->where('checkout_date','>',$request->start_date)
+        ->get()->pluck('rooms');
+        $building = CoreBuilding::with('rooms:building_id,room_type_id','rooms.roomType')->find($request->building_id);
         $room = CoreRoom::where('room_type_id',$request->room_type_id)
-        ->where('building_id',$request->building_id)->get();
-        $sessiondata['room_id'] ?? $sessiondata['room_id'] = 1;
-        if ($room->count() == 0) {
-            $data = "<option>Bangunan Tidak Memiliki Kamar</option>\n";
+        ->where('building_id',$request->building_id);
+        if($booking->count()){
+            $room = $room->whereNotIn('room_id',$booking->collapse()->pluck('room_id'));
         }
+        $room = $room->get();
+        $sessiondata['room_id'] ?? $sessiondata['room_id'] = 1;
+        if(!$room->count()&&$booking->count()&&$building->rooms->count()){
+            $data = "<option>Semua Kamar Sudah Dipesan</option>\n";
+        }elseif ($room->count() == 0) {
+            $data = "<option>Bangunan Tidak Memiliki Kamar</option>\n";
+        }else{
         foreach ( $room as $val) {
             $data .= "<option value='".$val->room_id."' " . ($sessiondata['room_id'] == $val->room_id ? 'selected' : '') .">".$val->room_name."</option>\n";
-        }
+        }}
         return response($data);
     }catch(\Exception $e){
         error_log(strval($e));
+        $data="Error";
         return response($data);
 
     }
@@ -118,15 +143,28 @@ class BookingController extends Controller
     public function addRoom(Request $request) {
         $data = '';$dropdown = '';$i=1;
         $no = $request->no + 1;
-        $room = CoreRoom::with('building','roomType','price.type')->orderBy('price_type_id')->find($request->room_id);
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+        $room = CoreRoom::with(['building','roomType','price'=>function ($query) use($start_date,$end_date){
+            $query->where('room_price_start_date', '<=', $start_date)
+                  ->where('room_price_end_date', '>=', $end_date)
+                  ->orWhereNull('room_price_start_date')
+                  ->orWhereNull('room_price_end_date')
+                  ->orderByDesc('price_type_id');
+        }])->find($request->room_id);
+        ;
+        if($room->count()){
         foreach ($room->price as $val){
             $dropdown .= "<option value='". $val->room_price_id."' " . ($i == 1 ? 'selected' : '') .">".$val->type->price_type_name."</option>\n";
             $i++;
         }
+        }else{
+            $dropdown ="<option selected>Kamar Tidak Memiliki Harga.<option>\n";
+        }
         $data = "
         <tr class='booked-room room-".$request->room_id."' id='booked-room-".$request->room_id."'>
         <td>".$no."
-        <input type='hidden' id='room_id[]' value='".$request->room_id."'/> </td>
+        <input type='hidden' class='room-id' name='room_id[]' value='".$request->room_id."'/> </td>
         </td>
         <td>".$room->room_name."</td>
         <td>".$room->roomType->room_type_name."</td>
@@ -145,8 +183,8 @@ class BookingController extends Controller
 
         </div>
         </td>
-        <td width='15%'> <select class='selection-search-clear required select-form' required placeholder='Pilih Harga' name='room_price_id_".$request->room_id."' id='room_price_id_".$request->room_id."'
-        onchange='changePrice(".$request->room_id."  ,this.value)' required>
+        <td width='15%'> <select class='selection-search-clear required room-price-select select-form' required placeholder='Pilih Harga' name='room_price_id[]' id='room_price_id_".$request->room_id."'
+        onchange='changePrice(".$request->room_id."  ,this.value)' >
         ".$dropdown."
         </select>
         </td>
@@ -159,34 +197,53 @@ class BookingController extends Controller
         <td class='text-center'><button type='button' class='btn btn-outline-danger btn-sm' onclick='deleteBooked(".$room->room_id.")'>Hapus</button></td>
         </tr>
         ";
-        $qty=collect(Session::get('booked-room-data-qty'));
-        $qty->put($request->room_id,1);
-        Session::put('booked-room-data-qty',$qty->toArray());
-        Session::push('booked-room-data',$request->room_id);
+        if($request->ci){
+            $qty=collect(Session::get('checkin-room-data-qty'));
+            $qty->put($request->room_id,1);
+            Session::put('checkin-room-data-qty',$qty->toArray());
+            Session::push('checkin-room-data',$request->room_id);
+        }else{
+            $qty=collect(Session::get('booked-room-data-qty'));
+            $qty->put($request->room_id,1);
+            Session::put('booked-room-data-qty',$qty->toArray());
+            Session::push('booked-room-data',$request->room_id);
+        }
         return response($data);
     }
     public function addPersonBooked(Request $request ) {
-        $qty=collect(Session::get('booked-room-data-qty'));
-        $qty->put($request->id,$request->qty);
-        Session::put('booked-room-data-qty',$qty->toArray());
+        if($request->ci){
+            $qty=collect(Session::get('checkin-room-data-qty'));
+            $qty->put($request->id,$request->qty);
+            Session::put('checkin-room-data-qty',$qty->toArray());
+        }else{
+            $qty=collect(Session::get('booked-room-data-qty'));
+            $qty->put($request->id,$request->qty);
+            Session::put('booked-room-data-qty',$qty->toArray());
+        }
         return 1;
     }
-    public function clearBooked() {
+    public function clearBooked() { 
+        Session::forget('checkin-room-data');
+        Session::forget('checkin-room-data-qty');
         Session::forget('booked-room-data');
         Session::forget('booked-room-data-qty');
         return 1;
     }
     public function clearFacility() {
+        Session::forget('checkin-room-facility');
+        Session::forget('checkin-room-facility-qty');
         Session::forget('booked-room-facility');
         Session::forget('booked-room-facility-qty');
         return 1;
     }
     public function clearMenu() {
+        Session::forget('checkin-room-menu');
+        Session::forget('checkin-room-menu-qty');
         Session::forget('booked-room-menu');
         Session::forget('booked-room-menu-qty');
         return 1;
     }
-    public function deleteBookedRoom($room_id){
+    public function deleteBookedRoom($room_id,$ci){
         $data=collect(Session::get('booked-room-data'));
         foreach($data as $key => $val){
             if($val == $room_id){
@@ -199,20 +256,20 @@ class BookingController extends Controller
         Session::put('booked-room-data-qty',$qty->toArray());
         return 1;
     }
-    public function deleteFacility($room_facility_id){
+    public function deleteFacility($room_facility_id,$ci){
         $data=collect(Session::get('booked-room-facility'));
         foreach($data as $key => $val){
             if($val == $room_facility_id){
                 $data->forget($key);
             }
         }
-        Session::put('booked-room-data',$data->toArray());
+        Session::put('booked-room-facility',$data->toArray());
         $qty=collect(Session::get('booked-room-facility-qty'));
         $qty->forget($room_facility_id);
-        Session::put('booked-room-data-qty',$qty->toArray());
+        Session::put('booked-room-facility-qty',$qty->toArray());
         return 1;
     }
-    public function deleteMenu($room_menu_id){
+    public function deleteMenu($room_menu_id,$ci){
         $data=collect(Session::get('booked-room-menu'));
         foreach($data as $key => $val){
             if($val == $room_menu_id){
@@ -226,13 +283,47 @@ class BookingController extends Controller
         return 1;
     }
     public function getRoomPrice(Request $request) {
+        if(empty($request->room_price_id)){
+            return 0;
+        }
         $price = SalesRoomPrice::find($request->room_price_id);
-        if($request->room_id!=null){
-        $pr=collect(Session::get('booked-room-price'));
-        $pr->put($request->room_id,$request->room_price_id);
-        Session::put('booked-room-price',$pr->toArray());
+        if($request->ci&&$request->room_id!=null){
+            $pr=collect(Session::get('checkin-room-price'));
+            $pr->put($request->room_id,$request->room_price_id);
+            Session::put('checkin-room-price',$pr->toArray());
+        }elseif($request->room_id!=null){
+            $pr=collect(Session::get('booked-room-price'));
+            $pr->put($request->room_id,$request->room_price_id);
+            Session::put('booked-room-price',$pr->toArray());
         }
         return response($price->room_price_price);
+    }
+    public function getRoomPriceList(Request $request) {
+        $i=1;$data ='';
+        if($request->ci){
+            $sessiondata = Session::get('checkin-data');
+        }else{
+            $sessiondata = Session::get('booking-data');
+        }
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+        $room = CoreRoom::with(['building','roomType','price'=>function ($query) use($start_date,$end_date){
+            $query->where('room_price_start_date', '<=', $start_date)
+                  ->where('room_price_end_date', '>=', $end_date)
+                  ->orWhereNull('room_price_start_date')
+                  ->orWhereNull('room_price_end_date')
+                  ->orderByDesc('price_type_id');
+        }])->find($request->room_id);
+        ;
+        $selectedId = $sessiondata['room_price_id_'.$request->room_id]??1;
+        if($room->count()){
+        foreach ($room->price as $val){
+            $data .= "<option value='". $val->room_price_id."' " . ($val->room_price_id == $selectedId ? 'selected' : '') .">".$val->type->price_type_name."</option>\n";
+            $i++;
+        }}else{
+            $data = "<option selected>Kamar Tidak Memiliki Harga.<option>\n";
+        }
+        return response($data);
     }
     public function addFacility(Request $request) {
         $data = '';
@@ -264,17 +355,30 @@ class BookingController extends Controller
         <td class='text-center'><button type='button' class='btn btn-outline-danger btn-sm' onclick='deleteFacilityItm(".$facility->room_facility_id.")'>Hapus</button></td>
         </tr>
         ";
-        $qty=collect(Session::get('booked-facility-data-qty'));
-        $qty->put($request->room_facility_id,1);
-        Session::put('booked-facility-data-qty',$qty->toArray());
-        Session::push('booked-facility-data',$request->room_facility_id);
+        if($request->ci){
+            $qty=collect(Session::get('checkin-room-facility-qty'));
+            $qty->put($request->room_facility_id,1);
+            Session::put('checkin-room-facility-qty',$qty->toArray());
+            Session::push('checkin-room-facility',$request->room_facility_id);
+        }else{
+            $qty=collect(Session::get('booked-room-facility-qty'));
+            $qty->put($request->room_facility_id,1);
+            Session::put('booked-room-facility-qty',$qty->toArray());
+            Session::push('booked-room-facility',$request->room_facility_id);
+        }
         return response($data);
     }
     public function changeFacilityQty(Request $request) {
-        $qty=collect(Session::get('booked-facility-data-qty'));
-        $qty->put($request->id,$request->qty);
-        Session::put('booked-facility-data-qty',$qty->toArray());
-        return 1;
+        if($request->ci){
+            $qty=collect(Session::get('checkin-room-facility-qty'));
+            $qty->put($request->id,$request->qty);
+            Session::put('checkin-room-facility-qty',$qty->toArray());
+        }else{
+            $qty=collect(Session::get('booked-room-facility-qty'));
+            $qty->put($request->id,$request->qty);
+            Session::put('booked-room-facility-qty',$qty->toArray());
+        }
+        return $qty;
     }
     public function getRoomMenus(Request $request) {
         $data = '';
@@ -320,51 +424,111 @@ class BookingController extends Controller
         <td class='text-center'><button type='button' class='btn btn-outline-danger btn-sm' onclick='deleteMenuItm(".$menu->room_menu_id.")'>Hapus</button></td>
         </tr>
         ";
-        $qty=collect(Session::get('booked-room-menu-qty'));
-        $qty->put($request->room_menu_id,1);
-        Session::put('booked-room-menu-qty',$qty->toArray());
-        Session::push('booked-room-menu',$request->room_menu_id);
+        if($request->ci){
+            $qty=collect(Session::get('checkin-room-menu-qty'));
+            $qty->put($request->room_menu_id,1);
+            Session::put('checkin-room-menu-qty',$qty->toArray());
+            Session::push('checkin-room-menu',$request->room_menu_id);
+        }else{
+            $qty=collect(Session::get('booked-room-menu-qty'));
+            $qty->put($request->room_menu_id,1);
+            Session::put('booked-room-menu-qty',$qty->toArray());
+            Session::push('booked-room-menu',$request->room_menu_id);
+        }
         return response($data);
     }
+    public function changeMenuQty(Request $request) {
+        if($request->ci){
+            $qty=collect(Session::get('checkin-room-menu-qty'));
+            $qty->put($request->id,$request->qty);
+            Session::put('checkin-room-menu-qty',$qty->toArray());
+        }else{
+            $qty=collect(Session::get('booked-room-menu-qty'));
+            $qty->put($request->id,$request->qty);
+            Session::put('booked-room-menu-qty',$qty->toArray());
+        }
+        return $qty;
+    }
     public function processAdd(Request $request) {
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
         $roomData = collect(Session::get('booked-room-data'));
         $booked = Session::get('booked-room-data-qty');
         $price = Session::get('booked-room-price');
         $menuData = collect(Session::get('booked-room-menu'));
         $menuqty = Session::get('booked-room-menu-qty');
-        $facilityData = collect(Session::get('booked-facility-data'));
-        $facilityqty = Session::get('booked-facility-data-qty');
+        $facilityData = collect(Session::get('booked-room-facility'));
+        $facilityqty = Session::get('booked-room-facility-qty');
         $token = Session::get('booking-token');
         $pricetype = CorePriceType::get();
         $prices = SalesRoomPrice::get();
+        $room = CoreRoom::with(['price'=>function ($query) use($start_date,$end_date){
+            $query->where('room_price_start_date', '<=', $start_date)
+                  ->where('room_price_end_date', '>=', $end_date)
+                  ->orWhereNull('room_price_start_date')
+                  ->orWhereNull('room_price_end_date')
+                  ->orderByDesc('price_type_id');
+        }])->get();
         if(!$roomData->count()){
             return redirect()->route('booking.add')->with(['msg'=>'Harap Tambahkan Kamar Yang Dibooking','type'=>'warning','tab-index' =>2]);
         }
-        if(empty($token)){
+        if(empty(Session::get('booking-token'))){
             return redirect()->route('booking.index')->with('msg','Tambah Booking Kamar Berhasil -');
         }
         dump($request->all());
         $field = $request->validate([
             'atas_nama' => 'required',
-            'down_payment' => 'required',
-        ],['atas_nama.required' => 'Nama Pemesan Diperlukan','down_payment.required'=>'Uang Muka Harus Diisi']);
+        ],['atas_nama.required' => 'Nama Pemesan Diperlukan']);
+        $check = collect();
+        $checkfac = collect();
+        $checkmenu = collect();
         foreach($roomData as $roomval){
-        dump($roomval);}
-        dump($booked);
-        dump(['price',$prices->find($price[2])->pluck('room_price_price')]);
-        dump($facilityData);
-        dump($facilityqty);
-        dump($menuData);
-        dump($menuqty);
-        dump(Carbon::now());
-        dump($token);
+            if(empty($price[$roomval])){
+                $priced = $room->find($roomval)->price->first();
+            }else{
+                $priced = $prices->find($price[$roomval]);
+            }
+            $check->push([
+                'sales_order_id'=> 5,
+                'room_id'       => $roomval,
+                'people'        => $booked[$roomval],
+                'room_price'    => $priced->room_price_price,
+                'price_type_id_old' => $priced->price_type_id,
+                'room_price_id' => $priced->room_price_id,
+                'price_type_name_old' => $priced->type->price_type_name,
+                'created_id'    => Auth::id(),
+                'company_id'    => Auth::user()->company_id,
+            ]);
+        }
+        foreach($facilityData as $facval){
+            $checkfac->push([
+                'sales_order_id'=> 5,
+                'room_facility_id'=> $facval,
+                'quantity'      => $facilityqty[$facval],
+                'created_id'    => Auth::id(),
+                'company_id'    => Auth::user()->company_id,
+            ]);
+        }
+        foreach($menuData as $menuval){
+            $checkmenu->push([
+                'sales_order_id'=> 5,
+                'room_menu_id'  => $menuval,
+                'quantity'      => $menuqty[$menuval],
+                'created_id'    => Auth::id(),
+                'company_id'    => Auth::user()->company_id,
+            ]);
+        }
+        dump($check);
+        dump($checkfac);
+        dump($checkmenu);
         return 0;
         try{
             DB::beginTransaction();
             SalesOrder::create([
-                'checkin_date' =>$request->start_date,
-                'checkout_date' =>$request->end_date,
+                'checkin_date' =>$start_date,
+                'checkout_date' =>$end_date,
                 'sales_order_price' =>$request->total_amount,
+                'discount' =>$request->discount_percentage_total,
                 'down_payment' =>$field['down_payment'],
                 'order_date' => Carbon::now()->format('Y-m-d'),
                 'sales_order_name' => $field['atas_nama'],
@@ -375,14 +539,18 @@ class BookingController extends Controller
             $order = SalesOrder::where('sales_order_token',$token->toString())->first();
         foreach($roomData as $roomval){
             if(empty($price[$roomval])){
-                $price;
+                $priced = $room->find($roomval)->price->first();
+            }else{
+                $priced = $prices->find($price[$roomval]);
             }
             SalesOrderRoom::create([
                 'sales_order_id'=> $order->sales_order_id,
                 'room_id'       => $roomval,
                 'people'        => $booked[$roomval],
-                'room_price'    => $booked[$roomval],
-                'price_type_name_old' => $booked[$roomval],
+                'room_price'    => $priced->room_price_price,
+                'price_type_id_old' => $priced->price_type_id,
+                'room_price_id' => $priced->room_price_id,
+                'price_type_name_old' => $priced->type->price_type_name,
                 'created_id'    => Auth::id(),
                 'company_id'    => Auth::user()->company_id,
             ]);
@@ -390,6 +558,8 @@ class BookingController extends Controller
         foreach($facilityData as $facval){
             SalesOrderFacility::create([
                 'sales_order_id'=> $order->sales_order_id,
+                'room_facility_id'=> $facval,
+                'quantity'      => $facilityqty[$facval],
                 'created_id'    => Auth::id(),
                 'company_id'    => Auth::user()->company_id,
             ]);
@@ -397,22 +567,51 @@ class BookingController extends Controller
         foreach($menuData as $menuval){
             SalesOrderMenu::create([
                 'sales_order_id'=> $order->sales_order_id,
+                'room_menu_id'  => $menuval,
+                'quantity'      => $menuqty[$menuval],
                 'created_id'    => Auth::id(),
                 'company_id'    => Auth::user()->company_id,
             ]);
         }
-            DB::rollBack();
-            // Session::forget('booking-token');
-            return redirect()->route('booking.add')->with(['msg'=>'Tambah Booking Kamar Berhasil','type'=>'success']);
+            DB::commit();
+            Session::forget('booking-token');
+            $this->resetSession();
+            return redirect()->route('booking.index')->with(['msg'=>'Tambah Booking Kamar Berhasil','type'=>'success']);
         }catch(\Exception $e){
+            $this->resetSession();
             Session::forget('booking-token');
             DB::rollBack();
             report($e);
+            dump($e);
             return redirect()->route('booking.add')->with(['msg'=>'Tambah Booking Kamar Gagal','type'=>'danger']);
         }
     }
     public function resetSession() {
-        Session::forget('booking-data');
+        Session::forget([
+            'booking-data','booking-token',
+            'booked-room-data','booked-room-price',
+            'booked-room-data-qty','booked-room-menu',
+            'booked-room-menu-qty','booked-room-facility',
+            'booked-room-facility-qty',
+        ]);
         return 1;
+    }
+    public function detail($sales_order_id){
+        $data = SalesOrder::with(['rooms','facilities','menus'])->find($sales_order_id);
+        $room = CoreRoom::with(['price','roomType','building'])->whereIn('room_id',$data->rooms->pluck('room_id'))->get();
+        $facility = SalesRoomFacility::whereIn('room_facility_id',$data->facilities->pluck('room_facility_id'))->get();
+        $menu = SalesRoomMenu::whereIn('room_menu_id',$data->menus->pluck('room_menu_id'))->get();
+        $menutype = AppHelper::menuType();
+        return  view('content.Booking.DetailBooking',compact('data','room','facility','menu','menutype'));
+    }
+    public function checkRoom(Request $request) {
+        $booking = SalesOrder::with('rooms')->where('data_state',0)
+        ->where('sales_order_status','!=',3)
+        ->where('checkin_date','>=',$request->start_date)
+        ->where('checkin_date','<=',$request->end_date)
+        ->Where('checkout_date','>',$request->start_date)
+        ->Where('sales_order_status',1)
+        ->get()->pluck('rooms');
+        return response($booking->collapse()->pluck('room_id'));
     }
 }

@@ -7,7 +7,8 @@
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="{{ url('home') }}">Beranda</a></li>
-      <li class="breadcrumb-item active" aria-current="page">Daftar Uang Muka </li>
+      <li class="breadcrumb-item"><a href="{{ route('dp.add') }}">Daftar Uang Muka</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Bayar Uang Muka</li>
     </ol>
   </nav>
 
@@ -20,7 +21,7 @@
 </h3>
 <br/>
 <div id="accordion">
-    <form  method="post" action="{{ route('dp.filter') }}" enctype="multipart/form-data">
+    <form  method="post" action="{{ route('dp.filter-add') }}" enctype="multipart/form-data">
     @csrf
         <div class="card border border-dark">
         <div class="card-header bg-dark" id="headingOne" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
@@ -84,7 +85,7 @@
         Daftar
     </h5>
     <div class="form-actions float-right">
-        <button onclick="location.href='{{ route('dp.add') }}'" name="Find" class="btn btn-sm btn-info" title="Add Data"><i class="fa fa-plus"></i> Bayar</button>
+        <button onclick="location.href='{{ route('dp.index') }}'" name="back" class="btn btn-sm btn-info" title="Add Data"><i class="fa fa-angle-left"></i> Kembali</button>
     </div>
   </div>
 
@@ -99,7 +100,7 @@
                         <th style="text-align: center; width: 20%">Atas Nama</th>
                         <th style="text-align: center; width: 10%">Kamar Dipesan</th>
                         <th style="text-align: center; width: 10%">Uang Muka</th>
-                        <th style="text-align: center; width: 10%">Status</th>
+                        <th style="text-align: center; width: 20%">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -113,7 +114,7 @@
                         <td>{{ $row->rooms->count() }}</td>
                         <td>{{ number_format($row->down_payment) }}</td>
                         <td style="text-align: center">
-                          <div class="w-75 px-1 rounded-pill mx-auto bg-success">Sudah Dibayar</div>
+                          <a type="button" class="btn btn-outline-success btn-sm" onclick="proses('{{ $row->sales_order_name}}','{{route('dp.process-add',$row->sales_order_id)}}')">Bayar</a>
                         </td>
                       </tr>
                   @endforeach
@@ -135,5 +136,11 @@
 @stop
 
 @section('js')
-
+<script>
+    function proses(name,uri){
+      if(confirm(`Yakin Ingin Memproses Booking Atas Nama '`+name+`' ?`)){
+        window.location.href = uri;
+      }
+    }
+</script>
 @stop

@@ -19,6 +19,7 @@ use App\Http\Controllers\CoreRoomTypeController;
 use App\Http\Controllers\CoreSupplierController;
 use App\Http\Controllers\DownPaymentController;
 use App\Http\Controllers\GeneralLedgerController;
+use App\Http\Controllers\PreferenceCompanyController;
 use App\Http\Controllers\RestoreDataController;
 use App\Http\Controllers\SalesMerchantController;
 use App\Http\Controllers\SalesRoomMenuController;
@@ -53,6 +54,7 @@ use App\Http\Controllers\SalesInvoiceController;
 use App\Http\Controllers\SalesInvoiceReportController;
 use App\Http\Controllers\SalesRoomFacilityController;
 use App\Http\Controllers\SalesRoomPriceController;
+use App\Http\Controllers\SystemLogsController;
 use Illuminate\Support\Facades\Auth;
 
 /*
@@ -412,11 +414,15 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
  Route::prefix('booking')->name('booking.')->group(function () {
     Route::get('/', [BookingController::class, 'index'])->name('index');
     Route::get('/add', [BookingController::class, 'add'])->name('add');
+    Route::get('/detail/{sales_order_id}', [BookingController::class, 'detail'])->name('detail');
     Route::post('/add-room', [BookingController::class, 'addRoom'])->name('add-room');
     Route::post('/add-facility', [BookingController::class, 'addFacility'])->name('add-facility');
     Route::post('/change-facility-qty', [BookingController::class, 'changeFacilityQty'])->name('facility-qty');
+    Route::post('/change-menu-qty', [BookingController::class, 'changeMenuQty'])->name('menu-qty');
     Route::post('/add-person', [BookingController::class, 'addPersonBooked'])->name('add-person');
     Route::post('/room', [BookingController::class, 'getRoom'])->name('get-room');
+    Route::post('/check-room', [BookingController::class, 'checkRoom'])->name('check-room');
+    Route::post('/get-price-list', [BookingController::class, 'getRoomPriceList'])->name('get-price-list');
     Route::get('/delete-room/{room_id?}', [BookingController::class, 'deleteBookedRoom'])->name('delete-booked-room');
     Route::get('/delete-facility/{room_facility_id?}', [BookingController::class, 'deleteFacility'])->name('delete-facility');
     Route::get('/delete-menu/{room_menu_id?}', [BookingController::class, 'deleteMenu'])->name('delete-menu');
@@ -429,9 +435,9 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
     Route::post('/room-type', [BookingController::class, 'getType'])->name('get-room-type');
     Route::post('/filter', [BookingController::class, 'filter'])->name('filter');
     Route::post('/process-add', [BookingController::class, 'processAdd'])->name('process-add');
-    Route::get('/edit/{merchant_id}', [BookingController::class, 'edit'])->name('edit');
+    Route::get('/edit/{sales_order_id}', [BookingController::class, 'edit'])->name('edit');
     Route::post('/process-edit', [BookingController::class, 'processEdit'])->name('process-edit');
-    Route::get('/delete/{merchant_id}', [BookingController::class, 'delete'])->name('delete');
+    Route::get('/delete/{sales_order_id}', [BookingController::class, 'delete'])->name('delete');
     Route::post('/elements-add', [BookingController::class, 'elementsAdd'])->name('elements-add');
     Route::get('/reset', [BookingController::class, 'resetSession'])->name('reset');
 });
@@ -439,24 +445,39 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
  Route::prefix('down-payment')->name('dp.')->group(function () {
     Route::get('/', [DownPaymentController::class, 'index'])->name('index');
     Route::get('/add', [DownPaymentController::class, 'add'])->name('add');
-    Route::post('/process-add', [DownPaymentController::class, 'processAdd'])->name('process-add');
-    Route::get('/edit/{merchant_id}', [DownPaymentController::class, 'edit'])->name('edit');
+    Route::get('/process-add/{sales_order_id}/{source?}', [DownPaymentController::class, 'processAdd'])->name('process-add');
+    Route::get('/edit/{sales_order_id}', [DownPaymentController::class, 'edit'])->name('edit');
     Route::post('/process-edit', [DownPaymentController::class, 'processEdit'])->name('process-edit');
-    Route::get('/delete/{merchant_id}', [DownPaymentController::class, 'delete'])->name('delete');
+    Route::get('/delete/{sales_order_id}', [DownPaymentController::class, 'delete'])->name('delete');
     Route::post('/elements-add', [DownPaymentController::class, 'elementsAdd'])->name('elements-add');
+    Route::post('/filter', [DownPaymentController::class, 'filter'])->name('filter');
+    Route::post('/filter-add', [DownPaymentController::class, 'filterAdd'])->name('filter-add');
 });
  // Check-in Check-Out pages
  Route::prefix('checkin-checkout')->name('cc.')->group(function () {
-    Route::get('/', [DownPaymentController::class, 'index'])->name('index');
-    Route::get('/add', [DownPaymentController::class, 'add'])->name('add');
-    Route::post('/process-add', [DownPaymentController::class, 'processAdd'])->name('process-add');
-    Route::get('/edit/{merchant_id}', [DownPaymentController::class, 'edit'])->name('edit');
-    Route::post('/process-edit', [DownPaymentController::class, 'processEdit'])->name('process-edit');
-    Route::get('/delete/{merchant_id}', [DownPaymentController::class, 'delete'])->name('delete');
-    Route::post('/elements-add', [DownPaymentController::class, 'elementsAdd'])->name('elements-add');
+    Route::get('/', [CheckInCheckOutController::class, 'index'])->name('index');
+    Route::get('/add', [CheckInCheckOutController::class, 'add'])->name('add');
+    Route::post('/check', [CheckInCheckOutController::class, 'check'])->name('check');
+    Route::post('/get-penalty', [CheckInCheckOutController::class, 'getPenalty'])->name('get-penalty');
+    Route::get('/extend/{sales_order_id?}', [CheckInCheckOutController::class, 'extend'])->name('extend');
+    Route::post('/process-extend', [CheckInCheckOutController::class, 'processExtend'])->name('process-extend');
+    Route::post('/process-add', [CheckInCheckOutController::class, 'processAdd'])->name('process-add');
+    Route::post('/process-checkout', [CheckInCheckOutController::class, 'processCheckOut'])->name('process-checkout');
+    Route::get('/edit/{sales_order_id}', [CheckInCheckOutController::class, 'edit'])->name('edit');
+    Route::post('/process-edit', [CheckInCheckOutController::class, 'processEdit'])->name('process-edit');
+    Route::get('/delete/{sales_order_id}', [CheckInCheckOutController::class, 'delete'])->name('delete');
+    Route::post('/filter', [CheckInCheckOutController::class, 'filter'])->name('filter');
+    Route::post('/elements-add', [CheckInCheckOutController::class, 'elementsAdd'])->name('elements-add');
+});
+ Route::prefix('cc-time')->name('ct.')->group(function () {
+    Route::get('/', [PreferenceCompanyController::class, 'index'])->name('index');
+    Route::post('/process-edit', [PreferenceCompanyController::class, 'processEditCCTime'])->name('process-edit-cc-time');
 });
 
-
+Route::prefix('log')->name('log.')->group(function () {
+    Route::resource('system', SystemLogsController::class)->only(['index', 'destroy']);
+    Route::get('system/del', [SystemLogsController::class,'destroy'])->name('destroy');
+});
 
 
 //penerimaan barang / invgoods received

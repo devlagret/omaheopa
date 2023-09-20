@@ -22,7 +22,7 @@ if (empty($paket)) {
         function function_elements_add(name, value) {
             $.ajax({
                 type: "POST",
-                url: "{{ route('booking.elements-add') }}",
+                url: "{{ isset($ci)?route('cc.elements-add'):route('booking.elements-add') }}",
                 data: {
                     'name': name,
                     'value': value,
@@ -39,6 +39,11 @@ if (empty($paket)) {
         function next() {
             index++;
             function_elements_add('tab-index', index)
+            if(index == 3&&$('#atas_nama').val()==''){
+                alert("Harap Mengisi Kolom Atas Nama");
+                $('#atas_nama').focus();
+                return 0;
+            }
             $("#card-total-all").hide();
             if(index == 4){
                 $("#card-total-all").show();
@@ -93,6 +98,7 @@ if (empty($paket)) {
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function(return_data) {
+                    console.log(return_data);
                     function_elements_add('building_id', building_id);
                     $('#room_type_id').html(return_data);
                     changeRoom($('#room_type_id').val());
@@ -120,6 +126,7 @@ if (empty($paket)) {
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function(return_data) {
+                    console.log(return_data);
                     function_elements_add('room_type_id', room_type_id);
                     $('#room_id').html(return_data);
                     loading(0);
@@ -146,6 +153,9 @@ if (empty($paket)) {
         function addRoom() {
             var room_id = $("#room_id").val();
             var days_booked = $("#days_booked").val();
+            var start_date = $("#start_date").val();
+            var end_date = $("#end_date").val();
+            var no =$('.booked-room').length;
             if ($('.room-' + room_id).length) {
                 return 0;
             }
@@ -155,7 +165,10 @@ if (empty($paket)) {
                 url: "{{ route('booking.add-room') }}",
                 dataType: "html",
                 data: {
-                    'no': $('.booked-room').length,
+                    'no': no,
+                    'ci' : {{$ci??0}},
+                    'start_date' : start_date,
+                    'end_date' : end_date,
                     'room_id': room_id,
                     'days_booked' : days_booked,
                     '_token': '{{ csrf_token() }}',
@@ -219,6 +232,7 @@ if (empty($paket)) {
                 dataType: "html",
                 data: {
                     'id': id,
+                    'ci' : {{$ci??0}},
                     'qty': qty,
                     '_token': '{{ csrf_token() }}',
                 },
@@ -258,6 +272,7 @@ if (empty($paket)) {
                 dataType: "html",
                 data: {
                     'id': id,
+                    'ci' : {{$ci??0}},
                     'qty': qty,
                     '_token': '{{ csrf_token() }}',
                 },
@@ -306,6 +321,7 @@ if (empty($paket)) {
                 dataType: "html",
                 data: {
                     'no': $('.room-facility').length,
+                    'ci' : {{$ci??0}},
                     'room_facility_id': room_facility_id,
                     '_token': '{{ csrf_token() }}',
                 },
@@ -371,6 +387,7 @@ if (empty($paket)) {
                 dataType: "html",
                 data: {
                     'room_price_id': room_price_id,
+                    'ci' : {{$ci??0}},
                     'room_id': save_id,
                     '_token': '{{ csrf_token() }}',
                 },
@@ -487,13 +504,22 @@ if (empty($paket)) {
         }
 
         function addMenuItem() {
-            loading();
             var room_menu_id = $("#room_menu_id").val();
+            if ($('.menu-item-' + room_menu_id).length) {
+                $('#menu_qty_' + room_menu_id).val(function(i, oldval) {
+                    var newval = ++oldval;
+                    changeMenuQty(room_menu_id, newval);
+                    return newval;
+                });
+                return 0;
+            }
+            loading();
             $.ajax({
                 type: "post",
                 url: "{{ route('booking.add-menu-item') }}",
                 dataType: "html",
                 data: {
+                    'ci' : {{$ci??0}},
                     'room_menu_id': room_menu_id,
                     'no': $('.menu-item').length,
                     '_token': '{{ csrf_token() }}',
@@ -512,10 +538,14 @@ if (empty($paket)) {
                     subtotalMenu();
                     setTimeout(function() {
                         loading(0);
-                    }, 200);
+                    }, 500);
                 },
                 error: function(data) {
                     console.log(data);
+                    loading(0);
+                    setTimeout(function() {
+                        loading(0);
+                    }, 500);
                 }
             });
         }
@@ -525,10 +555,11 @@ if (empty($paket)) {
             disableNav();
             $.ajax({
                 type: "POST",
-                url: "{{ route('booking.facility-qty') }}",
+                url: "{{ route('booking.menu-qty') }}",
                 dataType: "html",
                 data: {
                     'id': id,
+                    'ci' : {{$ci??0}},
                     'qty': qty,
                     '_token': '{{ csrf_token() }}',
                 },
@@ -564,10 +595,15 @@ if (empty($paket)) {
             loading();
             $.ajax({
                 type: "get",
-                url: "{{ route('booking.delete-booked-room') }}" + room_id,
+                url: "{{ route('booking.delete-booked-room') }}" +'/'+ room_id,
                 dataType: "html",
                 success: function(return_data) {
                     $("#booked-room-" + room_id).remove();
+                    if ($('.booked-room').length == 0) {
+                        $('#room-table').html(
+                        '<td valign="top" colspan="9" class="dataTables_empty">No data available in table</td>'
+                    );
+                    }
                     loading(0);
                     return 0;
                 },
@@ -587,10 +623,15 @@ if (empty($paket)) {
             loading();
             $.ajax({
                 type: "get",
-                url: "{{ route('booking.delete-facility') }}" + id,
+                url: "{{ route('booking.delete-facility') }}" +'/' + id,
                 dataType: "html",
                 success: function(return_data) {
                     $("#facility-" + id).remove();
+                    if ($('.room-facility').length == 0) {
+                        $('#facility-table').html(
+                        '<td valign="top" colspan="7" class="dataTables_empty">No data available in table</td>'
+                    );
+                    }
                     loading(0);
                     return 0;
                 },
@@ -610,10 +651,15 @@ if (empty($paket)) {
             loading();
             $.ajax({
                 type: "get",
-                url: "{{ route('booking.delete-menu') }}" + id,
+                url: "{{ route('booking.delete-menu') }}" +'/' + id,
                 dataType: "html",
                 success: function(return_data) {
                     $("#booked-room-" + id).remove();
+                    if ($('.menu-item').length == 0) {
+                        $('#menu-itm-table.').html(
+                        '<td valign="top" colspan="7" class="dataTables_empty">No data available in table</td>'
+                    );
+                    }
                     loading(0);
                     return 0;
                 },
@@ -646,6 +692,12 @@ if (empty($paket)) {
             $("#discount_amount").val(diskon);
             $("#total_amount_view").val(toRp(sbsAll - diskon));
             $("#total_amount").val(sbsAll - diskon);
+            $('#change_amount_view').attr('min',sbsAll - diskon);
+            if($("#payed_amount").val()!=''){
+                $("#change_amount_view").val(toRp($("#payed_amount").val()-$('#total_amount').val()));
+                $("#change_amount").val($("#payed_amount").val()-$('#total_amount').val());
+                $("#payed_amount_view").val(toRp($("#payed_amount").val()));
+            }
         }
         function reset_add(){
             clearBooked();
@@ -664,23 +716,113 @@ if (empty($paket)) {
         function changeDate(){
             var start_date = moment($("#start_date").val());
             var end_date = moment($("#end_date").val());
+            var start_dater = moment($("#start_date").val()).format('Y-MM-DD');
             var days = end_date.diff(start_date,'days');
             $("#end_date").attr('min',start_date.add(1,'d').format('Y-MM-DD'));
             if(days <= 0){
                 // alert("Tanggal Check-Out Tidak Boleh Sebelum Tanggal Check-In");
                 $("#end_date").val(start_date.format('Y-MM-DD'));
+                end_date = moment($("#end_date").val());
                 days = 1;
             }
             $("#days_booked").val(days);
+            $(".room-id").each(function() {
+                id = $(this).val();
+                getRoomPriceList(id);
+            });
+            disableNav();
+            loadingWidget();
+            $.ajax({
+                type: "POST",
+                url: "{{ route('booking.check-room') }}",
+                data: {
+                    'start_date': start_dater,
+                    'end_date': end_date.format('Y-MM-DD'),
+                    '_token': '{{ csrf_token() }}',
+                },
+                success: function(return_data) {
+                    return_data.forEach(element => {
+                        if($('#booked-room-'+element).length){
+                        deleteBooked(element);
+                        }
+                    });
+                    loadingWidget(0);
+                    setTimeout(function() {
+                        enableNav();
+                        loadingWidget(0);
+                    }, 100);
+                    enableNav();
+                },
+                complete: function() {
+                    loadingWidget(0);
+                    subtotalMenu();
+                    setTimeout(function() {
+                        loadingWidget(0);
+                        enableNav();
+                    }, 200);
+                    enableNav();
+                },
+                error: function(data) {
+                    console.log(data);
+                    loadingWidget(0);
+                    setTimeout(function() {
+                        loadingWidget(0);
+                        enableNav();
+                    }, 200);
+                }
+            });
+            changeType();
+            return subtotal();
+        }
+        function getRoomPriceList(id){
+            var start_date = $("#start_date").val();
+            var end_date = $("#end_date").val();
+            $.ajax({
+                type: "post",
+                url: "{{ route('booking.get-price-list') }}",
+                dataType: "html",
+                data: {
+                    'start_date' : start_date,
+                    'end_date' : end_date,
+                    'ci' : {{$ci??0}},
+                    'room_id': id,
+                    '_token': '{{ csrf_token() }}',
+                },
+                success: function(return_data) {
+                    $('#room_price_id_'+id).html(return_data);
+                    loading(0);
+                    return 0;
+                },
+                complete: function() {
+                    loading(0);
+                    setTimeout(function() {
+                        loading(0);
+                    }, 200);
+                    setRoomPrice();
+                },
+                error: function(data) {
+                    console.log(data);
+                    loading(0);
+                    setTimeout(function() {
+                        loading(0);
+                    }, 500);
+                }
+            });
+        }
+        function setRoomPrice(){
+            $(".room-price-select").each(function() {
+                        id=$(this).data('id');
+                        changePrice(id,$(this).val(),0);
+            });
             subtotal();
         }
         $(document).ready(function() {
+            $('#navigator-booking li:nth-child(' + index + ') a').tab('show');
             (index > 4)?index=4:(index<1)?index=1:'';
             changeMenu();
             subtotalFasilitas();
             subtotalMenu();
             changeDate();
-            $('#navigator-booking li:nth-child(' + index + ') a').tab('show');
             changeType();
             $("input").each(function() {
                 $(this).change(function() {
@@ -707,24 +849,54 @@ if (empty($paket)) {
                     }
                 })
             });
-            $(".room-price-select").each(function() {
-                id=$(this).data('id');
-                changePrice(id,$(this).val(),0);
+            $(".room-id").each(function() {
+                id = $(this).val();
+                getRoomPriceList(id);
             });
             $("#discount_amount_view").change(function() {
+            $("#discount_amount").val(this.value);
+            $("#discount_amount_view").val(toRp(this.value));
             var discount_percentage = (parseInt($(this).val()) / parseInt($("#total_amount").val())) * 100;
             $("#discount_percentage_total").val(discount_percentage);
+            count_total();
             });
+            if($("#down_payment").val()!=''){
+                $("#down_payment_view").val(toRp($("#down_payment").val()));
+            }
             $("#down_payment_view").change(function() {
+                function_elements_add(this.name,this.value);
                 $("#down_payment").val(this.value);
                 $("#down_payment_view").val(toRp(this.value));
             });
+            $("#payed_amount_view").change(function() {
+                function_elements_add(this.name,this.value);
+                $("#payed_amount").val(this.value);
+                $("#change_amount_view").val(toRp(this.value-$('#total_amount').val()));
+                $("#change_amount").val(this.value-$('#total_amount').val());
+                $("#payed_amount_view").val(toRp(this.value));
+            });
+            $("#no-dp").click(function () {
+            if(this.checked){
+                $('#down_payment').prop('disabled', false);
+                $('#change').prop('disabled', true);
+                $('#no-dp-input').val(1);
+                $('#without-dp').show();
+                $('#down-payment-el').hide();
+            }else{
+                $('#down_payment').prop('disabled', true);
+                $('#change').prop('disabled', false);
+                $('#no-dp-input').val(0);
+                $('#without-dp').hide();
+                $('#down-payment-el').show();
+            }
+        });
             if(index >= 4){
                 $("#card-total-all").show();
             }
             setTimeout(function () {
-                $(".modal-backdrop .fade").remove();
-            },5000);
+                $(".modal-backdrop.fade").remove();
+            },6000);
+
         });
     </script>
 @stop
@@ -733,15 +905,15 @@ if (empty($paket)) {
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ url('home') }}">Beranda</a></li>
-            <li class="breadcrumb-item"><a href="{{ url('item') }}">Daftar Booking</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Tambah Booking</li>
+            <li class="breadcrumb-item"><a href="{{ isset($ci)?route('cc.index'):route('booking.index') }}">Daftar {{isset($ci)?'Check-In':'Booking'}}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Tambah {{isset($ci)?'Check-In':'Booking'}}</li>
         </ol>
     </nav>
 
 @stop
 @section('content')
     <h3 class="page-title">
-        Form Tambah Booking
+        Form Tambah {{isset($ci)?'Check-In':'Booking'}}
     </h3>
     <br />
     @if (session('msg'))
@@ -756,14 +928,14 @@ if (empty($paket)) {
             @endforeach
         </div>
     @endif
-    <form method="post" id="form-booking" action="{{ route('booking.process-add') }}" enctype="multipart/form-data">
+    <form method="post" id="form-booking" action="{{  isset($ci)?route('cc.process-add'):route('booking.process-add')  }}" enctype="multipart/form-data">
         <div class="card border border-dark">
         <div class="card-header border-dark bg-dark">
             <h5 class="mb-0 float-left">
                 Form Tambah
             </h5>
             <div class="float-right">
-                <button onclick="location.href='{{ route('booking.index') }}'" name="Find" class="btn btn-sm btn-info"
+                <button onclick="location.href='{{ isset($ci)?route('cc.index'):route('booking.index') }}'" name="Find" class="btn btn-sm btn-info"
                     title="Back"><i class="fa fa-angle-left"></i> Kembali</button>
             </div>
         </div>
@@ -799,7 +971,7 @@ if (empty($paket)) {
                                     </section>
                                     <input type="date"
                                         class="form-control form-control-inline input-medium date-picker input-date"
-                                        data-date-format="dd-mm-yyyy" type="text" name="start_date" id="start_date"
+                                        data-date-format="dd-mm-yyyy" type="text" name="start_date" min="{{date('Y-m-d')}}" {{isset($ci)?'readonly':''}} id="start_date"
                                         value="{{ $sessiondata['start_date'] ?? date('Y-m-d') }}" onchange="changeDate()" style="width: 15rem;" />
                                 </div>
                             </div>
@@ -893,8 +1065,8 @@ if (empty($paket)) {
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
-                                    <table id="example" style="width:100%"
-                                        class="table table-striped table-bordered table-hover table-full-width">
+                                    <table id="room-table-parent"
+                                        class="table table-striped table-bordered datatables table-hover table-full-width">
                                         <thead>
                                             <tr>
                                                 <th width="2%" style='text-align:center'>No</th>
@@ -902,10 +1074,8 @@ if (empty($paket)) {
                                                 <th width="15%" style='text-align:center'>Tipe Kamar</th>
                                                 <th width="15%" style='text-align:center'>Bangunan</th>
                                                 <th width="13%" style='text-align:center'>Jumlah Orang</th>
-                                                <th colspan="2" width="30%" style='text-align:center'>Harga Kamar
-                                                </th>
-                                                <th width="20%" style='text-align:center'>Subtotal
-                                                </th>
+                                                <th colspan="2" width="30%" style='text-align:center'>Harga Kamar</th>
+                                                <th width="20%" style='text-align:center'>Subtotal</th>
                                                 <th width="10%" style='text-align:center'>Aksi</th>
                                             </tr>
                                         </thead>
@@ -916,7 +1086,7 @@ if (empty($paket)) {
                                                     <tr class="booked-room room-{{ $val->room_id }}"
                                                         id="booked-room-{{ $val->room_id }}">
                                                         <td>{{ $no++ }}
-                                                            <input type='hidden' id="room_id[]"
+                                                            <input type='hidden' class="room-id" name="room_id[]"
                                                                 value="{{ $val->room_id }}" />
                                                         </td>
                                                         <td>{{ $val->room_name }}</td>
@@ -938,19 +1108,10 @@ if (empty($paket)) {
                                                             </div>
                                                         </td>
                                                         <td width="15%">
-                                                            {!! Form::select(
-                                                                'room_price_id',
-                                                                $val->price->pluck('type.price_type_name', 'room_price_id'),
-                                                                $price[$val->room_id] ?? '',
-                                                                [
-                                                                    'class' => 'selection-search-clear room-price-select required select-form',
-                                                                    'name' => 'room_price_id_' . $val->room_id,
-                                                                    'id' => 'room_price_id_' . $val->room_id,
-                                                                    'data-id' =>  $val->room_id,
-                                                                    'onchange' => 'changePrice('.$val->room_id.',this.value)',
-                                                                    'required',
-                                                                ],
-                                                            ) !!}
+                                                            <select class="selection-search-clear room-price-select required select-form" required
+                                                             placeholder="Pilih Nama" name="room_price_id[]" id="room_price_id_{{$val->room_id}}"
+                                                            onchange="changePrice({{$val->room_id}},this.value)"  data-id="{{$val->room_id}}" >
+                                                            </select>
                                                         </td>
                                                         <td width="10%">
                                                             <input type="text"
@@ -975,15 +1136,15 @@ if (empty($paket)) {
                                             @endisset
                                             @empty($room)
                                                 <tr>
-                                                    <td align="center" valign="top" colspan="7"
+                                                    <td align="center" valign="top" colspan="9"
                                                         class="dataTables_empty">No data available in table</td>
                                                 </tr>
                                             @endempty
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <td colspan="5" class="font-weight-bold text-center fs-4">Subtotal</td>
-                                                <td colspan="2" class="font-weight-bold text-center fs-4">
+                                                <td colspan="6" class="font-weight-bold text-center fs-4">Subtotal</td>
+                                                <td colspan="3" class="font-weight-bold text-center fs-4">
                                                     <h5 id="subtotal"> Rp. <div class="sbs-room-view d-inline"
                                                             id="sbs-room-view"></div> - </h5>
                                                     <input type="hidden" name="subtotal_room" id="sbs-room" />
@@ -1103,7 +1264,7 @@ if (empty($paket)) {
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <td colspan="4" class="font-weight-bold text-center fs-4">Subtotal</td>
+                                                <td colspan="5" class="font-weight-bold text-center fs-4">Subtotal</td>
                                                 <td colspan="2" class="font-weight-bold text-center fs-4">
                                                     <h5 id="subtotal"> Rp. <div class="sbs-facility-view d-inline"
                                                             id="sbs-facility-view"></div> - </h5>
@@ -1165,7 +1326,7 @@ if (empty($paket)) {
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
-                                    <table id="example" style="width:100%"
+                                    <table style="width:100%"
                                         class="table table-striped table-bordered datatables table-hover table-full-width">
                                         <thead>
                                             <tr>
@@ -1212,7 +1373,7 @@ if (empty($paket)) {
                                                             id='menu_qty_{{ $men->room_menu_id }}'
                                                             style='text-align: center; height: 30px; font-weight: bold; font-size: 15px'
                                                             class='form-control input-bb' min='1'
-                                                            value='{{ $facilityqty[$men->room_menu_id] ?? 1 }}'
+                                                            value='{{ $menuqty[$men->room_menu_id] ?? 1 }}'
                                                             autocomplete='off' />
                                                     </td>
                                                     <td align="right" id="sbs-menu-itm-{{ $men->room_menu_id }}">
@@ -1337,20 +1498,56 @@ if (empty($paket)) {
                     :
                 </div>
                 <div class="col-8">
-                    <input class="form-control input-bb" id="total_amount_view" name="total_amount_view" autocomplete="off" onchange="count_total()"/>
-                    <input class="form-control input-bb" id="total_amount" type="hidden" name="total_amount" autocomplete="off" onchange="count_total()"/>
+                    <input class="form-control input-bb" id="total_amount_view" name="total_amount_view" autocomplete="off" readonly/>
+                    <input class="form-control input-bb" id="total_amount" type="hidden" name="total_amount" autocomplete="off" />
                 </div>
             </div>
-            <div class="row mb-3">
+            <div class="row form-group {{isset($ci)?'d-none':''}}">
+                <div class="col-3"></div>
+                <div class="col-8">
+                    <div class="form-check">
+                        <input class="form-check-input" id="no-dp" type="checkbox" >
+                        <input class="form-check-input" name="no-dp" value='0' id="no-dp-input" hidden />
+                        <label class="form-check-label">Tanpa Uang Muka</label>
+                     </div>
+                </div>
+            </div>
+            <div class="row mb-3 {{isset($ci)?'d-none':''}}" id="down-payment-el">
                 <div class="col-3">
-                    <a id="label-payment" class="text-dark col-form-label">Uang Muka</a><a class='red'> *</a></a>
+                    <a id="label-payment" class="text-dark col-form-label">Uang Muka</a> *</a></a>
                 </div>
                 <div class="col-auto">
                     :
                 </div>
                 <div class="col-8">
                     <input class="form-control required input-bb" required autocomplete="off" id="down_payment_view" name="down_payment_view" />
-                    <input class="form-control input-bb" id="down_payment" name="down_payment" hidden/>
+                    <input class="form-control input-bb" id="down_payment" value="{{$sessiondata['down_payment_view']??''}}" name="down_payment" hidden/>
+                </div>
+            </div>
+            <div id="without-dp" style="display: none;">
+                <div class="row mb-3">
+                    <div class="col-3">
+                        <a id="label-payment" class="text-dark col-form-label">Bayar</a><a class='red'> *</a></a>
+                    </div>
+                    <div class="col-auto">
+                        :
+                    </div>
+                    <div class="col-8">
+                        <input class="form-control required input-bb" required autocomplete="off" id="payed_amount_view" name="payed_amount_view" />
+                        <input class="form-control input-bb" id="payed_amount" value="{{$sessiondata['payed_amount_view']??''}}" name="payed_amount" hidden/>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-3">
+                        <a id="label-payment" class="text-dark col-form-label">Kembalian</a><a class='red'> *</a></a>
+                    </div>
+                    <div class="col-auto">
+                        :
+                    </div>
+                    <div class="col-8">
+                        <input class="form-control required input-bb" required autocomplete="off" id="change_amount_view" name="change_amount_view" readonly />
+                        <input class="form-control input-bb" id="change_amount" name="change_amount" hidden/>
+                    </div>
                 </div>
             </div>
             <br>

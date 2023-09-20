@@ -10,6 +10,9 @@ class SalesOrderRoom extends Model
     use HasFactory;
     protected $table = 'sales_order_room';
     protected $primaryKey = 'sales_order_room_id';
+    public function detail() {
+        return $this->belongsTo(CoreRoom::class,'room_id','room_id');
+    }
     protected $guarded = [
         'updated_at',
         'created_at',
