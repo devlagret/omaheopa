@@ -22,7 +22,7 @@ class AcctAccountSettingController extends Controller
 
         $accountlist = AcctAccount::select(DB::raw("CONCAT(account_code,' - ',account_name) AS full_account"),'account_id')
         ->where('data_state',0)
-        ->where('company_id',Auth::user()->company_id)
+        // ->where('company_id',Auth::user()->company_id)
         ->get()
         ->pluck('full_account','account_id');
         $status = array(

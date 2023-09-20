@@ -1,8 +1,7 @@
-@inject('InvWarehouseTransfer', 'App\Http\Controllers\InvWarehouseTransferController')
+@inject('InvWarehouseTransferReceivedNote', 'App\Http\Controllers\InvWarehouseTransferReceivedNoteController')
 @extends('adminlte::page')
 
-@section('title', "MOZAIC Point of Sales")
-
+@section('title',  "MOZAIC Omah'e Opa")
 <link rel="shortcut icon" href="{{ asset('resources/assets/logo_pbf.ico') }}" />
 
 @section('content_header')
@@ -10,7 +9,7 @@
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ url('home') }}">Beranda</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Daftar Transfer Gudang</li>
+        <li class="breadcrumb-item active" aria-current="page">Daftar Penerimaan Transfer Gudang</li>
     </ol>
 </nav>
 
@@ -19,12 +18,11 @@
 @section('content')
 
 <h3 class="page-title">
-    <b>Daftar  Transfer Gudang</b> <small>Mengelola Transfer Gudang </small>
+    <b>Daftar Penerimaan Transfer Gudang</b> <small>Mengelola Penerimaan Transfer Gudang</small>
 </h3>
 <br/>
-
 <div id="accordion">
-    <form  method="post" action="{{route('filter-warehouse-transfer')}}" enctype="multipart/form-data">
+    <form  method="post" action="{{route('filter-warehouse-transfer-received-note')}}" enctype="multipart/form-data">
     @csrf
         <div class="card border border-dark">
         <div class="card-header bg-dark" id="headingOne" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
@@ -46,6 +44,7 @@
                             <input type ="date" class="form-control form-control-inline input-medium date-picker input-date" data-date-format="dd-mm-yyyy" type="text" name="start_date" id="start_date" onChange="function_elements_add(this.name, this.value);" value="{{$start_date}}" style="width: 15rem;"/>
                         </div>
                     </div>
+
                     <div class = "col-md-6">
                         <div class="form-group form-md-line-input">
                             <section class="control-label">Tanggal Akhir
@@ -60,7 +59,7 @@
             </div>
             <div class="card-footer text-muted">
                 <div class="form-actions float-right">
-                    <a type="reset" name="Reset" class="btn btn-danger btn-sm" href="{{route('filter-reset-warehouse-transfer')}}"><i class="fa fa-times"></i> Batal</a>
+                    <a href="{{route('filter-reset-transfer-received-note')}}" type="reset" name="Reset" class="btn btn-danger btn-sm" onClick="window.location.reload();"><i class="fa fa-times"></i> Batal</a>
                     <button type="submit" name="Find" class="btn btn-primary btn-sm" title="Search Data"><i class="fa fa-search"></i> Cari</button>
                 </div>
             </div>
@@ -75,14 +74,14 @@
 </div>
 @endif 
 <div class="card border border-dark">
-<div class="card-header bg-dark clearfix">
-    <h5 class="mb-0 float-left">
-        Daftar
-    </h5>
-    <div class="form-actions float-right">
-        <button onclick="location.href='{{ url('warehouse-transfer/add') }}'" name="Find" class="btn btn-sm btn-info" title="Add Data"><i class="fa fa-plus"></i> Tambah Transfer Gudang Baru</button>
+    <div class="card-header bg-dark clearfix">
+        <h5 class="mb-0 float-left">
+            Daftar
+        </h5>
+        <div class="form-actions float-right">
+            <button onclick="location.href='{{ url('warehouse-transfer-received-note/search-warehouse-transfer') }}'" name="Find" class="btn btn-sm btn-info" title="Add Data"><i class="fa fa-plus"></i> Tambah Penerimaan Transfer Gudang Baru</button>
+        </div>
     </div>
-</div>
 
     <div class="card-body">
         <div class="table-responsive">
@@ -90,27 +89,27 @@
                 <thead>
                     <tr>
                         <th width="2%" style='text-align:center'>No.</th>
-                        <th width="10%" style='text-align:center'>Tanggal</th>
-                        <th width="20%" style='text-align:center'>Gudang Asal</th>
-                        <th width="20%" style='text-align:center'>Gudang Tujuan</th>
-                        <th width="30%" style='text-align:center'>Keterangan</th>
-                        <th width="18%" style='text-align:center'>Aksi</th>
+                        <th width="15%" style='text-align:center'>No Penerimaan Transfer Gudang</th>
+                        <th width="13%" style='text-align:center'>Tanggal Penerimaan</th>
+                        <th width="15%" style='text-align:center'>Gudang Asal</th>
+                        <th width="15%" style='text-align:center'>Gudang Tujuan</th>
+                        <th width="15%" style='text-align:center'>Ekspedisi</th>
+                        <th width="10%" style='text-align:center'>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php $no = 1; ?>
-                    @foreach($warehousetransfer as $transfer)
+                    @foreach($warehousetransferreceivednote as $item)
                     <tr>
-                        <td style='text-align:center'>{{$no}}</td>
-                        <td>{{date('d/m/Y', strtotime($transfer['warehouse_transfer_date']))}}</td>
-                        <td>{{$InvWarehouseTransfer->getInvWarehouseName($transfer['warehouse_from_id'])}}</td>
-                        <td>{{$InvWarehouseTransfer->getInvWarehouseName($transfer['warehouse_to_id'])}}</td>
-                        <td>{{$transfer['warehouse_transfer_remark']}}</td>
-                        <td class="" style="text-align: center">
-                            <a type="button" class="btn btn-outline-warning btn-sm" href="{{ url('/warehouse-transfer/detail/'.$transfer['warehouse_transfer_id']) }}">Detail</a>
-                            <?php if($transfer['warehouse_transfer_status']==0){?>
-                            <a type="button" class="btn btn-outline-danger btn-sm" href="{{ url('/warehouse-transfer/void/'.$transfer['warehouse_transfer_id']) }}">Hapus</a>
-                            <?php } ?>
+                        <td style='text-align:center'>{{$no}}.</td>
+                        <td>{{$item['warehouse_transfer_received_note_no']}}</td>
+                        <td>{{date('d/m/Y', strtotime($item['warehouse_transfer_received_note_date']))}}</td>
+                        <td>{{$InvWarehouseTransferReceivedNote->getInvWarehouseName($item['warehouse_transfer_from'])}}</td>
+                        <td>{{$InvWarehouseTransferReceivedNote->getInvWarehouseName($item['warehouse_transfer_to'])}}</td>
+                        <td>{{$InvWarehouseTransferReceivedNote->getCoreExpeditionName($item['expedition_id'])}}</td>
+                        <td class="">
+                            <a type="button" class="btn btn-outline-success btn-sm" href="{{ url('/warehouse-transfer-received-note/detail/'.$item['warehouse_transfer_received_note_id']) }}">Detail</a>
+                            <a type="button" class="btn btn-outline-danger btn-sm" href="{{ url('/warehouse-transfer-received-note/delete-warehouse-transfer-received-note/'.$item['warehouse_transfer_received_note_id']) }}">Hapus</a>
                         </td>
                     </tr>
                     <?php $no++; ?>
@@ -120,9 +119,6 @@
         </div>
     </div>
 </div>
-</div>
-<br>
-<br>
 
 @stop
 
@@ -131,5 +127,9 @@
 @stop
 
 @section('css')
+    
+@stop
+
+@section('js')
     
 @stop

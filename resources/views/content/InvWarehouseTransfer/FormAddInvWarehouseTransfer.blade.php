@@ -1,7 +1,7 @@
 @inject('InvWarehouseTransfer', 'App\Http\Controllers\InvWarehouseTransferController')
 @extends('adminlte::page')
 
-@section('title', "MOZAIC Point of Sales")
+@section('title', "MOZAIC Omah'e Opa")
 @section('js')
 <script>
 	$(document).ready(function(){
@@ -68,9 +68,7 @@
                     },
                     success: function(return_data){ 
 					$('#item_unit_id').html(return_data);
-                        console.log(return_data);
-                    $("#item_unit_id").val(return_data);
-                        console.log(return_data);        
+                        console.log(return_data);       
                     },
                     error: function(data)
                     {
@@ -98,10 +96,9 @@
                         '_token'            : '{{csrf_token()}}',
                     },
                     success: function(return_data){ 
-					$('#stock_quantity').html(return_data);
-                        console.log(return_data);
-                    $("#stock_quantity").val(return_data);
-                        console.log(return_data);        
+					$('#stock_quantity').val(return_data);
+                        console.log(return_data);     
+                       
                     },
                     error: function(data)
                     {
@@ -110,6 +107,38 @@
                     }
                 });
 		});
+
+
+
+        $("#item_unit_id").change(function(){
+            var item_category_id 	= $("#item_category_id").val();
+            var item_unit_id 	= $("#item_unit_id").val();
+			var item_id 	= $("#item_id").val();
+                $.ajax({
+                    type: "POST",
+                    url : "{{route('select-data-stock')}}",
+                    dataType: "html",
+                    data: {
+                        'item_category_id'	: item_category_id,
+                        'item_unit_id'	    : item_unit_id,
+                        'item_id'	        : item_id,
+                        '_token'            : '{{csrf_token()}}',
+                    },
+                    success: function(return_data){ 
+					$('#item_stock_id').val(return_data);
+                        console.log(return_data);  
+                   
+                    },
+                    error: function(data)
+                    {
+                        console.log(data);
+
+                    }
+                });
+		});
+
+
+        
 
 
         
@@ -143,6 +172,7 @@
         var quantity			                = document.getElementById("quantity").value;
         var warehouse_transfer_item_remark		= document.getElementById("warehouse_transfer_item_remark").value;
         var stock_quantity			            = document.getElementById("stock_quantity").value;
+        var item_stock_id			            = document.getElementById("item_stock_id").value;
 
         // if(item_unit_id == default_item_unit_id){
         //     if(stock_quantity<quantity){
@@ -159,6 +189,7 @@
                 'item_id' 			                : item_id,
                 'item_unit_id' 		                : item_unit_id,
                 'quantity' 			                : quantity,
+                'item_stock_id'                     : item_stock_id,
                 'warehouse_transfer_item_remark' 	: warehouse_transfer_item_remark,
                 '_token'                            : '{{csrf_token()}}'
             },
@@ -327,6 +358,12 @@
                     <div class="form-group">
                         <a class="text-dark">Stock Quantity</a>
                         <input class="form-control input-bb" type="text" name="stock_quantity" id="stock_quantity" value="" readonly/>
+                    </div>
+                </div>
+                <div class="col-md-6" hidden>
+                    <div class="form-group">
+                        <a class="text-dark">Stock </a>
+                        <input class="form-control input-bb" type="text" name="item_stock_id" id="item_stock_id" value="" readonly/>
                     </div>
                 </div>
                 <div class="col-md-6">

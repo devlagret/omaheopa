@@ -1,8 +1,7 @@
 @inject('InvWarehouseTransfer', 'App\Http\Controllers\InvWarehouseTransferController')
 @extends('adminlte::page')
 
-@section('title', 'PBF | Koperasi Menjangan Enam')
-<link rel="shortcut icon" href="{{ asset('resources/assets/logo_pbf.ico') }}" />
+@section('title', "MOZAIC Omah'e Opa")
 @section('js')
 <script>
 	$(document).ready(function(){
@@ -55,63 +54,6 @@
                 }
             });
 		});
-
-        $("#item_id").change(function(){
-            var warehouse_from_id 	= $("#warehouse_from_id").val();
-            var item_category_id 	= $("#item_category_id").val();
-            var item_type_id 	    = $("#item_type_id").val();
-            var item_id 	        = $("#item_id").val();
-
-            $.ajax({
-                type: "POST",
-                url : "{{route('warehouse-transfer-batch-number')}}",
-                dataType: "html",
-                data: {
-                    'warehouse_from_id'	: warehouse_from_id,
-                    'item_category_id'	: item_category_id,
-                    'item_type_id'	    : item_type_id,
-                    'item_id'	        : item_id,
-                    '_token'            : '{{csrf_token()}}',
-                },
-                success: function(return_data){ 
-                    return_data = JSON.parse(return_data);
-                    return_data = JSON.parse(return_data);
-
-                    $('#item_batch_number').html(return_data['data']);
-                    $('#default_item_unit_id').val(return_data['itemunit']);
-                },
-                error: function(data)
-                {
-                    console.log(data);
-
-                }
-            });
-        });
-
-        $("#item_batch_number").change(function(){
-            var item_stock_id 	= $("#item_batch_number").val();
-
-            $.ajax({
-                type: "POST",
-                url : "{{route('warehouse-transfer-batch-number-detail')}}",
-                dataType: "html",
-                data: {
-                    'item_stock_id'	    : item_stock_id,
-                    '_token'            : '{{csrf_token()}}',
-                },
-                success: function(return_data){ 
-                    // return_data = return_data.slice(1);
-                    return_data = JSON.parse(return_data);
-                    $('#stock_quantity').val(return_data['item_total']);
-                },
-                error: function(data)
-                {
-                    console.log(data);
-                }
-            });
-        });
-    
-	});
     
     function elements_add(name, value){
         $.ajax({
@@ -209,11 +151,11 @@
             <div class="row form-group">
                 <div class="col-md-6">
                     <a class="text-dark">Gudang Asal<a class='red'> *</a></a>
-                    <input class="form-control input-bb" type="text" name="warehouse_from_id" id="warehouse_from_id" value="{{$InvWarehouseTransfer->getInvWarehouseName($warehousetransfer['warehouse_transfer_from'])}}" readonly/>
+                    <input class="form-control input-bb" type="text" name="warehouse_from_id" id="warehouse_from_id" value="{{$InvWarehouseTransfer->getInvWarehouseName($warehousetransfer['warehouse_from_id'])}}" readonly/>
                 </div>
                 <div class="col-md-6">
                     <a class="text-dark">Gudang Tujuan<a class='red'> *</a></a>
-                    <input class="form-control input-bb" type="text" name="warehouse_to_id" id="warehouse_to_id" value="{{$InvWarehouseTransfer->getInvWarehouseName($warehousetransfer['warehouse_transfer_to'])}}" readonly/>
+                    <input class="form-control input-bb" type="text" name="warehouse_to_id" id="warehouse_to_id" value="{{$InvWarehouseTransfer->getInvWarehouseName($warehousetransfer['warehouse_to_id'])}}" readonly/>
                 </div>
             </div>
             <div class="row form-group">
@@ -237,7 +179,6 @@
         </div>
         <div class="card-footer text-muted">
             <div class="form-actions float-right">
-                <a name="Save" class="btn btn-primary" title="Save" onclick='processAddArrayWarehouseTransferItem()'>Detail</a>
             </div>
         </div>
     </div>
@@ -259,7 +200,6 @@
                             <tr>
                                 <th width='5%' style='text-align:center'>No.</th>
                                 <th width='20%' style='text-align:center'>Barang</th>
-                                <th width='20%' style='text-align:center'>Batch Number</th>
                                 <th width='10%' style='text-align:center'>Quantity</th>
                                 <th width='10%' style='text-align:center'>Satuan</th>
                                 <th width='30%' style='text-align:center'>Keterangan Barang</th>
@@ -283,7 +223,6 @@
                                                 <td style='text-align  : left !important;'>".$InvWarehouseTransfer->getItemName($val['item_id'])."</td>";
                                             }
                                                 echo"
-                                                <td style='text-align  : left !important;'>".$InvWarehouseTransfer->getItemBatchNumberName($val['item_stock_id'])."</td>
                                                 <td style='text-align  : right !important;'>".$val['quantity']."</td>
                                                 <td style='text-align  : left !important;'>".$InvWarehouseTransfer->getItemUnitName($val['item_unit_id'])."</td>
                                                 <td style='text-align  : left !important;'>".$val['warehouse_transfer_item_remark']."</td>

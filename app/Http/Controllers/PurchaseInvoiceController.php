@@ -192,7 +192,7 @@ class PurchaseInvoiceController extends Controller
             'subtotal_amount_total'     => $fields['subtotal_amount_total'],
             'total_amount'              => $fields['total_amount'],
             'paid_amount'               => $fields['paid_amount'],
-            'owing_amount'              => $fields['owing_amount'],
+            'owing_amount'              => $fields['total_amount'],
             'company_id'                => Auth::user()->company_id,
             'created_id'                => Auth::id(),
             'updated_id'                => Auth::id()
@@ -258,57 +258,57 @@ class PurchaseInvoiceController extends Controller
                 // }
             }
 
-            // $account_setting_name = 'purchase_cash_account';
-            // $account_id = $this->getAccountId($account_setting_name);
-            // $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
-            // $account_default_status = $this->getAccountDefaultStatus($account_id);
-            // $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
-            // if ($account_setting_status == 0){
-            //     $debit_amount = $fields['total_amount'];
-            //     $credit_amount = 0;
-            // } else {
-            //     $debit_amount = 0;
-            //     $credit_amount = $fields['total_amount'];
-            // }
-            // $journal_debit = array(
-            //     'company_id'                    => Auth::user()->company_id,
-            //     'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
-            //     'account_id'                    => $account_id,
-            //     'journal_voucher_amount'        => $fields['total_amount'],
-            //     'account_id_default_status'     => $account_default_status,
-            //     'account_id_status'             => $account_setting_status,
-            //     'journal_voucher_debit_amount'  => $debit_amount,
-            //     'journal_voucher_credit_amount' => $credit_amount,
-            //     'created_id'                    => Auth::id(),
-            //     'updated_id'                    => Auth::id()
-            // );
-            // JournalVoucherItem::create($journal_debit);
+            $account_setting_name = 'purchase_cash_account';
+            $account_id = $this->getAccountId($account_setting_name);
+            $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
+            $account_default_status = $this->getAccountDefaultStatus($account_id);
+            $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
+            if ($account_setting_status == 0){
+                $debit_amount = $fields['total_amount'];
+                $credit_amount = 0;
+            } else {
+                $debit_amount = 0;
+                $credit_amount = $fields['total_amount'];
+            }
+            $journal_debit = array(
+                'company_id'                    => Auth::user()->company_id,
+                'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
+                'account_id'                    => $account_id,
+                'journal_voucher_amount'        => $fields['total_amount'],
+                'account_id_default_status'     => $account_default_status,
+                'account_id_status'             => $account_setting_status,
+                'journal_voucher_debit_amount'  => $debit_amount,
+                'journal_voucher_credit_amount' => $credit_amount,
+                'created_id'                    => Auth::id(),
+                'updated_id'                    => Auth::id()
+            );
+            JournalVoucherItem::create($journal_debit);
 
-            // $account_setting_name = 'purchase_account';
-            // $account_id = $this->getAccountId($account_setting_name);
-            // $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
-            // $account_default_status = $this->getAccountDefaultStatus($account_id);
-            // $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
-            // if ($account_setting_status == 0){
-            //     $debit_amount = $fields['total_amount'];
-            //     $credit_amount = 0;
-            // } else {
-            //     $debit_amount = 0;
-            //     $credit_amount = $fields['total_amount'];
-            // }
-            // $journal_credit = array(
-            //     'company_id'                    => Auth::user()->company_id,
-            //     'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
-            //     'account_id'                    => $account_id,
-            //     'journal_voucher_amount'        => $fields['total_amount'],
-            //     'account_id_default_status'     => $account_default_status,
-            //     'account_id_status'             => $account_setting_status,
-            //     'journal_voucher_debit_amount'  => $debit_amount,
-            //     'journal_voucher_credit_amount' => $credit_amount,
-            //     'created_id'                    => Auth::id(),
-            //     'updated_id'                    => Auth::id()
-            // );
-            // JournalVoucherItem::create($journal_credit);
+            $account_setting_name = 'purchase_account';
+            $account_id = $this->getAccountId($account_setting_name);
+            $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
+            $account_default_status = $this->getAccountDefaultStatus($account_id);
+            $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
+            if ($account_setting_status == 0){
+                $debit_amount = $fields['total_amount'];
+                $credit_amount = 0;
+            } else {
+                $debit_amount = 0;
+                $credit_amount = $fields['total_amount'];
+            }
+            $journal_credit = array(
+                'company_id'                    => Auth::user()->company_id,
+                'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
+                'account_id'                    => $account_id,
+                'journal_voucher_amount'        => $fields['total_amount'],
+                'account_id_default_status'     => $account_default_status,
+                'account_id_status'             => $account_setting_status,
+                'journal_voucher_debit_amount'  => $debit_amount,
+                'journal_voucher_credit_amount' => $credit_amount,
+                'created_id'                    => Auth::id(),
+                'updated_id'                    => Auth::id()
+            );
+            JournalVoucherItem::create($journal_credit);
 
             $msg = 'Tambah Pembelian Berhasil';
             return redirect('/purchase-invoice/add')->with('msg',$msg);
