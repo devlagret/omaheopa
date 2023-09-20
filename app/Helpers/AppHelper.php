@@ -31,4 +31,12 @@ class AppHelper
     public static function menuType():Collection {
         return collect([1 => 'Breakfast', 2 => 'Lunch', 3 => 'Dinner']);
     }
+    /**
+     * Get order (booking) type
+     *
+     * @return Collection
+     */
+    public static function orderType():Collection {
+        return collect([0 => 'Dengan Uang Muka', 3 => 'Tanpa Uang Muka', 4 => 'Full Book']);
+    }
 }
