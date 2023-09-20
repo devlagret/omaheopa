@@ -181,7 +181,7 @@ class InvGoodsReceivedNoteController extends Controller
         $purchaseorderitem_temporary = Session::get('purchaseorderitem');
 
         $fields = $request->validate([
-            'purchase_invoice_id'         => 'required',
+            'purchase_invoice_id'       => 'required',
             'goods_received_note_date'  => 'required',
             'supplier_id'               => 'required',
             'warehouse_id'              => 'required',
@@ -272,10 +272,7 @@ class InvGoodsReceivedNoteController extends Controller
                     'item_unit_id'							=> $temprequest['item_unit_id_'.$i],
                     'item_unit_cost'					    => $temprequest['item_unit_cost_'.$i],
                     'quantity'					            => $temprequest['quantity_received_'.$i],
-                    // 'quantity_ordered'					    => $temprequest['quantity_received_'.$i],
-                    // 'quantity_received'					    => $temprequest['quantity_received_'.$i],
-                    // 'item_batch_number'                     => $temprequest['item_batch_number_'.$i],
-                    // 'item_expired_date'                     => $temprequest['item_expired_date_'.$i],
+                    'quantity_received'					    => $temprequest['quantity_received_'.$i],
                     'created_id'                            => Auth::id(),
                 );
 
@@ -284,19 +281,20 @@ class InvGoodsReceivedNoteController extends Controller
             
         
 
-//                 //update purchase invoice item
-                // $purchaseInvoiceitem = PurchaseInvoiceItem::findOrFail($invgoodsreceivednoteitem['purchase_invoice_item_id']);
-                // $purchaseInvoiceitem->quantity_received    = $purchaseInvoiceitem['quantity_received'] + $invgoodsreceivednoteitem['quantity'];
-                // $purchaseInvoiceitem->save();
+            // //update purchase invoice item
+            
+                $purchaseInvoiceitem = PurchaseInvoiceItem::findOrFail($invgoodsreceivednoteitem['purchase_invoice_item_id']);
+                $purchaseInvoiceitem->quantity_received    = $purchaseInvoiceitem['quantity_received'] + $invgoodsreceivednoteitem['quantity'];
+                $purchaseInvoiceitem->save();
 
-                // $total_received_item = $total_received_item + $purchaseInvoiceitem['quantity_received'] + $invgoodsreceivednoteitem['quantity'];
+                $total_received_item = $total_received_item + $purchaseInvoiceitem['quantity_received'] + $invgoodsreceivednoteitem['quantity'];
 
-                // $goodsreceivednoteitem = InvGoodsReceivedNoteItem::select('goods_received_note_item_id')
-                // ->where('quantity', $invgoodsreceivednoteitem['quantity'])
-                // ->where('item_id', $invgoodsreceivednoteitem['item_id'])
-                // ->where('created_id', Auth::id())
-                // ->orderBy('created_at', 'DESC')
-                // ->first();
+                $goodsreceivednoteitem = InvGoodsReceivedNoteItem::select('goods_received_note_item_id')
+                ->where('quantity', $invgoodsreceivednoteitem['quantity'])
+                ->where('item_id', $invgoodsreceivednoteitem['item_id'])
+                ->where('created_id', Auth::id())
+                ->orderBy('created_at', 'DESC')
+                ->first();
 
                 $item = InvtItem::where('data_state', 0)
                 ->where('item_id', $invgoodsreceivednoteitem['item_id'])
@@ -333,7 +331,7 @@ class InvGoodsReceivedNoteController extends Controller
 
 
                 $invitemstock = array(
-                    // 'goods_received_note_id'        => $goodsreceivednote['goods_received_note_id'],
+                    'goods_received_note_id'        => $goodsreceivednote['goods_received_note_id'],
                     // 'goods_received_note_item_id'   => $goodsreceivednoteitem['goods_received_note_item_id'],
                     'item_stock_date'               => $invgoodsreceivednote['goods_received_note_date'],
                     // 'item_batch_number'             => $invgoodsreceivednoteitem['item_batch_number'],
@@ -360,6 +358,7 @@ class InvGoodsReceivedNoteController extends Controller
                 }else{
                     $itemstockupdate = InvtItemStock::findOrFail($data_item_stock['item_stock_id']);
                     $itemstockupdate->last_balance += $invitemstock['last_balance'];
+                    $itemstockupdate->goods_received_note_id = $goodsreceivednote['goods_received_note_id'];
                     $itemstockupdate->save();
                 }
 
@@ -475,6 +474,21 @@ class InvGoodsReceivedNoteController extends Controller
             return redirect('/goods-received-note')->with('msg',$msg);
         }
 
+    }
+
+
+
+    public function voidInvGoodsReceivedNote($goods_received_note_id)
+    {
+        $invgoodsreceivednote = InvGoodsReceivedNote::where('data_state', 0)
+        ->where('goods_received_note_id', $goods_received_note_id)
+        ->first();
+        
+        $invgoodsreceivednoteitem = InvGoodsReceivedNoteItem::where('data_state', 0)
+        ->where('goods_received_note_id', $goods_received_note_id)
+        ->get();
+
+        return view('content/InvGoodsReceivedNote/FormVoidInvGoodsReceivedNote',compact('invgoodsreceivednote', 'invgoodsreceivednoteitem', 'goods_received_note_id'));
     }
 
 

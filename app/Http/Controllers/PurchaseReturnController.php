@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\AcctAccount;
 use App\Models\AcctAccountSetting;
+use App\Models\CoreSupplier;
+use App\Models\InvGoodsReceivedNote;
+use App\Models\InvGoodsReceivedNoteItem;
 use App\Models\InvtItem;
 use App\Models\InvtItemCategory;
 use App\Models\InvtItemStock;
@@ -13,8 +16,11 @@ use App\Models\InvtWarehouse;
 use App\Models\JournalVoucher;
 use App\Models\JournalVoucherItem;
 use App\Models\PreferenceTransactionModule;
+use App\Models\PurchaseInvoice;
+use App\Models\PurchaseInvoiceItem;
 use App\Models\PurchaseReturn;
 use App\Models\PurchaseReturnItem;
+use App\Models\SalesMerchant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -65,27 +71,33 @@ class PurchaseReturnController extends Controller
         return redirect('/purchase-return');
     }
 
-    public function addPurchaseReturn()
+
+
+    public function searchGoodsReceivedNote(){
+        
+        $GoodsReceivedNote = InvGoodsReceivedNote::select('invt_goods_received_note.*')
+        ->where('invt_goods_received_note.data_state','=',0)
+        ->get();
+      //  dd($GoodsReceivedNote);
+
+        return view('content/PurchaseReturn/SearchGooodsNote', compact('GoodsReceivedNote'));
+    }
+
+
+
+    public function addPurchaseReturn($goods_received_note_id)
     {
-        $categorys = InvtItemCategory::where('data_state',0)
-        ->where('company_id', Auth::user()->company_id)
-        ->get()
-        ->pluck('item_category_name','item_category_id');
-        $warehouses = InvtWarehouse::where('data_State',0)
-        ->where('company_id', Auth::user()->company_id)
-        ->get()
-        ->pluck('warehouse_name','warehouse_id');
-        $units     = InvtItemUnit::where('data_state',0)
-        ->where('company_id', Auth::user()->company_id)
-        ->get()
-        ->pluck('item_unit_name','item_unit_id');
-        $items     = InvtItem::where('data_state',0)
-        ->where('company_id', Auth::user()->company_id)
-        ->get()
-        ->pluck('item_name','item_id');
-        $datases   = Session::get('datases');
-        $arraydatases = Session::get('arraydatases');
-        return view('content.PurchaseReturn.FormAddPurchaseReturn', compact('items', 'units', 'categorys', 'warehouses','datases','arraydatases'));
+        $GoodsReceivedNote = InvGoodsReceivedNote::select('invt_goods_received_note.*')
+        ->where('data_state','=',0)
+        ->where('goods_received_note_id',$goods_received_note_id)
+        ->first();
+
+        $GoodsReceivedNoteItem = InvGoodsReceivedNoteItem::select('invt_goods_received_note_item.*')
+        ->where('data_state','=',0)
+        ->where('goods_received_note_id',$goods_received_note_id)
+        ->get();
+    //   dd($GoodsReceivedNote);
+        return view('content.PurchaseReturn.FormAddPurchaseReturn', compact('GoodsReceivedNote','GoodsReceivedNoteItem'));
     }
 
     public function addResetPurchaseReturn()
@@ -99,7 +111,7 @@ class PurchaseReturnController extends Controller
     {
         $datases = Session::get('datases');
         if(!$datases || $datases == ''){
-            $datases['purchase_return_supplier']    = '';
+            $datases['supplier_id']    = '';
             $datases['warehouse_id']                = '';
             $datases['purchase_return_date']        = '';
             $datases['purchase_return_remark']      = '';
@@ -109,11 +121,13 @@ class PurchaseReturnController extends Controller
     }
 
     public function processAddPurchaseReturn(Request $request)
-    {
+    {   
+
+        dd($request->all());
         $transaction_module_code = 'RPBL';
         $transaction_module_id  = $this->getTransactionModuleID($transaction_module_code);
         $fields = $request->validate([
-            'purchase_return_supplier' => 'required',
+            'supplier_id'              => 'required',
             'warehouse_id'             => 'required',
             'purchase_return_date'     => 'required',
             'purchase_return_remark'   => 'required',
@@ -122,7 +136,7 @@ class PurchaseReturnController extends Controller
         ]);
 
         $datases = array(
-            'purchase_return_supplier'  => $fields['purchase_return_supplier'],
+            'supplier_id'               => $fields['supplier_id'],
             'warehouse_id'              => $fields['warehouse_id'],
             'purchase_return_date'      => $fields['purchase_return_date'],
             'purchase_return_remark'    => $fields['purchase_return_remark'],
@@ -367,4 +381,105 @@ class PurchaseReturnController extends Controller
 
         return $data['account_default_status'];
     }
+
+
+    public function getCoreSupplierName($supplier_id){
+        $supplier = CoreSupplier::where('data_state', 0)
+        ->where('supplier_id', $supplier_id)
+        ->first();
+
+        if($supplier == null){
+            return "-";
+        }
+
+        return $supplier['supplier_name'];
+    }
+
+    public function getPurchaseinvoiceNo($purchase_invoice_id){
+        $purchaseinvoice = PurchaseInvoice::where('data_state', 0)
+        ->where('purchase_invoice_id', $purchase_invoice_id)
+        ->first();
+
+        if($purchaseinvoice == null){
+            return "-";
+        }
+
+        return $purchaseinvoice['purchase_invoice_no'];
+    }
+
+
+    
+    public function getPurchaseInvoiceDate($purchase_invoice_id){
+        $purchaseorder = PurchaseInvoice::where('data_state', 0)
+        ->where('purchase_invoice_id', $purchase_invoice_id)
+        ->first();
+
+        if($purchaseorder == null){
+            return "-";
+        }
+
+        return $purchaseorder['purchase_invoice_date'];
+    }
+
+
+    public function getQtyPurchaseInvoiceItem($purchase_invoice_item_id){
+        $purchaseorder = PurchaseInvoiceItem::where('data_state', 0)
+        ->where('purchase_invoice_item_id', $purchase_invoice_item_id)
+        ->first();
+
+        if($purchaseorder == null){
+            return "-";
+        }
+
+        return $purchaseorder['quantity'];
+    }
+
+    public function getInvWarehouseName($warehouse_id){
+        $warehouse = InvtWarehouse::where('data_state', 0)
+        ->where('warehouse_id', $warehouse_id)
+        ->first();
+
+        if($warehouse == null){
+            return "-";
+        }
+
+        return $warehouse['warehouse_name'];
+    }
+
+    public function getInvItemCategoryName($item_category_id){
+        $itemcategory = InvtItemCategory::where('data_state', 0)
+        ->where('item_category_id', $item_category_id)
+        ->first();
+
+        if($itemcategory == null){
+            return "-";
+        }
+        return $itemcategory['item_category_name'];
+    }
+
+    public function getInvItemUnitName($item_unit_id){
+        $itemunit = InvtItemUnit::where('data_state', 0)
+        ->where('item_unit_id', $item_unit_id)
+        ->first();
+
+        if($itemunit == null){
+            return "-";
+        }
+
+        return $itemunit['item_unit_name'];
+    }
+
+
+    
+    public function getMerchantName($merchant_id){
+        $itemcategory = SalesMerchant::where('data_state', 0)
+        ->where('merchant_id', $merchant_id)
+        ->first();
+
+        if($itemcategory == null){
+            return "-";
+        }
+        return $itemcategory['merchant_name'];
+    }
+
 }

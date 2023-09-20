@@ -118,7 +118,7 @@
         Daftar
     </h5>
     <div class="form-actions float-right">
-        <button onclick="location.href='{{ url('/purchase-return/add') }}'" name="Find" class="btn btn-sm btn-info" title="Add Data"><i class="fa fa-plus"></i> Tambah Retur Pembelian </button>
+        <button onclick="location.href='{{ url('/purchase-return/search-goods-received-note') }}'" name="Find" class="btn btn-sm btn-info" title="Add Data"><i class="fa fa-plus"></i> Tambah Retur Pembelian </button>
     </div>
   </div>
 

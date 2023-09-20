@@ -39,6 +39,7 @@
                 $("#subtotal_amount_after_discount").val(subtotal);
                 $("#subtotal_amount_after_discount_view").val(toRp(subtotal));
             });
+            
             $("#discount_percentage_total").change(function() {
                 var discount_percentage_total = $("#discount_percentage_total").val();
                 var subtotal_amount_total = $("#subtotal_amount_total").val();

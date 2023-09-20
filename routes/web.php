@@ -37,11 +37,13 @@ use App\Http\Controllers\InvtStockAdjustmentController;
 use App\Http\Controllers\InvtStockAdjustmentReportController;
 use App\Http\Controllers\InvtWarehouseController;
 use App\Http\Controllers\InvWarehouseTransferController;
+use App\Http\Controllers\InvWarehouseTransferReceivedNoteController;
 use App\Http\Controllers\JournalVoucherController;
 use App\Http\Controllers\PublicController;
 use App\Http\Controllers\PurchaseInvoicebyItemReportController;
 use App\Http\Controllers\PurchaseInvoiceController;
 use App\Http\Controllers\PurchaseInvoiceReportController;
+use App\Http\Controllers\PurchasePaymentController;
 use App\Http\Controllers\PurchaseReturnController;
 use App\Http\Controllers\PurchaseReturnReportController;
 use App\Http\Controllers\SalesCustomerController;
@@ -120,21 +122,6 @@ Route::get('/warehouse/edit-warehouse/{warehouse_id}',[InvtWarehouseController::
 Route::post('/warehouse/process-edit-warehouse', [InvtWarehouseController::class, 'processEditWarehouse'])->name('process-edit-warehouse');
 Route::get('/warehouse/delete-warehouse/{warehouse_id}', [InvtWarehouseController::class, 'deleteWarehouse'])->name('delete-warehouse');
 
-
-Route::get('/purchase-return', [PurchaseReturnController::class, 'index'])->name('purchase-return');
-Route::get('/purchase-return/add', [PurchaseReturnController::class, 'addPurchaseReturn'])->name('add-purchase-return');
-Route::get('/purchase-return/add-reset', [PurchaseReturnController::class, 'addResetPurchaseReturn'])->name('add-reset-purchase-return');
-Route::post('/purchase-return/add-elements', [PurchaseReturnController::class, 'addElementsPurchaseReturn'])->name('add-elements-purchase-return');
-Route::post('/purchase-return/process-add',[PurchaseReturnController::class, 'processAddPurchaseReturn'])->name('process-add-purchase-return');
-Route::post('/purchase-return/add-array',[PurchaseReturnController::class, 'addArrayPurchaseReturn'])->name('add-array-purchase-return');
-Route::get('/purchase-return/delete-array/{record_id}',[PurchaseReturnController::class, 'deleteArrayPurchaseReturn'])->name('delete-array-purchase-return');
-Route::get('/purchase-return/detail/{purchase_return_id}',[PurchaseReturnController::class, 'detailPurchaseReturn'])->name('detail-purchase-return');
-Route::post('/purchase-return/filter',[PurchaseReturnController::class, 'filterPurchaseReturn'])->name('filter-purchase-return');
-Route::get('/purchase-return/filter-reset',[PurchaseReturnController::class, 'filterResetPurchaseReturn'])->name('filter-reset-purchase-return');
-Route::get('/purchase-return/edit', [PurchaseReturnController::class, 'editPurchaseReturn'])->name('edit-purchase-return');
-Route::post('/purchase-return/process-edit',[PurchaseReturnController::class, 'processeditPurchaseReturn'])->name('process-edit-purchase-return');
-Route::get('/purchase-return/delete', [PurchaseReturnController::class, 'deletePurchaseReturn'])->name('delete-purchase-return');
-
 Route::get('/sales-invoice',[SalesInvoiceController::class, 'index'])->name('sales-invoice');
 Route::get('/sales-invoice/add', [SalesInvoiceController::class,'addSalesInvoice'])->name('add-sales-invoice');
 Route::post('/sales-invoice/add-elements', [SalesInvoiceController::class,'addElementsSalesInvoice'])->name('add-elements-sales-invoice');
@@ -196,12 +183,6 @@ Route::post('/purchase-invoice-report/filter',[PurchaseInvoiceReportController::
 Route::get('/purchase-invoice-report/filter-reset',[PurchaseInvoiceReportController::class, 'filterResetPurchaseInvoiceReport'])->name('filter-reset-purchase-invoice-report');
 Route::get('/purchase-invoice-report/print',[PurchaseInvoiceReportController::class, 'printPurchaseInvoiceReport'])->name('print-purchase-invoice-report');
 Route::get('/purchase-invoice-report/export',[PurchaseInvoiceReportController::class, 'exportPurchaseInvoiceReport'])->name('export-purchase-invoice-report');
-
-Route::get('/purchase-return-report',[PurchaseReturnReportController::class, 'index'])->name('purchase-return-report');
-Route::post('/purchase-return-report/filter',[PurchaseReturnReportController::class, 'filterPurchaseReturnReport'])->name('filter-purchase-return-report');
-Route::get('/purchase-return-report/filter-reset',[PurchaseReturnReportController::class, 'filterResetPurchaseReturnReport'])->name('filter-reset-purchase-return-report');
-Route::get('/purchase-return-report/print',[PurchaseReturnReportController::class, 'printPurchaseReturnReport'])->name('print-purchase-return-report');
-Route::get('/purchase-return-report/export',[PurchaseReturnReportController::class, 'exportPurchaseReturnReport'])->name('export-purchase-return-report');
 
 Route::get('/purchase-invoice-by-item-report',[PurchaseInvoicebyItemReportController::class, 'index'])->name('purchase-invoice-by-item-report');
 Route::post('/purchase-invoice-by-item-report/filter',[PurchaseInvoicebyItemReportController::class, 'filterPurchaseInvoicebyItemReport'])->name('filter-purchase-invoice-by-item-report');
@@ -501,8 +482,8 @@ Route::prefix('log')->name('log.')->group(function () {
     Route::get('system/del', [SystemLogsController::class,'destroy'])->name('destroy');
 });
 
-//penerimaan barang / invgoods received
 
+//penerimaan barang / invgoods received
 Route::get('/goods-received-note', [InvGoodsReceivedNoteController::class, 'index'])->name('goods-received-note');
 Route::get('/goods-received-note/search-purchase-order', [InvGoodsReceivedNoteController::class, 'searchPurchaseOrder'])->name('search-po-goods-received-note');
 Route::get('/goods-received-note/add/{purchase_invoice_id}', [InvGoodsReceivedNoteController::class, 'addInvGoodsReceivedNote'])->name('add-goods-received-note');
@@ -516,9 +497,7 @@ Route::post('/goods-received-note/add-new-purchase-order-item/{purchase_invoice_
 Route::get('/goods-received-note/delete-new_purchase_order_item/{purchase_invoice_id}', [InvGoodsReceivedNoteController::class, 'deleteNewPurchaseOrderItem'])->name('delete-new-purchase-order-item');
 
 
-
 //warehouse transfer
-
 Route::get('/warehouse-transfer', [InvWarehouseTransferController::class, 'index'])->name('warehouse-transfer');
 Route::get('/warehouse-transfer/add', [InvWarehouseTransferController::class, 'addInvWarehouseTransfer'])->name('add-warehouse-transfer');
 Route::post('/warehouse-transfer/process-add-warehouse-transfer', [InvWarehouseTransferController::class, 'processAddInvWarehouseTransfer'])->name('process-add-warehouse-transfer');
@@ -529,6 +508,7 @@ Route::post('/warehouse-transfer/process-void', [InvWarehouseTransferController:
 Route::post('/warehouse-transfer/filter', [InvWarehouseTransferController::class, 'filterInvWarehouseTransfer'])->name('filter-warehouse-transfer');
 Route::get('/warehouse-transfer/filter-reset', [InvWarehouseTransferController::class, 'resetFilterInvWarehouseTransfer'])->name('filter-reset-warehouse-transfer');
 Route::post('/warehouse-transfer/city', [InvWarehouseTransferController::class, 'getInvCity'])->name('warehouse-transfer-city');
+Route::post('/warehouse-transfer/type', [InvWarehouseTransferController::class, 'getCoreType'])->name('warehouse-transfer-change-type');
 Route::post('/warehouse-transfer/item', [InvWarehouseTransferController::class, 'getCoreItem'])->name('warehouse-transfer-item');
 Route::post('/warehouse-transfer/add-array', [InvWarehouseTransferController::class, 'processAddArrayWarehouseTransferItem'])->name('warehouse_transfer-add-array');
 Route::get('/warehouse-transfer/delete-array/{record_id}', [InvWarehouseTransferController::class, 'deleteArrayWarehouseTransferItem'])->name('warehouse-transfer-delete-array');
@@ -537,3 +517,55 @@ Route::post('/warehouse-transfer/elements-add', [InvWarehouseTransferController:
 Route::post('/warehouse-transfer/add-transfer-type', [InvWarehouseTransferController::class, 'addWarehouseTransferType'])->name('add-transfer-type-warehouse-transfer');
 Route::post('/warehouse-transfer/select-data-unit', [InvWarehouseTransferController::class, 'getSelectDataUnit'])->name('select-data-unit');
 Route::post('/warehouse-transfer/select-data-item', [InvWarehouseTransferController::class, 'getQtyStock'])->name('select-data-item');
+Route::post('/warehouse-transfer/select-data-stock', [InvWarehouseTransferController::class, 'getIdStock'])->name('select-data-stock');
+
+//penerimaan transfer gudang
+Route::get('/warehouse-transfer-received-note', [InvWarehouseTransferReceivedNoteController::class, 'index'])->name('warehouse-transfer-received-note');
+Route::get('/warehouse-transfer-received-note/search-warehouse-transfer', [InvWarehouseTransferReceivedNoteController::class, 'searchWarehouseTransfer'])->name('search-wt-warehouse-transfer-received-note');
+Route::get('/warehouse-transfer-received-note/add/{purchase_order_item_id}', [InvWarehouseTransferReceivedNoteController::class, 'addInvWarehouseTransferReceivedNote'])->name('add-warehouse-transfer-received-note');
+Route::get('/warehouse-transfer-received-note/detail/{purchase_order_item_id}', [InvWarehouseTransferReceivedNoteController::class, 'detailInvWarehouseTransferReceivedNote'])->name('detail-warehouse-transfer-received-note');
+Route::post('/warehouse-transfer-received-note/process-add-warehouse-transfer-received-note', [InvWarehouseTransferReceivedNoteController::class, 'processAddInvWarehouseTransferReceivedNote'])->name('process-add-warehouse-transfer-received-note');
+Route::get('/warehouse-transfer-received-note/delete-warehouse-transfer-received-note/{id}', [InvWarehouseTransferReceivedNoteController::class, 'voidInvWarehouseTransferReceivedNote'])->name('delete-warehouse-transfer-received-note');
+Route::get('/warehouse-transfer-received-note/process-delete/{id}', [InvWarehouseTransferReceivedNoteController::class, 'processVoidInvWarehouseTransferReceivedNote'])->name('process-delete-warehouse-transfer-received-note');
+Route::post('/warehouse-transfer-received-note/filter', [InvWarehouseTransferReceivedNoteController::class, 'filterInvWarehouseTransferReceivedNote'])->name('filter-warehouse-transfer-received-note');
+Route::get('/warehouse-transfer-received-note/filter-reset', [InvWarehouseTransferReceivedNoteController::class, 'resetFilterInvWarehouseTransferReceivedNote'])->name('filter-reset-transfer-received-note');
+
+
+//purchase - payment
+Route::get('/purchase-payment', [PurchasePaymentController::class, 'index'])->name('purchase-payment');
+Route::post('/purchase-payment/filter', [PurchasePaymentController::class, 'filterPurchasePayment'])->name('filter-purchase-payment');
+Route::get('/purchase-payment/search', [PurchasePaymentController::class, 'searchCoreSupplier'])->name('search-core-supplier-purchase-payment');
+Route::get('/purchase-payment/add/{supplier_id}', [PurchasePaymentController::class, 'addPurchasePayment'])->name('add-purchase-payment');
+Route::get('/purchase-payment/detail/{supplier_id}', [PurchasePaymentController::class, 'detailPurchasePayment'])->name('detail-purchase-payment');
+Route::get('/purchase-payment/delete/{supplier_id}', [PurchasePaymentController::class, 'deletePurchasePayment'])->name('delete-purchase-payment');
+Route::post('/purchase-payment/process-delete', [PurchasePaymentController::class, 'processVoidPurchasePayment'])->name('process-delete-purchase-payment');
+Route::post('/purchase-payment/process-add/', [PurchasePaymentController::class, 'processAddPurchasePayment'])->name('process-add-purchase-payment');
+Route::post('/purchase-payment/elements-add/', [PurchasePaymentController::class, 'elements_add'])->name('elements-add-purchase-payment');
+Route::post('/purchase-payment/add-bank/', [PurchasePaymentController::class, 'addCoreBank'])->name('add-bank-purchase-payment');
+Route::post('/purchase-payment/add-transfer-array/', [PurchasePaymentController::class, 'processAddTransferArray'])->name('add-transfer-array-purchase-payment');
+Route::get('/purchase-payment/delete-transfer-array/{record_id}/{supplier_id}', [PurchasePaymentController::class, 'deleteTransferArray'])->name('delete-transfer-array-purchase-payment');
+
+
+
+//purchase return
+Route::get('/purchase-return', [PurchaseReturnController::class, 'index'])->name('purchase-return');
+Route::get('/purchase-return/search-goods-received-note', [PurchaseReturnController::class, 'searchGoodsReceivedNote'])->name('search-goods-received-note');
+Route::get('/purchase-return/add/{goods_received_note_id}', [PurchaseReturnController::class, 'addPurchaseReturn'])->name('add-purchase-return');
+Route::get('/purchase-return/add-reset', [PurchaseReturnController::class, 'addResetPurchaseReturn'])->name('add-reset-purchase-return');
+Route::post('/purchase-return/add-elements', [PurchaseReturnController::class, 'addElementsPurchaseReturn'])->name('add-elements-purchase-return');
+Route::post('/purchase-return/process-add',[PurchaseReturnController::class, 'processAddPurchaseReturn'])->name('process-add-purchase-return');
+Route::post('/purchase-return/add-array',[PurchaseReturnController::class, 'addArrayPurchaseReturn'])->name('add-array-purchase-return');
+Route::get('/purchase-return/delete-array/{record_id}',[PurchaseReturnController::class, 'deleteArrayPurchaseReturn'])->name('delete-array-purchase-return');
+Route::get('/purchase-return/detail/{purchase_return_id}',[PurchaseReturnController::class, 'detailPurchaseReturn'])->name('detail-purchase-return');
+Route::post('/purchase-return/filter',[PurchaseReturnController::class, 'filterPurchaseReturn'])->name('filter-purchase-return');
+Route::get('/purchase-return/filter-reset',[PurchaseReturnController::class, 'filterResetPurchaseReturn'])->name('filter-reset-purchase-return');
+Route::get('/purchase-return/edit', [PurchaseReturnController::class, 'editPurchaseReturn'])->name('edit-purchase-return');
+Route::post('/purchase-return/process-edit',[PurchaseReturnController::class, 'processeditPurchaseReturn'])->name('process-edit-purchase-return');
+Route::get('/purchase-return/delete', [PurchaseReturnController::class, 'deletePurchaseReturn'])->name('delete-purchase-return');
+
+
+Route::get('/purchase-return-report',[PurchaseReturnReportController::class, 'index'])->name('purchase-return-report');
+Route::post('/purchase-return-report/filter',[PurchaseReturnReportController::class, 'filterPurchaseReturnReport'])->name('filter-purchase-return-report');
+Route::get('/purchase-return-report/filter-reset',[PurchaseReturnReportController::class, 'filterResetPurchaseReturnReport'])->name('filter-reset-purchase-return-report');
+Route::get('/purchase-return-report/print',[PurchaseReturnReportController::class, 'printPurchaseReturnReport'])->name('print-purchase-return-report');
+Route::get('/purchase-return-report/export',[PurchaseReturnReportController::class, 'exportPurchaseReturnReport'])->name('export-purchase-return-report');
