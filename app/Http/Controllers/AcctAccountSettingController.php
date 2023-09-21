@@ -14,7 +14,7 @@ class AcctAccountSettingController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        
+
     }
 
     public function index()
@@ -29,12 +29,13 @@ class AcctAccountSettingController extends Controller
             '0' => 'Debit',
             '1' => 'Kredit'
         );
-        return view('content.AcctAccountSetting.AcctAccountSetting',compact('accountlist','status'));
+        $data= AcctAccountSetting::where('data_state',0)->where('company_id',Auth::user()->company_id)->get();
+        return view('content.AcctAccountSetting.AcctAccountSetting',compact('accountlist','status','data'));
     }
 
     public function processAddAcctAccountSetting(Request $request)
     {
-        
+
         $data = array(
             '1_account_id'               => $request->input('purchase_cash_account_id'),
             '1_account_setting_status'   => $request->input('purchase_cash_account_status'),
@@ -115,6 +116,15 @@ class AcctAccountSettingController extends Controller
             '8_account_setting_name'     => 'expenditure_cash_account',
             '8_account_default_status'     => $this->getAccountDefault($request->input('expenditure_cash_account_id')),
 
+            '9_account_id'               => $request->input('hotel_account_id'),
+            '9_account_setting_status'   => $request->input('hotel_account_status'),
+            '9_account_setting_name'     => 'hotel_account',
+            '9_account_default_status'   => $this->getAccountDefault($request->input('hotel_account_id')),
+
+            '10_account_id'               => $request->input('hotel_cash_account_id'),
+            '10_account_setting_status'   => $request->input('hotel_cash_account_status'),
+            '10_account_setting_name'     => 'hotel_cash_account',
+            '10_account_default_status'   => $this->getAccountDefault($request->input('hotel_cash_account_id')),
             // '17_account_id'               => $request->input('account_receivable_account_2_id'),
             // '17_account_setting_status'   => $request->input('account_receivable_account_2_status'),
             // '17_account_setting_name'     => 'account_receivable',
@@ -180,38 +190,55 @@ class AcctAccountSettingController extends Controller
             // '8_account_setting_status'   => $request->input('service_account_status'),
             // '8_account_setting_name'     => 'service_cash_account',
             // '8_account_default_status'     => $this->getAccountDefault($request->input('service_account_id')),
-            
+
         );
 
         $company_id = AcctAccountSetting::where('company_id', Auth::user()->company_id)->first();
-        if(!empty($company_id)){
-            for($key = 1; $key<=8;$key++){
-                $data_item = array(
-                    'account_id' 				=> $data[$key."_account_id"],
-                    'account_setting_status'	=> $data[$key."_account_setting_status"],
-                    'account_setting_name' 		=> $data[$key."_account_setting_name"],
-                    'account_default_status'    => $data[$key."_account_default_status"],
-                    'company_id'                => Auth::user()->company_id
-                );
-                AcctAccountSetting::where('account_setting_name',$data_item['account_setting_name'])
-                ->where('company_id', Auth::user()->company_id)
-                ->update($data_item);
-            }
-        } else {
-            for($key = 1; $key<=8;$key++){
-                $data_item = array(
-                    'account_id' 				=> $data[$key."_account_id"],
-                    'account_setting_status'	=> $data[$key."_account_setting_status"],
-                    'account_setting_name' 		=> $data[$key."_account_setting_name"],
-                    'account_default_status'    => $data[$key."_account_default_status"],
-                    'company_id'                => Auth::user()->company_id
-                );
-                AcctAccountSetting::create($data_item);    
-            }
+        for($key = 1; $key<=10;$key++){
+            $data_item = array(
+                'account_id' 				=> $data[$key."_account_id"],
+                'account_setting_status'	=> $data[$key."_account_setting_status"],
+                'account_setting_name' 		=> $data[$key."_account_setting_name"],
+                'account_default_status'    => $data[$key."_account_default_status"],
+                'company_id'                => Auth::user()->company_id
+            );
+            AcctAccountSetting::updateOrCreate([
+                'account_setting_name'  => $data_item['account_setting_name'],
+                'company_id'            => Auth::user()->company_id
+            ],[
+                'account_id' 			  => $data_item['account_id'],
+                'account_setting_status'  => $data_item['account_setting_status'],
+                'account_default_status'  => $data_item['account_default_status'],
+            ]);
         }
+        // if(!empty($company_id)){
+        //     for($key = 1; $key<=8;$key++){
+        //         $data_item = array(
+        //             'account_id' 				=> $data[$key."_account_id"],
+        //             'account_setting_status'	=> $data[$key."_account_setting_status"],
+        //             'account_setting_name' 		=> $data[$key."_account_setting_name"],
+        //             'account_default_status'    => $data[$key."_account_default_status"],
+        //             'company_id'                => Auth::user()->company_id
+        //         );
+        //         AcctAccountSetting::where('account_setting_name',$data_item['account_setting_name'])
+        //         ->where('company_id', Auth::user()->company_id)
+        //         ->update($data_item);
+        //     }
+        // } else {
+        //     for($key = 1; $key<=8;$key++){
+        //         $data_item = array(
+        //             'account_id' 				=> $data[$key."_account_id"],
+        //             'account_setting_status'	=> $data[$key."_account_setting_status"],
+        //             'account_setting_name' 		=> $data[$key."_account_setting_name"],
+        //             'account_default_status'    => $data[$key."_account_default_status"],
+        //             'company_id'                => Auth::user()->company_id
+        //         );
+        //         AcctAccountSetting::create($data_item);
+        //     }
+        // }
         $msg = 'Setting Jurnal Berhasil';
         return redirect('/acct-account-setting')->with('msg',$msg);
-        
+
     }
 
     public function getAccountDefault($account_id)
