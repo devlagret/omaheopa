@@ -9,9 +9,16 @@ class SystemLogsController extends Controller
     public function index()
     {
         $d = file_get_contents(storage_path('logs\laravel.log'));
-        $del = "<div><a type='button' href='".route('log.destroy')."'>Clear Log</a><br/>";
+        $js = "<script>
+        function check(uri){
+          if(confirm(`Yakin Ingin Menghapus Log ?`)){
+            window.location.href = uri;
+          }
+        }
+        </script>";
+        $del = "<div><button type='button' onclick='check(\"".route('log.destroy')."\")'>Clear Log</button><br/>";
         $data="<div><pre>".$d."</pre></div></div>";
-        return $del .= $data;
+        return $js.=$del .= $data;
     }
     public function destroy()
     {
