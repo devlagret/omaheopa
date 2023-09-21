@@ -638,15 +638,34 @@ class BookingController extends Controller
         return response($booking->collapse()->pluck('room_id'));
     }
     public function rescedule($sales_order_id) {
+        $sessiondata = Session::get('booking-data');
         $rsc =1;
         $data = SalesOrder::with(['rooms','facilities','menus'])->find($sales_order_id);
         $room = CoreRoom::with(['price','roomType','building'])->whereIn('room_id',$data->rooms->pluck('room_id'))->get();
         $facility = SalesRoomFacility::whereIn('room_facility_id',$data->facilities->pluck('room_facility_id'))->get();
         $menu = SalesRoomMenu::whereIn('room_menu_id',$data->menus->pluck('room_menu_id'))->get();
         $menutype = AppHelper::menuType();
-        return  view('content.Booking.DetailBooking',compact('data','room','facility','menu','menutype','rsc'));
+        return  view('content.Booking.DetailBooking',compact('data','room','facility','menu','menutype','sessiondata','rsc'));
     }
-    public function processRescedule() {
-        
+    public function processRescedule(Request $request) {
+        dump($request->all());
+        $so = SalesOrder::with('rooms')->find($request->sales_order_id);
+        dump($so);
+        foreach ($so->rooms as $val){
+            dump($val);
+        }
+        return 1;
+        try{
+            DB::beginTransaction();
+            $so->checkin_date = $request->checkin_date;
+            $so->checkout_date= $request->checkout_date;
+            $so->save();
+            DB::rollBack();
+        }catch(\Exception $e){
+            DB::rollBack();
+            report($e);
+            dump($e);
+        }
+     
     }
 }

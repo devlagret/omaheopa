@@ -38,7 +38,7 @@ class CheckInCheckOutController extends Controller
         ->where('checkin_date','>=',$filter['start_date']??Carbon::now()->format('Y-m-d'))
         ->where('checkin_date','<=',$filter['end_date']??Carbon::now()->format('Y-m-d'))
         ->get();
-        return view('content.CheckInCheckOut.ListCheckInCheckOut')->with(['booking'=>$booking,'start_date'=>$filter['start_date'],'end_date'=>$filter['end_date']]);
+        return view('content.CheckInCheckOut.ListCheckInCheckOut')->with(['booking'=>$booking,'start_date'=>$filter['start_date']??Carbon::now()->format('Y-m-d'),'end_date'=>$filter['end_date']??Carbon::now()->format('Y-m-d')]);
     }
     public function add() {
         $ci = 1;
