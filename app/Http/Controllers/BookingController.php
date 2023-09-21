@@ -12,6 +12,7 @@ use App\Models\SalesInvoice;
 use App\Models\SalesOrder;
 use App\Models\SalesOrderFacility;
 use App\Models\SalesOrderMenu;
+use App\Models\SalesOrderRescedule;
 use App\Models\SalesOrderRoom;
 use App\Models\SalesRoomFacility;
 use App\Models\SalesRoomMenu;
@@ -657,10 +658,21 @@ class BookingController extends Controller
         return 1;
         try{
             DB::beginTransaction();
-            $so->checkin_date = $request->checkin_date;
-            $so->checkout_date= $request->checkout_date;
+            SalesOrderRescedule::create([
+                'sales_order_id' => $so->sales_order_id,
+                'checkin_date' => $request->checkin_date,
+                'checkin_date_old' => $request->checkin_date_old,
+                'checkout_date' => $request->checkout_date,
+                'checkout_date_old' => $request->checkout_date_old,
+                'created_id' => Auth::id(),
+            ]);
+            $so->checkin_date       = $request->checkin_date;
+            $so->checkout_date      = $request->checkout_date;
+            $so->down_payment       = $request->down_payment;
+            $so->sales_order_price  = $request->total_amount;
             $so->save();
             DB::rollBack();
+            return redirect()->route('booking.index')->with('msg','Rescedule Booking Berhasil');
         }catch(\Exception $e){
             DB::rollBack();
             report($e);

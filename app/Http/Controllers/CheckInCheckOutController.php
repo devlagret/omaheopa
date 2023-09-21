@@ -137,7 +137,7 @@ class CheckInCheckOutController extends Controller
         return response('',202);
         try{
             DB::beginTransaction();
-            SalesOrderRoomExtension::create([ 
+            SalesOrderRoomExtension::create([
                 'checkout_date'=>$request->checkout_date_old,
                 'checkout_date_new'=>$request->checkout_date,
                 'sales_order_id'=>$request->sales_order_id,
@@ -169,14 +169,16 @@ class CheckInCheckOutController extends Controller
         $field = $request->validate(['payed_amount'=>'required','sales_order_id'=>'required'],['payed_amount.required'=>'Uang Yang dibayar Harus Dimasukan','sales_order_id.required'=>'Error']);
         $order = SalesOrder::find($request->sales_order_id);
         $invoice = SalesInvoice::find($order->sales_invoice_id);
+        return dump($request->all());
         try{
             DB::beginTransaction();
             $order->sales_order_status= 3;
+            $order->checkout_date_real= Carbon::now()->format('Y-m-d');
             $order->save();
             if($request->use_penalty){
                 $invoice->penalty_amount = $request->pinalty;
             }
-            $invoice->paid_amount = $field['paid_amount'];
+            $invoice->paid_amount = $field['payed_amount'];
             $invoice->change_amount = $request->change_amount;
             $invoice->update_id = Auth::id();
 
@@ -189,7 +191,7 @@ class CheckInCheckOutController extends Controller
             // report($e);
             // return redirect()->back(200)->with('msg','Check-Out Gagal');
         }
-     
+
     }
     public function getPenalty(Request $request) {
         $total = 0;
