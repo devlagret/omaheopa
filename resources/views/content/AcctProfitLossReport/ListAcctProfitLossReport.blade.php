@@ -456,6 +456,8 @@
                             echo "
                                 </tr>";
                             
+                                echo "
+                                <tr>";
                             if($val['report_type'] == 6){
                                 if(!empty($val['report_formula']) && !empty($val['report_operator'])){
                                     $report_formula 	= explode('#', $val['report_formula']);
@@ -485,10 +487,55 @@
                                         ";
                                 }
 
-                            }
-                
-                        
-                            
+                            } echo "
+                                </tr>";
+
+                                echo "
+                                <tr>";
+                                    
+                                if($val['report_type']	== 6){
+                                    
+                                    $expenditure_subtotal 	= $grand_total_account_amount2;
+
+
+                                    $account_amount[$val['report_no']] = $expenditure_subtotal;
+                                }
+
+                            echo "
+                                </tr>";
+                             echo "
+                                <tr>";
+                            if($val['report_type'] == 8){
+                                if(!empty($val['report_formula']) && !empty($val['report_operator'])){
+                                    $report_formula 	= explode('#', $val['report_formula']);
+                                    $report_operator 	= explode('#', $val['report_operator']);
+
+                                    
+                                    $grand_total_account_amount2	= 0;
+                                    for($i = 0; $i < count($report_formula); $i++){
+                                        if($report_operator[$i] == '-'){
+                                            if($grand_total_account_amount2 == 0 ){
+                                                $grand_total_account_amount2 = $grand_total_account_amount2 + $account_amount[$report_formula[$i]];
+                                            } else {
+                                                $grand_total_account_amount2 = $grand_total_account_amount2 - $account_amount[$report_formula[$i]];
+                                            }
+                                        } else if($report_operator[$i] == '+'){
+                                            if($grand_total_account_amount2 == 0){
+                                                $grand_total_account_amount2 = $grand_total_account_amount2 + $account_amount[$report_formula[$i]];
+                                            } else {
+                                                $grand_total_account_amount2 = $grand_total_account_amount2 + $account_amount[$report_formula[$i]];
+                                            }
+                                        }
+                                    }
+
+                                    echo "
+                                        <td><div style='font-weight:".$report_bold."'>".$report_tab."".$val['account_name']."</div></td>
+                                        <td style='text-align:right'><div style='font-weight:".$report_bold."'>".number_format($grand_total_account_amount2, 2)."</div></td>
+                                        ";
+                                }
+
+                            } echo "
+                                </tr>";
                         ?> 
                     @endforeach
                     <tr>
