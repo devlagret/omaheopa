@@ -467,6 +467,6 @@ class SalesInvoiceController extends Controller
     {
         $data = SalesCustomer::where('customer_id', $customer_id)->first();
 
-        return $data['customer_name'];
+        return $data['customer_name']?? '';
     }
 }
