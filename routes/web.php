@@ -4,6 +4,7 @@ use App\Http\Controllers\AcctAccountController;
 use App\Http\Controllers\AcctAccountSettingController;
 use App\Http\Controllers\AcctDisbursementReportController;
 use App\Http\Controllers\AcctJournalMemorialController;
+use App\Http\Controllers\AcctBalanceSheetReportController;
 use App\Http\Controllers\AcctLedgerReportController;
 use App\Http\Controllers\AcctProfitLossReportController;
 use App\Http\Controllers\AcctProfitLossYearReportController;
@@ -545,6 +546,12 @@ Route::post('/purchase-payment/add-bank/', [PurchasePaymentController::class, 'a
 Route::post('/purchase-payment/add-transfer-array/', [PurchasePaymentController::class, 'processAddTransferArray'])->name('add-transfer-array-purchase-payment');
 Route::get('/purchase-payment/delete-transfer-array/{record_id}/{supplier_id}', [PurchasePaymentController::class, 'deleteTransferArray'])->name('delete-transfer-array-purchase-payment');
 
+//neraca
+Route::get('balance-sheet-report',[AcctBalanceSheetReportController::class, 'index'])->name('balance-sheet-report');
+Route::post('balance-sheet-report/filter',[AcctBalanceSheetReportController::class, 'filterAcctBalanceSheetReport'])->name('filter-balance-sheet-report');
+Route::get('balance-sheet-report/reset-filter',[AcctBalanceSheetReportController::class, 'resetFilterAcctBalanceSheetReport'])->name('reset-filter-balance-sheet-report');
+Route::get('balance-sheet-report/print',[AcctBalanceSheetReportController::class, 'printAcctBalanceSheetReport'])->name('print-balance-sheet-report');
+Route::get('balance-sheet-report/export',[AcctBalanceSheetReportController::class, 'exportAcctBalanceSheetReport'])->name('export-balance-sheet-report');
 
 
 //purchase return

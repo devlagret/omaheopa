@@ -1,7 +1,7 @@
 @inject('JournalVoucher','App\Http\Controllers\JournalVoucherController')
 @extends('adminlte::page')
 
-@section('title',  "MOZAIC Omah'e Opa")
+@section('title', 'MOZAIC Geprek')
 @section('js')
 <script>
       function function_elements_add(name, value){
@@ -101,13 +101,13 @@
                 <div class="col-md-9">
                     <div class="form-group">
                         <a class="text-dark">Tanggal<a class='red'> *</a></a>
-                        <input style="width: 30%" class="form-control input-bb" name="journal_voucher_date" id="journal_voucher_date" type="date" data-date-format="dd-mm-yyyy" autocomplete="off" onchange="function_elements_add(this.name, this.value)" value="{{ $journal['journal_voucher_date'] }}"/>
+                        <input style="width: 30%" class="form-control input-bb" name="journal_voucher_date" id="journal_voucher_date" type="date" data-date-format="dd-mm-yyyy" autocomplete="off" onchange="function_elements_add(this.name, this.value)" value="{{ $journal['journal_voucher_date'] ?? ''}}"/>
                     </div>
                 </div>
                 <div class="col-md-9 mb-5">
                     <div class="form-group">
                         <a class="text-dark">Uraian<a class='red'> *</a></a>
-                        <textarea rows="2" cols="2" style="width: 60%" class="form-control input-bb" name="journal_voucher_description" id="journal_voucher_description" autocomplete="off" onchange="function_elements_add(this.name, this.value)">{{ $journal['journal_voucher_description'] }}</textarea>
+                        <textarea rows="2" cols="2" style="width: 60%" class="form-control input-bb" name="journal_voucher_description" id="journal_voucher_description" autocomplete="off" onchange="function_elements_add(this.name, this.value)">{{ $journal['journal_voucher_description'] ?? ''}}</textarea>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -177,6 +177,7 @@
                                                     <td style='text-align  : right !important;'>".number_format($val['journal_voucher_amount'],2,'.',',')."</td>";
                                         }?>
                                         <input type="text" name="account_id" value="{{ $val['account_id'] }}" hidden>
+                                        <input type="text" name="account_default_status" value="{{ $JournalVoucher->getAccountDefaultStatus($val['account_id']) }}" hidden>
                                         <input type="text" name="account_status" value="{{ $val['account_status'] }}" hidden>
                                         <input type="text" name="journal_voucher_amount" value="{{ $val['journal_voucher_amount'] }}" hidden>
                                         <?php
