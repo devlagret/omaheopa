@@ -44,7 +44,6 @@ class CheckInCheckOutController extends Controller
         $ci = 1;
         Session::put('booking-token',Str::uuid());
         $sessiondata = Session::get('checkin-data');
-        dump($sessiondata);
         $roomData = collect(Session::get('checkin-room-data'));
         $booked = Session::get('checkin-room-data-qty');
         $price=collect(Session::get('checkin-room-price'));
