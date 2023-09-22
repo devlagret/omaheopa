@@ -283,9 +283,6 @@ class SalesInvoiceController extends Controller
         }
     }
 
-
-
-
     public function getCoreItem(Request $request){
         $item_category_id   = $request->item_category_id;
         $data='';
@@ -305,7 +302,6 @@ class SalesInvoiceController extends Controller
 
         return $data;
     }
-
 
 
     public function getSelectDataUnit(Request $request){
@@ -359,10 +355,6 @@ class SalesInvoiceController extends Controller
         return $data;
         }
     }
-
-
-
-
 
 
 
@@ -567,7 +559,7 @@ class SalesInvoiceController extends Controller
     {
         $data = SalesCustomer::where('customer_id', $customer_id)->first();
 
-        return $data['customer_name'] ?? ''?? '';
+        return $data['customer_name'] ?? '';
     }
 
 
