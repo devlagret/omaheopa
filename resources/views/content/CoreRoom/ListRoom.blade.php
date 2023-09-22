@@ -59,7 +59,7 @@ function check(name,uri){
                 </thead>
                 <tbody>
                     <?php $no = 1; ?>
-                    @foreach($room as $row)
+                    @foreach($sales as $row)
                     <tr>
                         <td style='text-align:center'>{{ $no++ }}</td>
                         <td>{{ $row->room_name }}</td>

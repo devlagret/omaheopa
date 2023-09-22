@@ -25,11 +25,21 @@ class InvtItemCategoryController extends Controller
         $data = InvtItemCategory::where('data_state', 0)
         ->where('company_id', Auth::user()->company_id)
         ->with('merchant');
+
+        //filter prepend
+        $merchant   = SalesMerchant::where('data_state', 0);
+        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
+            $merchant->where('merchant_id',Auth::user()->merchant_id);
+        }
+        $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
+        $merchant = $merchant->prepend('Tampil Semua',0);
+        // dump($merchant);
+
         if(Auth::id()!=1||Auth::user()->merchant_id!=null){
             $data->where('merchant_id',Auth::user()->merchant_id);
         }
         $data =$data->get();
-        return view('content.InvtItemCategory.ListInvtItemCategory', compact('data'));
+        return view('content.InvtItemCategory.ListInvtItemCategory', compact('data','merchant'));
     }
 
     public function addItemCategory($merchant_id = null)

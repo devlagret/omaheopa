@@ -38,6 +38,14 @@
   </div>
 
     <div class="card-body">
+        {!! Form::select('merchant_id', $merchant, $items['merchant_id'] ?? '', [
+                            'class' => 'selection-search-clear required select-form',
+                            'name' => 'merchant_id',
+                            'id' => 'merchant_id',
+                            'onchange' => 'changeCategory()',
+                            'form' => 'form-paket',
+                            'autofocus'=>'autofocus',
+                        ]) !!}
         <div class="table-responsive">
             <table id="example" style="width:100%" class="table table-striped table-bordered table-hover table-full-width">
                 <thead>

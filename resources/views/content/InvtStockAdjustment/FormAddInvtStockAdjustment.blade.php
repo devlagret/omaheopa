@@ -149,7 +149,6 @@
         @csrf
         <div class="card-body">
             <div class="row form-group">
-                
                 <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
