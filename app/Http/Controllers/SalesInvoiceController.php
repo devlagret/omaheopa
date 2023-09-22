@@ -369,19 +369,19 @@ class SalesInvoiceController extends Controller
     {
         $data   = InvtItem::where('item_id', $item_id)->first();
 
-        return $data['item_name'];
+        return $data['item_name']?? '';
     }
 
     public function getCategoryName($item_category_id)
     {
         $data = InvtItemCategory::where('item_category_id', $item_category_id)->first();
-        return $data['item_category_name'];
+        return $data['item_category_name']?? '';
     }
 
     public function getItemUnitName($item_unit_id)
     {
         $data = InvtItemUnit::where('item_unit_id', $item_unit_id)->first();
-        return $data['item_unit_name'];
+        return $data['item_unit_name']?? '';
     }
 
     public function detailSalesInvoice($sales_invoice_id)
@@ -559,7 +559,7 @@ class SalesInvoiceController extends Controller
     {
         $data = SalesCustomer::where('customer_id', $customer_id)->first();
 
-        return $data['customer_name'] ?? '';
+        return $data['customer_name']?? '';
     }
 
 
