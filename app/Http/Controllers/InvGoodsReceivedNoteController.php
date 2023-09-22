@@ -252,6 +252,7 @@ class InvGoodsReceivedNoteController extends Controller
                 'transaction_journal_id' 		=> $goodsreceivednote['goods_received_note_id'],
                 'transaction_journal_no' 		=> $goodsreceivednote['goods_received_note_no'],
                 'created_id' 					=> Auth::id(),
+                'company_id' 					=> 1,
             );
             
             JournalVoucher::create($data_journal);
