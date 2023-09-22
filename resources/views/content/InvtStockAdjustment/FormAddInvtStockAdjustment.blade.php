@@ -1,15 +1,17 @@
 @inject('ISAC','App\Http\Controllers\InvtStockAdjustmentController')
 @extends('adminlte::page')
 
-@section('title',  "MOZAIC Omah'e Opa")
+@section('title', 'MOZAIC Geprek')
 @section('js')
 <script>
       function function_elements_add(name, value){
+        console.log("name " + name);
+        console.log("value " + value);
 		$.ajax({
 				type: "POST",
 				url : "{{route('add-elements-purchase-return')}}",
 				data : {
-                    'name'      : name,
+                    'name'      : name, 
                     'value'     : value,
                     '_token'    : '{{csrf_token()}}'
                 },
@@ -20,20 +22,22 @@
 
     function function_last_balance_physical(value){
         last_data =  document.getElementById("last_balance_data").value;
-        last_adjustment =  document.getElementById("last_balance_adjustment").value;
-        var last_physical =  parseInt(last_adjustment) -parseInt(last_data) ;
-        $("#last_balance_physical").val(last_physical);
+        last_adjustment =  document.getElementById("last_balance_adjustment").value || 0;
+        
+        var last_physical = parseInt(last_adjustment) - parseInt(last_data);
+        $('#last_balance_physical').val(last_physical);
     }
-    function reset_add(){
-		$.ajax({
-				type: "GET",
-				url : "{{route('add-reset-stock-adjustment')}}",
-				success: function(msg){
-                    location.reload();
-			}
-
-		});
-	}
+    // nostr = $("#no").val();
+    // no = parseInt(nostr)+1;
+    // for(var i = 1; i < no; i++){
+    //     $('#'+i+"_last_balance_adjustment").change(function(){
+    //         var last_data = $('#'+i+"_last_balance_data").val();
+    //         var last_adjustment = $('#'+i+"_last_balance_adjustment").val();
+    //         var last_physical = last_data - last_adjustment;
+    
+    //         $('#'+i+"_last_balance_physical").val(last_physical);
+    //     });
+    // }
     function changeCategory() {
             var merchant_id = $("#merchant_id").val();
             loading();
@@ -81,14 +85,22 @@
             },
         });
     }
-    $(document).ready(function() {
-        changeCategory();
-        $('#last_balance_physical').val('');
-    });
+    function reset_add(){
+		$.ajax({
+				type: "GET",
+				url : "{{route('add-reset-stock-adjustment')}}",
+				success: function(msg){
+                    location.reload();
+			}
+
+		});
+	}
+
+
 </script>
 @stop
 @section('content_header')
-
+    
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ url('home') }}">Beranda</a></li>
@@ -128,7 +140,7 @@
         </div>
     </div>
 
-    <?php
+    <?php 
             // if (empty($coresection)){
             //     $coresection['section_name'] = '';
             // }
@@ -137,6 +149,7 @@
         @csrf
         <div class="card-body">
             <div class="row form-group">
+                
                 <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
@@ -151,13 +164,13 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                        <div class="form-group">
-                            <a class="text-dark">Kategori<a class='red'> *</a></a>
-                            <select class="selection-search-clear required select-form"
-                                placeholder="Masukan Kategori Barang" name="item_category" id="item_category"
-                                onchange="changeItem(this.value)">
-                            </select>
-                        </div>
+                    <div class="form-group">
+                        <a class="text-dark">Kategori<a class='red'> *</a></a>
+                        <select class="selection-search-clear required select-form"
+                            placeholder="Masukan Kategori Barang" name="item_category" id="item_category"
+                            onchange="changeItem(this.value)">
+                        </select>
+                    </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
@@ -170,8 +183,14 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
+                        <a class="text-dark">Kode Satuan<a class='red'> *</a></a>
+                        {!! Form::select('item_unit_id',  $units, $unit_id, ['class' => 'selection-search-clear select-form', 'id' => 'item_unit_id', 'name' => 'item_unit_id', 'onchange' => 'function_elements_add(this.name, this.value)']) !!}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
                         <a class="text-dark">Nama Gudang<a class='red'> *</a></a>
-                        {!! Form::select('warehouse_id',  $warehouse, $data_item['warehouse_id']??'', ['class' => 'selection-search-clear select-form', 'id' => 'warehouse_id', 'name' => 'warehouse_id', 'onchange' => 'function_elements_add(this.name, this.value)']) !!}
+                        {!! Form::select('warehouse_id',  $warehouse, $warehouse_id, ['class' => 'selection-search-clear select-form', 'id' => 'warehouse_id', 'name' => 'warehouse_id', 'onchange' => 'function_elements_add(this.name, this.value)']) !!}
                     </div>
                 </div>
                 <div class="col-md-3">
@@ -181,14 +200,14 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> 
         <div class="card-footer text-muted">
             <div class="form-actions float-right">
                 <button type="reset" name="Reset" class="btn btn-danger" onclick="reset_add();"><i class="fa fa-times"></i> Batal</button>
                 <button type="submit" name="Find" class="btn btn-primary" title="Search Data"><i class="fa fa-search"></i> Cari</button>
             </div>
-        </div>
-    </form>
+        </div>       
+    </form>    
 </div>
 
 <div class="card border border-dark">
@@ -205,7 +224,6 @@
                     <table class="table table-bordered table-advance table-hover">
                         <thead class="thead-light">
                             <tr>
-                                <th style='text-align:center'>Kategori Barang</th>
                                 <th style='text-align:center'>Nama Barang</th>
                                 <th style='text-align:center'>Satuan Barang</th>
                                 <th style='text-align:center'>Gudang</th>
@@ -216,46 +234,41 @@
                             </tr>
                         </thead>
                         <tbody>
-                          <?php $no = 0; ?>
-                          @if ($data != null)
-                              @foreach ($data as $val)
-                                <tr>
-                                  <td>
-                                      {{ $val->category->item_category_code }}
-                                      <input type="text" name="{{$no}}[item_category_id]" id="item_category_id" value="{{ $val['item_category_id'] }}" hidden>
-                                  </td>
-                                  <td>
-                                      {{ $val->item->item_name }}
-                                      <input type="text" name="{{$no}}[item_stock_id]" id="item_stock_id" value="{{ $val['item_stock_id'] }}" hidden>
-                                  </td>
-                                  <td>
-                                      {{ $val->unit->item_unit_code }}
-                                      <input type="text" name="{{$no}}[item_unit_id]" id="item_unit_id" value="{{ $val['item_unit_id'] }}" hidden>
-                                  </td>
-                                  <td>
-                                      {{ $val->warehouse->warehouse_name }}
-                                      <input type="text" name="{{$no}}[warehouse_id]" id="warehouse_id" value="{{ $val['warehouse_id'] }}" hidden>
-                                  </td>
-                                  <td>
-                                      {{ $val->last_balance }}
-                                      <input type="text" name="{{$no}}[last_balance_data]" id="last_balance_data" value="{{ $val['last_balance'] }}" hidden>
-                                  </td>
-                                  <td style="text-align: center">
-                                      <input class="form-control input-bb" type="text" name="{{$no}}[last_balance_adjustment]" id="last_balance_adjustment" onchange="function_last_balance_physical(this.value)" autocomplete="off">
-                                  </td>
-                                  <td style="text-align: center">
-                                      <input class="form-control input-bb" type="text" name="{{$no}}[last_balance_physical]" id="last_balance_physical" readonly>
-                                  </td>
-                                  <td style="text-align: center">
-                                      <input class="form-control input-bb" type="text" name="{{$no}}[stock_adjustment_item_remark]" id="stock_adjustment_item_remark" autocomplete="off" />
-                                  </td>
-                                </tr>
-                          <?php $no++ ?>
-                          @endforeach
-                                @else
-                                <tr class="odd"><td valign="top" colspan="8" style="text-align: center" class="dataTables_empty">No data available in table</td></tr>
-                            @endif
-                        </tbody>
+                            <?php $no = 1; ?>
+                                @foreach ($data as $row)
+                                    <?php $no++ ?>
+                                    <tr>
+                                        <td>
+                                            {{ $ISAC->getItemName($row['item_id']) }}
+                                            <input type="text" name="item_id" id="item_id" value="{{ $row['item_id'] }}" hidden>
+                                            <input type="text" name="item_category_id" id="item_category_id" value="{{ $row['item_category_id'] }}" hidden>
+                                        </td>
+                                        <td>
+                                            {{ $ISAC->getItemUnitName($row['item_unit_id']) }}
+                                            <input type="text" name="item_unit_id" id="item_unit_id" value="{{ $row['item_unit_id'] }}" hidden>
+                                        </td>
+                                        <td>
+                                            {{ $ISAC->getWarehouseName($row['warehouse_id']) }}
+                                            <input type="text" name="warehouse_id" id="warehouse_id" value="{{ $row['warehouse_id'] }}">
+                                            {{-- <input type="text" name="stock_adjustment_date" id="stock_adjustment_date" value="{{ $row['stock_adjustment_date'] }}"> --}}
+
+                                        </td>
+                                        <td style='text-align:right'>
+                                            {{ $ISAC->getItemStock($row['item_id'],$row['item_unit_id'],$row['item_category_id'],$row['warehouse_id']) }}
+                                            <input type="text" name="last_balance_data" id="last_balance_data" value="{{ $ISAC->getItemStock($row['item_id'],$row['item_unit_id'],$row['item_category_id'],$row['warehouse_id']) }}" hidden >
+                                        </td>
+                                        <td style="text-align: center">
+                                            <input style="text-align: right" class="form-control input-bb" type="text" name="last_balance_adjustment" id="last_balance_adjustment" onchange="function_last_balance_physical(this.value)" autocomplete="off">
+                                        </td>
+                                        <td style="text-align: center">
+                                            <input style="text-align: right" class="form-control input-bb" type="text" name="last_balance_physical" id="last_balance_physical" readonly>
+                                        </td>
+                                        <td style="text-align: center">
+                                            <input class="form-control input-bb" type="text" name="stock_adjustment_item_remark" id="stock_adjustment_item_remark" autocomplete="off">
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
                     </table>
                 </div>
             </div>
@@ -269,12 +282,13 @@
 </div>
 
 
+
 @stop
 
 @section('footer')
-
+    
 @stop
 
 @section('css')
-
+    
 @stop
