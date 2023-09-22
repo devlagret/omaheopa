@@ -117,8 +117,8 @@ class SalesInvoiceController extends Controller
         }
         Session::put('editarraystate',1);
 
-        $salesinvoice = Session::get('salesinvoice');
-        Session::push('salesinvoice', $salesinvoice);
+        // $salesinvoice = Session::get('salesinvoice');
+        // Session::push('salesinvoice', $salesinvoice);
 
         return redirect('/sales-invoice/add');
     }
