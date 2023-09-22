@@ -2,6 +2,16 @@
 
 @section('title',  "MOZAIC Omah'e Opa")
 
+@section('js')
+<script>
+    function check(name,uri){
+      if(confirm(`Yakin Ingin Menghapus Booking Atas Nama '`+name+`' ?`)){
+        window.location.href = uri;
+      }
+    }
+    </script>
+@stop
+
 @section('content_header')
 
 <nav aria-label="breadcrumb">
@@ -130,7 +140,7 @@
                             @if (!$row->sales_order_status)
                           <a type="button" class="btn btn-outline-primary btn-sm" href="{{ route('booking.rescedule',$row->sales_order_id) }}">Rescedule</a>
                           <a type="button" class="btn btn-outline-warning btn-sm" href="{{ route('booking.edit',$row->sales_order_id) }}">Edit</a>
-                          <a type="button" class="btn btn-outline-danger btn-sm" href="{{ route('booking.delete',$row->sales_order_id) }}">Hapus</a>
+                          <a type="button" class="btn btn-outline-danger btn-sm" onclick="check('{{ $row->sales_order_name}}', '{{route('booking.delete',$row->sales_order_id)}}')">Hapus</a>
                           @else
                           <div class="px-1 rounded-pill mx-auto bg-info mb-2"> Sudah Bayar Uang Muka </div>
                           @endif
@@ -152,9 +162,5 @@
 @stop
 
 @section('css')
-
-@stop
-
-@section('js')
 
 @stop
