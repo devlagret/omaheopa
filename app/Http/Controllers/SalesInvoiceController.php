@@ -143,8 +143,8 @@ class SalesInvoiceController extends Controller
     public function processAddSalesInvoice(Request $request)
     {
         // dd($request->all());
-        // $transaction_module_code = 'PJL';
-        // $transaction_module_id  = $this->getTransactionModuleID($transaction_module_code);
+        $transaction_module_code = 'SI';
+        $transaction_module_id  = $this->getTransactionModuleID($transaction_module_code);
         $fields = $request->validate([
             'sales_invoice_date'        => 'required',
             'subtotal_item'             => 'required',
@@ -188,8 +188,8 @@ class SalesInvoiceController extends Controller
             'created_id'                    => Auth::id()
         );
 
-        // if(SalesInvoice::create($data) && JournalVoucher::create($journal)){
-            if(SalesInvoice::create($data)){
+        if(SalesInvoice::create($data) && JournalVoucher::create($journal)){
+            // if(SalesInvoice::create($data)){
             $sales_invoice_id   = SalesInvoice::orderBy('created_at','DESC')->where('company_id', Auth::user()->company_id)->first();
             $arraydatases       = Session::get('arraydatases');
             foreach ($arraydatases as $key => $val) {
