@@ -134,6 +134,10 @@ Route::get('/sales-invoice/detail/{sales_invoice_id}',[SalesInvoiceController::c
 Route::get('/sales-invoice/delete/{sales_invoice_id}',[SalesInvoiceController::class, 'deleteSalesInvoice'])->name('delete-sales-invoice');
 Route::get('/sales-invoice/filter-reset',[SalesInvoiceController::class, 'filterResetSalesInvoice'])->name('filter-reset-sales-invoice');
 Route::post('/sales-invoice/filter',[SalesInvoiceController::class, 'filterSalesInvoice'])->name('filter-sales-invoice');
+Route::post('/sales-invoice/select-data-unit', [SalesInvoiceController::class, 'getSelectDataUnit'])->name('select-data-unit-sales-invoice');
+Route::post('/sales-invoice/filter',[SalesInvoiceController::class, 'filterSalesInvoice'])->name('filter-sales-invoice');
+Route::post('/sales-invoice/select-data-unit-price', [SalesInvoiceController::class, 'getUnitPrice'])->name('select-data-unit-price');
+Route::post('/sales-invoice/item', [SalesInvoiceController::class, 'getCoreItem'])->name('select-item-category-sales');
 
 Route::get('/purchase-invoice', [PurchaseInvoiceController::class, 'index'])->name('purchase-invoice');
 Route::get('/purchase-invoice/add', [PurchaseInvoiceController::class, 'addPurchaseInvoice'])->name('add-purchase-invoice');
@@ -281,7 +285,7 @@ Route::get('/cash-receipts-report/export',[AcctReceiptsReportController::class, 
 Route::get('/cash-disbursement-report',[AcctDisbursementReportController::class, 'index'])->name('cash-disbursement-report');
 Route::post('/cash-disbursement-report/filter',[AcctDisbursementReportController::class, 'filterDisbursementReport'])->name('filter-cash-disbursement-report');
 Route::get('/cash-disbursement-report/reset-filter',[AcctDisbursementReportController::class, 'resetFilterDisbursementReport'])->name('reset-filter-cash-disbursement-report');
-Route::get('/cash-disbursement-report/print',[AcctDisbursementReportController::class, 'printDisbursementReport'])->name('print-cash-disbursement-report');
+Route::get('/cash-disbuzrsement-report/print',[AcctDisbursementReportController::class, 'printDisbursementReport'])->name('print-cash-disbursement-report');
 Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController::class, 'exportDisbursementReport'])->name('export-cash-disbursement-report');
 
  // Restore Data pages
@@ -560,7 +564,7 @@ Route::get('/purchase-return/search-goods-received-note', [PurchaseReturnControl
 Route::get('/purchase-return/add/{goods_received_note_id}', [PurchaseReturnController::class, 'addPurchaseReturn'])->name('add-purchase-return');
 Route::get('/purchase-return/add-reset', [PurchaseReturnController::class, 'addResetPurchaseReturn'])->name('add-reset-purchase-return');
 Route::post('/purchase-return/add-elements', [PurchaseReturnController::class, 'addElementsPurchaseReturn'])->name('add-elements-purchase-return');
-Route::post('/purchase-return/process-add',[PurchaseReturnController::class, 'processAddPurchaseReturn'])->name('process-add-purchase-return');
+Route::post('/purchase-return/process-add',[PurchaseReturnController::class, 'processAddPurchase    Return'])->name('process-add-purchase-return');
 Route::post('/purchase-return/add-array',[PurchaseReturnController::class, 'addArrayPurchaseReturn'])->name('add-array-purchase-return');
 Route::get('/purchase-return/delete-array/{record_id}',[PurchaseReturnController::class, 'deleteArrayPurchaseReturn'])->name('delete-array-purchase-return');
 Route::get('/purchase-return/detail/{purchase_return_id}',[PurchaseReturnController::class, 'detailPurchaseReturn'])->name('detail-purchase-return');
@@ -576,3 +580,5 @@ Route::post('/purchase-return-report/filter',[PurchaseReturnReportController::cl
 Route::get('/purchase-return-report/filter-reset',[PurchaseReturnReportController::class, 'filterResetPurchaseReturnReport'])->name('filter-reset-purchase-return-report');
 Route::get('/purchase-return-report/print',[PurchaseReturnReportController::class, 'printPurchaseReturnReport'])->name('print-purchase-return-report');
 Route::get('/purchase-return-report/export',[PurchaseReturnReportController::class, 'exportPurchaseReturnReport'])->name('export-purchase-return-report');
+
+

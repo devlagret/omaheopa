@@ -142,7 +142,7 @@
                         <td style='text-align:center'>{{ $no++ }}</td>
                         <td>{{ $row['purchase_return_no'] }}</td>
                         <td>{{ $row['purchase_return_date'] }}</td>
-                        <td>{{ $row['purchase_return_supplier'] }}</td>
+                        <td>{{ $PurchaseReturn->getCoreSupplierName($row['supplier_id']) }}</td>
                         <td>{{ $PurchaseReturn->getWarehouseName($row['warehouse_id']) }}</td>
                         <td class="text-center">
                             <a type="button" class="btn btn-outline-warning btn-sm" href="{{ url('/purchase-return/detail/'.$row['purchase_return_id']) }}">Detail</a>

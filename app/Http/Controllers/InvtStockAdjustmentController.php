@@ -10,9 +10,8 @@ use App\Models\InvtItemUnit;
 use App\Models\InvtStockAdjustment;
 use App\Models\InvtStockAdjustmentItem;
 use App\Models\InvtWarehouse;
-use App\Models\PurchaseInvoice;
-use App\Models\PurchaseInvoiceItem;
 use App\Models\SalesMerchant;
+use App\Models\PurchaseInvoiceItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -22,7 +21,7 @@ class InvtStockAdjustmentController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-
+        
     }
 
     public function index()
@@ -33,7 +32,6 @@ class InvtStockAdjustmentController extends Controller
         Session::forget('warehouse_id');
         Session::forget('date');
         Session::forget('datases');
-        Session::forget('items');
         if(!$start_date = Session::get('start_date')){
             $start_date = date('Y-m-d');
         } else {
@@ -49,23 +47,41 @@ class InvtStockAdjustmentController extends Controller
         ->where('invt_stock_adjustment.stock_adjustment_date', '<=', $end_date)
         ->where('invt_stock_adjustment.company_id', Auth::user()->company_id)
         ->where('invt_stock_adjustment.data_state',0)
-        ->get();
+        ->get(); 
         return view('content.InvtStockAdjustment.ListInvtStockAdjustment',compact('data','start_date','end_date'));
     }
 
     public function addStockAdjustment()
-    {
+    {   
+        if(!$unit_id = Session::get('unit_id')){
+            $unit_id = '';
+        } else {
+             $unit_id = Session::get('unit_id');
+        }
+
+        // if(!$date = Session::get('date')){
+        //     $date = date('Y-m-d');
+        // } else {
+        //      $date = Session::get('date');
+        // }
+        if(!$warehouse_id = Session::get('warehouse_id')){
+            $warehouse_id = '';
+        } else {
+             $warehouse_id = Session::get('warehouse_id');
+        }
+        
         $data_item = Session::get('data_item');
         if(!$date = Session::get('date')){
             $date = date('Y-m-d');
         } else {
-             $date = Session::get('date');
+            $date = Session::get('date');
         }
         $merchant = SalesMerchant::where("data_state",0);
         if(Auth::id()!=1||Auth::user()->merchant_id!=null){
             $merchant->where('merchant_id',Auth::user()->merchant_id);
         }
         $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
+
         $categorys  = InvtItemCategory::where('data_state',0)
         ->where('company_id', Auth::user()->company_id)
         ->get()
@@ -88,8 +104,7 @@ class InvtStockAdjustmentController extends Controller
         ->where('item_category_id', $data_item['item_category']??'')
         ->where('item_unit_id', $data_item['item_unit']??'')
         ->where('warehouse_id',$data_item['warehouse_id']??'')->get();
-        // dump($data);exit;
-        return view('content.InvtStockAdjustment.FormAddInvtStockAdjustment', compact('merchant', 'items', 'datasess', 'data', 'date','warehouse','data_item'));
+        return view('content.InvtStockAdjustment.FormAddInvtStockAdjustment', compact('warehouse_id','merchant','categorys', 'units', 'items', 'datasess', 'data', 'date','warehouse','unit_id'));
     }
 
     public function addElementsStockAdjustment(Request $request)
@@ -104,8 +119,7 @@ class InvtStockAdjustmentController extends Controller
         }
 
         $datasess[$request->name] = $request->value;
-         Session::put('datases',$datasess);
-        $item = Session::put('items',$datasess);
+        $datasess = Session::put('datases',$datasess);
         return 1;
     }
 
@@ -116,9 +130,15 @@ class InvtStockAdjustmentController extends Controller
             "item_id"               =>$request->item_id,
             "warehouse_id"          =>$request->warehouse_id,
             "stock_adjustment_date" =>$request->stock_adjustment_date,
-            "item_unit" => InvtItem::findOrFail($request->item_id)->item_unit_id1,
+            "item_unit"             => InvtItem::findOrFail($request->item_id)->item_unit_id1,
         ];
+        // dd($datas);exit;
+        $date        = $request->stock_adjustment_date;
+        $warehouse_id        = $request->warehouse_id;
         Session::put('data_item', $datas);
+        Session::put('date',$date);
+        Session::put('warehouse_id',$warehouse_id);
+
         $data = InvtItemStock::with(['item','unit','category','warehouse'])->where('data_state',0)
         ->where('item_id', $datas['item_id']??'')
         ->where('item_category_id', $datas['item_category']??'')
@@ -182,44 +202,43 @@ class InvtStockAdjustmentController extends Controller
             'updated_id'            => Auth::id()
         );
 
-        $allrequest = request()->all();
-        $data = PurchaseInvoiceItem::get();
         if(InvtStockAdjustment::create($data_header)){
             $stock_adjustment_id   = InvtStockAdjustment::orderBy('created_at','DESC')->where('company_id', Auth::user()->company_id)->first();
-            foreach($data as $key=> $val){
-                if(isset($allrequest[$val['purchase_invoice_item_id'].'no'])){
-                    $dataArray = array(
-                    'stock_adjustment_id'           => $stock_adjustment_id['stock_adjustment_id'],
-                    'item_id'                       => request($val['purchase_invoice_item_id'].'_item_id'),
-                    'item_category_id'              => request($val['purchase_invoice_item_id'].'_item_category_id'),
-                    'item_unit_id'                  => request($val['purchase_invoice_item_id'].'_item_unit_id'),
-                    'last_balance_data'             => request($val['purchase_invoice_item_id'].'_last_balance_data'),
-                    'last_balance_physical'         => request($val['purchase_invoice_item_id'].'_last_balance_physical'),
-                    'last_balance_adjustment'       => request($val['purchase_invoice_item_id'].'_last_balance_adjustment'),
-                    'stock_adjustment_item_remark'  => request($val['purchase_invoice_item_id'].'_stock_adjustment_item_remark'),
-                    'company_id'                    => Auth::user()->company_id,
-                    'created_id'                    => Auth::id(),
-                    'updated_id'                    => Auth::id(),
-                    );
-                    InvtStockAdjustmentItem::create($dataArray);
-                    $stock_item = InvtItemStock::where('item_id',$dataArray['item_id'])
-                    ->where('item_category_id',$dataArray['item_category_id'])
-                    ->where('warehouse_id', $data_header['warehouse_id'])
-                    ->where('item_unit_id', $dataArray['item_unit_id'])
-                    ->first();
-                    if(isset($stock_item)){
-                        $table = InvtItemStock::findOrFail($stock_item['item_stock_id']);
-                        $table->last_balance = $dataArray['last_balance_adjustment'];
-                        $table->updated_id = Auth::id();
-                        $table->save();
+            $dataArray = array(
+                'stock_adjustment_id'           => $stock_adjustment_id['stock_adjustment_id'],
+                'item_id'                       => $request['item_id'],
+                'item_category_id'              => $request['item_category_id'],
+                'item_unit_id'                  => $request['item_unit_id'],
+                'last_balance_data'             => $request['last_balance_data'],
+                'last_balance_physical'         => $request['last_balance_physical'],
+                'last_balance_adjustment'       => $request['last_balance_adjustment'],
+                'stock_adjustment_item_remark'  => $request['stock_adjustment_item_remark'],
+                'company_id'                    => Auth::user()->company_id,
+                'created_id'                    => Auth::id(),
+                'updated_id'                    => Auth::id(),
+            );
+            InvtStockAdjustmentItem::create($dataArray); 
+            $stock_item = InvtItemStock::where('item_id',$dataArray['item_id'])
+            ->where('item_category_id',$dataArray['item_category_id'])
+            ->where('warehouse_id', $data_header['warehouse_id'])
+            ->where('item_unit_id', $dataArray['item_unit_id'])
+            ->first();
+            if(isset($stock_item)){
+                $table = InvtItemStock::findOrFail($stock_item['item_stock_id']);
+                $table->last_balance = $dataArray['last_balance_adjustment'];
+                $table->updated_id = Auth::id();
+                $table->save();
 
-                    }
-                }
             }
         } else {
             $msg = 'Tambah Stock Gagal';
             return redirect('/stock-adjustment/add')->with('msg',$msg);
         }
+        Session::forget('data_item');
+        Session::forget('warehouse_id');
+        Session::forget('date');
+        Session::forget('datases');
+
         $msg = 'Tambah Stock Berhasil';
         return redirect('/stock-adjustment/add')->with('msg',$msg);
     }
@@ -262,12 +281,12 @@ class InvtStockAdjustmentController extends Controller
         ->get()
         ->pluck('item_name','item_id');
 
-        $data = InvtStockAdjustment::where('stock_adjustment_id',$stock_adjustment_id)
+        $data = InvtStockAdjustment::select('invt_stock_adjustment_item.item_id', 'invt_stock_adjustment_item.item_category_id', 'invt_stock_adjustment_item.item_unit_id', 'invt_stock_adjustment_item.last_balance_adjustment', 'invt_stock_adjustment_item.last_balance_physical', 'invt_stock_adjustment_item.stock_adjustment_item_remark', 'invt_stock_adjustment.stock_adjustment_date', 'invt_stock_adjustment.stock_adjustment_date', 'invt_stock_adjustment_item.last_balance_data')
+        ->join('invt_stock_adjustment_item', 'invt_stock_adjustment_item.stock_adjustment_id', '=', 'invt_stock_adjustment.stock_adjustment_id')
+        ->where('invt_stock_adjustment.stock_adjustment_id', $stock_adjustment_id)
+        ->where('invt_stock_adjustment.data_state', 0)
         ->first();
-        $data_item = InvtStockAdjustmentItem::join('invt_stock_adjustment','invt_stock_adjustment.stock_adjustment_id','=','invt_stock_adjustment_item.stock_adjustment_id')
-        ->where('invt_stock_adjustment.stock_adjustment_id',$stock_adjustment_id)
-        ->get();
-        return view('content.InvtStockAdjustment.DetailInvtStockAdjustment',compact('categorys','warehouse','units','items','data','data_item'));
+        return view('content.InvtStockAdjustment.DetailInvtStockAdjustment',compact('categorys','warehouse','units','items','data'));
     }
 }
 
