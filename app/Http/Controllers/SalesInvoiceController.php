@@ -283,9 +283,6 @@ class SalesInvoiceController extends Controller
         }
     }
 
-
-
-
     public function getCoreItem(Request $request){
         $item_category_id   = $request->item_category_id;
         $data='';
@@ -305,7 +302,6 @@ class SalesInvoiceController extends Controller
 
         return $data;
     }
-
 
 
     public function getSelectDataUnit(Request $request){
@@ -362,10 +358,6 @@ class SalesInvoiceController extends Controller
 
 
 
-
-
-
-
     public function resetSalesInvoice()
     {
         Session::forget('arraydatases');
@@ -377,19 +369,19 @@ class SalesInvoiceController extends Controller
     {
         $data   = InvtItem::where('item_id', $item_id)->first();
 
-        return $data['item_name'];
+        return $data['item_name']?? '';
     }
 
     public function getCategoryName($item_category_id)
     {
         $data = InvtItemCategory::where('item_category_id', $item_category_id)->first();
-        return $data['item_category_name'];
+        return $data['item_category_name']?? '';
     }
 
     public function getItemUnitName($item_unit_id)
     {
         $data = InvtItemUnit::where('item_unit_id', $item_unit_id)->first();
-        return $data['item_unit_name'];
+        return $data['item_unit_name']?? '';
     }
 
     public function detailSalesInvoice($sales_invoice_id)

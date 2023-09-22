@@ -239,6 +239,11 @@ class InvtStockAdjustmentController extends Controller
             $msg = 'Tambah Stock Gagal';
             return redirect('/stock-adjustment/add')->with('msg',$msg);
         }
+        Session::forget('data_item');
+        Session::forget('warehouse_id');
+        Session::forget('date');
+        Session::forget('datases');
+
         $msg = 'Tambah Stock Berhasil';
         return redirect('/stock-adjustment/add')->with('msg',$msg);
     }
