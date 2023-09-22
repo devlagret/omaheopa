@@ -36,13 +36,14 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-theme/0.1.0-beta.10/select2-bootstrap.min.css" />
         <link rel="stylesheet" href="{{ asset('resources/css/app.css') }}">
         {{-- <link rel="stylesheet" href="{{ asset('resources/css/select2.min.css') }}"> --}}
-
+        
         {{-- Configured Stylesheets --}}
         @include('adminlte::plugins', ['type' => 'css'])
-
+        
         <link rel="stylesheet" href="{{ asset('vendor/adminlte/dist/css/adminlte.min.css') }}">
         <link rel="stylesheet"
-            href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+        href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+        <link rel="stylesheet" href="{{ asset('resources/css/colors.min.css') }}">
     @else
         <link rel="stylesheet" href="{{ mix(config('adminlte.laravel_mix_css_path', 'css/app.css')) }}">
     @endif
@@ -267,7 +268,7 @@
                         ],
                         "iDisplayLength": 5,
                     });
-                $(".datatables").addClass('pull-left');
+                $(".datatables").addClass('pull-left'); 
             });
             // $('.date').datepicker({ dateFormat: 'dd-mm-yy' }).val();
         </script>

@@ -4,6 +4,7 @@ use App\Http\Controllers\AcctAccountController;
 use App\Http\Controllers\AcctAccountSettingController;
 use App\Http\Controllers\AcctDisbursementReportController;
 use App\Http\Controllers\AcctJournalMemorialController;
+use App\Http\Controllers\AcctBalanceSheetReportController;
 use App\Http\Controllers\AcctLedgerReportController;
 use App\Http\Controllers\AcctProfitLossReportController;
 use App\Http\Controllers\AcctProfitLossYearReportController;
@@ -444,6 +445,8 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
     Route::get('/delete/{sales_order_id}', [BookingController::class, 'delete'])->name('delete');
     Route::post('/elements-add', [BookingController::class, 'elementsAdd'])->name('elements-add');
     Route::get('/reset', [BookingController::class, 'resetSession'])->name('reset');
+    Route::get('/rescedule/{sales_order_id}', [BookingController::class, 'rescedule'])->name('rescedule');
+    Route::post('/process-rescedule', [BookingController::class, 'processRescedule'])->name('process-rescedule');
 });
  // DP (Down Paymwnt) pages
  Route::prefix('down-payment')->name('dp.')->group(function () {
@@ -462,6 +465,7 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
     Route::get('/', [CheckInCheckOutController::class, 'index'])->name('index');
     Route::get('/add', [CheckInCheckOutController::class, 'add'])->name('add');
     Route::post('/check', [CheckInCheckOutController::class, 'check'])->name('check');
+    Route::post('/check-ext', [CheckInCheckOutController::class, 'checkExtend'])->name('check-extend');
     Route::post('/get-penalty', [CheckInCheckOutController::class, 'getPenalty'])->name('get-penalty');
     Route::get('/extend/{sales_order_id?}', [CheckInCheckOutController::class, 'extend'])->name('extend');
     Route::post('/process-extend', [CheckInCheckOutController::class, 'processExtend'])->name('process-extend');
@@ -546,6 +550,12 @@ Route::post('/purchase-payment/add-bank/', [PurchasePaymentController::class, 'a
 Route::post('/purchase-payment/add-transfer-array/', [PurchasePaymentController::class, 'processAddTransferArray'])->name('add-transfer-array-purchase-payment');
 Route::get('/purchase-payment/delete-transfer-array/{record_id}/{supplier_id}', [PurchasePaymentController::class, 'deleteTransferArray'])->name('delete-transfer-array-purchase-payment');
 
+//neraca
+Route::get('balance-sheet-report',[AcctBalanceSheetReportController::class, 'index'])->name('balance-sheet-report');
+Route::post('balance-sheet-report/filter',[AcctBalanceSheetReportController::class, 'filterAcctBalanceSheetReport'])->name('filter-balance-sheet-report');
+Route::get('balance-sheet-report/reset-filter',[AcctBalanceSheetReportController::class, 'resetFilterAcctBalanceSheetReport'])->name('reset-filter-balance-sheet-report');
+Route::get('balance-sheet-report/print',[AcctBalanceSheetReportController::class, 'printAcctBalanceSheetReport'])->name('print-balance-sheet-report');
+Route::get('balance-sheet-report/export',[AcctBalanceSheetReportController::class, 'exportAcctBalanceSheetReport'])->name('export-balance-sheet-report');
 
 
 //purchase return

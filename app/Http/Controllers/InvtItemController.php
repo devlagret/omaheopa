@@ -189,6 +189,8 @@ class InvtItemController extends Controller
 
     public function editItem($item_id)
     {
+        $paket='';
+        $pktitem='';
         $counts = collect();
         $items = Session::get('items');
         $msg = '';
@@ -197,7 +199,6 @@ class InvtItemController extends Controller
         if($pkg){
             $msg ='Ada paket yang menggunakan item ini';
         }
-
         if($invtpaket->count()){
             //* mengecek apakah (session) paket kosong
             if(empty(Session::get('paket'))){

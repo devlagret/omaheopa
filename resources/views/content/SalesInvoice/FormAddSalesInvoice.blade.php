@@ -290,8 +290,7 @@
                 </div>
             </div>
             
-                <h6 class="col-md-8 mt-4 mb-3"><b>Data Penjualan Barang</b></h6>
-
+                <h6 class="col-md-8 mt-2 mb-2"><b>Data Penjualan Barang</b></h6>
                 <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">Nama Kategori Barang<a class='red'> *</a></a>
