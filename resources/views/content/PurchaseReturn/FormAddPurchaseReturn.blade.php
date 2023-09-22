@@ -69,6 +69,7 @@
                         <a class="text-dark">No. Penerimaan<a class='red'> *</a></a>
                         <div class="">
                             <input type ="text" class="form-control input-bb"  name="goods_received_note_no" id="goods_received_note_no"  style="width: 15rem;" value="{{ $GoodsReceivedNote->goods_received_note_no }}" readonly/>
+                            <input type ="text" class="form-control input-bb" hidden  name="goods_received_note_id" id="goods_received_note_id"  style="width: 15rem;" value="{{ $GoodsReceivedNote->goods_received_note_id }}" readonly/>
                         </div>
                         <div hidden class="">
                         </div>
@@ -85,6 +86,7 @@
                         <a class="text-dark">No. Pembelian<a class='red'> *</a></a>
                         <div class="">
                             <input type ="text" class="form-control input-bb"  name="purchase_invoice_no" id="purchase_invoice_no"  style="width: 15rem;" value="{{  $PurchaseReturn->getPurchaseinvoiceNo($GoodsReceivedNote->purchase_invoice_id) }}" readonly/>
+                            <input type ="text" class="form-control input-bb" hidden  name="purchase_invoice_id" id="purchase_invoice_id"  style="width: 15rem;" value="{{ $GoodsReceivedNote->purchase_invoice_id }}" readonly/>
                         </div>
                         <div hidden class="">
                         </div>
@@ -99,7 +101,8 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">Supplier</a>
-                        <input type ="text" class="form-control input-bb"  name="supplier_id" id="supplier_id"  style="width: 15rem;" value="{{  $PurchaseReturn->getCoreSupplierName($GoodsReceivedNote->supplier_id)  }}" readonly/>
+                        <input type ="text" class="form-control input-bb"  name="supplier_name" id="supplier_name"  style="width: 15rem;" value="{{  $PurchaseReturn->getCoreSupplierName($GoodsReceivedNote->supplier_id)  }}" readonly/>
+                        <input type ="text" class="form-control input-bb"  hidden name="supplier_id" id="supplier_id"  style="width: 15rem;" value="{{  $GoodsReceivedNote->supplier_id  }}" readonly/>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -151,6 +154,7 @@
                                     } else {
                                         $no =1;
                                         foreach ($GoodsReceivedNoteItem AS $key => $val){
+                                            
                                             echo"
                                                 <tr>
                                                     <td style='text-align  : center'>".$no."</td>
@@ -161,12 +165,14 @@
                                                     <td style='text-align  : right !important;'>".$PurchaseReturn->getQtyPurchaseInvoiceItem($val['purchase_invoice_item_id'])."</td>
                                                     <td style='text-align  : right !important;'>".$val['quantity']."</td>
                                                     <td style='text-align  : right !important;'> <input class='form-control' style='text-align:right;'type='number' name='quantity_return_".$no."' id='quantity_return_".$no."'/>
-                                                    
+                                                        
+                                                        <input class='form-control' style='text-align:right;'type='hidden' name='goods_received_note_item_id_".$no."' id='goods_received_note_item_id_".$no."' value='".$val['goods_received_note_item_id']."'/>
                                                         <input class='form-control' style='text-align:right;'type='hidden' name='merchant_id_".$no."' id='merchant_id_".$no."' value='".$val['merchant_id']."'/>
                                                         <input class='form-control' style='text-align:right;'type='hidden' name='item_category_id_".$no."' id='item_category_id_".$no."' value='".$val['item_category_id']."'/>
                                                         <input class='form-control' style='text-align:right;'type='hidden' name='item_id_".$no."' id='item_id_".$no."' value='".$val['item_id']."'/>   
                                                         <input class='form-control' style='text-align:right;'type='hidden' name='item_unit_id_".$no."' id='item_unit_id_".$no."' value='".$val['item_unit_id']."'/>
-
+                                                        <input class='form-control' style='text-align:right;'type='hidden' name='purchase_invoice_item_id_".$no."' id='purchase_invoice_item_id_".$no."' value='".$val['purchase_invoice_item_id']."'/>
+                                                        <input class='form-control' style='text-align:right;'type='hidden' name='item_unit_cost_".$no."' id='item_unit_cost_".$no."' value='".$PurchaseReturn->getInvItemUnitCost($val['item_id'])."'/>
                                                     </td>
                                                    ";
                                                     echo"
@@ -174,6 +180,10 @@
                                             ";
                                             $no++;
                                         }
+                                        $total_no = $no - 1;
+                                        echo"
+                                            <input class='form-control' style='text-align:right;'type='hidden' name='total_no' id='total_no' value='".$total_no."' readonly/>
+                                        ";
                                     }
                             ?>
                         </tbody>

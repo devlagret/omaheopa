@@ -32,6 +32,7 @@ class SalesCustomerController extends Controller
 
     public function processAddSalesCustomer(Request $request)
     {
+        // dd($request->all());
         $request->validate([
             'customer_name' => 'required',
             'customer_gender' => 'required'

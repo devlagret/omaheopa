@@ -5,19 +5,19 @@
 @section('js')
 <script>
     function function_elements_add(name, value){
-        // console.log("name " + name);
-        // console.log("value " + value);
-		// $.ajax({
-		// 		type: "POST",
-		// 		url : "{{route('add-elements-purchase-return')}}",
-		// 		data : {
-        //             'name'      : name, 
-        //             'value'     : value,
-        //             '_token'    : '{{csrf_token()}}'
-        //         },
-		// 		success: function(msg){
-		// 	}
-		// });
+        console.log("name " + name);
+        console.log("value " + value);
+		$.ajax({
+				type: "POST",
+				url : "{{route('add-elements-sales-invoice')}}",
+				data : {
+                    'name'      : name, 
+                    'value'     : value,
+                    '_token'    : '{{csrf_token()}}'
+                },
+				success: function(msg){
+			}
+		});
 	}
 
     $(document).ready(function(){
@@ -80,7 +80,106 @@
             $("#change_amount").val(change_amount);
             $("#change_amount_view").val(toRp(change_amount));
         });
+
+
+
+        $("#item_category_id").change(function(){
+			var item_category_id 	= $("#item_category_id").val();
+
+            $.ajax({
+                type: "POST",
+                url : "{{route('select-item-category-sales')}}",
+                dataType: "html",
+                data: {
+                    'item_category_id'			    : item_category_id,
+                    '_token'                        : '{{csrf_token()}}',
+                },
+                 success: function(return_data){ 
+                    // console.log(item_category_id);
+                    $('#item_id').html(return_data);
+                    $('#item_unit_id').html('');
+                    $('#item_unit_price').val('');
+                    $('#quantity').val('');
+                    $('#subtotal_amount_view').val('');
+                    $('#subtotal_amount_after_discount_view').val('');
+                    // console.log(return_data);
+                },
+                error: function(data)
+                {
+                    console.log(data);
+
+                }
+            });
+		});
+
+
+
     });
+
+
+    
+    $("#item_id").change(function(){
+			var item_id 	= $("#item_id").val();
+                $.ajax({
+                    type: "POST",
+                    url : "{{route('select-data-unit-sales-invoice')}}",
+                    dataType: "html",
+                    data: {
+                        'item_id'	: item_id,
+                        '_token'        : '{{csrf_token()}}',
+                    },
+                    success: function(return_data){ 
+					$('#item_unit_id').html(return_data);
+                        console.log(return_data);       
+                    },
+                    error: function(data)
+                    {
+                        console.log(data);
+
+                    }
+                });
+		});
+
+
+        $("#item_unit_id").change(function(){
+            var item_category_id 	= $("#item_category_id").val();
+            var item_unit_id 	= $("#item_unit_id").val();
+			var item_id 	= $("#item_id").val();
+
+            // console.log(item_id);
+                $.ajax({
+                    type: "POST",
+                    url : "{{route('select-data-unit-price')}}",
+                    dataType: "html",
+                    data: {
+                        'item_category_id'	: item_category_id,
+                        'item_unit_id'	    : item_unit_id,
+                        'item_id'	        : item_id,
+                        '_token'            : '{{csrf_token()}}',
+                    },
+                    success: function(return_data){
+                        $('#item_unit_price').val(return_data);
+                        console.log(return_data);  
+                   
+                    },
+                    error: function(data)
+                    {
+                        console.log(data);
+
+                    }
+                });
+		});
+
+
+
+
+
+
+
+
+
+
+
 
     function processAddArraySalesInvoice(){
         var item_category_id		        = document.getElementById("item_category_id").value;
@@ -185,12 +284,13 @@
             </div>
             <div class="col-md-6">
                 <div class="form-group">
-                    <a class="text-dark">Nama Pelanggan<a class='red'> *</a></a>
-                    {!! Form::select('customer_id', $customers,  0, ['class' => 'selection-search-clear select-form', 'id' => 'customer_id', 'name' => 'customer_id']) !!}
+                    <a class="text-dark">Pelanggan</a>
+                    <input class="form-control input-bb" name="customer_name" id="customer_name" type="text" autocomplete="off" value="" onChange="function_elements_add(this.name, this.value);"/>
+                    <input class="form-control input-bb" hidden name="merchant_id" id="merchant_id" type="text" autocomplete="off" value="{{ Auth::user()->merchant_id }}"/>
                 </div>
             </div>
             
-                <h6 class="col-md-8 mt-4 mb-3"><b>Data Retur Pembelian Barang</b></h6>
+                <h6 class="col-md-8 mt-4 mb-3"><b>Data Penjualan Barang</b></h6>
 
                 <div class="col-md-6">
                     <div class="form-group">
@@ -213,7 +313,7 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">Harga Per Barang<a class='red'> *</a></a>
-                        <input class="form-control input-bb" name="item_unit_price" id="item_unit_price" type="text" autocomplete="off" value=""/>
+                        <input class="form-control input-bb" name="item_unit_price" id="item_unit_price" type="text" autocomplete="off" readonly/>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -224,7 +324,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <a class="text-dark">Subtotal<a class='red'> *</a></a>
+                        <a class="text-dark">Total<a class='red'> *</a></a>
                         <input style="text-align: right" class="form-control input-bb" name="subtotal_amount_view" id="subtotal_amount_view" type="text" autocomplete="off" value="" disabled/>
                         <input class="form-control input-bb" name="subtotal_amount" id="subtotal_amount" type="text" autocomplete="off" value="" hidden/>
                     </div>
@@ -249,12 +349,19 @@
                         <input class="form-control input-bb" name="subtotal_amount_after_discount" id="subtotal_amount_after_discount" type="text" autocomplete="off" value="" hidden/>
                     </div>
                 </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <div class="form-actions float-center mt-3">
+                            <a  type="submit" name="Save" class="btn btn-primary btn-block" title="Save" onclick="processAddArraySalesInvoice()"><i class="fa fa-plus"></i> Tambah</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="card-footer text-muted">
-            <div class="form-actions float-right">
+            {{-- <div class="form-actions float-right">
                 <a  type="submit" name="Save" class="btn btn-primary" title="Save" onclick="processAddArraySalesInvoice()"> Tambah</a>
-            </div>
+            </div> --}}
         </div>
     </div>
     </div>

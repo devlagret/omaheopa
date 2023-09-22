@@ -160,8 +160,8 @@ class PurchaseInvoiceController extends Controller
     {
         // return 0;
         //dd($request->all());
-        // $transaction_module_code = 'PBL';
-        // $transaction_module_id = $this->getTransactionModuleID($transaction_module_code);
+        $transaction_module_code = 'PI';
+        $transaction_module_id = $this->getTransactionModuleID($transaction_module_code);
         $fields = $request->validate([
             // 'purchase_invoice_supplier' => 'required',
             'warehouse_id'              => 'required',
@@ -197,20 +197,20 @@ class PurchaseInvoiceController extends Controller
             'created_id'                => Auth::id(),
             'updated_id'                => Auth::id()
         );
-        // $journal = array(
-        //     'company_id'                    => Auth::user()->company_id,
-        //     'transaction_module_id'         => $transaction_module_id,
-        //     'transaction_module_code'       => $transaction_module_code,
-        //     'journal_voucher_status'        => 1,
-        //     'journal_voucher_date'          => $fields['purchase_invoice_date'],
-        //     'journal_voucher_description'   => $this->getTransactionModuleName($transaction_module_code),
-        //     'journal_voucher_period'        => date('Ym'),
-        //     'journal_voucher_title'         => $this->getTransactionModuleName($transaction_module_code),
-        //     'created_id'                    => Auth::id(),
-        //     'updated_id'                    => Auth::id()
-        // );
-        // if(PurchaseInvoice::create($datases) && JournalVoucher::create($journal)){
-            if(PurchaseInvoice::create($datases)){
+        $journal = array(
+            'company_id'                    => Auth::user()->company_id,
+            'transaction_module_id'         => $transaction_module_id,
+            'transaction_module_code'       => $transaction_module_code,
+            'journal_voucher_status'        => 1,
+            'journal_voucher_date'          => $fields['purchase_invoice_date'],
+            'journal_voucher_description'   => $this->getTransactionModuleName($transaction_module_code),
+            'journal_voucher_period'        => date('Ym'),
+            'journal_voucher_title'         => $this->getTransactionModuleName($transaction_module_code),
+            'created_id'                    => Auth::id(),
+            'updated_id'                    => Auth::id()
+        );
+        if(PurchaseInvoice::create($datases) && JournalVoucher::create($journal)){
+            // if(PurchaseInvoice::create($datases)){
             $purchase_invoice_id = PurchaseInvoice::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
             $arraydatases = Session::get('arraydatases');
             foreach ($arraydatases as $key => $val) {

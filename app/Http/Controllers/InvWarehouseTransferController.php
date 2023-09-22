@@ -557,8 +557,6 @@ class InvWarehouseTransferController extends Controller
 
         return $item['item_stock_id'];
     }
-
-
     
 
 

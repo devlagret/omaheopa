@@ -58,7 +58,7 @@
                                     *
                                 </span>
                             </section>
-                            <input type ="date" class="form-control form-control-inline input-medium date-picker input-date" data-date-format="dd-mm-yyyy" type="text" name="start_date" id="start_date" value="{{ $start_date }}" style="width: 15rem;"/>
+                            <input type ="date" class="form-control form-control-inline input-medium date-picker input-date" data-date-format="dd-mm-yyyy" type="text" name="start_date" id="start_date" value="{{ $start_date ?? '' }}" style="width: 15rem;"/>
                         </div>
                     </div>
 
@@ -69,7 +69,7 @@
                                     *
                                 </span>
                             </section>
-                            <input type ="date" class="form-control form-control-inline input-medium date-picker input-date" data-date-format="dd-mm-yyyy" type="text" name="end_date" id="end_date"  value="{{ $end_date }}" style="width: 15rem;"/>
+                            <input type ="date" class="form-control form-control-inline input-medium date-picker input-date" data-date-format="dd-mm-yyyy" type="text" name="end_date" id="end_date"  value="{{ $end_date ?? '' }}" style="width: 15rem;"/>
                         </div>
                     </div>
 
@@ -128,13 +128,13 @@
                     @foreach($data as $row)
                     <tr>
                         <td style='text-align:center'>{{ $no++ }}</td>
-                        <td>{{ $row['sales_invoice_date'] }}</td>
-                        <td>{{ $row['sales_invoice_no'] }}</td>
-                        <td>{{ $SalesInvoice->getCustomerName($row['customer_id']) }}</td>
-                        <td style="text-align: right">{{ number_format($row['total_amount'],2,'.',',') }}</td>
+                        <td>{{ $row['sales_invoice_date'] ?? '' }}</td>
+                        <td>{{ $row['sales_invoice_no'] ?? '' }}</td>
+                        <td>{{ $row['customer_name'] ?? ''  }}</td>
+                        <td style="text-align: right">{{ $row['total_amount'] ?? '' }}</td>
                         <td class="text-center">
-                            <a type="button" class="btn btn-outline-warning btn-sm" href="{{ url('/sales-invoice/detail/'.$row['sales_invoice_id']) }}">Detail</a>
-                            <a type="button" class="btn btn-outline-danger btn-sm" href="{{ url('/sales-invoice/delete/'.$row['sales_invoice_id']) }}">Hapus</a>
+                            <a type="button" class="btn btn-outline-warning btn-sm" href="{{ url('/sales-invoice/detail/'.$row['sales_invoice_id'] ?? '') }}">Detail</a>
+                            <a type="button" class="btn btn-outline-danger btn-sm" href="{{ url('/sales-invoice/delete/'.$row['sales_invoice_id'] ?? '' ) }}">Hapus</a>
                         </td>
                     </tr>
                     @endforeach

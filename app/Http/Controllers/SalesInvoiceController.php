@@ -47,6 +47,7 @@ class SalesInvoiceController extends Controller
         ->where('company_id', Auth::user()->company_id)
 
         ->get();
+        // dd($data);
         return view('content.SalesInvoice.ListSalesInvoice',compact('data', 'start_date', 'end_date'));
     }
 
@@ -116,6 +117,9 @@ class SalesInvoiceController extends Controller
         }
         Session::put('editarraystate',1);
 
+        // $salesinvoice = Session::get('salesinvoice');
+        // Session::push('salesinvoice', $salesinvoice);
+
         return redirect('/sales-invoice/add');
     }
 
@@ -138,12 +142,13 @@ class SalesInvoiceController extends Controller
 
     public function processAddSalesInvoice(Request $request)
     {
-        $transaction_module_code = 'PJL';
-        $transaction_module_id  = $this->getTransactionModuleID($transaction_module_code);
+        // dd($request->all());
+        // $transaction_module_code = 'PJL';
+        // $transaction_module_id  = $this->getTransactionModuleID($transaction_module_code);
         $fields = $request->validate([
             'sales_invoice_date'        => 'required',
-            'subtotal_item'            => 'required',
-            'subtotal_amount1'           => 'required',
+            'subtotal_item'             => 'required',
+            'subtotal_amount1'          => 'required',
             'total_amount'              => 'required',
             'paid_amount'               => 'required',
             'change_amount'             => 'required'
@@ -156,7 +161,8 @@ class SalesInvoiceController extends Controller
             $discount_amount_total = $request->discount_amount_total;
         }
         $data = array(
-            'customer_id'               => $request->customer_id,
+            'customer_name'             => $request->customer_name,
+            'merchant_id'               => $request->merchant_id,
             'sales_invoice_date'        => $fields['sales_invoice_date'],
             'subtotal_item'             => $fields['subtotal_item'],
             'subtotal_amount'           => $fields['subtotal_amount1'],
@@ -169,20 +175,21 @@ class SalesInvoiceController extends Controller
             'created_id'                => Auth::id(),
             'updated_id'                => Auth::id()
         );
-        $journal = array(
-            'company_id'                    => Auth::user()->company_id,
-            'journal_voucher_status'        => 1,
-            'journal_voucher_description'   => $this->getTransactionModuleName($transaction_module_code),
-            'journal_voucher_title'         => $this->getTransactionModuleName($transaction_module_code),
-            'transaction_module_id'         => $transaction_module_id,
-            'transaction_module_code'       => $transaction_module_code,
-            'journal_voucher_date'          => $fields['sales_invoice_date'],
-            'journal_voucher_period'        => date('Ym'),
-            'updated_id'                    => Auth::id(),
-            'created_id'                    => Auth::id()
-        );
+        // $journal = array(
+        //     'company_id'                    => Auth::user()->company_id,
+        //     'journal_voucher_status'        => 1,
+        //     'journal_voucher_description'   => $this->getTransactionModuleName($transaction_module_code),
+        //     'journal_voucher_title'         => $this->getTransactionModuleName($transaction_module_code),
+        //     'transaction_module_id'         => $transaction_module_id,
+        //     'transaction_module_code'       => $transaction_module_code,
+        //     'journal_voucher_date'          => $fields['sales_invoice_date'],
+        //     'journal_voucher_period'        => date('Ym'),
+        //     'updated_id'                    => Auth::id(),
+        //     'created_id'                    => Auth::id()
+        // );
 
-        if(SalesInvoice::create($data) && JournalVoucher::create($journal)){
+        // if(SalesInvoice::create($data) && JournalVoucher::create($journal)){
+            if(SalesInvoice::create($data)){
             $sales_invoice_id   = SalesInvoice::orderBy('created_at','DESC')->where('company_id', Auth::user()->company_id)->first();
             $arraydatases       = Session::get('arraydatases');
             foreach ($arraydatases as $key => $val) {
@@ -202,71 +209,71 @@ class SalesInvoiceController extends Controller
                     'updated_id'                        => Auth::id()
                 );
                 SalesInvoiceItem::create($dataarray);
-                $stock_item = InvtItemStock::where('item_id',$dataarray['item_id'])
-                ->where('item_category_id',$dataarray['item_category_id'])
-                ->where('item_unit_id', $dataarray['item_unit_id'])
-                ->where('company_id', Auth::user()->company_id)
-                ->first();
-                if(isset($stock_item)){
-                    $table = InvtItemStock::findOrFail($stock_item['item_stock_id']);
-                    $table->last_balance = $stock_item['last_balance'] - $dataarray['quantity'];
-                    $table->updated_id = Auth::id();
-                    $table->save();
+                // $stock_item = InvtItemStock::where('item_id',$dataarray['item_id'])
+                // ->where('item_category_id',$dataarray['item_category_id'])
+                // ->where('item_unit_id', $dataarray['item_unit_id'])
+                // ->where('company_id', Auth::user()->company_id)
+                // ->first();
+                // if(isset($stock_item)){
+                //     $table = InvtItemStock::findOrFail($stock_item['item_stock_id']);
+                //     $table->last_balance = $stock_item['last_balance'] - $dataarray['quantity'];
+                //     $table->updated_id = Auth::id();
+                //     $table->save();
 
-                }
+                // }
             }
 
-            $account_setting_name = 'sales_cash_account';
-            $account_id = $this->getAccountId($account_setting_name);
-            $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
-            $account_default_status = $this->getAccountDefaultStatus($account_id);
-            $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
-            if ($account_setting_status == 0){
-                $debit_amount = $fields['total_amount'];
-                $credit_amount = 0;
-            } else {
-                $debit_amount = 0;
-                $credit_amount = $fields['total_amount'];
-            }
-            $journal_debit = array(
-                'company_id'                    => Auth::user()->company_id,
-                'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
-                'account_id'                    => $account_id,
-                'journal_voucher_amount'        => $fields['total_amount'],
-                'account_id_default_status'     => $account_default_status,
-                'account_id_status'             => $account_setting_status,
-                'journal_voucher_debit_amount'  => $debit_amount,
-                'journal_voucher_credit_amount' => $credit_amount,
-                'updated_id'                    => Auth::id(),
-                'created_id'                    => Auth::id()
-            );
-            JournalVoucherItem::create($journal_debit);
+            // $account_setting_name = 'sales_cash_account';
+            // $account_id = $this->getAccountId($account_setting_name);
+            // $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
+            // $account_default_status = $this->getAccountDefaultStatus($account_id);
+            // $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
+            // if ($account_setting_status == 0){
+            //     $debit_amount = $fields['total_amount'];
+            //     $credit_amount = 0;
+            // } else {
+            //     $debit_amount = 0;
+            //     $credit_amount = $fields['total_amount'];
+            // }
+            // $journal_debit = array(
+            //     'company_id'                    => Auth::user()->company_id,
+            //     'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
+            //     'account_id'                    => $account_id,
+            //     'journal_voucher_amount'        => $fields['total_amount'],
+            //     'account_id_default_status'     => $account_default_status,
+            //     'account_id_status'             => $account_setting_status,
+            //     'journal_voucher_debit_amount'  => $debit_amount,
+            //     'journal_voucher_credit_amount' => $credit_amount,
+            //     'updated_id'                    => Auth::id(),
+            //     'created_id'                    => Auth::id()
+            // );
+            // JournalVoucherItem::create($journal_debit);
 
-            $account_setting_name = 'sales_account';
-            $account_id = $this->getAccountId($account_setting_name);
-            $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
-            $account_default_status = $this->getAccountDefaultStatus($account_id);
-            $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
-            if ($account_setting_status == 0){
-                $debit_amount = $fields['total_amount'];
-                $credit_amount = 0;
-            } else {
-                $debit_amount = 0;
-                $credit_amount = $fields['total_amount'];
-            }
-            $journal_credit = array(
-                'company_id'                    => Auth::user()->company_id,
-                'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
-                'account_id'                    => $account_id,
-                'journal_voucher_amount'        => $fields['total_amount'],
-                'account_id_default_status'     => $account_default_status,
-                'account_id_status'             => $account_setting_status,
-                'journal_voucher_debit_amount'  => $debit_amount,
-                'journal_voucher_credit_amount' => $credit_amount,
-                'updated_id'                    => Auth::id(),
-                'created_id'                    => Auth::id()
-            );
-            JournalVoucherItem::create($journal_credit);
+            // $account_setting_name = 'sales_account';
+            // $account_id = $this->getAccountId($account_setting_name);
+            // $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
+            // $account_default_status = $this->getAccountDefaultStatus($account_id);
+            // $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
+            // if ($account_setting_status == 0){
+            //     $debit_amount = $fields['total_amount'];
+            //     $credit_amount = 0;
+            // } else {
+            //     $debit_amount = 0;
+            //     $credit_amount = $fields['total_amount'];
+            // }
+            // $journal_credit = array(
+            //     'company_id'                    => Auth::user()->company_id,
+            //     'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
+            //     'account_id'                    => $account_id,
+            //     'journal_voucher_amount'        => $fields['total_amount'],
+            //     'account_id_default_status'     => $account_default_status,
+            //     'account_id_status'             => $account_setting_status,
+            //     'journal_voucher_debit_amount'  => $debit_amount,
+            //     'journal_voucher_credit_amount' => $credit_amount,
+            //     'updated_id'                    => Auth::id(),
+            //     'created_id'                    => Auth::id()
+            // );
+            // JournalVoucherItem::create($journal_credit);
 
             $msg = 'Tambah Invoice Penjualan Berhasil';
             return redirect('/sales-invoice/add')->with('msg',$msg);
@@ -275,6 +282,89 @@ class SalesInvoiceController extends Controller
             return redirect('/sales-invoice/add')->with('msg',$msg);
         }
     }
+
+
+
+
+    public function getCoreItem(Request $request){
+        $item_category_id   = $request->item_category_id;
+        $data='';
+        
+
+        $item = InvtItem::select(DB::raw("invt_item.item_id, invt_item.item_name AS item_name"))
+        ->where('invt_item.item_category_id', $item_category_id)
+        // ->where('invt_item.merchant_id', Auth::merchant_id())
+        ->where('invt_item.data_state','=',0)
+        ->get();
+
+        $data .= "<option value=''>--Choose One--</option>";
+        //     $data .= "<option value='0'>".$item['item_name']."</option>\n";
+        foreach ($item as $mp){
+            $data .= "<option value='$mp[item_id]'>$mp[item_name]</option>\n";	
+        }
+
+        return $data;
+    }
+
+
+
+    public function getSelectDataUnit(Request $request){
+        $item_id   = $request->item_id;
+
+        $invt_item= InvtItem::where('item_id', $item_id)
+        ->first();
+        
+        $data= '';
+
+        if($invt_item != null){
+            $unit1 = InvtItem::select('invt_item.item_unit_id1','invt_item_unit.*')
+            ->join('invt_item_unit', 'invt_item_unit.item_unit_id', '=', 'invt_item.item_unit_id1')
+            ->where('invt_item.item_unit_id1', $invt_item['item_unit_id1'])
+            // ->where('invt_item.item_unit_2', $invt_item['item_unit_2'])
+            // ->where('invt_item.item_unit_3', $invt_item['item_unit_3'])
+            ->first();
+            
+            // return $unit1;
+            $unit2 = InvtItem::select('invt_item.item_unit_id2','invt_item_unit.*')
+            ->join('invt_item_unit', 'invt_item_unit.item_unit_id', '=', 'invt_item.item_unit_id2')
+            ->where('invt_item.item_unit_id2', $invt_item['item_unit_id2'])
+            ->first();
+
+            $unit3 = InvtItem::select('invt_item.item_unit_id3','invt_item_unit.*')
+            ->join('invt_item_unit', 'invt_item_unit.item_unit_id', '=', 'invt_item.item_unit_id3')
+            ->where('invt_item.item_unit_id3', $invt_item['item_unit_id3'])
+            ->first();
+        
+
+        $array = [];
+        if($unit1){
+            array_push($array, $unit1);
+        }
+        if($unit2){
+            array_push($array, $unit2);
+        }
+        if($unit3){
+            array_push($array, $unit3);
+        }
+        // $unit = array_merge($unit1, $unit2);
+        // $unit4 = array_merge($unit, $unit3);
+        
+        
+        $data .= "<option value=''>--Choose One--</option>";
+        foreach ($array as $val){
+            print_r($val['item_unit_id']);
+            
+            $data .= "<option value='$val[item_unit_id]'>$val[item_unit_name]</option>\n";	
+        }
+        return $data;
+        }
+    }
+
+
+
+
+
+
 
     public function resetSalesInvoice()
     {
@@ -404,6 +494,16 @@ class SalesInvoiceController extends Controller
             return redirect('/sales-invoice')->with('msg',$msg);
         }
     }
+
+    public function addElementsSalesInvoice(Request $request)
+    {
+        $salesinvoice  = Session::get('salesinvoice');
+        if(!$salesinvoice || $salesinvoice == ''){
+            $salesinvoice['customer_name'] = '';
+        }
+        $salesinvoice[$request->name] = $request->value;
+        Session::put('salesinvoice', $salesinvoice);
+    }
     
     public function filterSalesInvoice(Request $request)
     {
@@ -467,6 +567,36 @@ class SalesInvoiceController extends Controller
     {
         $data = SalesCustomer::where('customer_id', $customer_id)->first();
 
-        return $data['customer_name'];
+        return $data['customer_name'] ?? '';
     }
+
+
+    public function getUnitPrice(Request $request){
+
+        $item_id            = $request->item_id;   
+
+        $item = InvtItem::select('*')
+        ->where('invt_item.item_id', $item_id)
+        ->where('invt_item.data_state','=',0)
+        ->first();
+
+            if($item['item_unit_id1'] == $request->item_unit_id){
+                $item_unit_price = $item['item_unit_price1'];
+            }
+            if($item['item_unit_id2'] == $request->item_unit_id){
+                $item_unit_price = $item['item_unit_price2'];
+            }
+            if($item['item_unit_id3'] == $request->item_unit_id){
+                $item_unit_price = $item['item_unit_price3'];
+            }
+            if($item['item_unit_id4'] == $request->item_unit_id){
+                $item_unit_price = $item['item_unit_price4'];
+            }
+
+
+        return $item_unit_price;
+        
+    }
+
+
 }
