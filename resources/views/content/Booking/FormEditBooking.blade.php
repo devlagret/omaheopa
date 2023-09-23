@@ -981,10 +981,11 @@ if (empty($paket)) {
                                             *
                                         </span>
                                     </section>
+                                    <input type="hidden" name="sales_order_id" id="sales_order_id" value="{{$data->sales_order_id}}"/>
                                     <input type="date"
                                         class="form-control form-control-inline input-medium date-picker input-date"
                                         data-date-format="dd-mm-yyyy" type="text" name="start_date" min="{{date('Y-m-d')}}" readonly id="start_date"
-                                        value="{{ $sessiondata['start_date'] ?? date('Y-m-d') }}" onchange="changeDate()" style="width: 15rem;" />
+                                        value="{{ $sessiondata['start_date'] ??  $data->checkin_date }}" onchange="changeDate()" style="width: 15rem;" />
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -997,7 +998,7 @@ if (empty($paket)) {
                                     <input type="date"
                                         class="form-control form-control-inline input-medium date-picker input-date"
                                         data-date-format="dd-mm-yyyy" type="text" name="end_date" id="end_date"
-                                        value="{{ $sessiondata['end_date'] ?? date('Y-m-d') }}" onchange="changeDate()" readonly style="width: 15rem;" />
+                                        value="{{ $sessiondata['end_date'] ?? $data->checkout_date }}" onchange="changeDate()" readonly style="width: 15rem;" />
                                     <input type="text" name="days_booked" id="days_booked" hidden/>
                                 </div>
                             </div>

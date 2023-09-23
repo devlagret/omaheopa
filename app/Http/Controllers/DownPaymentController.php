@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Helpers\AppHelper;
 use App\Http\Controllers\Controller;
+use App\Models\JournalVoucher;
+use App\Models\JournalVoucherItem;
 use App\Models\SalesInvoice;
 use App\Models\SalesOrder;
 use Illuminate\Http\Request;
@@ -78,6 +80,20 @@ class DownPaymentController extends Controller
             DB::rollBack();
             return redirect()->route('booking.index')->with('msg','Tambah Booking Berhasil  -.');
         }
+        // * buat journal dp
+        JournalVoucher::create([
+            'journal_voucher_token' => $token,
+            'transaction_module_code' => 'BDP',
+            'journal_voucher_description'=> 'Booking Down Payment'
+        ]);
+         //
+        $jv = JournalVoucher::where('journal_voucher_token',$token)->first();
+        //* buat journal item
+        JournalVoucherItem::create([
+            // 'merchat_id' => 1,
+            'journal_voucher_id'=>$jv->journal_voucher_id,
+        ]);
+        //
         $order->sales_order_status = 1;
         $order->save();
         DB::commit();
