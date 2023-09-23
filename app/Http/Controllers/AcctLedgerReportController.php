@@ -330,7 +330,7 @@ class AcctLedgerReportController extends Controller
             <tr>
                 <td width=\"20%\"><div style=\"text-align: lef=ft; font-size:12px;font-weight: bold\">Saldo Awal</div></td>
                 <td width=\"5%\"><div style=\"text-align: center; font-size:12px; font-weight: bold\">:</div></td>
-                <td width=\"65%\"><div style=\"text-align: left; font-size:12px; font-weight: bold\">".number_format($accountbalancedetail_old['last_balance'],2,'.',',')."</div></td>
+                <td width=\"65%\"><div style=\"text-align: left; font-size:12px; font-weight: bold\">".number_format((int)$accountbalancedetail_old?? ''['last_balance'],2,'.',',')."</div></td>
             </tr>
         </table>";
         $pdf::writeHTML($tbl, true, false, false, false, '');

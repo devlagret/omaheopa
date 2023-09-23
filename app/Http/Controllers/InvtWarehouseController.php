@@ -52,7 +52,7 @@ class InvtWarehouseController extends Controller
 
     public function processAddWarehouse(Request $request)
     {
-        dump($request->all());exit;
+        // dump($request->all());exit;
         $fields = $request->validate([
             'warehouse_code'    => 'required',
             'warehouse_name'    => 'required',
