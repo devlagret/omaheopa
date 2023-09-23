@@ -108,8 +108,8 @@ class PurchaseInvoiceController extends Controller
     public function addArrayPurchaseInvoice(Request $request)
     {
         $arraydatases = array(
-            'merchant_id'  => $request->merchant_id,
-            'warehouse_id'  => $request->warehouse_id,
+            'merchant_id'       => $request->merchant_id,
+            'warehouse_id'      => $request->warehouse_id,
             'item_category_id'  => $request->item_category,
             'item_id'           => $request->item_id,
             'item_unit_id'      => $request->item_unit,
@@ -119,14 +119,8 @@ class PurchaseInvoiceController extends Controller
             'item_expired_date' => $request->item_expired_date,
             'subtotal_amount_after_discount' => $request->subtotal_amount_after_discount
         );
-        $data = InvtItemStock::where('data_state',0)
-        ->where('item_id', $arraydatases['item_id']??'')
-        ->where('item_category_id', $arraydatases['item_category_id']??'')
-        ->where('item_unit_id', $arraydatases['item_unit_id']??'')
-        ->where('warehouse_id',$arraydatases['warehouse_id']??'')->first();
-        if($data==null){
-            return redirect()->route('add-stock-adjustment')->with('msg',"Barang yang Dicari Tidak Memiliki Stok");
-        }
+
+    
         $lastdatases = Session::get('arraydatases');
         if($lastdatases !== null){
             array_push($lastdatases, $arraydatases);
