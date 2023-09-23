@@ -120,7 +120,6 @@ class PurchaseInvoiceController extends Controller
             'subtotal_amount_after_discount' => $request->subtotal_amount_after_discount
         );
 
-    
         $lastdatases = Session::get('arraydatases');
         if($lastdatases !== null){
             array_push($lastdatases, $arraydatases);
