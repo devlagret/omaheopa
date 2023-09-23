@@ -120,10 +120,10 @@ class PurchaseInvoiceController extends Controller
             'subtotal_amount_after_discount' => $request->subtotal_amount_after_discount
         );
         $data = InvtItemStock::where('data_state',0)
-        ->where('item_id', $arraydatases['item_id']??'')
-        ->where('item_category_id', $arraydatases['item_category_id']??'')
-        ->where('item_unit_id', $arraydatases['item_unit_id']??'')
-        ->where('warehouse_id',$arraydatases['warehouse_id']??'')->first();
+        ->where('item_id', $arraydatases['item_id'])
+        ->where('item_category_id', $arraydatases['item_category_id'])
+        ->where('item_unit_id', $arraydatases['item_unit_id'])
+        ->where('warehouse_id',$arraydatases['warehouse_id'])->first();
         if($data==null){
             return redirect()->route('add-stock-adjustment')->with('msg',"Barang yang Dicari Tidak Memiliki Stok");
         }
