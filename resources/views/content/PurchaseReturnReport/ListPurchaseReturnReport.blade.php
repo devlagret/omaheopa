@@ -116,10 +116,10 @@
                    @foreach ($data as $row)
                    <tr>
                         <td>{{ $no++ }}</td>
-                        <td>{{ $row['purchase_return_supplier'] }}</td>
+                        <td>{{ $PRRC->getSupplierName($row['supplier_id']) }}</td>
                         <td>{{ $PRRC->getWarehouseName($row['warehouse_id']) }}</td>
                         <td>{{ $row['purchase_return_date'] }}</td>
-                        <td style="text-align: right">{{ number_format($row['purchase_item_subtotal'],2,'.',',') }}</td>
+                        <td style="text-align: right">{{ number_format($row['quantity'],2,'.',',') }}</td>
                    </tr>
                        
                    @endforeach

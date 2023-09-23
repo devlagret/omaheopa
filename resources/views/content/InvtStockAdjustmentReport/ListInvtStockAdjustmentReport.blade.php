@@ -41,7 +41,7 @@
                                     *
                                 </span>
                             </section>
-                            {!! Form::select('item_category_id',  $category, $category_id, ['class' => 'selection-search-clear select-form', 'id' => 'category_id', 'name' => 'category_id']) !!}
+                            {!! Form::select('item_category_id',  $category, $category_id, ['class' => 'selection-search-clear select-form', 'id' => 'category_id', 'name' => 'category_id'] ?? '') !!}
                         </div>
                     </div>
 
@@ -52,7 +52,7 @@
                                     *
                                 </span>
                             </section>
-                            {!! Form::select('warehouse_id',  $warehouse, $warehouse_id, ['class' => 'selection-search-clear select-form', 'id' => 'warehouse_id', 'name' => 'warehouse_id']) !!}
+                            {!! Form::select('warehouse_id',  $warehouse, $warehouse_id, ['class' => 'selection-search-clear select-form', 'id' => 'warehouse_id', 'name' => 'warehouse_id'] ?? '') !!}
                         </div>
                     </div>
                     {{-- <div class = "col-md-6">
@@ -105,11 +105,11 @@
                    @foreach ($data as $row )
                        <tr>
                         <td>{{ $no++ }}</td>
-                        <td>{{ $ISARC->getWarehouseName($row['warehouse_id']) }}</td>
-                        <td>{{ $ISARC->getItemCategoryName($row['item_category_id']) }}</td>
-                        <td>{{ $ISARC->getItemName($row['item_id']) }}</td>
-                        <td>{{ $ISARC->getItemUnitName($row['item_unit_id']) }}</td>
-                        <td>{{ $ISARC->getStock($row['item_id'],$row['item_category_id'],$row['item_unit_id'],$row['warehouse_id']) }}</td>
+                        <td>{{ $ISARC->getWarehouseName($row['warehouse_id'] ?? '') }}</td>
+                        <td>{{ $ISARC->getItemCategoryName($row['item_category_id'] ?? '') }}</td>
+                        <td>{{ $ISARC->getItemName($row['item_id'] ?? '') }}</td>
+                        <td>{{ $ISARC->getItemUnitName($row['item_unit_id'] ?? '') }}</td>
+                        <td>{{ $ISARC->getStock($row['item_id'] ?? '',$row['item_category_id'] ?? '',$row['item_unit_id'] ?? '',$row['warehouse_id'] ?? '') }}</td>
                        </tr>
                    @endforeach
                 </tbody>

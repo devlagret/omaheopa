@@ -27,6 +27,7 @@ use App\Http\Controllers\SalesRoomMenuController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InvGoodsReceivedNoteController;
+use App\Http\Controllers\InvItemStockController;
 use App\Http\Controllers\InvtItemBarcodeController;
 use App\Http\Controllers\SystemUserController;
 use App\Http\Controllers\SystemUserGroupController;
@@ -574,11 +575,16 @@ Route::get('/purchase-return/edit', [PurchaseReturnController::class, 'editPurch
 Route::post('/purchase-return/process-edit',[PurchaseReturnController::class, 'processeditPurchaseReturn'])->name('process-edit-purchase-return');
 Route::get('/purchase-return/delete', [PurchaseReturnController::class, 'deletePurchaseReturn'])->name('delete-purchase-return');
 
-
 Route::get('/purchase-return-report',[PurchaseReturnReportController::class, 'index'])->name('purchase-return-report');
 Route::post('/purchase-return-report/filter',[PurchaseReturnReportController::class, 'filterPurchaseReturnReport'])->name('filter-purchase-return-report');
 Route::get('/purchase-return-report/filter-reset',[PurchaseReturnReportController::class, 'filterResetPurchaseReturnReport'])->name('filter-reset-purchase-return-report');
 Route::get('/purchase-return-report/print',[PurchaseReturnReportController::class, 'printPurchaseReturnReport'])->name('print-purchase-return-report');
 Route::get('/purchase-return-report/export',[PurchaseReturnReportController::class, 'exportPurchaseReturnReport'])->name('export-purchase-return-report');
 
+//Inv-item-stock
 
+Route::get('/item-stock', [InvItemStockController::class, 'index'])->name('item-stock');
+Route::post('/item-stock/filter', [InvItemStockController::class, 'filterInvItemStock'])->name('filter-item-stock');
+Route::post('/item-stock/type', [InvItemStockController::class, 'getInvItemType'])->name('item-stock-type');
+Route::post('/item-stock/grade', [InvItemStockController::class, 'getGrade'])->name('item-stock-grade');
+Route::get('/item-stock/export', [InvItemStockController::class, 'export'])->name('item-stock-export');

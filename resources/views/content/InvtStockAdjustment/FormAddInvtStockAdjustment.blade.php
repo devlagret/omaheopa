@@ -248,7 +248,7 @@
                                         </td>
                                         <td>
                                             {{ $ISAC->getWarehouseName($row['warehouse_id']) }}
-                                            <input type="text" name="warehouse_id" id="warehouse_id" value="{{ $row['warehouse_id'] }}">
+                                            <input type="text" name="warehouse_id" id="warehouse_id" value="{{ $row['warehouse_id'] }}" hidden>
                                             {{-- <input type="text" name="stock_adjustment_date" id="stock_adjustment_date" value="{{ $row['stock_adjustment_date'] }}"> --}}
 
                                         </td>

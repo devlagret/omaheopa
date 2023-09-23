@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\CoreSupplier;
 use App\Models\InvtWarehouse;
 use App\Models\PurchaseReturn;
 use Elibyy\TCPDF\Facades\TCPDF;
@@ -44,8 +45,8 @@ class PurchaseReturnReportController extends Controller
         ->where('purchase_return.warehouse_id', $warehouse_id)
         ->where('purchase_return.purchase_return_date','>=',$start_date)
         ->where('purchase_return.purchase_return_date','<=',$end_date)
-        ->where('purchase_return.company_id', Auth::user()->company_id)
-        ->where('purchase_return.data_state',0)
+        // ->where('purchase_return.company_id', Auth::user()->company_id)
+        // ->where('purchase_return.data_state',0)
         ->get();
         return view('content.PurchaseReturnReport.ListPurchaseReturnReport', compact('warehouse', 'data', 'start_date', 'end_date'));
     }
@@ -78,6 +79,12 @@ class PurchaseReturnReportController extends Controller
         return redirect('/purchase-return-report');
     }
 
+    public function getSupplierName($supplier_id)
+    {
+        $data = CoreSupplier::where('supplier_id',$supplier_id)->first();
+
+        return $data['supplier_name'];
+    }
     public function printPurchaseReturnReport()
     {
         if(!$start_date = Session::get('start_date')){
@@ -154,10 +161,10 @@ class PurchaseReturnReportController extends Controller
             $tblStock2 .="
                 <tr>			
                     <td style=\"text-align:left\">$no.</td>
-                    <td style=\"text-align:left\">".$val['purchase_return_supplier']."</td>
+                    <td style=\"text-align:left\">".$this->getSupplierName($val['supplier_id'])."</td>
                     <td style=\"text-align:left\">".$this->getWarehouseName($val['warehouse_id'])."</td>
                     <td style=\"text-align:left\">".$val['purchase_return_date']."</td>
-                    <td style=\"text-align:right\">".number_format($val['purchase_return_subtotal'],2,'.',',')."</td>
+                    <td style=\"text-align:right\">".number_format($val['quantity'],2,'.',',')."</td>
                 </tr>
                 
             ";
@@ -196,8 +203,8 @@ class PurchaseReturnReportController extends Controller
         ->where('purchase_return.warehouse_id', $warehouse_id)
         ->where('purchase_return.purchase_return_date','>=',$start_date)
         ->where('purchase_return.purchase_return_date','<=',$end_date)
-        ->where('purchase_return.company_id', Auth::user()->company_id)
-        ->where('purchase_return.data_state',0)
+        // ->where('purchase_return.company_id', Auth::user()->company_id)
+        // ->where('purchase_return.data_state',0)
         ->get();
 
         $spreadsheet = new Spreadsheet();
@@ -258,10 +265,10 @@ class PurchaseReturnReportController extends Controller
 
                         $no++;
                         $sheet->setCellValue('B'.$j, $no);
-                        $sheet->setCellValue('C'.$j, $val['purchase_return_supplier']);
+                        $sheet->setCellValue('C'.$j, $this->getSupplierName($val['supplier_id']));
                         $sheet->setCellValue('D'.$j, $this->getWarehouseName($val['warehouse_id']));
                         $sheet->setCellValue('E'.$j, $val['purchase_return_date']);
-                        $sheet->setCellValue('F'.$j, number_format($val['purchase_return_subtotal'],2,'.',','));
+                        $sheet->setCellValue('F'.$j, number_format($val['quantity'],2,'.',','));
                 }
                 $j++;
         

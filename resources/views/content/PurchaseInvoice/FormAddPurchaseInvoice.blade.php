@@ -141,12 +141,12 @@
         });
 
         function processAddArrayPurchaseInvoice() {
-            $('.item-required').each(function() {
-            if($( this ).val()==''){
-                alert("Harap Semua Input Barang dengan Tanda Bintang Merah untuk Diisi!").
-                $(this).focus();
-            }
-            });
+            // $('.item-required').each(function() {
+            // if($( this ).val()==''){
+            //     alert("Harap Semua Input Barang dengan Tanda Bintang Merah untuk Diisi!").
+            //     $(this).focus();
+            // }
+            // });
             var merchant_id = $("#merchant_id").val();
             var warehouse_id = $("#warehouse_id").val();
             var item_category = $("#item_category").val();
@@ -159,6 +159,8 @@
             var discount_amount = $("#discount_amount").val();
             var subtotal_amount_after_discount = $("#subtotal_amount_after_discount").val();
             var item_expired_date = $("#item_expired_date").val();
+
+            console.log(merchant_id,warehouse_id,item_category,item_id,item_unit,quantity,item_unit_cost,discount_amount,discount_percentage,subtotal_amount,subtotal_amount_after_discount);
             $.ajax({
                 type: "POST",
                 url: "{{ route('add-array-purchase-invoice') }}",
