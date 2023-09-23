@@ -92,19 +92,19 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">Kode Barang Satuan<a class='red'> *</a></a>
-                        <input class="form-control input-bb" autofocus="autofocus" name="item_unit_code" id="item_unit_code" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value);" value="{{ $itemunits['item_unit_code'] }}" />
+                        <input class="form-control input-bb" autofocus="autofocus" name="item_unit_code" id="item_unit_code" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value);" value="{{ $itemunits['item_unit_code']??'' }}" />
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">Nama Barang Satuan<a class='red'> *</a></a>
-                        <input class="form-control input-bb" name="item_unit_name" id="item_unit_name" type="text" autocomplete="off"  onchange="function_elements_add(this.name, this.value);" value="{{ $itemunits['item_unit_name'] }}"/>
+                        <input class="form-control input-bb" name="item_unit_name" id="item_unit_name" type="text" autocomplete="off"  onchange="function_elements_add(this.name, this.value);" value="{{ $itemunits['item_unit_name']??'' }}"/>
                     </div>
                 </div>
                 <div class="col-md-8 mt-3">
                     <div class="form-group">
                         <a class="text-dark">Keterangan</a>
-                        <textarea class="form-control input-bb" name="item_unit_remark" id="item_unit_remark" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value);">{{ $itemunits['item_unit_remark'] }}</textarea>
+                        <textarea class="form-control input-bb" name="item_unit_remark" id="item_unit_remark" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value);">{{ $itemunits['item_unit_remark']??''}}</textarea>
                     </div>
                 </div>
             </div>
