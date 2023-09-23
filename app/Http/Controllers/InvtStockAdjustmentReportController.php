@@ -23,33 +23,41 @@ class InvtStockAdjustmentReportController extends Controller
         
     }
     
-    public function index(){
-        if(!$category_id = Session::get('category_id')){
-            $category_id = '';
-        } else {
-            $category_id = Session::get('category_id');
+    public function index()
+    {
+        $invitemcategory    = InvtItemCategory::where('data_state', 0)->pluck('item_category_name', 'item_category_id');
+
+        $invitemtype        = InvtItem::where('data_state', 0)->pluck('item_type_name', 'item_type_id');
+
+        // $coregrade          = CoreGrade::where('data_state', 0)->pluck('grade_name', 'grade_id');
+
+        $invwarehouse       = InvtWarehouse::where('data_state', 0)->pluck('warehouse_name', 'warehouse_id');
+
+        $item_category_id   = Session::get('filteritemcategoryid');
+
+        $item_type_id       = Session::get('filteritemtypeid');
+
+        $grade_id           = Session::get('filtergradeid');
+        
+        $warehouse_id       = Session::get('filterwarehouseid');
+        
+        $invitemstock       = InvtItemStock::select('inv_item_stock.*')
+        ->where('inv_item_stock.data_state','=',0);
+        if($item_category_id||$item_category_id!=null||$item_category_id!=''){
+            $invitemstock   = $invitemstock->where('inv_item_stock.item_category_id', $item_category_id);
         }
-        if(!$warehouse_id = Session::get('warehouse_id')){
-            $warehouse_id = '';
-        } else {
-            $warehouse_id = Session::get('warehouse_id');
+        if($item_type_id||$item_type_id!=null||$item_type_id!=''){
+            $invitemstock   = $invitemstock->where('inv_item_stock.item_type_id', $item_type_id);
         }
-        $category = InvtItemCategory::where('data_state',0)
-        ->where('company_id', Auth::user()->company_id)
-        ->get()
-        ->pluck('item_category_name','item_category_id');
-        $warehouse = InvtWarehouse::where('data_state',0)
-        ->where('company_id', Auth::user()->company_id)
-        ->get()
-        ->pluck('warehouse_name','warehouse_id');
-        $data = InvtStockAdjustment::join('invt_stock_adjustment_item','invt_stock_adjustment.stock_adjustment_id','=','invt_stock_adjustment_item.stock_adjustment_id')
-        ->where('invt_stock_adjustment_item.item_category_id',$category_id)
-        ->where('invt_stock_adjustment.warehouse_id',$warehouse_id)
-        ->where('invt_stock_adjustment.company_id', Auth::user()->company_id)
-        ->where('invt_stock_adjustment.data_state',0)
-        ->get();
-        return view('content.InvtStockAdjustmentReport.ListInvtStockAdjustmentReport',compact('category','warehouse','category_id','warehouse_id','data'));
+        if($warehouse_id||$warehouse_id!=null||$warehouse_id!=''){
+            $invitemstock   = $invitemstock->where('inv_item_stock.warehouse_id', $warehouse_id);
+        }
+        $invitemstock       = $invitemstock->get();
+       // dd($invitemstock);
+
+        return view('content/InvItemStock/ListInvItemStock',compact('invitemstock', 'invitemcategory', 'invitemtype', 'coregrade', 'invwarehouse', 'item_category_id', 'item_type_id', 'grade_id', 'warehouse_id'));
     }
+
 
     public function filterStockAdjustmentReport(Request $request)
     {
@@ -79,7 +87,7 @@ class InvtStockAdjustmentReportController extends Controller
     public function getWarehouseName($warehouse_id)
     {
         $data = InvtWarehouse::where('warehouse_id', $warehouse_id)->first();
-        return $data['warehouse_name'];
+        return $data['warehouse_name'] ?? '';
     }
 
     public function getItemUnitName($item_unit_id)
@@ -102,7 +110,7 @@ class InvtStockAdjustmentReportController extends Controller
         ->where('warehouse_id',$warehouse_id)
         ->first();
 
-        return $data['last_balance'];
+        return $data['last_balance'] ?? '';
     }
 
     public function printStockAdjustmentReport()
