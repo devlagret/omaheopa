@@ -120,6 +120,7 @@ if (empty($paket)) {
                 url: "{{ route('booking.get-room') }}",
                 dataType: "html",
                 data: {
+                    'sales_order_id' : {{$data->sales_order_id}},
                     'room_type_id': room_type_id,
                     'building_id': building_id,
                     'start_date': start_date,
@@ -596,7 +597,7 @@ if (empty($paket)) {
             loading();
             $.ajax({
                 type: "get",
-                url: "{{ route('booking.delete-booked-room') }}" +'/'+ room_id,
+                url: "{{ route('booking.delete-booked-room') }}" +'/'+ room_id +'/'+ {{$ci??0}},
                 dataType: "html",
                 success: function(return_data) {
                     $("#booked-room-" + room_id).remove();
@@ -624,7 +625,7 @@ if (empty($paket)) {
             loading();
             $.ajax({
                 type: "get",
-                url: "{{ route('booking.delete-facility') }}" +'/' + id,
+                url: "{{ route('booking.delete-facility') }}" +'/' + id +'/'+ {{$ci??0}},
                 dataType: "html",
                 success: function(return_data) {
                     $("#facility-" + id).remove();
@@ -644,6 +645,10 @@ if (empty($paket)) {
                 },
                 error: function(data) {
                     console.log(data);
+                    loading(0);
+                    setTimeout(function() {
+                        loading(0);
+                    }, 200);
                 }
             });
         }
@@ -652,7 +657,7 @@ if (empty($paket)) {
             loading();
             $.ajax({
                 type: "get",
-                url: "{{ route('booking.delete-menu') }}" +'/' + id,
+                url: "{{ route('booking.delete-menu') }}" +'/' + id +'/'+ {{$ci??0}},
                 dataType: "html",
                 success: function(return_data) {
                     $("#booked-room-" + id).remove();
@@ -662,6 +667,9 @@ if (empty($paket)) {
                     );
                     }
                     loading(0);
+                    setTimeout(function() {
+                        loading(0);
+                    }, 200);
                     return 0;
                 },
                 complete: function() {
@@ -735,18 +743,23 @@ if (empty($paket)) {
             loadingWidget();
             $.ajax({
                 type: "POST",
-                url: "{{ route('booking.check-room') }}",
+                url: "{{ route('booking.check-conflic') }}",
                 data: {
+                    'ci' : {{$ci??0}},
                     'start_date': start_dater,
                     'end_date': end_date.format('Y-MM-DD'),
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function(return_data) {
-                    return_data.forEach(element => {
-                        if($('#booked-room-'+element).length){
-                        deleteBooked(element);
-                        }
-                    });
+                    // console.log(return_data);
+                    if(return_data.status){
+                        $('#conflic-room-table').html(return_data.html);
+                    }
+                    // return_data.forEach(element => {
+                    //     if($('#booked-room-'+element).length){
+                    //     deleteBooked(element);
+                    //     }
+                    // });
                     loadingWidget(0);
                     setTimeout(function() {
                         enableNav();
@@ -790,6 +803,7 @@ if (empty($paket)) {
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function(return_data) {
+                    console.log(return_data);
                     $('#room_price_id_'+id).html(return_data);
                     loading(0);
                     return 0;
@@ -1089,7 +1103,7 @@ if (empty($paket)) {
                                                 <th width="13%" style='text-align:center'>Jumlah Orang</th>
                                                 <th colspan="2" width="30%" style='text-align:center'>Harga Kamar</th>
                                                 <th width="20%" style='text-align:center'>Subtotal</th>
-                                                {{-- <th width="10%" style='text-align:center'>Aksi</th> --}}
+                                                <th width="10%" style='text-align:center'>Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody id="room-table">
@@ -1109,12 +1123,11 @@ if (empty($paket)) {
                                                             <div class='row'>
                                                                 <div class="col-5">
                                                                     <input
-                                                                    disabled
                                                                         oninput='changeHowManyPerson({{ $val->room_id }}, this.value)'
                                                                         type='number' name='room_qty_{{ $val->room_id }}'
                                                                         id='room_qty_{{ $val->room_id }}'
                                                                         style='text-align: center; height: 30px; font-weight: bold; font-size: 15px'
-                                                                        class='disabled form-control input-bb' min='1'
+                                                                        class='form-control input-bb' min='1'
                                                                         value='{{ $booked[$val->room_id] ?? 1 }}'
                                                                         autocomplete='off'>
                                                                 </div>
@@ -1122,7 +1135,7 @@ if (empty($paket)) {
                                                             </div>
                                                         </td>
                                                         <td width="15%">
-                                                            <select disabled class="disabled selection-search-clear room-price-select required select-form" required
+                                                            <select class="selection-search-clear room-price-select required select-form" required
                                                              placeholder="Pilih Nama" name="room_price_id[]" id="room_price_id_{{$val->room_id}}"
                                                             onchange="changePrice({{$val->room_id}},this.value)"  data-id="{{$val->room_id}}" >
                                                             </select>
@@ -1141,10 +1154,10 @@ if (empty($paket)) {
                                                         </td>
                                                         <td id="sbs-room-booked-{{ $val->room_id }}">
                                                         </td>
-                                                        {{-- <td class='text-center'><button type='button'
+                                                        <td class='text-center'><button type='button'
                                                                 class='btn btn-outline-danger btn-sm'
                                                                 onclick='deleteBooked({{ $val->room_id }})'>Hapus</button>
-                                                        </td> --}}
+                                                        </td>
                                                     </tr>
                                                 @endforeach
                                             @endisset
@@ -1264,7 +1277,7 @@ if (empty($paket)) {
                                                         </td>
                                                         <td class='text-center'><button type='button'
                                                                 class='btn btn-outline-danger btn-sm'
-                                                                onclick='deleteBooked({{ $fas->room_facility_id }})'>Hapus</button>
+                                                                onclick='deleteFacilityItm({{ $fas->room_facility_id }})'>Hapus</button>
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -1516,11 +1529,11 @@ if (empty($paket)) {
                     <input class="form-control input-bb" id="total_amount" type="hidden" name="total_amount" autocomplete="off" />
                 </div>
             </div>
-            <div class="row form-group {{isset($ci)?'d-none':''}}">
+            <div class="row form-group {{isset($ci)?($ci==1?'d-none':''):''}}">
                 <div class="col-3">Tipe Booking</div>
                 <div class="col-auto">:</div>
                 <div class="col-8">
-                    @if (!isset($ci))
+                    @if (!isset($ci)||(isset($ci)?$ci:0)==2)
                         {!! Form::select('sales_order_type', $ordertype, $sessiondata['sales_order_type'] ?? '', [
                             'class' => 'selection-search-clear required select-form',
                             'name' => 'sales_order_type',
@@ -1531,22 +1544,22 @@ if (empty($paket)) {
                     @endif
                 </div>
             </div>
-            <div class="row mb-3 {{isset($ci)?'d-none':''}}" id="down-payment-el">
+            <div class="row mb-3 {{isset($ci)?($ci==1?'d-none':''):''}}" id="down-payment-el">
                 <div class="col-3">
-                    <a id="label-payment" class="text-dark col-form-label">Uang Muka</a class="red"> *</a></a>
+                    <a id="label-payment" class="text-dark col-form-label">Uang Muka<a class="red"> *</a></a>
                 </div>
                 <div class="col-auto">
                     :
                 </div>
                 <div class="col-8">
                     <input class="form-control required input-bb" required autocomplete="off" id="down_payment_view" name="down_payment_view" />
-                    <input class="form-control input-bb" id="down_payment" value="{{$sessiondata['down_payment_view']??''}}" name="down_payment" hidden/>
+                    <input class="form-control input-bb" id="down_payment" value="{{$sessiondata['down_payment_view']??number_format($data->down_payment,0,'','')}}" name="down_payment" hidden/>
                 </div>
             </div>
             <div id="without-dp" style="display: none;">
                 <div class="row mb-3">
                     <div class="col-3">
-                        <a id="label-payment" class="text-dark col-form-label">Bayar</a><a class='red'> *</a></a>
+                        <a id="label-payment" class="text-dark col-form-label">Bayar<a class='red'> *</a></a>
                     </div>
                     <div class="col-auto">
                         :
@@ -1573,14 +1586,47 @@ if (empty($paket)) {
             <div class="">
                 <div class="form-actions float-right">
                     <button type="reset" name="Reset" class="btn btn-danger" autocomplete="off" id="form-reset" onclick="reset_add();"><i class="fa fa-times"></i> Batal</button>
-                    <button type="button" name="Save" class="btn btn-success button-prevent" onclick="$(this).addClass('disabled');$('#form-booking').submit();" title="Save"><i class="fa fa-check"></i> Simpan</button>
+                    <button type="button" name="Save" class="btn btn-success button-prevent" onclick="$(this).prop('disabled',true);$('#form-booking').submit();" title="Save"><i class="fa fa-check"></i> Simpan</button>
                 </div>
             </div>
         </div>
     </div>
     </div>
 </form>
-
+<!-- Conflic Table Modal -->
+<div class="modal fade" id="conlictBooking" tabindex="-1" aria-labelledby="conlictBookingLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="conlictBookingLabel">Modal title</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <table id="room-table-parent" class="table table-striped table-bordered datatables table-hover table-full-width">
+                <thead>
+                    <tr>
+                        <th width="2%" style='text-align:center'>No</th>
+                        <th width="15%" style='text-align:center'>No Booking</th>
+                        <th width="15%" style='text-align:center'>Atas Nama</th>
+                        <th width="15%" style='text-align:center'>Kamar</th>
+                        <th width="20%" style='text-align:center'>Tanggal Check-In</th>
+                        <th width="20%" style='text-align:center'>Tanggal Check-Out</th>
+                        {{-- <th width="10%" style='text-align:center'>Aksi</th> --}}
+                    </tr>
+                </thead>
+                <tbody id="conflic-room-table">
+                </tbody>
+            </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
 @stop
 
 @section('footer')
