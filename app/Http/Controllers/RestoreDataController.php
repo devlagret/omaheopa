@@ -18,7 +18,8 @@ class RestoreDataController extends Controller
     }
     private function check(){
         if(Auth::id()!=1){
-        return redirect()->route('home');
+            abort(401);
+            return redirect()->route('home');
         }
     }
     public function index(){
