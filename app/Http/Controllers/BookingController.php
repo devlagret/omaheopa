@@ -8,6 +8,8 @@ use App\Models\CoreBuilding;
 use App\Models\CorePriceType;
 use App\Models\CoreRoom;
 use App\Models\CoreRoomType;
+use App\Models\JournalVoucher;
+use App\Models\JournalVoucherItem;
 use App\Models\SalesInvoice;
 use App\Models\SalesOrder;
 use App\Models\SalesOrderFacility;
@@ -558,10 +560,10 @@ class BookingController extends Controller
             DB::beginTransaction();
             $down_payment=null;$sales_invoice_id=null;$sales_order_status=0;
             if($request->sales_order_type==0){
+                // * booking normal
                 $down_payment = $request->down_payment;
             }elseif($request->sales_order_type==3){
-                $sales_order_status = 2;
-            }elseif($request->sales_order_type==4){
+                // * booking tanpa dp
                 $sales_order_status = 2;
                 SalesInvoice::create([
                     'total_amount' => $request->total_amount,
@@ -571,6 +573,33 @@ class BookingController extends Controller
                     'company_id' => Auth::user()->company_id,
                     'merchant_id' => empty(Auth::user()->merchant_id)?1:Auth::user()->merchant_id,
                 ]);
+                $si = SalesInvoice::where('sales_invoice_token',$token)->first();
+                $sales_invoice_id = $si->sales_invoice_id;
+            }elseif($request->sales_order_type==4){
+                // * booking full book
+                $sales_order_status = 2;
+                SalesInvoice::create([
+                    'total_amount' => $request->total_amount,
+                    'sales_invoice_token' => $token,
+                    'sales_invoice_date' => Carbon::now()->format('Y-m-d'),
+                    'created_id' => Auth::id(),
+                    'company_id' => Auth::user()->company_id,
+                    'merchant_id' => empty(Auth::user()->merchant_id)?1:Auth::user()->merchant_id,
+                ]);
+                // * buat jurnal
+                JournalVoucher::create([
+                    'journal_voucher_token' => $token,
+                    'transaction_module_code' => 'BFB',
+                    'journal_voucher_description'=> 'Booking Full Book'
+                ]);
+                //
+                $jv = JournalVoucher::where('journal_voucher_token',$token)->first();
+                //* buat journal item
+                JournalVoucherItem::create([
+                    // 'merchat_id' => 1,
+                    'journal_voucher_id'=>$jv->journal_voucher_id,
+                ]);
+                //
                 $si = SalesInvoice::where('sales_invoice_token',$token)->first();
                 $sales_invoice_id = $si->sales_invoice_id;
             }
@@ -777,6 +806,145 @@ class BookingController extends Controller
             Session::push('edit-booked-room-menu',$rm->room_menu_id);
         }
         Session::put('edit-booking-data', $sessiondata);
+    }
+    public function processEdit(Request $request) {
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+        $roomData = collect(Session::get('edit-booked-room-data'));
+        $booked = Session::get('edit-booked-room-data-qty');
+        $price = Session::get('edit-booked-room-price');
+        $menuData = collect(Session::get('edit-booked-room-menu'));
+        $menuqty = Session::get('edit-booked-room-menu-qty');
+        $facilityData = collect(Session::get('edit-booked-room-facility'));
+        $facilityqty = Session::get('edit-booked-room-facility-qty');
+        $token = Session::get('booking-token');
+        $pricetype = CorePriceType::get();
+        $prices = SalesRoomPrice::get();
+        $room = CoreRoom::with(['price'=>function ($query) use($start_date,$end_date){
+            $query->where('room_price_start_date', '<=', $start_date)
+                  ->where('room_price_end_date', '>=', $end_date)
+                  ->orWhereNull('room_price_start_date')
+                  ->orWhereNull('room_price_end_date')
+                  ->orderByDesc('price_type_id');
+        }])->get();
+        if(!$roomData->count()){
+            return redirect()->back()->with(['msg'=>'Harap Tambahkan Kamar Yang Dibooking','type'=>'warning','tab-index' =>2]);
+        }
+        dump($request->all());
+        $field = $request->validate([
+            'atas_nama' => 'required',
+        ],['atas_nama.required' => 'Nama Pemesan Diperlukan']);
+        $check = collect();
+        $checkfac = collect();
+        $checkmenu = collect();
+        foreach($roomData as $roomval){
+            if(empty($price[$roomval])){
+                $priced = $room->find($roomval)->price->first();
+            }else{
+                $priced = $prices->find($price[$roomval]);
+            }
+            $check->push([
+                'sales_order_id'=> 5,
+                'room_id'       => $roomval,
+                'people'        => $booked[$roomval],
+                'room_price'    => $priced->room_price_price,
+                'price_type_id_old' => $priced->price_type_id,
+                'room_price_id' => $priced->room_price_id,
+                'price_type_name_old' => $priced->type->price_type_name,
+                'created_id'    => Auth::id(),
+                'company_id'    => Auth::user()->company_id,
+            ]);
+        }
+        foreach($facilityData as $facval){
+            $checkfac->push([
+                'sales_order_id'=> 5,
+                'room_facility_id'=> $facval,
+                'quantity'      => $facilityqty[$facval],
+                'created_id'    => Auth::id(),
+                'company_id'    => Auth::user()->company_id,
+            ]);
+        }
+        foreach($menuData as $menuval){
+            $checkmenu->push([
+                'sales_order_id'=> 5,
+                'room_menu_id'  => $menuval,
+                'quantity'      => $menuqty[$menuval],
+                'created_id'    => Auth::id(),
+                'company_id'    => Auth::user()->company_id,
+            ]);
+        }
+        dump($check);
+        dump($checkfac);
+        dump($checkmenu);
+        return 0;
+        try{
+          $order = SalesOrder::find($request->sales_order_id);
+            // SalesOrder::create([
+            //     'checkin_date' =>$start_date,
+            //     'checkout_date' =>$end_date,
+            //     'sales_invoice_id' =>$sales_invoice_id,
+            //     'sales_order_status' =>$sales_order_status,
+            //     'sales_order_price' =>$request->total_amount,
+            //     'discount' =>$request->discount_percentage_total,
+            //     'down_payment' =>$down_payment,
+            //     'sales_order_type' => $request->sales_order_type,
+            //     'order_date' => Carbon::now()->format('Y-m-d'),
+            //     'sales_order_name' => $field['atas_nama'],
+            //     'created_id'    => Auth::id(),
+            //     'company_id'    => Auth::user()->company_id,
+            //     'sales_order_token' => $token->toString(),
+            // ]);
+            SalesOrderRoom::where('sales_order_id',$order->sales_order_id)->delete();
+            SalesOrderFacility::where('sales_order_id',$order->sales_order_id)->delete();
+            SalesOrderMenu::where('sales_order_id',$order->sales_order_id)->delete();
+        foreach($roomData as $roomval){
+            if(empty($price[$roomval])){
+                $priced = $room->find($roomval)->price->first();
+            }else{
+                $priced = $prices->find($price[$roomval]);
+            }
+            SalesOrderRoom::create([
+                'sales_order_id'=> $order->sales_order_id,
+                'room_id'       => $roomval,
+                'people'        => $booked[$roomval],
+                'room_price'    => $priced->room_price_price,
+                'price_type_id_old' => $priced->price_type_id,
+                'room_price_id' => $priced->room_price_id,
+                'price_type_name_old' => $priced->type->price_type_name,
+                'created_id'    => Auth::id(),
+                'company_id'    => Auth::user()->company_id,
+            ]);
+        }
+        foreach($facilityData as $facval){
+            SalesOrderFacility::create([
+                'sales_order_id'=> $order->sales_order_id,
+                'room_facility_id'=> $facval,
+                'quantity'      => $facilityqty[$facval],
+                'created_id'    => Auth::id(),
+                'company_id'    => Auth::user()->company_id,
+            ]);
+        }
+        foreach($menuData as $menuval){
+            SalesOrderMenu::create([
+                'sales_order_id'=> $order->sales_order_id,
+                'room_menu_id'  => $menuval,
+                'quantity'      => $menuqty[$menuval],
+                'created_id'    => Auth::id(),
+                'company_id'    => Auth::user()->company_id,
+            ]);
+        }
+            DB::commit();
+            // Session::forget('edit-token');
+            $this->resetSession();
+            return redirect()->route('booking.index')->with(['msg'=>'Tambah Booking Kamar Berhasil','type'=>'success']);
+        }catch(\Exception $e){
+            $this->resetSession();
+            Session::forget('booking-token');
+            DB::rollBack();
+            report($e);
+            dump($e);
+            return redirect()->route('booking.add')->with(['msg'=>'Tambah Booking Kamar Gagal','type'=>'danger']);
+        }
     }
     public function delete($sales_order_id) {
         $so =SalesOrder::find($sales_order_id);

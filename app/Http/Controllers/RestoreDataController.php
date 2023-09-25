@@ -18,7 +18,8 @@ class RestoreDataController extends Controller
     }
     private function check(){
         if(Auth::id()!=1){
-        return redirect()->route('home');
+            abort(401);
+            return redirect()->route('home');
         }
     }
     public function index(){
@@ -44,6 +45,12 @@ class RestoreDataController extends Controller
             'acct_account_balance',
             'invt_stock_adjustment',
             'invt_stock_adjustment_item',
+            'acct_account',
+            'acct_balance_sheet_report',
+            'acct_profit_loss_report',
+            'core_city',
+            'core_province',
+            'preference_transaction_module',
             ])
         ->pluck('Tables_in_'.$dbName)->flatten();
         foreach($tables as $val){

@@ -64,19 +64,19 @@ class SalesInvoiceController extends Controller
         ->get()
         ->pluck('item_unit_name','item_unit_id');
         $merchant  = Auth::user()->merchant_id;
+        
         if($merchant == null){
-              
         $categorys      = InvtItemCategory::select('invt_item_category.*',DB::raw('CONCAT(invt_item_category.item_category_name, " ", sales_merchant.merchant_name) AS item_name') )
         ->join('sales_merchant','sales_merchant.merchant_id','invt_item_category.merchant_id')
-         ->where('invt_item_category.data_state',0)
+        ->where('invt_item_category.data_state',0)
         ->where('company_id', Auth::user()->company_id)
         ->get()
         ->pluck('item_name','item_category_id');
         }else{
             $categorys      = InvtItemCategory::select('invt_item_category.*',DB::raw('CONCAT(invt_item_category.item_category_name, " ", sales_merchant.merchant_name) AS item_name') )
             ->join('sales_merchant','sales_merchant.merchant_id','invt_item_category.merchant_id')
-             ->where('invt_item_category.data_state',0)
-             ->where('sales_merchant.merchant_id',Auth::user()->merchant_id)
+            ->where('invt_item_category.data_state',0)
+            ->where('sales_merchant.merchant_id',Auth::user()->merchant_id)
             ->where('company_id', Auth::user()->company_id)
             ->get()
             ->pluck('item_name','item_category_id');
