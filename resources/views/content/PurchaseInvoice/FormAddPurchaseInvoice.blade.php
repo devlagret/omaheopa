@@ -467,7 +467,7 @@
                             <input class="form-control input-bb" name="purchase_invoice_date" id="purchase_invoice_date"
                                 type="date" data-date-format="dd-mm-yyyy" autocomplete="off"
                                 onchange="function_elements_add(this.name, this.value)"
-                                value="{{ !isset($datases['purchase_invoice_date']) ? date('Y-m-d') : $datases['purchase_invoice_date'] }}" />
+                                value="{{ $datases['purchase_invoice_date'] ?? '' }}" />
                         </div>
                     </div>
                     <div class="col-md-6">
