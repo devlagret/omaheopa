@@ -35,6 +35,7 @@ use App\Models\SalesMerchant;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 
 class InvGoodsReceivedNoteController extends Controller
@@ -100,12 +101,24 @@ class InvGoodsReceivedNoteController extends Controller
     {
         Session::forget('purchaseorderitem');
 
+        $merchant  = Auth::user()->merchant_id;
+        if($merchant == null){
+
         $purchaseorder = PurchaseInvoice::select('purchase_invoice.*','purchase_invoice_item.*')
         ->where('purchase_invoice_item.data_state','=',0)
         ->where('purchase_invoice.invt_goods_received_status','=',0)
         ->join('purchase_invoice_item','purchase_invoice.purchase_invoice_id','purchase_invoice_item.purchase_invoice_id')
         ->where('purchase_invoice_item.quantity', '>', 0)
         ->get();
+        }else{
+            $purchaseorder = PurchaseInvoice::select('purchase_invoice.*','purchase_invoice_item.*')
+            ->where('purchase_invoice_item.data_state','=',0)
+            ->where('purchase_invoice.invt_goods_received_status','=',0)
+            ->join('purchase_invoice_item','purchase_invoice.purchase_invoice_id','purchase_invoice_item.purchase_invoice_id')
+            ->where('purchase_invoice_item.quantity', '>', 0)
+            ->where('purchase_invoice_item.merchant_id',Auth::user()->merchant_id)
+            ->get();
+        }
         // dd($purchaseorder);
 
         return view('content/InvGoodsReceivedNote/SearchPurchaseOrder', compact('purchaseorder'));
@@ -622,14 +635,13 @@ class InvGoodsReceivedNoteController extends Controller
     }
 
     public function getInvItemCategoryName($item_category_id){
-        $itemcategory = InvtItemCategory::where('data_state', 0)
-        ->where('item_category_id', $item_category_id)
+        $invitemcategory = InvtItemCategory::select('item_category_id',DB::raw('CONCAT(invt_item_category.item_category_name, " ", sales_merchant.merchant_name) AS item_name'))
+        ->join('sales_merchant', 'sales_merchant.merchant_id', 'invt_item_category.merchant_id')
+        ->where('invt_item_category.data_state', 0)
+        ->where('invt_item_category.item_category_id',$item_category_id)
         ->first();
 
-        if($itemcategory == null){
-            return "-";
-        }
-        return $itemcategory['item_category_name'];
+        return $invitemcategory['item_name0'];
     }
 
     public function getInvItemUnitName($item_unit_id){
