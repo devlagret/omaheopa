@@ -69,6 +69,7 @@ class PurchaseInvoiceController extends Controller
         ->where('company_id', Auth::user()->company_id)
         ->get()
         ->pluck('supplier_name','supplier_id');
+        
         $merchant   = SalesMerchant::where('data_state', 0);
         if(Auth::id()!=1||Auth::user()->merchant_id!=null){
             $merchant->where('merchant_id',Auth::user()->merchant_id);
