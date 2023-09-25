@@ -1,10 +1,12 @@
 <?php
 namespace App\Helpers;
+use App\Models\PreferenceTransactionModule;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 
 class AppHelper
 {
+    protected static $data;
     /**
      * Get random quote from storage
      *
@@ -39,4 +41,22 @@ class AppHelper
     public static function orderType():Collection {
         return collect([0 => 'Dengan Uang Muka', 3 => 'Tanpa Uang Muka', 4 => 'Full Book']);
     }
+    /**
+     * Get Transaction Module
+     *
+     * @param [string] $transaction_module_code
+     * @return AppHelper
+     */
+    public static function getTransactionModule(string $transaction_module_code)
+    {
+        self::$data = PreferenceTransactionModule::where('transaction_module_code',$transaction_module_code)->first();
+        return new self;
+    }
+    public function name(){
+        return self::$data->transaction_module_name;
+    }
+    public function id(){
+        return self::$data->transaction_module_id;
+    }
+
 }
