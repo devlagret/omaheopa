@@ -293,7 +293,7 @@
                 <h6 class="col-md-8 mt-2 mb-2"><b>Data Penjualan Barang</b></h6>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <a class="text-dark">Nama Kategori Barang<a class='red'> *</a></a>
+                        <a class="text-dark">Nama Kategori Wahana<a class='red'> *</a></a>
                         {!! Form::select('item_category_id', $categorys, 0, ['class' => 'selection-search-clear select-form', 'id' => 'item_category_id', 'name' => 'item_category_id']) !!}
                     </div>
                 </div>

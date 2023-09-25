@@ -76,9 +76,11 @@ class PurchaseReturnController extends Controller
     public function searchGoodsReceivedNote()
     {
 
-        $GoodsReceivedNote = InvGoodsReceivedNote::select('invt_goods_received_note.*')
+        $GoodsReceivedNote = InvGoodsReceivedNote::select('invt_goods_received_note.*','invt_goods_received_note_item.*')
+           ->join('invt_goods_received_note_item','invt_goods_received_note_item.goods_received_note_id','invt_goods_received_note.goods_received_note_id')
             ->where('invt_goods_received_note.data_state', '=', 0)
             ->where('invt_goods_received_note.return_status', '=', 0)
+            ->where('invt_goods_received_note_item.merchant_id',Auth::user()->merchant_id)
             ->get();
         //  dd($GoodsReceivedNote);
 
@@ -158,7 +160,7 @@ class PurchaseReturnController extends Controller
 
             // $preferencecompany             = PreferenceCompany::first();
 
-            // $transaction_module_code     = "POR";
+            // $transaction_module_code     = "PR";
 
             // $transactionmodule             = PreferenceTransactionModule::where('transaction_module_code', $transaction_module_code)
             //     ->first();
