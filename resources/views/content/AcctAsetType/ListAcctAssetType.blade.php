@@ -5,7 +5,7 @@
 @section('js')
 <script>
 function check(name,uri){
-  if(confirm(`Yakin Ingin Menghapus Supplier dengan nama '`+name+`' ?`)){
+  if(confirm(`Yakin Ingin Menghapus Asset dengan nama '`+name+`' ?`)){
     window.location.href = uri;
   }
 }
@@ -16,7 +16,7 @@ function check(name,uri){
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="{{ url('home') }}">Beranda</a></li>
-      <li class="breadcrumb-item active" aria-current="page">Daftar Supplier</li>
+      <li class="breadcrumb-item active" aria-current="page">Daftar Jenis Aset</li>
     </ol>
   </nav>
 
@@ -25,7 +25,7 @@ function check(name,uri){
 @section('content')
 
 <h3 class="page-title">
-    <b>Daftar Supplier</b> <small>Kelola Supplier </small>
+    <b>Daftar Jenis Aset</b> <small>Kelola Jenis Aset </small>
 </h3>
 <br/>
 
@@ -37,10 +37,10 @@ function check(name,uri){
 <div class="card border border-dark">
   <div class="card-header bg-dark clearfix">
     <h5 class="mb-0 float-left">
-        Daftar Supplier
+        Daftar Jenis Aset
     </h5>
     <div class="form-actions float-right">
-        <button onclick="location.href='{{ route('aset-type.add') }}'" name="add" class="btn btn-sm btn-info" title="Add Data"><i class="fa fa-plus"></i> Tambah Supplier </button>
+        <button onclick="location.href='{{ route('aset-type.add') }}'" name="add" class="btn btn-sm btn-info" title="Add Data"><i class="fa fa-plus"></i> Tambah Jenis Aset </button>
     </div>
   </div>
 
@@ -50,23 +50,23 @@ function check(name,uri){
                 <thead>
                     <tr>
                       <th width="2%" style='text-align:center'>No</th>
-                      <th width="20%" style='text-align:center'>Nama Supplier</th>
-                      <th width="20%" style='text-align:center'>Telp Supplier</th>
+                      <th width="20%" style='text-align:center'>Nama Jenis Aset</th>
+                      <th width="20%" style='text-align:center'>Telp Jenis Aset</th>
                       <th width="20%" style='text-align:center'>Alamat</th>
                       <th width="10%" style='text-align:center'>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php $no = 1; ?>
-                    @foreach($supplier as $row)
+                    @foreach($asettype as $row)
                     <tr>
                         <td style='text-align:center'>{{ $no++ }}</td>
-                        <td>{{ $row->supplier_name }}</td>
-                        <td>{{ $row->supplier_mobile_phone1 }}</td>
-                        <td>{{ $row->supplier_address }}</td>
+                        <td>{{ $row->asset_type_code }}</td>
+                        <td>{{ $row->asset_type_name }}</td>
+                        <td>{{ $row->asset_type_description }}</td>
                         <td class="text-center">
-                            <a type="button" class="btn btn-outline-warning btn-sm" href="{{ route('supplier.edit',$row->supplier_id) }}">Edit</a>
-                            <button type="button" onclick="$('this').attr('disabled');check('{{$row->supplier_name}}','{{ route('supplier.delete',$row->supplier_id) }}')" class="btn btn-outline-danger btn-sm" >Hapus</button>
+                            <a type="button" class="btn btn-outline-warning btn-sm" href="{{ route('aset-type.edit',$row->asset_type_id) }}">Edit</a>
+                            <button type="button" onclick="$('this').attr('disabled');check('{{$row->asset_type_name}}','{{ route('aset-type.delete',$row->asset_type_id) }}')" class="btn btn-outline-danger btn-sm" >Hapus</button>
                         </td>
                     </tr>
                     @endforeach
