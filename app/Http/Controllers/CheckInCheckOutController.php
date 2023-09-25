@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Models\CoreBuilding;
 use App\Models\CorePriceType;
 use App\Models\CoreRoom;
+use App\Models\JournalVoucher;
+use App\Models\JournalVoucherItem;
 use App\Models\PreferenceCompany;
 use App\Models\SalesInvoice;
 use App\Models\SalesOrder;
@@ -178,6 +180,23 @@ class CheckInCheckOutController extends Controller
             if($request->use_penalty){
                 $invoice->penalty_amount = $request->pinalty;
             }
+            // buat journal kalau tidak full book
+            if($order->sales_order_type!=4){
+            // * buat jurnal
+            JournalVoucher::create([
+                'journal_voucher_token' => $token,
+                'transaction_module_code' => 'SO',
+                'journal_voucher_description'=> 'Check-Out'
+            ]);
+            //
+            $jv = JournalVoucher::where('journal_voucher_token',$token)->first();
+            //* buat journal item
+            JournalVoucherItem::create([
+                // 'merchat_id' => 1,
+                'journal_voucher_id'=>$jv->journal_voucher_id,
+            ]);
+            //
+            }
             $invoice->paid_amount = $field['payed_amount'];
             $invoice->change_amount = $request->change_amount;
             $invoice->update_id = Auth::id();
@@ -336,6 +355,22 @@ class CheckInCheckOutController extends Controller
                 'company_id'    => Auth::user()->company_id,
             ]);
         }
+
+        // * buat jurnal
+        JournalVoucher::create([
+            'journal_voucher_token' => $token,
+            'transaction_module_code' => 'CNB',
+            'journal_voucher_description'=> 'Check-in Non Booking'
+        ]);
+        //
+        $jv = JournalVoucher::where('journal_voucher_token',$token)->first();
+        //* buat journal item
+        JournalVoucherItem::create([
+            // 'merchat_id' => 1,
+            'journal_voucher_id'=>$jv->journal_voucher_id,
+        ]);
+        //
+
             DB::commit();
             Session::forget('booking-token');
             $this->resetSession();
