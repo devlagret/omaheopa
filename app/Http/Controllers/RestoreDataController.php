@@ -16,14 +16,8 @@ class RestoreDataController extends Controller
         $this->middleware('auth');
 
     }
-    private function check(){
-        if(Auth::id()!=1){
-            abort(401);
-            return redirect()->route('home');
-        }
-    }
     public function index(){
-        $this->check();
+        abort_unless(Auth::id()!=1, 401);
         $table = collect();
         $dbName = config('app.db');
         $tables = collect(DB::select('SHOW TABLES'))
@@ -63,14 +57,14 @@ class RestoreDataController extends Controller
         return view('content.RestoreData.RestoreData',compact('table'));
     }
     public function table($table) {
-        $this->check();
+        abort_unless(Auth::id()!=1, 401);
         $header = collect(DB::select('DESCRIBE '.$table))->pluck('Field');
         $data = collect(DB::table($table)->where('data_state','1')->orWhere('deleted_at','!=',null)->get());
         $pk = collect(DB::select("SHOW KEYS FROM ".$table." WHERE Key_name = 'PRIMARY'"))->pluck('Column_name')[0];
         return view('content.RestoreData.RestoreDataTable',compact('header','pk','data','table'));
     }
     public function restore($table,$col,$id){
-        $this->check();
+        abort_unless(Auth::id()!=1, 401);
         try{
         $data = DB::table($table)->where($col,$id);
         $data->update(['data_state'=>0,'deleted_at'=>null]);}catch(\Illuminate\Database\QueryException $e){
@@ -81,7 +75,7 @@ class RestoreDataController extends Controller
     }
     public function forceDelete($table,$col,$id) {
         return [$table,$col,$id];
-        $this->check();
+        abort_unless(Auth::id()!=1, 401);
         try{
         $data = DB::table($table)->where($col,$id);
         $data->forceDelete();}catch(\Illuminate\Database\QueryException $e){
