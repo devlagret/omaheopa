@@ -29,11 +29,18 @@ class AcctAssetReportController extends Controller
             $year = Session::get('year');
         }
 
+        if(!$year_period = Session::get('year_period')){
+            $year_period = date('Y');
+        }else{
+            $year_period = Session::get('year_period');
+        }
         
         $year_now 	=	date('Y');
         for($i=($year_now-2); $i<($year_now+2); $i++){
             $yearlist[$i] = $i;
         } 
+
+        
 
         if(empty($sesi['branch_id'])){
             $sesi['branch_id']		= 1;
@@ -47,7 +54,8 @@ class AcctAssetReportController extends Controller
             $sesi['year']		= date('Y');
         }
 
-        Session::get('year', $year);
+        // Session::get('year', $year);
+        // Session::get('year_period', $year_period);
         // Session::get('branch_id', $branch_id);
 
         $aset = AcctAssetReport::select('*')
@@ -55,12 +63,13 @@ class AcctAssetReportController extends Controller
         ->where('acct_asset_depreciation.data_state',0)
         ->get();
 
-        // dump($sesi);
+        dump($sesi);
         
         $last_year 		= $sesi['year_period'] - 1;
 		$prosentase		= $this->ProsentasePenyusutan();
         $acctasset = $this->getAcctAsset($sesi['branch_id'], $sesi['year']);
         // echo json_encode($acctasset);exit;
+        
         foreach ($acctasset as $key => $val) {
             $tahun_perolehan 					= substr($val['asset_purchase_date'],0,4);
         // echo json_encode($tahun_perolehan);exit;
@@ -120,7 +129,7 @@ class AcctAssetReportController extends Controller
 					'asset_purchase_value_then'						=> $nilai_perolehan_tahun_lalu,
 					'asset_purchase_value_now'						=> $nilai_perolehan_tahun_ini,
 					'asset_estimated_lifespan'						=> $val['asset_estimated_lifespan'],
-					// 'asset_estimated_lifespan_percentage'			=> $prosentase[nominal($val['asset_estimated_lifespan'])],
+					'asset_estimated_lifespan_percentage'			=> $prosentase[($val['asset_estimated_lifespan'])],
 					'asset_depreciation_amount'						=> $depreciation_amount,
 					'asset_depreciation_accumulation_last_year'		=> $accumulation_amount_last_year,
 					'asset_depreciation_book_value_last_year'		=> $book_value_last_year,
@@ -131,7 +140,7 @@ class AcctAssetReportController extends Controller
 
         }
 
-        return view('content.AcctAssetReport.ListAcctAssetReport',compact('aset','year_now','year','yearlist','data_assetreport','last_year'));
+        return view('content.AcctAssetReport.ListAcctAssetReport',compact('aset','year_now','year','yearlist','data_assetreport','last_year','year_period'));
     }
 
 
@@ -177,22 +186,19 @@ class AcctAssetReportController extends Controller
     }
 
     public function getAssetDepreciationBookValue($asset_id, $year){
-        $data = AcctAssetReportitem::select('acct_asset_depreciation_item.asset_depreciation_item_id', 'acct_asset_depreciation_item.asset_depreciation_item_book_value')
-        ->join('acct_asset_depreciation', 'acct_asset_depreciation.asset_depreciation_id','acct_asset_depreciation_item.asset_depreciation_id')
-        // ->join('acct_asset_depreciation', 'acct_asset_depreciation_item.asset_depreciation_id','acct_asset_depreciation.asset_depreciation_id')
+        $data = AcctAssetReportitem::join('acct_asset_depreciation', 'acct_asset_depreciation.asset_depreciation_id','acct_asset_depreciation_item.asset_depreciation_id')
         ->where('acct_asset_depreciation_item.asset_depreciation_item_journal_status', 1)
         ->where('acct_asset_depreciation.asset_id', $asset_id)
         ->where('acct_asset_depreciation_item.asset_depreciation_item_year', $year)
         ->orderBy('acct_asset_depreciation_item.asset_depreciation_item_id', 'DESC')
         ->limit(1)
-        ->get();
+        ->get();1
         // echo json_encode($data);exit;
-
-        return $data;
+        return $data->count()?$data[0]['asset_depreciation_item_book_value']:0;
     }
 
     public function ProsentasePenyusutan(){
-		$prosentase_penyusutan = array ("20.00" => "5%", "8.00" => "13%", "4.00" => "25%");
+		$prosentase_penyusutan = array ("20.00" => "5%", "8.00" => "13%", "4.00" => "25%", "2.00"=> "30%", "14.00" => "35%");
 
 		return $prosentase_penyusutan;
 	}
@@ -219,10 +225,12 @@ class AcctAssetReportController extends Controller
     public function filter(Request $request)
     {
         $year = $request->year;
+        $year_period = $request->year_period;
         $branch_id = $request->branch_id;
 
 
         Session::put('year', $year);
+        Session::put('year_period', $year_period);
         Session::put('branch_id', $branch_id);
 
 
