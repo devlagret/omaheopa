@@ -55,13 +55,13 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">Nama Type Asset<a class='red'> *</a></a>
-                        <input class="form-control input-bb" name="purchase_return_supplier" id="purchase_return_supplier" type="text" autocomplete="off" value="{{ $acctasset['asset_type_id'] }}" readonly/>
+                        <input class="form-control input-bb" name="purchase_return_supplier" id="purchase_return_supplier" type="text" autocomplete="off" value="{{ $Asset->getAssetTypeName($acctasset['asset_type_id']) }}" readonly/>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">Metode Penyusutan<a class='red'> *</a></a>
-                        <input class="form-control input-bb" name="purchase_return_supplier" id="purchase_return_supplier" type="text" autocomplete="off" value="{{ $acctasset['asset_type_id'] }}" readonly/>
+                        <input class="form-control input-bb" name="purchase_return_supplier" id="purchase_return_supplier" type="text" autocomplete="off" value="{{ $Asset->DepreciationMethod($acctasset['asset_type_id']) }}" readonly/>
                     </div>
                 </div>
             </div>
@@ -89,7 +89,7 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">Metode Penyusutan<a class='red'> *</a></a>
-                        <input class="form-control input-bb" name="purchase_return_supplier" id="purchase_return_supplier" type="text" autocomplete="off" value="{{ $acctasset['asset_depreciation_type'] }}" readonly/>
+                        <input class="form-control input-bb" name="purchase_return_supplier" id="purchase_return_supplier" type="text" autocomplete="off" value="{{ $Asset->DepreciationMethod($acctasset['asset_type_id']) }}" readonly/>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -109,7 +109,7 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">Nilai Residu<a class='red'> *</a></a>
-                        <input class="form-control input-bb" name="purchase_return_supplier" id="purchase_return_supplier" type="text" autocomplete="off" value="{{ $acctasset['asset_type_id'] }}" readonly/>
+                        <input class="form-control input-bb" name="purchase_return_supplier" id="purchase_return_supplier" type="text" autocomplete="off" value="{{ $acctasset['asset_depreciation_salvage_value'] }}" readonly/>
                     </div>
                 </div>
             </div>
@@ -117,13 +117,13 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">Mulai Bulan<a class='red'> *</a></a>
-                        <input class="form-control input-bb" name="purchase_return_supplier" id="purchase_return_supplier" type="text" autocomplete="off" value="{{ $acctasset['asset_type_id'] }}" readonly/>
+                        <input class="form-control input-bb" name="purchase_return_supplier" id="purchase_return_supplier" type="text" autocomplete="off" value="{{ $acctasset['asset_depreciation_start_month'] }}" readonly/>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">Awal tahun<a class='red'> *</a></a>
-                        <input class="form-control input-bb" name="purchase_return_supplier" id="purchase_return_supplier" type="text" autocomplete="off" value="{{ $acctasset['asset_type_id'] }}" readonly/>
+                        <input class="form-control input-bb" name="purchase_return_supplier" id="purchase_return_supplier" type="text" autocomplete="off" value="{{ $acctasset['asset_depreciation_start_year'] }}" readonly/>
                     </div>
                 </div>
             </div>
@@ -131,7 +131,7 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">Bulan Akhir<a class='red'> *</a></a>
-                        <input class="form-control input-bb" name="purchase_return_supplier" id="purchase_return_supplier" type="text" autocomplete="off" value="{{ $acctasset['asset_type_id'] }}" readonly/>
+                        <input class="form-control input-bb" name="purchase_return_supplier" id="purchase_return_supplier" type="text" autocomplete="off" value="{{ $acctasset['asset_depreciation_end_month'] }}" readonly/>
                     </div>
                 </div>
                 <div class="col-md-6">
