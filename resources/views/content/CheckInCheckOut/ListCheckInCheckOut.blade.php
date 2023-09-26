@@ -284,7 +284,7 @@
                             @if($row->sales_order_type==0)
                             {{  number_format($row->down_payment) }}
                             @else
-                            <div class="text-center px-auto rounded-pill mx-auto bg-info" style="font-size:0.9rem;">Langsung Check-In<div>
+                            <div class="text-center px-auto rounded-pill mx-auto bg-info" style="font-size:0.9rem;">Langsung Check-In</div>
                             @endif
                         </td>
                         <td>{{ number_format($row->sales_order_price) }}</td>
@@ -295,7 +295,7 @@
                             <a type="button" class="btn btn-outline-danger btn-sm" onclick="checkout('{{ $row->sales_order_id}}',{{$row->sales_order_price}})">Check-Out</a>
                             <a type="button" class="btn btn-outline-primary btn-sm" href="{{route('cc.extend',$row->sales_order_id)}}">Perpanjangan</a>
                             @else
-                                <div class="w-75 px-1 rounded-pill mx-auto bg-info">Sudah Check-Out<div>
+                                <div class="w-75 px-1 rounded-pill mx-auto bg-info">Sudah Check-Out</div>
                             @endif
                             @if($row->sales_order_type==1&& $row->checkin_date == date('Y-m-d'))
                             <a type="button" class="btn btn-outline-secondary btn-sm" onclick="check('{{ $row->sales_order_name}}','{{route('cc.delete',$row->sales_order_id)}}')">Batal</a>
