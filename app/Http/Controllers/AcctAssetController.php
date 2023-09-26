@@ -45,4 +45,6 @@ class AcctAssetController extends Controller
         $acctasset  = AcctAsset::find($asset_id);
         return view('content.AcctAset.FormDetailAcctAsset',compact('sessiondata','acctasset'));
     }
+
+
 }
