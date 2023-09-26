@@ -3,6 +3,7 @@
 use App\Http\Controllers\AcctAccountController;
 use App\Http\Controllers\AcctAssetTypeController;
 use App\Http\Controllers\AcctAssetController;
+use App\Http\Controllers\AcctAssetReportController;
 use App\Http\Controllers\AcctAccountSettingController;
 use App\Http\Controllers\AcctDisbursementReportController;
 use App\Http\Controllers\AcctJournalMemorialController;
@@ -407,8 +408,20 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
     Route::post('/process-add', [AcctAssetController::class, 'processAdd'])->name('process-add');
     Route::get('/detail/{asset_type_id}', [AcctAssetController::class, 'detail'])->name('detail');
     Route::post('/process-edit', [AcctAssetController::class, 'processEdit'])->name('process-edit');
-    Route::get('/penyesuaian/{asset_type_id}', [AcctAssetController::class, 'penyesuaian'])->name('penyesuaian');
+    Route::get('/depreciation/{asset_type_id}', [AcctAssetController::class, 'depreciation'])->name('depreciation');
     Route::post('/elements-add', [AcctAssetController::class, 'elementsAdd'])->name('elements-add');
+});
+ // aset report pages
+ Route::prefix('report-aset')->name('report-aset.')->group(function () {
+    Route::get('/', [AcctAssetReportController::class, 'index'])->name('index');
+    Route::get('/add', [AcctAssetReportController::class, 'add'])->name('add');
+    Route::post('/process-add', [AcctAssetReportController::class, 'processAdd'])->name('process-add');
+    Route::get('/detail/{asset_type_id}', [AcctAssetReportController::class, 'detail'])->name('detail');
+    Route::post('/process-edit', [AcctAssetReportController::class, 'processEdit'])->name('process-edit');
+    Route::get('/penyesuaian/{asset_type_id}', [AcctAssetReportController::class, 'penyesuaian'])->name('penyesuaian');
+    Route::post('/elements-add', [AcctAssetReportController::class, 'elementsAdd'])->name('elements-add');
+    Route::post('/filter', [AcctAssetReportController::class, 'filter'])->name('filter');
+
 });
  // Merchant (wahana) pages
  Route::prefix('sales-merchant')->name('sales-merchant.')->group(function () {
@@ -419,6 +432,7 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
     Route::post('/process-edit', [SalesMerchantController::class, 'processEdit'])->name('process-edit');
     Route::get('/delete/{merchant_id}', [SalesMerchantController::class, 'delete'])->name('delete');
     Route::post('/elements-add', [SalesMerchantController::class, 'elementsAdd'])->name('elements-add');
+
 });
  // Item barcode pages
  Route::prefix('item-barcode')->name('item-barcode.')->group(function () {
