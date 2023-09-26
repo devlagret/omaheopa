@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\AppHelper;
+use App\Helpers\JournalHelper;
 use App\Http\Controllers\Controller;
 use App\Models\CoreBuilding;
 use App\Models\CorePriceType;
@@ -33,6 +34,7 @@ class CheckInCheckOutController extends Controller
         $this->middleware('auth');
     }
     public function index() {
+        Session::put('cc-token',Str::uuid());
         $this->resetSession();
         $filter = Session::get('filter-cc');
         $booking = SalesOrder::with('rooms')->where('data_state',0)
@@ -105,8 +107,6 @@ class CheckInCheckOutController extends Controller
         ->where('checkin_date','>',$request->checkin_date)
         // ->where('checkout_date','>',$request->checkout_date)
         ->get();
-        foreach ($data->rooms as $d){
-        }
         foreach($so as $val){
             foreach($val->rooms->whereIn('room_id',$dataroom) as $row){
                 $i++;
@@ -128,15 +128,12 @@ class CheckInCheckOutController extends Controller
         // ->where('checkout_date','>',$request->checkout_date)
         ->get();
         dump($dataroom);
-        foreach ($data->rooms as $d){
-        }
         foreach($so as $val){
             foreach($val->rooms->whereIn('room_id',$dataroom) as $row){
                 dump($row);
             }
         }
-        dump($so);
-        return response('',202);
+        // return response('',202);
         try{
             DB::beginTransaction();
             SalesOrderRoomExtension::create([
@@ -152,7 +149,6 @@ class CheckInCheckOutController extends Controller
         }catch(\Exception $e){
             DB::rollBack();
             report($e);
-            dump($e);return 0;
             return redirect()->route('index')->with('msg','Data Gagal Diinput');
         }
     }
@@ -168,33 +164,27 @@ class CheckInCheckOutController extends Controller
         if(empty(Session::get('cc-token'))){
             return redirect()->back()->with('msg',"Check-Out Berhasil -");
         }
-        $field = $request->validate(['payed_amount'=>'required','sales_order_id'=>'required'],['payed_amount.required'=>'Uang Yang dibayar Harus Dimasukan','sales_order_id.required'=>'Error']);
+        $field = $request->validate(['paid_amount'=>'required','sales_order_id'=>'required'],['paid_amount.required'=>'Uang Yang dibayar Harus Dimasukan','sales_order_id.required'=>'Error']);
         $order = SalesOrder::find($request->sales_order_id);
         $invoice = SalesInvoice::find($order->sales_invoice_id);
-        return dump($request->all());
+        // return dump($request->all());
         try{
             DB::beginTransaction();
             $order->sales_order_status= 3;
             $order->checkout_date_real= Carbon::now()->format('Y-m-d');
             $order->save();
+            $total_amount = $request->total_amount;
             if($request->use_penalty){
                 $invoice->penalty_amount = $request->pinalty;
+                $total_amount = $request->total_w_pinalty;
+            }
+            if($order->sales_order_type==4&&$request->use_penalty){
+                JournalHelper::make($token,'Penalty Overtime',['hotel_account','hotel_cash_account'],($request->pinalty),'PyO');
             }
             // buat journal kalau tidak full book
             if($order->sales_order_type!=4){
             // * buat jurnal
-            JournalVoucher::create([
-                'journal_voucher_token' => $token,
-                'transaction_module_code' => 'SO',
-                'journal_voucher_description'=> 'Check-Out'
-            ]);
-            //
-            $jv = JournalVoucher::where('journal_voucher_token',$token)->first();
-            //* buat journal item
-            JournalVoucherItem::create([
-                // 'merchat_id' => 1,
-                'journal_voucher_id'=>$jv->journal_voucher_id,
-            ]);
+                JournalHelper::make($token,'Check-Out',['hotel_account','hotel_cash_account'],$total_amount,'SO');
             //
             }
             $invoice->paid_amount = $field['payed_amount'];
@@ -203,12 +193,12 @@ class CheckInCheckOutController extends Controller
 
             Session::forget('cc-token');
             DB::commit();
-            return redirect()->back(200)->with('msg','Check-Out Berhasil');
+            return redirect()->back()->with('msg','Check-Out Berhasil');
         }catch(\Exception $e){
             DB::rollBack();
-            return dump($e);
-            // report($e);
-            // return redirect()->back(200)->with('msg','Check-Out Gagal');
+            // return dump($e);s
+            report($e);
+            return redirect()->back()->with('msg','Check-Out Gagal');
         }
 
     }
@@ -357,18 +347,7 @@ class CheckInCheckOutController extends Controller
         }
 
         // * buat jurnal
-        JournalVoucher::create([
-            'journal_voucher_token' => $token,
-            'transaction_module_code' => 'CNB',
-            'journal_voucher_description'=> 'Check-in Non Booking'
-        ]);
-        //
-        $jv = JournalVoucher::where('journal_voucher_token',$token)->first();
-        //* buat journal item
-        JournalVoucherItem::create([
-            // 'merchat_id' => 1,
-            'journal_voucher_id'=>$jv->journal_voucher_id,
-        ]);
+        JournalHelper::make($token,'Check-in Non Booking',['hotel_account','hotel_cash_account'],$request->total_amount);
         //
 
             DB::commit();
@@ -380,7 +359,6 @@ class CheckInCheckOutController extends Controller
             Session::forget('booking-token');
             DB::rollBack();
             report($e);
-            return dump($e);
             return redirect()->route('cc.add')->with(['msg'=>'Tambah Check-In Kamar Gagal','type'=>'danger']);
         }
     }
