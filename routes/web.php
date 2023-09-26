@@ -408,7 +408,7 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
     Route::post('/process-add', [AcctAssetController::class, 'processAdd'])->name('process-add');
     Route::get('/detail/{asset_type_id}', [AcctAssetController::class, 'detail'])->name('detail');
     Route::post('/process-edit', [AcctAssetController::class, 'processEdit'])->name('process-edit');
-    Route::get('/penyesuaian/{asset_type_id}', [AcctAssetController::class, 'penyesuaian'])->name('penyesuaian');
+    Route::get('/depreciation/{asset_type_id}', [AcctAssetController::class, 'depreciation'])->name('depreciation');
     Route::post('/elements-add', [AcctAssetController::class, 'elementsAdd'])->name('elements-add');
 });
  // aset report pages
