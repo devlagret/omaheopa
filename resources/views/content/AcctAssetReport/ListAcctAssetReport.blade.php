@@ -93,12 +93,12 @@ function check(name,uri){
                         <th width="6%">Jml Tahun</th>
                         <th width="6%">%</th>
                         <th width="12%">Harga Perolehan <?php echo $last_year; ?> </th>
-                        <th width="12%">Harga Perolehan <?php echo $data['year_period']; ?></th>
+                        <th width="12%">Harga Perolehan <?php echo $year_period; ?></th>
                         <th width="12%">Akum. Penyusutan Tahun s.d. <?php echo $last_year; ?></th></th>
                         <th width="12%">Nilai Buku Tahun s.d. <?php echo $last_year; ?></th></th>
-                        <th width="12%">Penyusutan Tahun <?php echo $data['year_period']; ?></th>
-                        <th width="12%">Akum. Penyusutan Tahun s.d. <?php echo $data['year_period']; ?></th>
-                        <th width="12%">Nilai Buku Tahun s.d.<?php echo $data['year_period']; ?></th>
+                        <th width="12%">Penyusutan Tahun <?php echo $year_period; ?></th>
+                        <th width="12%">Akum. Penyusutan Tahun s.d. <?php echo $year_period; ?></th>
+                        <th width="12%">Nilai Buku Tahun s.d.<?php echo $year_period; ?></th>
 					</tr>
                 </thead>
                 <tbody>
@@ -116,10 +116,10 @@ function check(name,uri){
                         <td style='text-align:right'>{{ number_format((int)$val['asset_purchase_value_then']) }} </td>
                         <td style='text-align:right'>{{ number_format($val['asset_purchase_value_now']) }} </td>
                         <td style='text-align:right'>{{ number_format($val['asset_depreciation_accumulation_last_year'], 2) }} </td>
-                        {{-- <td style='text-align:right'>{{ number_format($val['asset_depreciation_book_value_last_year'], 2) }}</td> --}}
+                        <td style='text-align:right'>{{ $val['asset_depreciation_book_value_last_year'] }}</td>
                         <td style='text-align:right'>{{ number_format($val['asset_depreciation_amount'], 2) }} </td>
                         <td style='text-align:right'>{{ number_format($val['asset_depreciation_accumulation_this_year'], 2) }} </td>
-                        {{-- <td style='text-align:right'>{{ number_format($val['asset_depreciation_book_value_this_year'], 2) }} </td> --}}
+                        <td style='text-align:right'>{{ $val['asset_depreciation_book_value_this_year'] }} </td>
                         
                     </tr>
                     @endforeach
