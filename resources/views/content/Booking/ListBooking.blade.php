@@ -142,7 +142,11 @@
                           <a type="button" class="btn btn-outline-warning btn-sm" href="{{ route('booking.edit',$row->sales_order_id) }}">Edit</a>
                           <a type="button" class="btn btn-outline-danger btn-sm" onclick="check('{{ $row->sales_order_name}}', '{{route('booking.delete',$row->sales_order_id)}}')">Hapus</a>
                           @else
-                          <div class="px-1 rounded-pill mx-auto bg-info mb-2"> Sudah Bayar Uang Muka </div>
+                          @if($row->sales_order_type==0)
+                          <div class="px-1 rounded-pill mx-auto bg-info mb-2" style="font-size:0.9rem;"> Sudah Bayar Uang Muka </div>
+                          @else
+                          <div class="text-center px-auto w-75 rounded-pill mx-auto bg-info" style="font-size:0.9rem;">Langsung Check-In</div>
+                          @endif
                           @endif
                             <a type="button" class="btn btn-outline-dark btn-sm" href="{{ route('booking.detail',$row->sales_order_id) }}">Detail</a>
                         </td>

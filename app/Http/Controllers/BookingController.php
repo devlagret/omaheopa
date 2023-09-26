@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\AppHelper;
+use App\Helpers\JournalHelper;
 use App\Http\Controllers\Controller;
 use App\Models\CoreBuilding;
 use App\Models\CorePriceType;
@@ -26,6 +27,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 
+use function PHPUnit\Framework\matches;
+
 class BookingController extends Controller
 {
 // * Note : ci = check-in
@@ -43,7 +46,8 @@ class BookingController extends Controller
             'booked-room-facility-qty']);
         $this->resetUpdateSession();
         $booking = SalesOrder::with('rooms')->where('data_state',0)
-        ->where('sales_order_type',0)
+        ->where('sales_order_type','!=',1)
+        ->where('sales_order_type','!=',2)
         ->where('checkin_date','>=',$filter['start_date']??Carbon::now()->format('Y-m-d'))
         ->where('checkin_date','<=',$filter['end_date']??Carbon::now()->format('Y-m-d'))->get();
         return view('content.Booking.ListBooking')->with(['booking'=>$booking,'start_date'=>$filter['start_date']??null,'end_date'=>$filter['end_date']??null]);
@@ -623,26 +627,7 @@ class BookingController extends Controller
                     'merchant_id' => empty(Auth::user()->merchant_id)?1:Auth::user()->merchant_id,
                 ]);
                 // * buat jurnal
-                JournalVoucher::create([
-                    'company_id'                    => Auth::user()->company_id,
-                    'journal_voucher_status'        => 1,
-                    'journal_voucher_description'   => 'Booking Full Book',
-                    'journal_voucher_title'         => AppHelper::getTransactionModule('BFB')->name(),
-                    'transaction_module_id'         => AppHelper::getTransactionModule('BFB')->id(),
-                    'transaction_module_code'       => 'BFB',
-                    'journal_voucher_date'          => Carbon::now()->format('Y-m-d'),
-                    'journal_voucher_period'        => Carbon::now()->format('Ym'),
-                    'created_id'                    => Auth::id(),
-                    'journal_voucher_token'         => $token,
-                ]);
-                //
-                $jv = JournalVoucher::where('journal_voucher_token',$token)->first();
-                //* buat journal item
-                JournalVoucherItem::create([
-                    // 'merchat_id' => 1,
-                    'journal_voucher_id'=>$jv->journal_voucher_id,
-                ]);
-                //
+                JournalHelper::make($token,'Booking Full Book',['hotel_account','hotel_cash_account'],$request->total_amount);
                 $si = SalesInvoice::where('sales_invoice_token',$token)->first();
                 $sales_invoice_id = $si->sales_invoice_id;
             }
@@ -708,7 +693,7 @@ class BookingController extends Controller
             DB::rollBack();
             report($e);
             dump($e);
-            return redirect()->route('booking.add')->with(['msg'=>'Tambah Booking Kamar Gagal','type'=>'danger']);
+            return redirect()->route('booking.index')->with(['msg'=>'Tambah Booking Kamar Gagal','type'=>'danger']);
         }
     }
     private function resetSession() {
@@ -793,7 +778,9 @@ class BookingController extends Controller
     }
     public function edit($sales_order_id) {
         $ci = 2;
-        dump(AppHelper::getTransactionModule('PJL')->name());
+        dump(preg_match('/[A-Z]/', 'BookingFull Book', $matches));
+        dump(preg_replace('/[^A-Z]/', '','Booking Full Book' ));
+        dump($matches);
         $data =SalesOrder::find($sales_order_id);
         if(empty(Session::get('edit-booked-room-data'))&&empty(Session::get('edit-booked-room-menu'))&&empty(Session::get('edit-booked-room-facility'))){
             $this->setEditSession($sales_order_id);

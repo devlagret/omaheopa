@@ -472,6 +472,9 @@ if (empty($paket)) {
                 success: function(return_data) {
                     $('#room_menu_id').html(return_data);
                     loading(0);
+                     setTimeout(function() {
+                        loading(0);
+                    }, 200);
                     return 0;
                 },
                 complete: function() {
@@ -533,6 +536,9 @@ if (empty($paket)) {
                         $('#menu-itm-table').append(return_data);
                     }
                     loading(0);
+                    setTimeout(function() {
+                        loading(0);
+                    }, 300);
                     return 0;
                 },
                 complete: function() {
@@ -660,7 +666,7 @@ if (empty($paket)) {
                 url: "{{ route('booking.delete-menu') }}" +'/' + id +'/'+ {{$ci??0}},
                 dataType: "html",
                 success: function(return_data) {
-                    $("#booked-room-" + id).remove();
+                    $("#menu-item-" + id).remove();
                     if ($('.menu-item').length == 0) {
                         $('#menu-itm-table.').html(
                         '<td valign="top" colspan="7" class="dataTables_empty">No data available in table</td>'
@@ -1371,7 +1377,7 @@ if (empty($paket)) {
                                                 @php $nomen = 1; @endphp
                                                 @foreach ($menuItm as $men)
                                                 <tr class="menu-item menu-item-{{ $men->room_menu_id }}"
-                                                    id="facility-{{ $men->room_menu_id }}">
+                                                    id="menu-item-{{ $men->room_menu_id }}">
                                                     <td>{{ $nomen++ }}
                                                         <input type='hidden' id="room_menu_id[]"
                                                             value="{{ $men->room_menu_id }}" />
