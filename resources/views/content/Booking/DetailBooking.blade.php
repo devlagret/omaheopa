@@ -23,6 +23,7 @@
 
         function check(id) {
             loadingWidget();
+            subtotal();
             var checkout_date = $('#checkout_date').val();
             var checkout_date_old = $('#checkout_date_old').val();
             var checkin_date = $('#checkin_date').val();

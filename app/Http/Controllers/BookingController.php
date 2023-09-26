@@ -592,10 +592,10 @@ class BookingController extends Controller
                 'company_id'    => Auth::user()->company_id,
             ]);
         }
-        dump($check);
-        dump($checkfac);
-        dump($checkmenu);
-        // return 0;
+        // dump($check);
+        // dump($checkfac);
+        // dump($checkmenu);
+        // // return 0;
         try{
             DB::beginTransaction();
             $down_payment=null;$sales_invoice_id=null;$sales_order_status=0;
@@ -751,7 +751,7 @@ class BookingController extends Controller
         foreach ($so->rooms as $val){
             dump($val);
         }
-        return 1;
+        // return 1;
         try{
             DB::beginTransaction();
             SalesOrderRescedule::create([
@@ -907,10 +907,10 @@ class BookingController extends Controller
                 'company_id'    => Auth::user()->company_id,
             ]);
         }
-        dump($check);
-        dump($checkfac);
-        dump($checkmenu);
-        return 0;
+        // dump($check);
+        // dump($checkfac);
+        // dump($checkmenu);
+        // return 0;
         try{
             DB::beginTransaction();
             $down_payment=null;$sales_invoice_id=null;$sales_order_status=0;
@@ -942,18 +942,7 @@ class BookingController extends Controller
                     'merchant_id' => empty(Auth::user()->merchant_id)?1:Auth::user()->merchant_id,
                 ]);
                 // * buat jurnal
-                JournalVoucher::create([
-                    'journal_voucher_token' => $token,
-                    'transaction_module_code' => 'BFB',
-                    'journal_voucher_description'=> 'Booking Full Book'
-                ]);
-                //
-                $jv = JournalVoucher::where('journal_voucher_token',$token)->first();
-                //* buat journal item
-                JournalVoucherItem::create([
-                    // 'merchat_id' => 1,
-                    'journal_voucher_id'=>$jv->journal_voucher_id,
-                ]);
+                JournalHelper::make($token,'Booking Full Book',['hotel_account','hotel_cash_account'],$request->total_amount);
                 //
                 $si = SalesInvoice::where('sales_invoice_token',$token)->first();
                 $sales_invoice_id = $si->sales_invoice_id;

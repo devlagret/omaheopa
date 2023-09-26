@@ -93,14 +93,18 @@
     $(document).ready(function() {
         $('#pinalty_view').change(function() {
             $("#pinalty").val(this.value);
-            console.log(this.value);
-            $('#total_w_pinalty_view').val(toRp(parseInt($('#total_amount').val())+parseInt($('#pinalty').val())));
-            $('#total_w_pinalty').val(parseInt($('#total_amount').val())+parseInt($('#pinalty').val()));
+            pinalty = parseInt(this.value);
+            if($('#pinalty').val()==''){
+                pinalty = 0;
+            }
+            console.log(pinalty);
+            $('#total_w_pinalty_view').val(toRp(parseInt($('#total_amount').val())+pinalty));
+            $('#total_w_pinalty').val(parseInt($('#total_amount').val())+pinalty);
             if($("#paid_amount").val()!=''){
             $("#change_amount_view").val(toRp($("#paid_amount").val()-$('#total_w_pinalty').val()));
             $("#change_amount").val($("#paid_amount").val()-$('#total_w_pinalty').val());
             }
-            $("#pinalty_view").val(toRp(this.value));
+            $("#pinalty_view").val(toRp(pinalty??0));
         });
         $("#paid_amount_view").change(function() {
             $("#paid_amount").val(this.value);
@@ -122,6 +126,7 @@
             var total = button.data('total');
             $(this).find('#use_penalty').val(0);
             $(this).find('#pinalty_view').prop('required',false);
+            console.log('foo');
             if(id!=''){
                 $(this).find('#id_modal').val(id);
                 $(this).find('#total_amount_view').val(toRp(total));
@@ -366,7 +371,7 @@
                     :
                 </div>
                 <div class="col-8">
-                    <input class="form-control required input-bb" autocomplete="off" id="pinalty_view" name="pinalty_view" />
+                    <input class="form-control input-bb" autocomplete="off" id="pinalty_view" name="pinalty_view" />
                     <input class="form-control input-bb" id="pinalty" name="pinalty" hidden/>
                 </div>
             </div>
@@ -379,7 +384,7 @@
                 </div>
                 <div class="col-8">
                     <input class="form-control required input-bb" required autocomplete="off" id="total_w_pinalty_view" name="pinalty_view" />
-                    <input class="form-control input-bb" id="total_w_pinalty" name="pinalty" hidden/>
+                    <input class="form-control input-bb" id="total_w_pinalty" name="total_w_pinalty" hidden/>
                 </div>
             </div>
             <div class="row mb-3">
