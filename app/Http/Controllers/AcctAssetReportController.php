@@ -192,7 +192,7 @@ class AcctAssetReportController extends Controller
         ->where('acct_asset_depreciation_item.asset_depreciation_item_year', $year)
         ->orderBy('acct_asset_depreciation_item.asset_depreciation_item_id', 'DESC')
         ->limit(1)
-        ->get();1
+        ->get();
         // echo json_encode($data);exit;
         return $data->count()?$data[0]['asset_depreciation_item_book_value']:0;
     }
