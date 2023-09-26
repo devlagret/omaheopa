@@ -464,10 +464,11 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
     Route::post('/add-person', [BookingController::class, 'addPersonBooked'])->name('add-person');
     Route::post('/room', [BookingController::class, 'getRoom'])->name('get-room');
     Route::post('/check-room', [BookingController::class, 'checkRoom'])->name('check-room');
+    Route::post('/check-conflic', [BookingController::class, 'checkConflic'])->name('check-conflic');
     Route::post('/get-price-list', [BookingController::class, 'getRoomPriceList'])->name('get-price-list');
-    Route::get('/delete-room/{room_id?}', [BookingController::class, 'deleteBookedRoom'])->name('delete-booked-room');
-    Route::get('/delete-facility/{room_facility_id?}', [BookingController::class, 'deleteFacility'])->name('delete-facility');
-    Route::get('/delete-menu/{room_menu_id?}', [BookingController::class, 'deleteMenu'])->name('delete-menu');
+    Route::get('/delete-room/{room_id?}/{ci?}', [BookingController::class, 'deleteBookedRoom'])->name('delete-booked-room');
+    Route::get('/delete-facility/{room_facility_id?}/{ci?}', [BookingController::class, 'deleteFacility'])->name('delete-facility');
+    Route::get('/delete-menu/{room_menu_id?}/{ci?}', [BookingController::class, 'deleteMenu'])->name('delete-menu');
     Route::post('/room-price', [BookingController::class, 'getRoomPrice'])->name('get-room-price');
     Route::post('/room-menu', [BookingController::class, 'getRoomMenus'])->name('get-room-menu');
     Route::post('/add-menu-item', [BookingController::class, 'addMenuItem'])->name('add-menu-item');

@@ -1,10 +1,15 @@
 <?php
 namespace App\Helpers;
+use App\Models\AcctAccount;
+use App\Models\AcctAccountSetting;
+use App\Models\PreferenceTransactionModule;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class AppHelper
 {
+    protected static $data;
     /**
      * Get random quote from storage
      *
@@ -39,4 +44,38 @@ class AppHelper
     public static function orderType():Collection {
         return collect([0 => 'Dengan Uang Muka', 3 => 'Tanpa Uang Muka', 4 => 'Full Book']);
     }
+    /**
+     * Get Transaction Module
+     *
+     * @param [string] $transaction_module_code
+     * @return Collection
+     */
+    public static function getTransactionModule(string $transaction_module_code)
+    {
+        return PreferenceTransactionModule::select(['transaction_module_name as name','transaction_module_id as id'])->where('transaction_module_code',$transaction_module_code)->first();
+    }
+    /**
+     * Get Account Seting status and account id
+     *
+     * @param string $account_setting_name
+     * @return Collection
+     */
+    public static function getAccountSetting(string $account_setting_name){
+        return AcctAccountSetting::select(['account_setting_status as status','account_id'])->where('company_id', Auth::user()->company_id)->where('account_setting_name', $account_setting_name)->first();
+    }
+    /**
+     * Get account default status
+     *
+     * @param [int] $account_id
+     * @return string
+     */
+    public static function getAccountDefaultStatus(int $account_id)
+    {
+        $data = AcctAccount::where('account_id',$account_id)->first();
+
+        return $data->account_default_status;
+    }
+    function __destruct() {
+       self::$data = ''; 
+      }
 }

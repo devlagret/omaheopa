@@ -422,19 +422,19 @@
                         <tr>
                             <th style="text-align: left !important; width: 40% !important">Kas</th>
                             <td style="text-align: left !important; width: 30% !important">
-                                {!! Form::select(0, $accountlist,$data->where('account_setting_name','hotel_account')->pluck('account_id')??'',['class' => 'selection-search-clear select-form','name'=>'hotel_cash_account_id','id'=>'hotel_cash_account_id']) !!}
+                                {!! Form::select(0, $accountlist,$data->where('account_setting_name','hotel_cash_account')->pluck('account_id')??'',['class' => 'selection-search-clear select-form','name'=>'hotel_cash_account_id','id'=>'hotel_cash_account_id']) !!}
                             </td>
                             <td style="text-align: left !important; width: 30% !important">
-                                {!! Form::select(0, $status,$data->where('account_setting_name','hotel_account')->pluck('account_setting_status')??'',['class' => 'selection-search-clear select-form','name'=>'hotel_cash_account_status','id'=>'hotel_cash_account_status']) !!}
+                                {!! Form::select(0, $status,$data->where('account_setting_name','hotel_cash_account')->pluck('account_setting_status')??'',['class' => 'selection-search-clear select-form','name'=>'hotel_cash_account_status','id'=>'hotel_cash_account_status']) !!}
                             </td>
                         </tr>
                         <tr>
                             <th style="text-align: left !important; width: 40% !important">Pengeluaran</th>
                             <td style="text-align: left !important; width: 30% !important">
-                                {!! Form::select(0, $accountlist,$data->where('account_setting_name','hotel_cash_account')->pluck('account_id')??'',['class' => 'selection-search-clear select-form','name'=>'hotel_account_id','id'=>'hotel_account_id']) !!}
+                                {!! Form::select(0, $accountlist,$data->where('account_setting_name','hotel_account')->pluck('account_id')??'',['class' => 'selection-search-clear select-form','name'=>'hotel_account_id','id'=>'hotel_account_id']) !!}
                             </td>
                             <td style="text-align: left !important; width: 30% !important">
-                                {!! Form::select(0, $status,$data->where('account_setting_name','hotel_cash_account')->pluck('account_setting_status')??'',['class' => 'selection-search-clear select-form','name'=>'hotel_account_status','id'=>'hotel_account_status']) !!}
+                                {!! Form::select(0, $status,$data->where('account_setting_name','hotel_account')->pluck('account_setting_status')??'',['class' => 'selection-search-clear select-form','name'=>'hotel_account_status','id'=>'hotel_account_status']) !!}
                             </td>
                         </tr>
                     </table>

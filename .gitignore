@@ -16,3 +16,4 @@ yarn-error.log
 vendor/phpoffice
 
 /.vs
+cert/CA/CA.key

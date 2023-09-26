@@ -24,6 +24,7 @@ if (empty($paket)) {
                 type: "POST",
                 url: "{{ isset($ci)?route('cc.elements-add'):route('booking.elements-add') }}",
                 data: {
+                    'ci' : {{$ci??0}},
                     'name': name,
                     'value': value,
                     '_token': '{{ csrf_token() }}'
@@ -470,13 +471,15 @@ if (empty($paket)) {
                 success: function(return_data) {
                     $('#room_menu_id').html(return_data);
                     loading(0);
-                    return 0;
+                     setTimeout(function() {
+                        loading(0);
+                    }, 300);
                 },
                 complete: function() {
                     loading(0);
                     setTimeout(function() {
                         loading(0);
-                    }, 200);
+                    }, 300);
                 },
                 error: function(data) {
                     console.log(data);
@@ -531,6 +534,9 @@ if (empty($paket)) {
                         $('#menu-itm-table').append(return_data);
                     }
                     loading(0);
+                    setTimeout(function() {
+                        loading(0);
+                    }, 300);
                     return 0;
                 },
                 complete: function() {
@@ -595,7 +601,7 @@ if (empty($paket)) {
             loading();
             $.ajax({
                 type: "get",
-                url: "{{ route('booking.delete-booked-room') }}" +'/'+ room_id,
+                url: "{{ route('booking.delete-booked-room') }}" +'/'+ room_id +'/'+ {{$ci??0}},
                 dataType: "html",
                 success: function(return_data) {
                     $("#booked-room-" + room_id).remove();
@@ -623,7 +629,7 @@ if (empty($paket)) {
             loading();
             $.ajax({
                 type: "get",
-                url: "{{ route('booking.delete-facility') }}" +'/' + id,
+                url: "{{ route('booking.delete-facility') }}" +'/' + id +'/'+ {{$ci??0}},
                 dataType: "html",
                 success: function(return_data) {
                     $("#facility-" + id).remove();
@@ -651,10 +657,10 @@ if (empty($paket)) {
             loading();
             $.ajax({
                 type: "get",
-                url: "{{ route('booking.delete-menu') }}" +'/' + id,
+                url: "{{ route('booking.delete-menu') }}" +'/' + id +'/'+ {{$ci??0}},
                 dataType: "html",
                 success: function(return_data) {
-                    $("#booked-room-" + id).remove();
+                    $("#menu-item-" + id).remove();
                     if ($('.menu-item').length == 0) {
                         $('#menu-itm-table.').html(
                         '<td valign="top" colspan="7" class="dataTables_empty">No data available in table</td>'
@@ -879,24 +885,29 @@ if (empty($paket)) {
                 var sot = $('#sales_order_type').val();
                 if(sot == 0){
                 $('#down-payment-el').show();
+                $("#down_payment_view").prop('required',true);
                 $('#without-dp').hide();
             }else if(sot == 3){
+                $("#down_payment_view").prop('required',false);
                 $('#down-payment-el').hide();
                 $('#without-dp').hide();
             }else if(sot == 4){
+                $("#down_payment_view").prop('required',false);
                 $('#down-payment-el').hide();
                 $('#without-dp').show();
             }
             }
             $("#sales_order_type").change(function () {
-           console.log(this.value);
             if(this.value == 0){
+                $("#down_payment_view").prop('required',true);
                 $('#down-payment-el').show();
                 $('#without-dp').hide();
             }else if(this.value == 3){
+                $("#down_payment_view").prop('required',false);
                 $('#down-payment-el').hide();
                 $('#without-dp').hide();
             }else if(this.value == 4){
+                $("#down_payment_view").prop('required',false);
                 $('#down-payment-el').hide();
                 $('#without-dp').show();
             }
@@ -1261,7 +1272,7 @@ if (empty($paket)) {
                                                         </td>
                                                         <td class='text-center'><button type='button'
                                                                 class='btn btn-outline-danger btn-sm'
-                                                                onclick='deleteBooked({{ $fas->room_facility_id }})'>Hapus</button>
+                                                                onclick='deleteFacilityItm({{ $fas->room_facility_id }})'>Hapus</button>
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -1355,7 +1366,7 @@ if (empty($paket)) {
                                                 @php $nomen = 1; @endphp
                                                 @foreach ($menuItm as $men)
                                                 <tr class="menu-item menu-item-{{ $men->room_menu_id }}"
-                                                    id="facility-{{ $men->room_menu_id }}">
+                                                    id="menu-item-{{ $men->room_menu_id }}">
                                                     <td>{{ $nomen++ }}
                                                         <input type='hidden' id="room_menu_id[]"
                                                             value="{{ $men->room_menu_id }}" />

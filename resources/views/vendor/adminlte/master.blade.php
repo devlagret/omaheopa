@@ -168,9 +168,9 @@
                     $('#loading').modal('show');
                 } else {
                     $('#loading').modal('hide');
-                    $('.modal-backdrop .fade').remove();
+                    $('.modal-backdrop .fade').hide();
                     setTimeout(() => {
-                        $('.modal-backdrop .fade').remove();
+                        $('.modal-backdrop .fade').hide();
                     }, 1000);
                 }
             }

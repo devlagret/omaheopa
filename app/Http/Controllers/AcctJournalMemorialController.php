@@ -29,12 +29,18 @@ class AcctJournalMemorialController extends Controller
         }else{
             $end_date = Session::get('end_date');
         }
-        $data = JournalVoucher::join('acct_journal_voucher_item','acct_journal_voucher_item.journal_voucher_id','=','acct_journal_voucher.journal_voucher_id')
-        ->join('acct_account', 'acct_account.account_id','=','acct_journal_voucher_item.account_id')
-        ->where('acct_journal_voucher.journal_voucher_date', '>=', $start_date)
-        ->where('acct_journal_voucher.journal_voucher_date', '<=', $end_date)
-        ->where('acct_journal_voucher.company_id', Auth::user()->company_id)
-        ->where('acct_journal_voucher.journal_voucher_status', 1)
+        // $data = JournalVoucher::join('acct_journal_voucher_item','acct_journal_voucher_item.journal_voucher_id','=','acct_journal_voucher.journal_voucher_id')
+        // ->join('acct_account', 'acct_account.account_id','=','acct_journal_voucher_item.account_id')
+        // ->where('acct_journal_voucher.journal_voucher_date', '>=', $start_date)
+        // ->where('acct_journal_voucher.journal_voucher_date', '<=', $end_date)
+        // ->where('acct_journal_voucher.company_id', Auth::user()->company_id)
+        // ->where('acct_journal_voucher.journal_voucher_status', 1)
+        // ->get();
+        $data = JournalVoucher::with('items')
+        ->where('journal_voucher_date', '>=', $start_date)
+        ->where('journal_voucher_date', '<=', $end_date)
+        ->where('company_id', Auth::user()->company_id)
+        ->where('journal_voucher_status', 1)
         ->get();
         return view('content.AcctJournalMemorial.ListAcctJournalMemorial', compact('start_date','end_date','data'));
     }
