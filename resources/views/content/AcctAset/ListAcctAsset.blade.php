@@ -16,7 +16,7 @@ function check(name,uri){
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="{{ url('home') }}">Beranda</a></li>
-      <li class="breadcrumb-item active" aria-current="page">Daftar Jenis Aset</li>
+      <li class="breadcrumb-item active" aria-current="page">Daftar Aset</li>
     </ol>
   </nav>
 
@@ -25,7 +25,7 @@ function check(name,uri){
 @section('content')
 
 <h3 class="page-title">
-    <b>Daftar Jenis Aset</b> <small>Kelola Jenis Aset </small>
+    <b>Daftar Aset</b> <small>Kelola Aset </small>
 </h3>
 <br/>
 
@@ -37,10 +37,10 @@ function check(name,uri){
 <div class="card border border-dark">
   <div class="card-header bg-dark clearfix">
     <h5 class="mb-0 float-left">
-        Daftar Jenis Aset
+        Daftar Aset
     </h5>
     <div class="form-actions float-right">
-        <button onclick="location.href='{{ route('aset.add') }}'" name="add" class="btn btn-sm btn-info" title="Add Data"><i class="fa fa-plus"></i> Tambah Jenis Aset </button>
+        <button onclick="location.href='{{ route('aset.add') }}'" name="add" class="btn btn-sm btn-info" title="Add Data"><i class="fa fa-plus"></i> Tambah Aset </button>
     </div>
   </div>
 
@@ -97,7 +97,7 @@ function check(name,uri){
 
                         <td class="text-center">
                             <a type="button" class="btn btn-outline-warning btn-sm" href="{{ route('aset.detail',$row->asset_id) }}">Detail</a>
-                            <button type="button" onclick="$('this').attr('disabled');check('{{$row->asset_name}}','{{ route('aset.penyesuaian',$row->asset_id) }}')" class="btn btn-outline-info btn-sm" >Penyesuaian</button>
+                            <button type="button" onclick="$('this').attr('disabled');check('{{$row->asset_name}}','{{ route('aset.penyesuaian',$row->asset_id) }}')" class="btn btn-outline-info btn-sm" >Penyusutan</button>
                         </td>
                     </tr>
                     @endforeach
