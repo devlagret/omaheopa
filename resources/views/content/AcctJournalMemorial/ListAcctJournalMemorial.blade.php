@@ -4,7 +4,7 @@
 @section('title',  "MOZAIC Omah'e Opa")
 
 @section('content_header')
-    
+
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="{{ url('home') }}">Beranda</a></li>
@@ -29,7 +29,7 @@
                 Filter
             </h5>
         </div>
-    
+
         <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
             <div class="card-body">
                 <div class = "row">
@@ -72,7 +72,7 @@
 <div class="alert alert-info" role="alert">
     {{session('msg')}}
 </div>
-@endif 
+@endif
 <div class="card border border-dark">
   <div class="card-header bg-dark clearfix">
     <h5 class="mb-0 float-left">
@@ -98,64 +98,101 @@
                 <tbody>
                     <?php
                         $no = 1;
+                        $i = 1;
                         $total_debit = 0;
                         $total_credit = 0;
                         if(empty($data)){
-                            echo "
-                                <tr>
-                                    <td colspan='8' align='center'>Data Kosong</td>
-                                </tr>
-                            ";
+                            // echo "
+                            //     <tr>
+                            //         <td colspan='8' align='center'>Data Kosong</td>
+                            //     </tr>
+                            // ";
                         } else {
-                            foreach ($data as $key=>$val){	
-                                $id = $JournalMemorial->getMinID($val['journal_voucher_id']);
+                        //     foreach ($data as $key=>$val){
+                        //         $id = $JournalMemorial->getMinID($val['journal_voucher_id']);
 
-                                    if($val['journal_voucher_debit_amount'] <> 0 ){
-                                        $nominal = $val['journal_voucher_debit_amount'];
-                                        $status = 'D';
-                                    } else if($val['journal_voucher_credit_amount'] <> 0){
-                                        $nominal = $val['journal_voucher_credit_amount'];
-                                        $status = 'K';
-                                    } else {
-                                        $nominal = 0;
-                                        $status = 'Kosong';
-                                    }
+                        //             if($val['journal_voucher_debit_amount'] <> 0 ){
+                        //                 $nominal = $val['journal_voucher_debit_amount'];
+                        //                 $status = 'D';
+                        //             } else if($val['journal_voucher_credit_amount'] <> 0){
+                        //                 $nominal = $val['journal_voucher_credit_amount'];
+                        //                 $status = 'K';
+                        //             } else {
+                        //                 $nominal = 0;
+                        //                 $status = 'Kosong';
+                        //             }
 
 
-                                if($val['journal_voucher_item_id'] == $id){
-                                    echo"
-                                        <tr class='table-active'>			
-                                            <td style='text-align:center'>$no.</td>
-                                            <td>".$val['transaction_module_code']."</td>
-                                            <td>".$val['journal_voucher_description']."</td>
-                                            <td>".$val['journal_voucher_date']."</td>
-                                            <td>".$val['account_code']."</td>
-                                            <td>".$val['account_name']."</td>
-                                            <td style='text-align: right'>".number_format($nominal,2,'.',',')."</td>
-                                            <td style='text-align: right'>".$status."</td>
-                                        </tr>
-                                    ";
-                                    $no++;
-                                } else {
-                                    echo"
-                                        <tr>			
-                                            <td style='text-align:center'></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td>".$val['account_code']."</td>
-                                            <td>".$val['account_name']."</td>
-                                            <td style='text-align: right'>".number_format($nominal,2,'.',',')."</td>
-                                            <td style='text-align: right'>".$status."</td>
-                                        </tr>
-                                    ";
-                                }
-                                $total_debit += $val['journal_voucher_debit_amount'];
-                                $total_credit += $val['journal_voucher_credit_amount'];
-                            } 
+                        //         if($val['journal_voucher_item_id'] == $id){
+                        //             echo"
+                        //                 <tr class='table-active'>
+                        //                     <td style='text-align:center'>$no.</td>
+                        //                     <td>".$val['transaction_module_code']."</td>
+                        //                     <td>".$val['journal_voucher_description']."</td>
+                        //                     <td>".$val['journal_voucher_date']."</td>
+                        //                     <td>".$val['account_code']."</td>
+                        //                     <td>".$val['account_name']."</td>
+                        //                     <td style='text-align: right'>".number_format($nominal,2,'.',',')."</td>
+                        //                     <td style='text-align: right'>".$status."</td>
+                        //                 </tr>
+                        //             ";
+                        //             $no++;
+                        //         } else {
+                        //             echo"
+                        //                 <tr>
+                        //                     <td style='text-align:center'></td>
+                        //                     <td></td>
+                        //                     <td></td>
+                        //                     <td></td>
+                        //                     <td>".$val['account_code']."</td>
+                        //                     <td>".$val['account_name']."</td>
+                        //                     <td style='text-align: right'>".number_format($nominal,2,'.',',')."</td>
+                        //                     <td style='text-align: right'>".$status."</td>
+                        //                 </tr>
+                        //             ";
+                        //         }
+                        //         $total_debit += $val['journal_voucher_debit_amount'];
+                        //         $total_credit += $val['journal_voucher_credit_amount'];
+                        //     }
                         }
-                        
+
                     ?>
+                    @if (empty($data))
+                    <tr>
+                        <td colspan='8' align='center'>Data Kosong</td>
+                    </tr>
+                    @else
+                    @foreach ( $data as $key=>$val )
+                    @foreach ( $val->items as $keya=>$vala )
+                    @php
+                        if($vala['journal_voucher_debit_amount'] <> 0 ){
+                            $nominal = $vala['journal_voucher_debit_amount'];
+                            $status = 'D';
+                        } else if($vala['journal_voucher_credit_amount'] <> 0){
+                            $nominal = $vala['journal_voucher_credit_amount'];
+                            $status = 'K';
+                        } else {
+                            $nominal = 0;
+                            $status = 'Kosong';
+                        }
+                        $total_debit += $vala['journal_voucher_debit_amount'];
+                        $total_credit += $vala['journal_voucher_credit_amount'];
+                    @endphp
+                            <tr {{$i==1?"class=table-active":''}}>
+                                <td style='text-align:center'>{{$no++}}</td>
+                                <td>{{$i==1?$val['transaction_module_code']:''}}</td>
+                                <td>{{$i==1?$val['journal_voucher_description']:''}}</td>
+                                <td>{{$i==1?$val['journal_voucher_date']:''}}</td>
+                                <td>{{$vala->account->account_code}}</td>
+                                <td>{{$vala->account->account_name}}</td>
+                                <td style='text-align: right'>{{number_format($nominal,2,'.',',')}}</td>
+                                <td style='text-align: right'>{{$status}}</td>
+                            </tr>
+                            @php $i++; @endphp
+                    @endforeach
+                    @php $i = 1; @endphp
+                    @endforeach
+                    @endif
                     <tr>
                         <th style="text-align: right" colspan="6">Total Debit</th>
                         <td style="text-align: right">{{ number_format($total_debit,2,'.',',') }}</td>
@@ -176,13 +213,13 @@
 @stop
 
 @section('footer')
-    
+
 @stop
 
 @section('css')
-    
+
 @stop
 
 @section('js')
-    
-@stop   
+
+@stop
