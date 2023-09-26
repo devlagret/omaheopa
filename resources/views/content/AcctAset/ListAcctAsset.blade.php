@@ -97,7 +97,7 @@ function check(name,uri){
 
                         <td class="text-center">
                             <a type="button" class="btn btn-outline-warning btn-sm" href="{{ route('aset.detail',$row->asset_id) }}">Detail</a>
-                            <button type="button" onclick="$('this').attr('disabled');check('{{$row->asset_name}}','{{ route('aset.penyesuaian',$row->asset_id) }}')" class="btn btn-outline-info btn-sm" >Penyesuaian</button>
+                            <a type="button" href="{{ route('aset.depreciation',$row->asset_id) }}" class="btn btn-outline-info btn-sm" >Penyesuaian</a>
                         </td>
                     </tr>
                     @endforeach
