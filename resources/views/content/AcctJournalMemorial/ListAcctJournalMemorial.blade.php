@@ -181,7 +181,7 @@
                             <tr {{$i==1?"class=table-active":''}}>
                                 <td style='text-align:center'>{{$no++}}</td>
                                 <td>{{$i==1?$val['transaction_module_code']:''}}</td>
-                                <td>{{$i==1?$val['journal_voucher_description']:''}}</td>
+                                <td>{{$i==1?$val['journal_voucher_description']??$val['journal_voucher_title']:''}}</td>
                                 <td>{{$i==1?$val['journal_voucher_date']:''}}</td>
                                 <td>{{$vala->account->account_code}}</td>
                                 <td>{{$vala->account->account_name}}</td>
