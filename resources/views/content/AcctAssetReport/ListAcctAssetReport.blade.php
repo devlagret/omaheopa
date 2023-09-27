@@ -54,7 +54,7 @@ function check(name,uri){
                                     *
                                 </span>
                             </section>
-                            {!! Form::select(0, $yearlist, $year,['class' => 'selection-search-clear select-form','name'=>'year','id'=>'year']) !!}
+                            {!! Form::select(0, $yearlist, $year_period,['class' => 'selection-search-clear select-form','name'=>'year_period','id'=>'year_period']) !!}
                         </div>
                     </div>
                 </div>
@@ -116,10 +116,10 @@ function check(name,uri){
                         <td style='text-align:right'>{{ number_format((int)$val['asset_purchase_value_then']) }} </td>
                         <td style='text-align:right'>{{ number_format($val['asset_purchase_value_now']) }} </td>
                         <td style='text-align:right'>{{ number_format($val['asset_depreciation_accumulation_last_year'], 2) }} </td>
-                        <td style='text-align:right'>{{ $val['asset_depreciation_book_value_last_year'] }}</td>
+                        <td style='text-align:right'>{{ number_format($val['asset_depreciation_book_value_last_year'], 2) }}</td>
                         <td style='text-align:right'>{{ number_format($val['asset_depreciation_amount'], 2) }} </td>
                         <td style='text-align:right'>{{ number_format($val['asset_depreciation_accumulation_this_year'], 2) }} </td>
-                        <td style='text-align:right'>{{ $val['asset_depreciation_book_value_this_year'] }} </td>
+                        <td style='text-align:right'>{{ number_format($val['asset_depreciation_book_value_this_year'], 2) }} </td>
                         
                     </tr>
                     @endforeach

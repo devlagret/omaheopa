@@ -63,12 +63,12 @@ class AcctAssetReportController extends Controller
         ->where('acct_asset_depreciation.data_state',0)
         ->get();
 
-        dump($sesi);
+        // dump($sesi);
         
         $last_year 		= $sesi['year_period'] - 1;
 		$prosentase		= $this->ProsentasePenyusutan();
         $acctasset = $this->getAcctAsset($sesi['branch_id'], $sesi['year']);
-        // echo json_encode($acctasset);exit;
+        // echo json_encode($last_year);exit;
         
         foreach ($acctasset as $key => $val) {
             $tahun_perolehan 					= substr($val['asset_purchase_date'],0,4);
