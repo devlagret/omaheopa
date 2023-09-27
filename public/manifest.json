@@ -13,10 +13,26 @@
     "start_url": ".",
     "background_color": "#202124",
     "display": "browser",
-    "display_override": ["browser"],
+    "display_override": ["minimal-ui","fullscreen"],
     "scope": "/",
     "theme_color": "#202124",
     "shortcuts": [
+      {
+        "name": "Buat Booking",
+        "url": "/booking",
+        "icons" :[
+          {
+            "src": "/resources/assets/img/logo_baru_mozaic/logo baru set-09.png",
+            "type": "image/png",
+            "sizes": "512x512"
+          },
+          {
+            "src": "/resources/assets/img/logo_baru_mozaic/logo baru set-09-96x96.png",
+            "type": "image/png",
+            "sizes": "96x96"
+          }
+        ]
+      }
     ],
     "description": "Aplikasi Manajemen Omah'e Opa",
     "screenshots": [
