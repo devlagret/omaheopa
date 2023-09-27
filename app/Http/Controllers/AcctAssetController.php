@@ -8,6 +8,9 @@ use App\Models\AcctAsset;
 use App\Models\AcctAssetReport;
 use App\Models\AcctAssetReportItem;
 use App\Models\AcctAssetType;
+use App\Models\JournalVoucher;
+use App\Models\JournalVoucherItem;
+use App\Models\PreferenceTransactionModule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -115,6 +118,8 @@ class AcctAssetController extends Controller
 
 		return $data;
 	}
+
+ 
     
 
     public function Journaldepreciation($asset_depreciation_item_id,$asset_id){
@@ -128,4 +133,85 @@ class AcctAssetController extends Controller
         // dd($acctasset,$acctassetItem,$acctaccount);
         return view('content.AcctAset.FormAddJournalAcctAsset',compact('acctasset','acctassetItem','acctaccount'));
     }
+
+    public function processAddJournal(Request $request)
+    {
+
+        // dd($request->all());
+        $transaction_module_code = 'AS';
+        $transaction_module_id = $this->getTransactionModuleID($transaction_module_code);
+        // $fields = $request->validate([
+        //     'journal_voucher_date'          => 'required',
+        //     'journal_voucher_description'   => 'required',
+            
+        // ]);
+
+        $datases = array(
+            'journal_voucher_date'          => $request['depreciation_date'],
+            'journal_voucher_description'   => $request['depreciation_description'],
+            'journal_voucher_title'         => $request['depreciation_description'],
+            'journal_voucher_period'        => date('Ym'),
+            'transaction_module_code'       => $transaction_module_code,
+            'transaction_module_id'         => $transaction_module_id,
+            'company_id'                    => Auth::user()->company_id,
+            'created_id'                    => Auth::id(),
+            'updated_id'                    => Auth::id()
+        );
+
+        
+        if(JournalVoucher::create($datases)){
+            $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
+
+            $account_default_status_debit = $this->getAccountDefaultStatus($request['account_id_debit']);
+            $account_default_status_credit = $this->getAccountDefaultStatus($request['account_id_credit']);
+
+              
+                    $datadebit = array(
+                        'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
+                        'account_id'                    => $request['account_id_debit'],
+                        'account_id_status'             => $account_default_status_debit,
+                        'account_id_default_status'     => $this->getAccountDefaultStatus($request['account_id_debit']),
+                        'journal_voucher_amount'        => $request['journal_voucher_debit_amount'],
+                        'journal_voucher_debit_amount'  => $request['journal_voucher_debit_amount'],
+                        'created_id'                    => Auth::id(),
+                        'updated_id'                    => Auth::id()
+                    );
+                    JournalVoucherItem::create($datadebit);
+                    $datacredit = array(
+                        'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
+                        'account_id'                    => $request['account_id_credit'],
+                        'account_id_status'             => $account_default_status_credit,
+                        'account_id_default_status'     => $this->getAccountDefaultStatus($request['account_id_credit']),
+                        'journal_voucher_amount'        => $request['journal_voucher_credit_amount'],
+                        'journal_voucher_credit_amount' => $request['journal_voucher_credit_amount'],
+                        'created_id'                    => Auth::id(),
+                        'updated_id'                    => Auth::id()
+                    );
+                    JournalVoucherItem::create($datacredit);
+
+    
+
+            
+
+            $msg = 'Tambah Jurnal Umum Berhasil';
+            return redirect('/aset')->with('msg',$msg);
+        } else {
+            $msg = 'Tambah Jurnal Umum Gagal';
+            return redirect('/aset')->with('msg',$msg);
+        }
+    }
+
+    public function getAccountDefaultStatus($account_id)
+    {
+        $data = AcctAccount::where('account_id',$account_id)->first();
+        // dd($data);exit;
+        return $data['account_status'];
+    }
+    public function getTransactionModuleID($transaction_module_code)
+    {
+        $data = PreferenceTransactionModule::where('transaction_module_code',$transaction_module_code)->first();
+
+        return $data['transaction_module_id'];
+    }
+
 }
