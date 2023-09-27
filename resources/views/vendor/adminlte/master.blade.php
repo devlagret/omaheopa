@@ -197,26 +197,6 @@
                     .split('').reverse().join('');
                 return rupiah + ',' + cents.slice(0, 2);
             }
-
-            function quote() {
-                var data;
-
-                $.ajax({
-                    type: "GET",
-                    url: "{{ route('quote') }}",
-                    dataType: "html",
-                    async: false,
-                    success: function(return_data) {
-                        data = return_data;
-                    },
-                    error: function(data) {
-                        console.log(data);
-                        data =
-                            "Hanya seseorang yang takut yang bisa bertindak berani. Tanpa rasa takut itu tidak ada apa pun yang bisa disebut berani";
-                    }
-                });
-                return data;
-            }
             $(document).ready(function() {
                 $('#example').dataTable({
                     "aLengthMenu": [
@@ -238,24 +218,27 @@
                     // ]
                 });
                 $('#example').addClass('pull-left');
-                // $(".datatables").each(function() {
-                //     $(this).dataTable({
-                //         "aLengthMenu": [
-                //             [5, 15, 20, -1],
-                //             [5, 15, 20, "All"]
-                //         ],
-                //         "iDisplayLength": 5,
-                //     });
-                //     $(this).addClass('pull-left');
-                // });
             });
             $(document).ready(function() {
                 $("[data-toggle=popover]").popover({
                     trigger: 'focus',
-                    content: function() {
-                        return quote();
-                    }
+                    content: '<div class="spinner-border spinner-border-sm text-secondary" role="status"><span class="sr-only">Loading...</span></div>',
                 });
+                $("[data-toggle=popover]").on("shown.bs.popover", function () {
+                    $.ajax({
+                        url: "{{ route('quote') }}",
+                        type: "GET",
+                        success: function (result) {
+                            $(".popover-body").html(result);
+                            $("[data-toggle=popover]").popover("update");
+                        },
+                        error: function (data) {
+                            console.log(data);
+                            $(".popover-body").html("<em class='text-danger'>Error ... </em>");
+                        }
+                    });
+                });
+
                 $('.selection-search-clear').select2({
                     theme: "bootstrap",
                     placeholder: "Select",
