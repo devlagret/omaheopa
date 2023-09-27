@@ -77,20 +77,85 @@
                      <div class="row form-group">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <a class="text-dark">Kode Jenis Aset<a class='red'> *</a></a>
-                                <input class="form-control input-bb" name="asset_type_code" id="asset_type_code" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value)" value="{{ $suppliers['supplier_name'] ??''}}"/>
+                                <a class="text-dark">Tipe Aset<a class='red'> *</a></a>
+                                {!! Form::select('asset_type_id', $acctassettype, [
+                                'class' => 'selection-search-clear select-form',
+                                'id' => 'asset_type_id',
+                                'name' => 'asset_type_id',
+                                'onchange' => 'function_elements_add(this.name, this.value)',
+                            ]) !!}
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <a class="text-dark">Nama Jenis Aset</a>
-                                <input class="form-control input-bb" name="asset_type_name" id="asset_type_name" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value)" value="{{ $suppliers['supplier_mobile_phone1'] ??''}}"/>
+                                <a class="text-dark">Kode Aset<a class='red'> *</a></a>
+                                <input class="form-control input-bb" name="asset_code" id="asset_code" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value)"/>
                             </div>
                         </div>
-                        <div class="col-md-8">
+                        
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <a class="text-dark">Nama Aset</a>
+                                <input class="form-control input-bb" name="asset_name" id="asset_name" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value)" />
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <a class="text-dark">Tanggal Pembelian</a>
+                                <input class="form-control input-bb" name="asset_purchase_date" id="asset_purchase_date" type="date" autocomplete="off" onchange="function_elements_add(this.name, this.value)"/>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <a class="text-dark">Satuan</a>
+                                <input class="form-control input-bb" name="item_unit_code" id="item_unit_code" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value)" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <a class="text-dark">Harga Pembelian</a>
+                                <input class="form-control input-bb" name="asset_purchase_value" id="asset_purchase_value" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value)" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <a class="text-dark">Metode Penyusutan<a class='red'> *</a></a>
+                                {!! Form::select('asset_depreciation_type', $depreciation_method, [
+                                'class' => 'selection-search-clear select-form',
+                                'id' => 'asset_depreciation_type',
+                                'name' => 'asset_depreciation_type',
+                                'onchange' => 'function_elements_add(this.name, this.value)',
+                            ]) !!}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <a class="text-dark">Nilai Perolehan</a>
+                                <input class="form-control input-bb" name="asset_book_value" id="asset_book_value" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value)" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <a class="text-dark">Taksiran Usia</a>
+                                <input class="form-control input-bb" name="asset_estimated_lifespan" id="asset_estimated_lifespan" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value)" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <a class="text-dark">Nilai Residu</a>
+                                <input class="form-control input-bb" name="asset_salvage_value" id="asset_salvage_value" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value)" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <a class="text-dark">Detail Lokasi</a>
+                                <input class="form-control input-bb" name="asset_location_detail" id="asset_location_detail" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value)" />
+                            </div>
+                        </div>
+                        <div class="col-md-12">
                             <div class="form-group">
                                 <a class="text-dark">Deskripsi</a>
-                                <textarea class="form-control input-bb" name="asset_type_description" id="asset_type_description" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value)">{{ $suppliers['supplier_address'] ??''}}</textarea>
+                                <input class="form-control input-bb" name="asset_description" id="asset_description" type="text" autocomplete="off" onchange="function_elements_add(this.name, this.value)" />
                             </div>
                         </div>
                     </div>
