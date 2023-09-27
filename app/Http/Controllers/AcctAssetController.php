@@ -30,8 +30,16 @@ class AcctAssetController extends Controller
         return view('content.AcctAset.ListAcctAsset',compact('aset'));
     }
     public function add() {
+
+        $acctassettype = AcctAssetType::select('asset_type_id','asset_type_name')
+		->where('data_state', 0)
+        ->get()
+        ->pluck('asset_type_name','asset_type_id');
+
         $sessiondata = Session::get('supplier-data');
-        return view('content.AcctAsetType.FormAddAcctAssetType',compact('sessiondata'));
+        $depreciation_method = array (1 => 'Garis Lurus');
+
+        return view('content.AcctAset.FormAddAcctAsset',compact('sessiondata','depreciation_method','acctassettype'));
     }
 
     public function getAssetTypeName($asset_type_id){
@@ -96,4 +104,212 @@ class AcctAssetController extends Controller
 
 		return $data;
 	}	
+
+    public function processAdd(Request $request){
+
+        $fields = $request->validate([
+            // 'purchase_invoice_supplier' => 'required',
+            'asset_type_id'             => 'required',
+            'asset_code'                => 'required',
+            'asset_name'                => 'required',
+            'asset_purchase_date'       => 'required',
+            'item_unit_code'            => 'required',
+            'asset_purchase_value'      => 'required',  
+            'asset_depreciation_type'   => 'required',
+            'asset_book_value'          => 'required'
+        ]);
+
+        $data= array (
+            'branch_id'					=> 1,
+            'asset_type_id'				=> $fields['asset_type_id'],
+            // 'location_id'				=> $fields['location_id'],
+            'asset_code'				=> $fields['asset_code'],
+            'asset_name'				=> $fields['asset_name'],
+            'item_unit_code'			=> $fields['item_unit_code'],
+            'asset_purchase_date'		=> $fields['asset_purchase_date'],
+            'asset_purchase_value'		=> $fields['asset_purchase_value'],
+            'asset_depreciation_type'	=> $fields['asset_depreciation_type'],
+            'asset_book_value'			=> $fields['asset_book_value'],
+            'asset_estimated_lifespan'	=> $request['asset_estimated_lifespan'],
+            'asset_salvage_value'		=> $request['asset_salvage_value'],
+            'asset_location_detail'		=> $request['asset_location_detail'],
+            'asset_description'			=> $request['asset_description'],
+            'created_id'				=> Auth::id()
+        );
+
+        AcctAsset::create($data);
+        
+                    $depreciation_month 		= $data['asset_estimated_lifespan'] * 12;
+					$depreciation_start_month 	= date('m', strtotime('+1 months', strtotime($data['asset_purchase_date'])));
+					$depreciation_start_year 	= date('Y', strtotime($data['asset_purchase_date']));
+					$depreciation_end_month		= date('m', strtotime('+'.$depreciation_month.' months', strtotime($data['asset_purchase_date'])));
+					$depreciation_end_year		= date('Y', strtotime('+'.$data['asset_estimated_lifespan'].' years', strtotime($data['asset_purchase_date'])));
+
+                    $asset_id = AcctAsset::orderBy('created_at', 'DESC')->first();
+                
+                    $datadepreciation = array (
+						'asset_id'							=> $asset_id['asset_id'],
+						'asset_type_id'						=> $data['asset_type_id'],
+						'branch_id'							=> 1,
+						'asset_depreciation_date'			=> $data['asset_purchase_date'],
+						'asset_depreciation_duration'		=> $data['asset_estimated_lifespan'],
+						'asset_depreciation_start_month'	=> $depreciation_start_month,
+						'asset_depreciation_start_year'		=> $depreciation_start_year,
+						'asset_depreciation_end_month'		=> $depreciation_end_month,
+						'asset_depreciation_end_year'		=> $depreciation_end_year,
+						'asset_depreciation_book_value'		=> $data['asset_book_value'],
+						'asset_depreciation_salvage_value'	=> $data['asset_salvage_value'],
+						'created_on'						=> date('Y-m-d H:i:s'),
+						'created_id'						=> Auth::id(),
+					);
+                        // dump($datadepreciation);
+
+                        // }
+                        
+            if(AcctAssetReport::create($datadepreciation)){
+                $asset_depreciation_id = AcctAssetReport::orderBy('created_at', 'DESC')->first();
+                $datadepreciationitem = collect();
+                        $month 				= $depreciation_start_month;
+						$year 				= $depreciation_start_year;
+
+						if($data['asset_depreciation_type'] == 1){
+
+							
+							$nilai_buku 		= $data['asset_book_value'];
+							$akm_penyusutan 	= 0;
+
+							for ($i=1; $i <= $data['asset_estimated_lifespan'] ; $i++) { 
+								
+								if($i == $data['asset_estimated_lifespan']){
+									$by_penyusutan_tahun = $nilai_buku - $data['asset_salvage_value'];
+								} else {
+									$by_penyusutan_tahun 	= ($data['asset_book_value'] - $data['asset_salvage_value']) / $data['asset_estimated_lifespan'];
+								}
+
+								$by_penyusutan_bulan 	= ($by_penyusutan_tahun) / 12;
+
+								for ($j=1; $j <= 12 ; $j++) { 
+									if($month == 13){
+										$month = 01;
+										$year = $year + 1;
+									}
+
+									
+									$akm_penyusutan 	= $akm_penyusutan + $by_penyusutan_bulan;
+									$nilai_buku 		= $nilai_buku - $by_penyusutan_bulan;
+
+									$datadepreciationitem->push([
+
+                                        'asset_depreciation_id'							=> $asset_depreciation_id['asset_depreciation_id'],
+										'asset_depreciation_item_year_to'				=> $i,
+										'asset_depreciation_item_month'					=> $month,
+										'asset_depreciation_item_year'					=> $year,
+										'asset_depreciation_item_amount'				=> $by_penyusutan_bulan,
+										'asset_depreciation_item_accumulation_amount'	=> $akm_penyusutan,
+										'asset_depreciation_item_book_value'			=> $nilai_buku,
+                                        ]
+									);
+
+									$month = $month + 01;
+                                    // dump($datadepreciationitem);
+                                    // AcctAssetReportItem ::create($datadepreciationitem);
+
+
+								}							
+							}
+
+						} else if($data['asset_depreciation_type'] == 2){
+
+							$nilai_buku 		= $data['asset_book_value'];
+							$akm_penyusutan 	= 0;
+							$prosentase_by 		= (100 / $data['asset_estimated_lifespan']) * 2;
+
+							for ($i=1; $i <= $data['asset_estimated_lifespan'] ; $i++) { 
+
+								if($i == $data['asset_estimated_lifespan']){
+									$by_penyusutan_tahun = $nilai_buku - $data['asset_salvage_value'];
+								} else {
+									$by_penyusutan_tahun 	= ($prosentase_by * $nilai_buku) / 100;
+								}
+
+								$by_penyusutan_bulan 	= ($by_penyusutan_tahun) / 12;
+
+								for ($j=1; $j <= 12 ; $j++) { 
+									if($month == 13){
+										$month = 01;
+										$year = $year + 1;
+									}
+
+									
+									$akm_penyusutan 	= $akm_penyusutan + $by_penyusutan_bulan;
+									$nilai_buku 		= $nilai_buku - $by_penyusutan_bulan;
+
+									$datadepreciationitem-> push ([
+										'asset_depreciation_id'							=> $asset_depreciation_id['asset_depreciation_id'],
+										'asset_depreciation_item_year_to'				=> $i,
+										'asset_depreciation_item_month'					=> $month,
+										'asset_depreciation_item_year'					=> $year,
+										'asset_depreciation_item_amount'				=> $by_penyusutan_bulan,
+										'asset_depreciation_item_accumulation_amount'	=> $akm_penyusutan,
+										'asset_depreciation_item_book_value'			=> $nilai_buku,
+									]);
+									$month = $month + 01;
+                                    AcctAssetReportItem ::create($datadepreciationitem);
+
+								}							
+							}
+
+						} else if($data['asset_depreciation_type'] == 3){
+
+							$nilai_buku 		= $data['asset_book_value'];
+							$nilai_perolehan 	= $data['asset_book_value'] - $data['asset_salvage_value'];
+							$akm_penyusutan 	= 0;
+							$jml_angka_th 		= ( $data['asset_estimated_lifespan'] * ($data['asset_estimated_lifespan'] + 1) ) / 2;
+
+							$n = $data['asset_estimated_lifespan'];
+
+							for ($i=1; $i <= $data['asset_estimated_lifespan']  ; $i++) { 
+
+								if($i == $data['asset_estimated_lifespan']){
+									$by_penyusutan_tahun = $nilai_buku - $data['asset_salvage_value'];
+								} else {
+									$by_penyusutan_tahun 	= ($n / $jml_angka_th) * $nilai_perolehan;
+								}
+								
+								$by_penyusutan_bulan 	= ($by_penyusutan_tahun) / 12;
+
+								for ($j=1; $j <= 12 ; $j++) { 
+									if($month == 13){
+										$month = 01;
+										$year = $year + 1;
+									}
+
+									
+									$akm_penyusutan 	= $akm_penyusutan + $by_penyusutan_bulan;
+									$nilai_buku 		= $nilai_buku - $by_penyusutan_bulan;
+
+									$datadepreciationitem->push([
+										'asset_depreciation_id'							=> $asset_depreciation_id['asset_depreciation_id'],
+										'asset_depreciation_item_year_to'				=> $i,
+										'asset_depreciation_item_month'					=> $month,
+										'asset_depreciation_item_year'					=> $year,
+										'asset_depreciation_item_amount'				=> $by_penyusutan_bulan,
+										'asset_depreciation_item_accumulation_amount'	=> $akm_penyusutan,
+										'asset_depreciation_item_book_value'			=> $nilai_buku,
+                                    ]);
+                                    
+									$month = $month + 01;
+								}
+								$n = $n -1;
+								
+							}
+                            
+						}
+                    }
+                    
+                    // dump($datadepreciationitem);
+                    AcctAssetReportItem ::insert($datadepreciationitem->toArray());
+                                            $msg = 'Tambah Asset Berhasil';
+                                            return redirect('/aset')->with('msg',$msg);
+                    }
 }
