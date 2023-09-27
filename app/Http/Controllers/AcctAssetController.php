@@ -57,7 +57,8 @@ class AcctAssetController extends Controller
         $acctassetItem = $this->getAcctAssetDepreciationItem_Detail($asset_id);
         $account    = $this->getAcctAccount($asset_id);
 
-        // dd($acctasset,$acctassetItem,$account);
+        // return json_encode($acctassetItem);
+        // exit;
         return view('content.AcctAset.FormDetailAcctAssetDepreciation',compact('acctasset','acctassetItem','account'));
     }
 
