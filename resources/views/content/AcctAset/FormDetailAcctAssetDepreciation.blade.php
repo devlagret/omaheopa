@@ -216,7 +216,7 @@
 
                                     <?php if($row['asset_depreciation_item_journal_status'] == 0){ ?>
                                         <td align='center'>
-                                            <a href="" class='btn default btn-sm btn-success'><i class="fa fa-pen"></i> Posting Jurnal</a>
+                                            <a href="{{ route('aset.depreciation',$row->asset_depreciation_item_id.'/'.$row->asset_id) }}" class='btn default btn-sm btn-success'><i class="fa fa-pen"></i> Posting Jurnal</a>
                                             </td>
                                     <?php }else{ ?>
                                         <td align='center'>
