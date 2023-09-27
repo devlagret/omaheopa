@@ -120,7 +120,7 @@
                     <tbody>
                         <tr>
                             <td>
-                                {!! Form::select('account_id_debit',  $acctaccount, null, ['class' => 'selection-search-clear select-form', 'id' => 'account_id_debit', 'onchange' => 'elements_add(this.name , this.value);']) !!}
+                                {!! Form::select('account_id_debit',  $acctaccount, null, ['class' => 'selection-search-clear select-form', 'id' => 'account_id_debit', 'onchange' => 'function_elements_add(this.name , this.value);']) !!}
                             </td>
                             <td>
                                 <input type="hidden" name="journal_voucher_debit_amount" id="journal_voucher_debit_amount" value="{{ $acctassetItem['asset_depreciation_item_amount']; }} " class="form-control">
@@ -132,7 +132,7 @@
 
                         <tr>
                             <td>
-                                {!! Form::select('account_id_credit',  $acctaccount, null, ['class' => 'selection-search-clear select-form', 'id' => 'account_id_credit', 'onchange' => 'elements_add(this.name , this.value);']) !!}
+                                {!! Form::select('account_id_credit',  $acctaccount, null, ['class' => 'selection-search-clear select-form', 'id' => 'account_id_credit', 'onchange' => 'function_elements_add(this.name , this.value);']) !!}
                             </td>
                             <td></td>
                             <td>
