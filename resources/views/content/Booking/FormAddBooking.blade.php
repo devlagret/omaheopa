@@ -1091,12 +1091,13 @@ if (empty($paket)) {
                                         class="table table-striped table-bordered datatables table-hover table-full-width">
                                         <thead>
                                             <tr>
-                                                <th width="2%" style='text-align:center'>No</th>
+                                                <th width="1%" style='text-align:center'>No</th>
                                                 <th width="15%" style='text-align:center'>Nama Kamar</th>
                                                 <th width="15%" style='text-align:center'>Tipe Kamar</th>
                                                 <th width="15%" style='text-align:center'>Bangunan</th>
                                                 <th width="13%" style='text-align:center'>Jumlah Orang</th>
-                                                <th colspan="2" width="30%" style='text-align:center'>Harga Kamar</th>
+                                                <th width="10%" style='text-align:center'>Tipe Harga</th>
+                                                <th width="30%" style='text-align:center'>Harga Kamar</th>
                                                 <th width="20%" style='text-align:center'>Subtotal</th>
                                                 <th width="10%" style='text-align:center'>Aksi</th>
                                             </tr>
