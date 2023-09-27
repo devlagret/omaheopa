@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Session;
 
 class InvtItemCategoryController extends Controller
 {
+    protected $merchant_id;
     public function __construct()
     {
         $this->middleware('auth');
@@ -22,26 +23,26 @@ class InvtItemCategoryController extends Controller
     public function index()
     {
         Session::forget('datacategory');
-        $data = InvtItemCategory::where('data_state', 0)
+        $sessiondata = Session::get('cat-filter');
+        $data = InvtItemCategory::with('merchant')->where('data_state', 0)
         ->where('company_id', Auth::user()->company_id)
-        ->with('merchant');
-
+        ;
+        $admin = 1;
         //filter prepend
-        $merchant   = SalesMerchant::where('data_state', 0);
-        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
-            $merchant->where('merchant_id',Auth::user()->merchant_id);
-        }
-        $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
-        $merchant = $merchant->prepend('Tampil Semua',0);
-        // dump($merchant);
-
+        $merchant   = SalesMerchant::where('data_state', 0)->get()->pluck('merchant_name', 'merchant_id')->prepend('Tampil Semua',0);
         if(Auth::id()!=1||Auth::user()->merchant_id!=null){
             $data->where('merchant_id',Auth::user()->merchant_id);
         }
+        if(isset($sessiondata)&&$sessiondata){
+            $data->where('merchant_id',$sessiondata);
+        }
         $data =$data->get();
-        return view('content.InvtItemCategory.ListInvtItemCategory', compact('data','merchant'));
+        return view('content.InvtItemCategory.ListInvtItemCategory', compact('data','merchant','admin','sessiondata'));
     }
-
+    public function filter(Request $request){
+       Session::put('cat-filter',$request->merchant_id);
+        return redirect()->route('item-category');
+    }
     public function addItemCategory($merchant_id = null)
     {
         $datacategory = Session::get('datacategory');

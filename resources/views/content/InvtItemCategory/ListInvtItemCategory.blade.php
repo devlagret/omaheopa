@@ -27,6 +27,42 @@
     {{session('msg')}}
 </div>
 @endif
+@if ($admin)    
+<div id="accordion">
+    <form  method="post" action="{{ route('category-filter') }}" enctype="multipart/form-data">
+    @csrf
+        <div class="card border border-dark">
+        <div class="card-header bg-dark" id="headingOne" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+            <h5 class="mb-0">
+                Filter
+            </h5>
+        </div>
+
+        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+            <div class="card-body">
+                    <div class="form-group">
+                            <div class="form-group">
+                                <a class="text-dark">Merchant<a class='red'> *</a></a>
+                                {!! Form::select('merchant_id', $merchant, $sessiondata ?? '', [
+                                    'class' => 'selection-search-clear required select-form',
+                                    'name' => 'merchant_id',
+                                    'id' => 'merchant_id',
+                                    'autofocus'=>'autofocus',
+                                ]) !!}
+                        </div>
+                </div>
+            </div>
+            <div class="card-footer text-muted">
+                <div class="form-actions float-right">
+                    <a href="{{ route('list-reset-stock-adjustment') }}" type="reset" name="Reset" class="btn btn-danger"><i class="fa fa-times"></i> Batal</a>
+                    <button type="submit" name="Find" class="btn btn-primary" title="Search Data"><i class="fa fa-search"></i> Cari</button>
+                </div>
+            </div>
+        </div>
+        </div>
+    </form>
+</div>
+@endif
 <div class="card border border-dark">
   <div class="card-header bg-dark clearfix">
     <h5 class="mb-0 float-left">
@@ -38,14 +74,6 @@
   </div>
 
     <div class="card-body">
-        {!! Form::select('merchant_id', $merchant, $items['merchant_id'] ?? '', [
-                            'class' => 'selection-search-clear required select-form',
-                            'name' => 'merchant_id',
-                            'id' => 'merchant_id',
-                            'onchange' => 'changeCategory()',
-                            'form' => 'form-paket',
-                            'autofocus'=>'autofocus',
-                        ]) !!}
         <div class="table-responsive">
             <table id="example" style="width:100%" class="table table-striped table-bordered table-hover table-full-width">
                 <thead>

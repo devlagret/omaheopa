@@ -92,6 +92,7 @@ Route::post('/item-unit/process-edit-item-unit', [InvtItemUnitController::class,
 Route::get('/item-unit/delete/{item_unit_id}', [InvtItemUnitController::class, 'deleteInvtItemUnit'])->name('delete-item-unit');
 
 Route::get('/item-category',[InvtItemCategoryController::class, 'index'])->name('item-category');
+Route::post('/item-category/filter',[InvtItemCategoryController::class, 'filter'])->name('category-filter');
 Route::get('/item-category/add/{merchant_id?}',[InvtItemCategoryController::class, 'addItemCategory'])->name('add-item-category');
 Route::post('/item-category/elements-add',[InvtItemCategoryController::class, 'elementsAddItemCategory'])->name('elements-add-category');
 Route::post('/item-category/process-add-category', [InvtItemCategoryController::class, 'processAddItemCategory'])->name('process-add-item-category');
