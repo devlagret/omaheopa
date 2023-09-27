@@ -1,0 +1,33 @@
+{
+    "short_name": "OMAPA",
+    "name": "Omah'e Opa",
+    "icons": [
+      {
+        "src": "/resources/assets/img/logo_baru_mozaic/logo baru set-09.png",
+        "type": "image/png",
+        "sizes": "192x192"
+      },
+      {
+        "src": "/resources/assets/img/logo_baru_mozaic/logo baru set-09.png",
+        "type": "image/png",
+        "sizes": "512x512"
+      }
+    ],
+    "id": "/?source=pwa",
+    "start_url": "/?source=pwa",
+    "background_color": "#343a40",
+    "display": "standalone",
+    "scope": "/",
+    "theme_color": "#343a40",
+    "shortcuts": [
+    ],
+    "description": "Aplikasi Manajeme Omah'e Opa",
+    "screenshots": [
+      {
+        "src": "/resources/assets/img/ss.png",
+        "type": "image/png",
+        "sizes": "540x720",
+        "form_factor": "narrow"
+      }
+    ]
+  }

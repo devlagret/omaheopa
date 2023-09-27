@@ -409,6 +409,7 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
     Route::get('/detail/{asset_type_id}', [AcctAssetController::class, 'detail'])->name('detail');
     Route::post('/process-edit', [AcctAssetController::class, 'processEdit'])->name('process-edit');
     Route::get('/depreciation/{asset_type_id}', [AcctAssetController::class, 'depreciation'])->name('depreciation');
+    Route::get('/depreciation/{asset_depreciation_item_id}/{asset_type_id}', [AcctAssetController::class, 'Journaldepreciation'])->name('Journaldepreciation');
     Route::post('/elements-add', [AcctAssetController::class, 'elementsAdd'])->name('elements-add');
 });
  // aset report pages
