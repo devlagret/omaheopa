@@ -78,7 +78,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <a class="text-dark">Tipe Aset<a class='red'> *</a></a>
-                                {!! Form::select('asset_type_id', $acctassettype, [
+                                {!! Form::select('asset_type_id', $acctassettype,0, [
                                 'class' => 'selection-search-clear select-form',
                                 'id' => 'asset_type_id',
                                 'name' => 'asset_type_id',
@@ -120,7 +120,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <a class="text-dark">Metode Penyusutan<a class='red'> *</a></a>
-                                {!! Form::select('asset_depreciation_type', $depreciation_method, [
+                                {!! Form::select('asset_depreciation_type', $depreciation_method,0, [
                                 'class' => 'selection-search-clear select-form',
                                 'id' => 'asset_depreciation_type',
                                 'name' => 'asset_depreciation_type',

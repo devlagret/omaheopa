@@ -350,8 +350,6 @@ class AcctAssetController extends Controller
                 
                     public function processAddJournal(Request $request)
                     {
-                
-                        // dd($request->all());
                         $transaction_module_code = 'AS';
                         $transaction_module_id = $this->getTransactionModuleID($transaction_module_code);
                         // $fields = $request->validate([
@@ -359,7 +357,11 @@ class AcctAssetController extends Controller
                         //     'journal_voucher_description'   => 'required',
                 
                         // ]);
-                
+
+                            $table = AcctAssetReportItem::findOrFail($request['asset_depreciation_item_id']);
+                            $table->asset_depreciation_item_journal_status = 1;
+                            $table->save();
+
                         $datases = array(
                             'journal_voucher_date'          => $request['depreciation_date'],
                             'journal_voucher_description'   => $request['depreciation_description'],
@@ -402,10 +404,6 @@ class AcctAssetController extends Controller
                                         'updated_id'                    => Auth::id()
                                     );
                                     JournalVoucherItem::create($datacredit);
-                
-                
-                
-                
                 
                             $msg = 'Tambah Jurnal Umum Berhasil';
                             return redirect('/aset')->with('msg',$msg);
