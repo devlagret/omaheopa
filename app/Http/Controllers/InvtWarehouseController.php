@@ -21,8 +21,11 @@ class InvtWarehouseController extends Controller
     {
         Session::forget('warehouses');
         $data = InvtWarehouse::with('merchant')->where('data_state','=',0)
-        ->where('company_id', Auth::user()->company_id)
-        ->get();
+        ->where('company_id', Auth::user()->company_id);
+        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
+            $data->where('merchant_id',Auth::user()->merchant_id);
+        }
+        $data = $data->get();
         return view('content.InvtWarehouse.ListInvtWarehouse', compact('data'));
     }
 

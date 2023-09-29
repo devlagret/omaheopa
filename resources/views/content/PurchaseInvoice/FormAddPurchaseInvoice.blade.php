@@ -18,6 +18,9 @@
         }
 
         $(document).ready(function() {
+            if($('#merchant_id_view').val()!=''){
+                $('#merchant_id').val($('#merchant_id_view').val());
+            }
             $("#quantity").change(function() {
                 var quantity = $("#quantity").val();
                 var cost = $("#item_unit_cost").val();
@@ -227,7 +230,10 @@
 
         function changeCategory() {
             loading();
-            var merchant_id = $("#merchant_id").val();
+            if($('#merchant_id_view').val()!=''){
+                $('#merchant_id').val($('#merchant_id_view').val());
+            }
+            var merchant_id = $("#merchant_id_view").val();
             $.ajax({
                 type: "POST",
                 url: "{{ route('get-item-category') }}",
@@ -487,11 +493,13 @@
                             <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
                             {!! Form::select('merchant_id', $merchant, $items['merchant_id'] ?? '', [
                                 'class' => 'selection-search-clear item-required select-form',
-                                'name' => 'merchant_id',
-                                'id' => 'merchant_id',
+                                'name' => 'merchant_id_view',
+                                'id' => 'merchant_id_view',
                                 'onchange' => 'changeCategory()',
                                 'form' => 'form-paket',
+                                $merchant->count()==1?"disabled":''
                             ]) !!}
+                        <input type="hidden" name="merchant_id" id="merchant_id">
                         </div>
                     </div>
                     <div class="col-md-6">

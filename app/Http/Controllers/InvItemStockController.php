@@ -59,7 +59,7 @@ class InvItemStockController extends Controller
         
         $warehouse_id       = Session::get('filterwarehouseid');
         
-        $invitemstock       = InvtItemStock::select('invt_item_stock.*')
+        $invitemstock       = InvtItemStock::with('item.merchant','unit','category','warehouse')
         // ->join('')
         ->where('invt_item_stock.data_state','=',0);
         if($item_category_id||$item_category_id!=null||$item_category_id!=''){

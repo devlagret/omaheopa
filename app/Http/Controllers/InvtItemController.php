@@ -263,30 +263,27 @@ class InvtItemController extends Controller
         DB::beginTransaction();
         $table       = InvtItem::findOrFail($fields['item_id']);
         $packageitem = InvtItemPackage::with('unit')->where('package_item_id',$fields['item_id']);
-        foreach ($warehouse as $key => $val) {
-           $stok = InvtItemStock::where('company_id',Auth::user()->company_id)
-            ->where('item_id',$table['item_id'])
-            ->where('item_category_id',$table['item_category_id'])
-            ->where('warehouse_id',$val['warehouse_id'])
-            ->where('item_unit_id',$table['item_unit_id1'])
-            ->first();
-            $stok->item_unit_id = $request->item_unit_id1;
-            $stok->save();
-        }
-            for($l=1;$l<=4;$l++){
-                if($table['item_unit_id'.$l] != $request['item_unit_id'.$l]){
-                    if($table['item_unit_id'.$l]!=null && $request['item_unit_id'.$l]==null){
-                        if($packageitem->where('data_state',0)->where('item_unit_id',$table['item_unit_id'.$l])->get()->count()){
-                        return redirect()->back()->withErrors('Ada Paket yang Menggunankan Item "'.$table->item_name.'" Dengan Satuan "'.$packageitem->where('data_state',0)->where('item_unit_id',$table['item_unit_id'.$l])->first()->unit->item_unit_name.'". Harap Tidak Menghapus Satuan Tersebut.' );
-                    }
-                    }
-                    /*if($table['item_unit_id'.$l]!=null&&$request->used_in_package){
-                        $itmpackage = InvtItemPackage::where('item_id',$fields['item_id'])->where('item_unit_id',$table['item_unit_id'.$l]);
-                        $itmpackage->update(['item_unit_id'=> $request['item_unit_id'.$l]]);
-                    }*/
+        for($l=1;$l<=4;$l++){
+            if($table['item_unit_id'.$l] != $request['item_unit_id'.$l]){
+                if($table['item_unit_id'.$l]!=null && $request['item_unit_id'.$l]==null){
+                    if($packageitem->where('data_state',0)->where('item_unit_id',$table['item_unit_id'.$l])->get()->count()){
+                    return redirect()->back()->withErrors('Ada Paket yang Menggunankan Item "'.$table->item_name.'" Dengan Satuan "'.$packageitem->where('data_state',0)->where('item_unit_id',$table['item_unit_id'.$l])->first()->unit->item_unit_name.'". Harap Tidak Menghapus Satuan Tersebut.' );
                 }
+                }
+                /*if($table['item_unit_id'.$l]!=null&&$request->used_in_package){
+                    $itmpackage = InvtItemPackage::where('item_id',$fields['item_id'])->where('item_unit_id',$table['item_unit_id'.$l]);
+                    $itmpackage->update(['item_unit_id'=> $request['item_unit_id'.$l]]);
+                }*/
             }
-
+        }
+        foreach ($warehouse as $key => $val) {
+            InvtItemStock::updateOrCreate(['company_id'=>Auth::user()->company_id,
+                'item_id'=>$table['item_id'],
+                'item_category_id'=>$table['item_category_id'],
+                'warehouse_id'=>$val['warehouse_id'],
+                'item_unit_id'=>$table['item_unit_id1']
+            ],['item_unit_id'=>$request->item_unit_id1]);
+        }
         $table->item_category_id        = $fields['item_category_id'];
         $table->item_code               = $fields['item_code'];
         $table->item_name               = $fields['item_name'];
@@ -315,25 +312,15 @@ class InvtItemController extends Controller
         if($paket->count()&&empty(Session::get('paket'))){
             $itm = "Paket";
             $paket->delete();
-        }else if($paket->count()&&!empty(Session::get('paket'))){
+        }else{
             $itm = "Paket";
             $paket->delete();
-        foreach($paketarr as $vala){
-            InvtItemPackage::create([
-                'item_id' => $fields['item_id'],
-                'package_item_id' => array_keys($vala)[0],
-                'item_quantity' => $vala[array_keys($vala)[0]][0],
-                'item_unit_id' => $vala[array_keys($vala)[0]][1],
-            ]);
-        }
-        }else if(!$paketarr->count()&&!empty(Session::get('paket'))){
-            $itm = "Paket";
-            foreach($paket as $valb){
+            foreach($paketarr as $vala){
                 InvtItemPackage::create([
                     'item_id' => $fields['item_id'],
-                    'package_item_id' => array_keys($valb)[0],
-                    'item_quantity' => $valb[array_keys($valb)[0]][0],
-                    'item_unit_id' => $valb[array_keys($valb)[0]][1],
+                    'package_item_id' => array_keys($vala)[0],
+                    'item_quantity' => $vala[array_keys($vala)[0]][0],
+                    'item_unit_id' => $vala[array_keys($vala)[0]][1],
                 ]);
             }
         }
@@ -347,7 +334,6 @@ class InvtItemController extends Controller
             return redirect('/item')->with('msg', $msg);
         }}catch(\Exception $e){
             report($e);
-            dump($e);exit;
             DB::rollBack();
             $msg = "Ubah ".$itm." Gagal";
             return redirect('/item')->with('msg', $msg);

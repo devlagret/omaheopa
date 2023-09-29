@@ -48,6 +48,9 @@ if (empty($paket)) {
 
         function changeCategory(id, el, from_paket = 0) {
             loading();
+            if($('#'+id).val()!=''){
+                $('#merchant_id').val($('#'+id).val());
+            }
             var merchant_id = $("#" + id).val();
             console.log(id);
             $.ajax({
@@ -294,6 +297,9 @@ if (empty($paket)) {
             $('#package_price').val(harga);
         }
         $(document).ready(function() {
+            if($('#merchant_id_view').val()!=''){
+                $('#merchant_id').val($('#merchant_id_view').val());
+            }
             changeCategory('merchant_id', 'item_category_id');
             changeCategory('package_merchant_id', 'package_item_category', 1);
             checkCategory();
@@ -376,14 +382,16 @@ if (empty($paket)) {
                                 <div class="form-group">
                                     <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
                                     {!! Form::select('merchant_id', $merchant, $items['merchant_id'] ?? '', [
-                                        'class' => 'selection-search-clear required select-form',
-                                        'name' => 'merchant_id',
-                                        'id' => 'merchant_id',
+                                        'class' => 'selection-search-clear required select-form '.($merchant->count()==1?"disabled":""),
+                                        'name' => 'merchant_id_view',
+                                        'id' => 'merchant_id_view',
                                         'onchange' => 'changeCategory(this.id,`item_category_id`)',
                                         'form' => 'form-barang',
                                         'autofocus' => 'autofocus',
                                         'required',
+                                        $merchant->count()==1?"disabled":''
                                     ]) !!}
+                                    <input type="hidden" name="merchant_id" id="merchant_id">
                                 </div>
                             </div>
                             <div class="col-6">

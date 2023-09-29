@@ -29,6 +29,15 @@
 
 		});
 	}
+    $(document).ready(function() {
+        if($('#merchant_id_view').val()!=''){
+            $('#merchant_id').val($('#merchant_id_view').val());
+        }
+        $("#merchant_id_view").change(function() {
+            $('#merchant_id').val(this.value);
+            function_elements_add(this.name, this.value)
+        });
+    })
 </script>
 @stop
 @section('content_header')
@@ -103,16 +112,13 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
-                            {!! Form::select('merchant_id', $merchant, $datacategory['merchant_id'] ?? '', [
-                                'class' => 'form-control selection-search-clear select-form required',
-                                'name' => 'merchant_id',
-                                'id' => 'merchant_id',
-                                'onchange' => 'function_elements_add(this.name, this.value)',
+                            {!! Form::select('merchant_id', $merchant, $datacategory['merchant_id_view'] ?? '', [
+                                'class' => 'form-control selection-search-clear select-form required '.($merchant->count() == 1||$datacategory['from_item']?'disabled':''),
+                                'name' => 'merchant_id_view',
+                                'id' => 'merchant_id_view',
                                 $merchant->count() == 1||$datacategory['from_item']?'disabled':''
                             ]) !!}
-                            @if ($merchant->count() == 1||$datacategory['from_item'])
-                                <input type="hidden" name="merchant_id" value="{{$datacategory['merchant_id'] }}">
-                            @endif
+                                <input type="hidden" name="merchant_id" id="merchant_id"/>
                         </div>
                     </div>
                 <div class="col-md-8 mt-3">

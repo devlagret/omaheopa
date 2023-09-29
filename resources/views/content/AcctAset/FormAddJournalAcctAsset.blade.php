@@ -96,7 +96,7 @@
                     <div class="form-group">
                         <a class="text-dark">Tanggal Penyusutan<a class='red'> *</a></a>
                         <input class="form-control input-bb" name="depreciation_date" id="depreciation_date"
-                            type="date" autocomplete="off" value="{{ date('Y-m-d');  }}" />
+                            type="date" autocomplete="off" value="{{ date('Y-m-d') }}" />
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -123,9 +123,9 @@
                                 {!! Form::select('account_id_debit',  $acctaccount, null, ['class' => 'selection-search-clear select-form', 'id' => 'account_id_debit', 'onchange' => 'function_elements_add(this.name , this.value);']) !!}
                             </td>
                             <td>
-                                <input type="hidden" name="journal_voucher_debit_amount" id="journal_voucher_debit_amount" value="{{ $acctassetItem['asset_depreciation_item_amount']; }} " class="form-control">
+                                <input type="hidden" name="journal_voucher_debit_amount" id="journal_voucher_debit_amount" value="{{ $acctassetItem['asset_depreciation_item_amount'] }} " class="form-control">
 
-                                <input type="text" style="text-align:right" name="journal_voucher_debit_amount_view" id="journal_voucher_debit_amount_view" value="{{ number_format($acctassetItem['asset_depreciation_item_amount'], 2); }} " class="form-control">
+                                <input type="text" style="text-align:right" name="journal_voucher_debit_amount_view" id="journal_voucher_debit_amount_view" value="{{ number_format($acctassetItem['asset_depreciation_item_amount'], 2) }} " class="form-control">
                             </td>
                             <td></td>
                         </tr>
@@ -136,9 +136,9 @@
                             </td>
                             <td></td>
                             <td>
-                                <input type="hidden" name="journal_voucher_credit_amount" id="journal_voucher_credit_amount" value="{{ $acctassetItem['asset_depreciation_item_amount']; }} " class="form-control">
+                                <input type="hidden" name="journal_voucher_credit_amount" id="journal_voucher_credit_amount" value="{{ $acctassetItem['asset_depreciation_item_amount'] }} " class="form-control">
 
-                                <input type="text" style="text-align:right" name="journal_voucher_credit_amount_view" id="journal_voucher_credit_amount_view" value="{{ number_format($acctassetItem['asset_depreciation_item_amount'], 2); }} " class="form-control">
+                                <input type="text" style="text-align:right" name="journal_voucher_credit_amount_view" id="journal_voucher_credit_amount_view" value="{{ number_format($acctassetItem['asset_depreciation_item_amount'], 2) }} " class="form-control">
                             </td>
                             <input type="text" style="text-align:right" name="asset_depreciation_item_id" id="asset_depreciation_item_id" value="{{ $acctassetItem['asset_depreciation_item_id']; }} " class="form-control" hidden>
                             <input type="text" style="text-align:right" name="asset_depreciation_id" id="asset_depreciation_id" value="{{ $acctassetItem['asset_depreciation_id']; }} " class="form-control" hidden>

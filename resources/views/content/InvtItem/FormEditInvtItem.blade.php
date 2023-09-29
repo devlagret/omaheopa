@@ -55,6 +55,9 @@ if (empty($pktitem)) {
 
         function changeCategory(id, el, from_paket = 0) {
             loading();
+            if($('#'+id).val()!=''){
+                $('#merchant_id').val($('#'+id).val());
+            }
             var merchant_id = $("#" + id).val();
             console.log(id);
             $.ajax({
@@ -137,6 +140,9 @@ if (empty($pktitem)) {
             });
         }
         $(document).ready(function() {
+            if($('#merchant_id_view').val()!=''){
+                $('#merchant_id').val($('#merchant_id_view').val());
+            }
             changeCategory('merchant_id', 'item_category_id');
             changeCategory('package_merchant_id', 'package_item_category', 1);
             checkKemasan();
@@ -206,7 +212,7 @@ if (empty($pktitem)) {
                             data-toggle="tab">Kemasan</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ $counts->count() >= 1 ? 'active' : '' }}" href="#form-pkt" role="tab"
+                        <a class="nav-link {{!empty($pkg)&&!$pktitem->count()?"disabled":''}} {{ $counts->count() >= 1 ? 'active' : '' }}" href="#form-pkt" role="tab"
                             data-toggle="tab">Paket</a>
                     </li>
                 </ul>
@@ -222,18 +228,17 @@ if (empty($pktitem)) {
                                         $merchant,
                                         isset($items['merchant_id']) ? $items['merchant_id'] : $data['merchant_id'],
                                         [
-                                            'class' => 'selection-search-clear required select-form',
-                                            'name' => 'merchant_id',
-                                            'id' => 'merchant_id',
+                                            'class' => 'selection-search-clear required select-form '.($merchant->count()==1||!empty($pkg)?"disabled":""),
+                                            'name' => 'merchant_id_view',
+                                            'id' => 'merchant_id_view',
                                             'onchange' => 'changeCategory(`' . route('get-item-category') . '`,`' . csrf_token() . '`)',
                                             'form' => 'form-barang',
                                             'required',
-                                            !empty($pkg) ? 'disabled' : '',
+                                            $merchant->count()==1||!empty($pkg)?"disabled":''
                                         ],
                                     ) !!}
-                                    @if (!empty($pkg))
-                                        <input type="hidden" name="merchant_id" value="{{ $data['merchant_id'] }}" />
-                                    @endif
+                                    <input type="hidden" name="merchant_id" id="merchant_id">
+
                                 </div>
                             </div>
                             <div class="col-md-6">

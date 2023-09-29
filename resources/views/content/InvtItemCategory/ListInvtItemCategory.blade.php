@@ -27,7 +27,7 @@
     {{session('msg')}}
 </div>
 @endif
-@if ($admin)    
+@if ($admin)
 <div id="accordion">
     <form  method="post" action="{{ route('category-filter') }}" enctype="multipart/form-data">
     @csrf

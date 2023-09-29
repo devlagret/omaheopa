@@ -33,6 +33,13 @@ $(document).ready(function() {
             $('#input-merchant').hide();
             $('#gp-input').addClass('col-md-6').removeClass('col-md-1');
         }
+        if($('#merchant_id_view').val()!=''){
+            $('#merchant_id').val($('#merchant_id_view').val());
+        }
+        $("#merchant_id_view").change(function() {
+            $('#merchant_id').val(this.value);
+            function_elements_add(this.name, this.value)
+        });
         $("#gp").click(function () {
             if(this.checked){
                 $('#merchant_id').prop('disabled', true);
@@ -98,23 +105,26 @@ $(document).ready(function() {
         @csrf
         <div class="card-body">
             <div class="row form-group">
+                @if ($merchant->count()>1)
                 <div id="gp-input" class="col-md-1">
                     <div class="form-check mt-4">
                         <input type="checkbox" class="form-check-input" {{ $data['merchant_id']==null?'checked':''}} id="gp">
                         <label class="form-check-label" for="exampleCheck1">Gudang Pusat</label>
                     </div>
                 </div>
+                @endif
                 <div class="col-md-5" id="input-merchant">
                     <div class="form-group">
                         <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
                         {!! Form::select('merchant_id', $merchant, $data['merchant_id'] ?? '', [
-                            'class' => 'selection-search-clear required select-form',
-                            'name' => 'merchant_id',
-                            'id' => 'merchant_id',
-                            'onchange' => 'function_elements_add(this.name, this.value)',
+                            'class' => 'selection-search-clear required select-form '.($merchant->count()==1?"disabled":""),
+                            'name' => 'merchant_id_view',
+                            'id' => 'merchant_id_view',
                             'autofocus' => 'autofocus',
                             'required',
+                            $merchant->count()==1?"disabled":''
                         ]) !!}
+                        <input type="hidden" name="merchant_id" id="merchant_id">
                     </div>
                 </div>
                 <div class="col-md-6">

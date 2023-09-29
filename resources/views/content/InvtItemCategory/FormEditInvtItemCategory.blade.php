@@ -2,7 +2,7 @@
 
 @section('title',  "MOZAIC Omah'e Opa")
 @section('js')
-{{-- <script>
+<script>
     function function_elements_add(name, value){
 		$.ajax({
 				type: "POST",
@@ -26,7 +26,16 @@
 
 		});
 	}
-</script> --}}
+    $(document).ready(function() {
+            if($('#merchant_id_view').val()!=''){
+                $('#merchant_id').val($('#merchant_id_view').val());
+            }
+            $("#merchant_id_view").change(function() {
+            $('#merchant_id').val(this.value);
+            function_elements_add(this.name, this.value)
+        });
+    });
+</script>
 @stop
 @section('content_header')
     
@@ -103,12 +112,14 @@
                         <div class="form-group">
                             <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
                             {!! Form::select('merchant_id', $merchant, $datacategory['merchant_id'] ?$datacategory['merchant_id']:$data->merchant_id, [
-                                'class' => 'form-control selection-search-clear select-form required',
-                                'name' => 'merchant_id',
-                                'id' => 'merchant_id',
+                                'class' => 'form-control selection-search-clear select-form required '.($merchant->count()==1||!empty($pkg)?"disabled":""),
+                                'name' => 'merchant_id_view',
+                                'id' => 'merchant_id_view',
                                 'onchange' => 'function_elements_add(this.name, this.value)',
-                                !empty($pkg)?'disabled':''
+                                $merchant->count()==1||!empty($pkg)?"disabled":''
                             ]) !!}
+                        <input type="hidden" name="merchant_id" id="merchant_id">
+
                         </div>
                     </div>
                 <div class="col-md-8 mt-3">

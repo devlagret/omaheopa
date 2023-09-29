@@ -155,11 +155,12 @@
                 <thead>
                     <tr>
                         <th width="2%" style='text-align:center'>No</th>
+                        <th width="13%" style='text-align:center'>Wahana / Merchant</th>
                         <th width="13%" style='text-align:center'>Kategori Barang</th>
                         <th width="15%" style='text-align:center'>Nama Barang</th>
                         {{-- <th width="10%" style='text-align:center'>Grade</th> --}}
                         <th width="10%" style='text-align:center'>Qty</th>
-                        <th width="10%" style='text-align:center'>Unit</th>
+                        {{-- <th width="10%" style='text-align:center'>Unit</th> --}}
                         <th width="10%" style='text-align:center'>Gudang</th>
                         <th width="10%" style='text-align:center'>Tanggal Datang</th>
                         {{-- <th width="8%" style='text-align:center'>Aksi</th> --}}
@@ -170,16 +171,16 @@
                     @foreach($invitemstock as $stock)
                     <tr>
                         <td style='text-align:center'>{{$no}}</td>
-                        <td>{{$Grading->getInvItemCategoryName($stock['item_category_id'])}}</td>
-                        <td>{{$Grading->getInvItemName($stock['item_id'])}}</td>
+                        <td>{{$stock->item->merchant->merchant_name}}</td>
+                        <td>{{$stock->category->item_category_name}}</td>
+                        <td>{{$stock->item->item_name}}</td>
                         {{-- <?php if($stock['item_id']==0) {?>
                             <td>No Grade</td>
                         <?php } else {?>
                             <td>{{$InvItemStock->getCoreGradeName($stock['item_id'])}}</td>
                         <?php } ?> --}}
-                        <td style='text-align:right'>{{$stock['last_balance']}}</td>
-                        <td>{{$Grading->getInvItemUnitName($stock['item_unit_id'])}}</td>
-                        <td>{{$Grading->getInvWarehouseName($stock['warehouse_id'])}}</td>
+                        <td>{{$stock->last_balance." ".$stock->unit->item_unit_name}}</td>
+                        <td>{{$stock->warehouse->warehouse_name}}</td>
                         <td>{{date('d/m/Y', strtotime($stock['created_at']))}}</td>
                         {{-- <td class="">
                             <a type="button" class="btn btn-outline-warning btn-sm" href="{{ url('/inv-item-stock/edit/'.$stock['item_stock_id']) }}">Edit</a>
