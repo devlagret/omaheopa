@@ -32,6 +32,7 @@ class InvtItemCategoryController extends Controller
         $merchant   = SalesMerchant::where('data_state', 0)->get()->pluck('merchant_name', 'merchant_id')->prepend('Tampil Semua',0);
         if(Auth::id()!=1||Auth::user()->merchant_id!=null){
             $data->where('merchant_id',Auth::user()->merchant_id);
+        $admin = 0;
         }
         if(isset($sessiondata)&&$sessiondata){
             $data->where('merchant_id',$sessiondata);
@@ -49,7 +50,6 @@ class InvtItemCategoryController extends Controller
         $url = 'item-category';
         $merchant = SalesMerchant::where('data_state','0');
         if(Auth::id()!=1||Auth::user()->merchant_id!=null){
-            $merchant_id = Auth::user()->merchant_id;
             $merchant->where('merchant_id',Auth::user()->merchant_id);
         }
         $merchant = $merchant->get()->pluck('merchant_name','merchant_id');
@@ -116,7 +116,7 @@ class InvtItemCategoryController extends Controller
     {
          //* check if item is in package
          $msg = '';
-         $pkg = InvtItem::with('package')->where('item_category_id',$item_category_id)->get()->count();
+         $pkg = InvtItem::with('packets')->where('item_category_id',$item_category_id)->get()->count();
          if($pkg){
              $msg ='Ada item yang menggunakan kategori ini';
          }

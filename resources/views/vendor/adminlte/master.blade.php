@@ -137,6 +137,9 @@
             transform: rotate(360deg);
         }
     }
+    .select2-container--disabled{
+        background-color: #bcbcbc;
+    }
 </style>
 
 <body class="@yield('classes_body')" @yield('body_data')>
@@ -220,6 +223,9 @@
                 $('#example').addClass('pull-left');
             });
             $(document).ready(function() {
+                if($('#merchant_id_view').val()!=''){
+                     $('#merchant_id').val($('#merchant_id_view').val());
+                 }
                 $("[data-toggle=popover]").popover({
                     trigger: 'focus',
                     content: '<div class="spinner-border spinner-border-sm text-secondary" role="status"><span class="sr-only">Loading...</span></div>',

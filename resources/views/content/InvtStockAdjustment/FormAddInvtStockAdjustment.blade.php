@@ -39,7 +39,10 @@
     //     });
     // }
     function changeCategory() {
-            var merchant_id = $("#merchant_id").val();
+            var merchant_id = $("#merchant_id_view").val();
+            if($('#merchant_id_view').val()!=''){
+            $('#merchant_id').val(merchant_id);
+        }
             loading();
             $.ajax({
                 type: "POST",
@@ -154,12 +157,14 @@
                         <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
                         {!! Form::select('merchant_id', $merchant, $items['merchant_id'] ?? '', [
                             'class' => 'selection-search-clear required select-form',
-                            'name' => 'merchant_id',
-                            'id' => 'merchant_id',
+                            'name' => 'merchant_id_view',
+                            'id' => 'merchant_id_view',
                             'onchange' => 'changeCategory()',
                             'form' => 'form-paket',
                             'autofocus'=>'autofocus',
+                            $merchant->count()==1?"disabled":''
                         ]) !!}
+                        <input type="hidden" name="merchant_id" id="merchant_id">
                     </div>
                 </div>
                 <div class="col-md-6">

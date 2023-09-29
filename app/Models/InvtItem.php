@@ -15,9 +15,6 @@ class InvtItem extends Model
     public function category() {
         return $this->belongsTo(InvtItemCategory::class,'item_category_id', 'item_category_id')->withDefault();;
     }
-    public function package() {
-        return $this->hasMany(InvtItemPackageItem::class,'item_id','item_id');
-    }
     public function packets() {
         return $this->hasMany(InvtItemPackage::class,'item_id','item_id');
     }
