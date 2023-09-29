@@ -27,7 +27,7 @@ class SalesInvoiceByYearReportController extends Controller
         } else {
             $year = Session::get('year');
         }
-        $data = SalesInvoice::join('sales_invoice_item','sales_invoice.sales_invoice_id','=','sales_invoice_item.sales_invoice_id')
+        $data = SalesInvoice::join('sales_invoice_item','sales_invoice.sales_invoice_id','sales_invoice_item.sales_invoice_id')
         ->whereYear('sales_invoice.sales_invoice_date',$year)
         ->where('sales_invoice.company_id', Auth::user()->company_id)
         ->where('sales_invoice.data_state',0)

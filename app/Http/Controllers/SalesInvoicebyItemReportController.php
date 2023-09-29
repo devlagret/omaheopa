@@ -33,7 +33,8 @@ class SalesInvoicebyItemReportController extends Controller
         } else {
             $end_date = Session::get('end_date');
         }
-        $data = SalesInvoice::join('sales_invoice_item','sales_invoice.sales_invoice_id','=','sales_invoice_item.sales_invoice_id')
+        $data = SalesInvoice::select('*')
+        ->join('sales_invoice_item','sales_invoice.sales_invoice_id','sales_invoice_item.sales_invoice_id')
         ->where('sales_invoice.sales_invoice_date','>=',$start_date)
         ->where('sales_invoice.sales_invoice_date','<=',$end_date)
         ->where('sales_invoice.company_id', Auth::user()->company_id)
