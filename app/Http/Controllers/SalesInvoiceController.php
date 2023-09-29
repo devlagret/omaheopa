@@ -15,6 +15,7 @@ use App\Models\PreferenceTransactionModule;
 use App\Models\SalesCustomer;
 use App\Models\SalesInvoice;
 use App\Models\SalesInvoiceItem;
+use App\Models\SalesMerchant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -45,7 +46,6 @@ class SalesInvoiceController extends Controller
         ->where('sales_invoice_date','>=',$start_date)
         ->where('sales_invoice_date','<=',$end_date)
         ->where('company_id', Auth::user()->company_id)
-
         ->get();
         // dd($data);
         return view('content.SalesInvoice.ListSalesInvoice',compact('data', 'start_date', 'end_date'));
@@ -63,31 +63,16 @@ class SalesInvoiceController extends Controller
         ->where('company_id', Auth::user()->company_id)
         ->get()
         ->pluck('item_unit_name','item_unit_id');
-        $merchant  = Auth::user()->merchant_id;
-        
-        if($merchant == null){
-        $categorys      = InvtItemCategory::select('invt_item_category.*',DB::raw('CONCAT(invt_item_category.item_category_name, " ", sales_merchant.merchant_name) AS item_name') )
-        ->join('sales_merchant','sales_merchant.merchant_id','invt_item_category.merchant_id')
-        ->where('invt_item_category.data_state',0)
-        ->where('company_id', Auth::user()->company_id)
-        ->get()
-        ->pluck('item_name','item_category_id');
-        }else{
-            $categorys      = InvtItemCategory::select('invt_item_category.*',DB::raw('CONCAT(invt_item_category.item_category_name, " ", sales_merchant.merchant_name) AS item_name') )
-            ->join('sales_merchant','sales_merchant.merchant_id','invt_item_category.merchant_id')
-            ->where('invt_item_category.data_state',0)
-            ->where('sales_merchant.merchant_id',Auth::user()->merchant_id)
-            ->where('company_id', Auth::user()->company_id)
-            ->get()
-            ->pluck('item_name','item_category_id');
+        $merchant   = SalesMerchant::where('data_state', 0);
+        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
+            $merchant->where('merchant_id',Auth::user()->merchant_id);
         }
-
-     
-        $customers      = SalesCustomer::where('data_state',0)
+        $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
+        $customers = SalesCustomer::where('data_state',0)
         // ->where('company_id', Auth::user()->company_id)
         ->get()
         ->pluck('customer_name','customer_id');
-        return view('content.SalesInvoice.FormAddSalesInvoice',compact('date','categorys','items','units','arraydatases','customers'));
+        return view('content.SalesInvoice.FormAddSalesInvoice',compact('date','items','units','arraydatases','customers','merchant'));
     }
 
     public function addArraySalesInvoice(Request $request)
@@ -136,7 +121,6 @@ class SalesInvoiceController extends Controller
 
         return redirect('/sales-invoice/add');
     }
-
     public function deleteArraySalesInvoice($record_id)
     {
         $arrayBaru = array();
@@ -153,7 +137,6 @@ class SalesInvoiceController extends Controller
 
         return redirect('/sales-invoice/add');
     }
-
     public function processAddSalesInvoice(Request $request)
     {
         // dd($request->all());
@@ -296,7 +279,6 @@ class SalesInvoiceController extends Controller
             return redirect('/sales-invoice/add')->with('msg',$msg);
         }
     }
-
     public function getCoreItem(Request $request){
         $item_category_id   = $request->item_category_id;
         $data='';
@@ -316,8 +298,6 @@ class SalesInvoiceController extends Controller
 
         return $data;
     }
-
-
     public function getSelectDataUnit(Request $request){
         $item_id   = $request->item_id;
 
@@ -369,42 +349,34 @@ class SalesInvoiceController extends Controller
         return $data;
         }
     }
-
-
-
     public function resetSalesInvoice()
     {
         Session::forget('arraydatases');
 
         return redirect('/sales-invoice/add');
     }
-
     public function getItemName($item_id)
     {
         $data   = InvtItem::where('item_id', $item_id)->first();
 
         return $data['item_name']?? '';
     }
-
     public function getCategoryName($item_category_id)
     {
         $data = InvtItemCategory::where('item_category_id', $item_category_id)->first();
         return $data['item_category_name']?? '';
     }
-
     public function getItemUnitName($item_unit_id)
     {
         $data = InvtItemUnit::where('item_unit_id', $item_unit_id)->first();
         return $data['item_unit_name']?? '';
     }
-
     public function detailSalesInvoice($sales_invoice_id)
     {
         $salesinvoice = SalesInvoice::where('sales_invoice_id', $sales_invoice_id)->first();
         $salesinvoiceitem = SalesInvoiceItem::where('sales_invoice_id', $sales_invoice_id)->get();
         return view('content.SalesInvoice.FormDetailSalesInvoice', compact('salesinvoice','salesinvoiceitem'));
     }
-
     public function deleteSalesInvoice($sales_invoice_id)
     {
         $transaction_module_code = 'HPSPJL';
@@ -500,7 +472,6 @@ class SalesInvoiceController extends Controller
             return redirect('/sales-invoice')->with('msg',$msg);
         }
     }
-
     public function addElementsSalesInvoice(Request $request)
     {
         $salesinvoice  = Session::get('salesinvoice');
@@ -510,7 +481,6 @@ class SalesInvoiceController extends Controller
         $salesinvoice[$request->name] = $request->value;
         Session::put('salesinvoice', $salesinvoice);
     }
-    
     public function filterSalesInvoice(Request $request)
     {
         $start_date = $request->start_date;
@@ -521,7 +491,6 @@ class SalesInvoiceController extends Controller
 
         return redirect('/sales-invoice');
     }
-
     public function filterResetSalesInvoice()
     {
         Session::forget('start_date');
@@ -529,21 +498,18 @@ class SalesInvoiceController extends Controller
 
         return redirect('/sales-invoice');
     }
-
     public function getTransactionModuleID($transaction_module_code)
     {
         $data = PreferenceTransactionModule::where('transaction_module_code',$transaction_module_code)->first();
 
         return $data['transaction_module_id'];
     }
-
     public function getTransactionModuleName($transaction_module_code)
     {
         $data = PreferenceTransactionModule::where('transaction_module_code',$transaction_module_code)->first();
 
         return $data['transaction_module_name'];
     }
-
     public function getAccountSettingStatus($account_setting_name)
     {
         $data = AcctAccountSetting::where('company_id', Auth::user()->company_id)
@@ -552,7 +518,6 @@ class SalesInvoiceController extends Controller
 
         return $data['account_setting_status'];
     }
-
     public function getAccountId($account_setting_name)
     {
         $data = AcctAccountSetting::where('company_id', Auth::user()->company_id)
@@ -561,22 +526,18 @@ class SalesInvoiceController extends Controller
 
         return $data['account_id'];
     }
-
     public function getAccountDefaultStatus($account_id)
     {
         $data = AcctAccount::where('account_id',$account_id)->first();
 
         return $data['account_default_status'];
     }
-
     public function getCustomerName($customer_id)
     {
         $data = SalesCustomer::where('customer_id', $customer_id)->first();
 
         return $data['customer_name']?? '';
     }
-
-
     public function getUnitPrice(Request $request){
 
         $item_id            = $request->item_id;   
@@ -598,11 +559,6 @@ class SalesInvoiceController extends Controller
             if($item['item_unit_id4'] == $request->item_unit_id){
                 $item_unit_price = $item['item_unit_price4'];
             }
-
-
         return $item_unit_price;
-        
     }
-
-
 }
