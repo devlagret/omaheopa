@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\JournalHelper;
 use App\Http\Controllers\Controller;
 use App\Models\JournalVoucher;
 use App\Models\JournalVoucherItem;
@@ -19,6 +20,7 @@ class AcctJournalMemorialController extends Controller
     
     public function index()
     {
+        // JournalHelper::reverse(135);
         if(!$start_date = Session::get('start_date')){
             $start_date = date('Y-m-d');
         }else{
