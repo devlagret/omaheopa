@@ -34,13 +34,6 @@ class AcctAssetReportController extends Controller
         }else{
             $year_period = Session::get('year_period');
         }
-        
-        $year_now 	=	date('Y');
-        for($i=($year_now-2); $i<($year_now+2); $i++){
-            $yearlist[$i] = $i;
-        } 
-
-        
 
         if(empty($sesi['branch_id'])){
             $sesi['branch_id']		= 1;
@@ -52,6 +45,12 @@ class AcctAssetReportController extends Controller
 
         if(empty($sesi['year'])){
             $sesi['year']		= date('Y');
+        
+        $year_now 	=	date('Y');
+        for($i=($year_now-2); $i<($year_now+2); $i++){
+            $yearlist[$i] = $i;
+        } 
+
         }
 
         // Session::get('year', $year);
@@ -65,7 +64,7 @@ class AcctAssetReportController extends Controller
 
         // dump($sesi);
         
-        $last_year 		= $sesi['year_period'] - 1;
+        $last_year 		= Session::get('year_period') - 1;
 		$prosentase		= $this->ProsentasePenyusutan();
         $acctasset = $this->getAcctAsset($sesi['branch_id'], $sesi['year']);
         // echo json_encode($last_year);exit;
@@ -139,8 +138,8 @@ class AcctAssetReportController extends Controller
                 // echo json_encode($data_assetreport);exit;
 
         }
-
-        return view('content.AcctAssetReport.ListAcctAssetReport',compact('aset','year_now','year','yearlist','data_assetreport','last_year','year_period'));
+            $data = $data_assetreport[$key];
+        return view('content.AcctAssetReport.ListAcctAssetReport',compact('aset','year_now','year','yearlist','data_assetreport','last_year','year_period','data','sesi'));
     }
 
 
@@ -198,7 +197,7 @@ class AcctAssetReportController extends Controller
     }
 
     public function ProsentasePenyusutan(){
-		$prosentase_penyusutan = array ("20.00" => "5%", "8.00" => "13%", "4.00" => "25%", "2.00"=> "30%", "14.00" => "35%");
+		$prosentase_penyusutan = array ("20.00" => "5%", "8.00" => "13%", "4.00" => "25%", "2.00"=> "30%", "14.00" => "35%", "12.00" => "32%" );
 
 		return $prosentase_penyusutan;
 	}
@@ -226,11 +225,13 @@ class AcctAssetReportController extends Controller
     {
         $year = $request->year;
         $year_period = $request->year_period;
+        $last_year = $request->last_year;
         $branch_id = $request->branch_id;
 
 
         Session::put('year', $year);
         Session::put('year_period', $year_period);
+        Session::put('last_year', $last_year);
         Session::put('branch_id', $branch_id);
 
 

@@ -89,6 +89,11 @@
                             $no = 1;
                             @endphp
                                 @foreach ($salesinvoiceitem as $salesinvoiceitem )
+
+                                @php
+                                    $subtotal =  $salesinvoiceitem['quantity']  * $salesinvoiceitem['item_unit_price'];
+                                    $subtotalafdiscount =  $salesinvoiceitem['quantity']  * $salesinvoiceitem['item_unit_price'] - $salesinvoiceitem['discount_percentage'] ;
+                                @endphp
                                     <tr>
                                         <td>{{ $no++ }}</td>
                                         <td>{{ $SalesInvoice->getCategoryName($salesinvoiceitem['item_category_id']) }}</td>
@@ -96,9 +101,9 @@
                                         <td style="text-align: right">{{ $salesinvoiceitem['quantity'] }}</td>
                                         <td>{{ $SalesInvoice->getItemUnitName($salesinvoiceitem['item_unit_id']) }}</td>
                                         <td style="text-align: right">{{ number_format($salesinvoiceitem['item_unit_price'],2,'.',',') }}</td>
-                                        <td style="text-align: right">{{ number_format($salesinvoiceitem['subtotal_amount'],2,'.',',') }}</td>
+                                        <td style="text-align: right">{{ number_format($subtotal,2,'.',',') }}</td>
                                         <td style="text-align: right">{{ $salesinvoiceitem['discount_percentage'] }}</td>
-                                        <td style="text-align: right">{{ number_format($salesinvoiceitem['subtotal_amount_after_discount'],2,'.',',') }}</td>
+                                        <td style="text-align: right">{{ number_format($subtotalafdiscount,2,'.',',') }}</td>
                                     </tr>
                                 @endforeach
                                 <tr>

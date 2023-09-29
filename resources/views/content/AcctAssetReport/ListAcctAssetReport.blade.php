@@ -74,9 +74,6 @@ function check(name,uri){
     <h5 class="mb-0 float-left">
         Daftar Aset
     </h5>
-    <div class="form-actions float-right">
-        <button onclick="location.href='{{ route('aset.add') }}'" name="add" class="btn btn-sm btn-info" title="Add Data"><i class="fa fa-plus"></i> Tambah Aset </button>
-    </div>
   </div>
 
     <div class="card-body">

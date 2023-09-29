@@ -219,9 +219,9 @@
 		});
 
 
-        $("#item_unit_id").change(function(){
+        $("#item_unit").change(function(){
             var item_category_id 	= $("#item_category_id").val();
-            var item_unit_id 	= $("#item_unit_id").val();
+            var item_unit 	= $("#item_unit").val();
 			var item_id 	= $("#item_id").val();
 
             // console.log(item_id);
@@ -231,7 +231,7 @@
                     dataType: "html",
                     data: {
                         'item_category_id'	: item_category_id,
-                        'item_unit_id'	    : item_unit_id,
+                        'item_unit_id'	    : item_unit,
                         'item_id'	        : item_id,
                         '_token'            : '{{csrf_token()}}',
                     },
@@ -262,7 +262,7 @@
     function processAddArraySalesInvoice(){
         var item_category_id		        = document.getElementById("item_category_id").value;
         var item_id		                    = document.getElementById("item_id").value;
-        var item_unit_id		            = document.getElementById("item_unit_id").value;
+        var item_unit_id		            = document.getElementById("item_unit").value;
         var item_unit_price		            = document.getElementById("item_unit_price").value;
         var quantity                        = document.getElementById("quantity").value;
         var subtotal_amount                 = document.getElementById("subtotal_amount").value;
@@ -274,7 +274,7 @@
             type: "POST",
             url : "{{route('add-array-sales-invoice')}}",
             data: {
-                'item_category_id'                  : item_category_id,
+                'item_category_id'                  : item_category_id, 
                 'item_id'    		                : item_id, 
                 'item_unit_id'                      : item_unit_id,
                 'item_unit_price'                   : item_unit_price,

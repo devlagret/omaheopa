@@ -76,19 +76,19 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group form-md-line-input">
+                                        <label class="text-dark">Tipe</label>
                                         <input type="text" class="form-control" name="asset_type_name"
                                             id="asset_type_name" placeholder="123"
                                             value="{{ $Asset->getAssetTypeName($acctasset['asset_type_id']) }} " readonly />
-                                        <label class="text-dark">Tipe</label>
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <div class="form-group form-md-line-input">
+                                        <label class="text-dark">Tipe Asset</label>
                                         <input type="text" class="form-control" id="asset_type_name"
                                             name="asset_type_name" onChange="function_elements_add(this.name, this.value);"
                                             value="{{ $Asset->getAssetTypeName($acctasset['asset_type_id']) }}" readonly />
-                                        <label class="text-dark">Tipe Asset</label>
                                     </div>
                                 </div>
                             </div>
@@ -96,17 +96,17 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group form-md-line-input">
+                                        <label class="text-dark">Kode Asset</label>
                                         <input type="text" class="form-control" name="asset_code" id="asset_code"
                                             placeholder="123" value="{{ $acctasset['asset_code'] }} " readonly />
-                                        <label class="text-dark">Kode Asset</label>
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <div class="form-group form-md-line-input">
+                                        <label class="text-dark">Nama Asset</label>
                                         <input type="text" class="form-control" name="asset_name" id="asset_name"
                                             placeholder="Nama" value="{{ $acctasset['asset_name'] }}" readonly />
-                                        <label class="text-dark">Nama Asset</label>
                                     </div>
                                 </div>
                             </div>
@@ -115,27 +115,27 @@
                             <div class="row">
                                 <div class="col-md-3">
                                     <div class="form-group form-md-line-input">
+                                        <label class="text-dark">Tanggal Pembelian</label>
                                         <input type="text" class="form-control" name="asset_purchase_date"
                                             id="asset_purchase_date" placeholder="Name"
                                             value="{{ $acctasset['asset_purchase_date'] }} " readonly />
-                                        <label class="text-dark">Tanggal Pembelian</label>
                                     </div>
                                 </div>
 
                                 <div class="col-md-3">
                                     <div class="form-group form-md-line-input">
-                                        <input type="text" class="form-control" name="item_unit_code" id="item_unit_code"
-                                            value="{{ number_format($acctasset['item_unit_code'],2) }}" readonly />
                                         <label class="text-dark">Satuan</label>
+                                        <input type="text" class="form-control" name="item_unit_code" id="item_unit_code"
+                                            value="{{ number_format((int)$acctasset['item_unit_code'],2) }}" readonly />
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <div class="form-group form-md-line-input">
+                                        <label class="text-dark">Harga Pembelian</label>
                                         <input type="text" class="form-control" name="asset_purchase_value"
                                             id="asset_purchase_value"
                                             value="{{ number_format($acctasset['asset_purchase_value'], 2) }}" readonly />
-                                        <label class="text-dark">Harga Pembelian</label>
                                     </div>
                                 </div>
                             </div>
@@ -143,37 +143,53 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group form-md-line-input">
+                                        <label class="text-dark">Metode Penyusutan</label>
                                         <input type="text" class="form-control" name="asset_purchase_value"
                                             id="asset_purchase_value" value="{{ $acctasset['asset_depreciation_type'] }}"
                                             readonly />
-                                        <label class="text-dark">Metode Penyusutan</label>
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <div class="form-group form-md-line-input">
+                                        <label class="text-dark">Nilai Perolehan</label>
                                         <input type="text" class="form-control" name="asset_book_value"
                                             id="asset_book_value"
                                             value="{{ number_format($acctasset['asset_book_value'], 2) }}" readonly />
-                                        <label class="text-dark">Nilai Perolehan</label>
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <div class="form-group form-md-line-input">
+                                        <label class="text-dark">Taksiran Usia</label>
                                         <input type="text" class="form-control" name="asset_estimate_lifespan"
                                             id="asset_estimate_lifespan" placeholder="123"
                                             value="{{ $acctasset['asset_estimated_lifespan'] }}" readonly />
-                                        <label class="text-dark">Taksiran Usia</label>
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <div class="form-group form-md-line-input">
+                                        <label class="text-dark">Nilai Residu</label>
                                         <input type="text" class="form-control" name="asset_salvage_value"
                                             id="asset_salvage_value" value="{{ $acctasset['asset_salvage_value'] }}"
                                             readonly />
-                                        <label class="text-dark">Nilai Residu</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group form-md-line-input">
+                                        <label class="text-dark">Detail Lokasi</label>
+                                        <input type="textarea" class="form-control" name="asset_location_detail"
+                                            id="asset_location_detail" value="{{ $acctasset['asset_location_detail'] }}"
+                                            readonly />
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group form-md-line-input">
+                                        <label class="text-dark">Deskripsi</label>
+                                        <input type="textarea" class="form-control" name="asset_description"
+                                            id="asset_description" value="{{ $acctasset['asset_description'] }}"
+                                            readonly />
                                     </div>
                                 </div>
                             </div>

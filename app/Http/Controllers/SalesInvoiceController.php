@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\JournalHelper;
 use App\Http\Controllers\Controller;
 use App\Models\AcctAccount;
 use App\Models\AcctAccountSetting;
@@ -382,7 +383,8 @@ class SalesInvoiceController extends Controller
         $transaction_module_code = 'HPSPJL';
         $transaction_module_id  = $this->getTransactionModuleID($transaction_module_code);
         $sales_invoice = SalesInvoice::where('sales_invoice_id', $sales_invoice_id)->first();
-        $journal_voucher = JournalVoucherItem::where('created_at', $sales_invoice['created_at'])->where('company_id',Auth::user()->company_id)->first();
+        $journal_voucher = JournalVoucherItem::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
+        // dd($sales_invoice);
         // dd($journal_voucher['journal_voucher_amount']);
         $journal = array(
             'company_id'                    => Auth::user()->company_id,
