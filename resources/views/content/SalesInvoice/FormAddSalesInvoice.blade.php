@@ -193,14 +193,14 @@
                 });
             });
             if ($('#merchant_id_view').val() != '') {
-                $('#merchant_id').val($('#merchant_id_view'));
+                $('#merchant_id').val($('#merchant_id_view').val());
             }
 
 
         });
 
 
-                
+
         $("#item_id").change(function() {
             var item_id = $("#item_id").val();
             $.ajax({
@@ -387,8 +387,9 @@
                                 'id' => 'merchant_id_view',
                                 'onchange' => 'changeCategory(this.id,`item_category_id`)',
                                 'autofocus' => 'autofocus',
+                                $merchant->count()==1?"disabled":''
                             ]) !!}
-                            <input type="hidden" name="merchant_id" id="merchant_id_view" />
+                            <input type="hidden" name="merchant_id" id="merchant_id" />
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -540,13 +541,13 @@
                                     class='btn btn-danger btn-sm'
                                     onclick="return confirm('Apakah Anda Yakin Ingin Menghapus Data Ini ?')"></i> Hapus</a>
                             </td>
-                            <?php 
+                            <?php
 
                                         $subtotal_item += $val['quantity'];
                                         $subtotal_amount += $val['subtotal_amount_after_discount'];
 
                                     }
-                                }  
+                                }
                             ?>
                             <tr>
                                 <th colspan="3">Sub Total</th>

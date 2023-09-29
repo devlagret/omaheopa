@@ -1,7 +1,7 @@
 @inject('ISAC','App\Http\Controllers\InvtStockAdjustmentController')
 @extends('adminlte::page')
 
-@section('title', 'MOZAIC Geprek')
+@section('title', "MOZAIC Omah'e Opa")
 @section('js')
 <script>
       function function_elements_add(name, value){
