@@ -128,6 +128,13 @@ class InvGoodsReceivedNoteController extends Controller
 
     public function addInvGoodsReceivedNote($purchase_invoice_id)
     {
+
+        $merchant = Auth::user()->merchant_id;
+        if($merchant == null){
+            $merchant_id = 0;
+        }else{
+            $merchant_id = Auth::user()->merchant_id;
+        }
         $purchaseInvoice = PurchaseInvoice::where('purchase_invoice.data_state', 0)
         ->join('purchase_invoice_item','purchase_invoice.purchase_invoice_id','purchase_invoice_item.purchase_invoice_id')
         ->where('purchase_invoice.purchase_invoice_id', $purchase_invoice_id)
@@ -169,7 +176,7 @@ class InvGoodsReceivedNoteController extends Controller
         $null_add_purchaseInvoiceitem = Session::get('purchase_invoice_item_id');
         $null_add_unit_purchaseInvoiceitem = Session::get('item_unit_id');
 
-        return view('content/InvGoodsReceivedNote/FormAddInvGoodsReceivedNote',compact('merge_data', 'purchaseInvoiceitem_temporary', 'purchaseInvoice', 'purchaseInvoiceitem', 'add_type_purchaseInvoiceitem', 'null_add_purchaseInvoiceitem', 'add_unit_purchaseInvoiceitem', 'null_add_unit_purchaseInvoiceitem'));
+        return view('content/InvGoodsReceivedNote/FormAddInvGoodsReceivedNote',compact('merchant','merchant_id','merge_data', 'purchaseInvoiceitem_temporary', 'purchaseInvoice', 'purchaseInvoiceitem', 'add_type_purchaseInvoiceitem', 'null_add_purchaseInvoiceitem', 'add_unit_purchaseInvoiceitem', 'null_add_unit_purchaseInvoiceitem'));
     }
 
     public function detailInvGoodsReceivedNote($goods_received_note_id)
@@ -188,7 +195,7 @@ class InvGoodsReceivedNoteController extends Controller
     public function processAddInvGoodsReceivedNote(Request $request){
 
 
-        //dd($request->all());
+        // dd($request->all());
 
 
         $purchaseorderitem_temporary = Session::get('purchaseorderitem');
@@ -225,7 +232,7 @@ class InvGoodsReceivedNoteController extends Controller
             'supplier_id'                           => $fields['supplier_id'],
             'warehouse_id'                          => $fields['warehouse_id'],
             'goods_received_note_remark'            => $request->goods_received_note_remark,
-            'faktur_no'                             => $request->faktur_no,
+            'merchant_id'                           => Auth::user()->merchant_id,
             'subtotal_item'                         => $request->quantity_received_total,
             'receipt_image'                         => $fileNameToStore,
             'created_id' 				            => Auth::id(),
@@ -477,9 +484,9 @@ class InvGoodsReceivedNoteController extends Controller
 
 			
 
-            $purchaseInvoice = PurchaseInvoice::findOrFail($invgoodsreceivednote['purchase_invoice_id']);
-            $purchaseInvoice->invt_goods_received_status = 1;
-            $purchaseInvoice->save();
+            // $purchaseInvoice = PurchaseInvoice::findOrFail($invgoodsreceivednote['purchase_invoice_id']);
+            // $purchaseInvoice->invt_goods_received_status = 1;
+            // $purchaseInvoice->save();
 
             $msg = 'Tambah Penerimaan Barang Berhasil';
             return redirect('/goods-received-note')->with('msg',$msg);
@@ -567,7 +574,7 @@ class InvGoodsReceivedNoteController extends Controller
     {
         $data = SalesMerchant::where('merchant_id', $merchant_id)->first();
 
-        return $data['merchant_name'];
+        return $data['merchant_name'] ?? '';
     }
 
 
@@ -635,13 +642,13 @@ class InvGoodsReceivedNoteController extends Controller
     }
 
     public function getInvItemCategoryName($item_category_id){
-        $invitemcategory = InvtItemCategory::select('item_category_id',DB::raw('CONCAT(invt_item_category.item_category_name, " ", sales_merchant.merchant_name) AS item_name'))
+        $invitemcategory = InvtItemCategory::select('item_category_id',DB::raw('CONCAT(invt_item_category.item_category_name) AS item_name'))
         ->join('sales_merchant', 'sales_merchant.merchant_id', 'invt_item_category.merchant_id')
         ->where('invt_item_category.data_state', 0)
         ->where('invt_item_category.item_category_id',$item_category_id)
         ->first();
 
-        return $invitemcategory['item_name0'];
+        return $invitemcategory['item_name'];
     }
 
     public function getInvItemUnitName($item_unit_id){
@@ -655,4 +662,6 @@ class InvGoodsReceivedNoteController extends Controller
 
         return $itemunit['item_unit_name'];
     }
+
+
 }
