@@ -9,8 +9,6 @@ use App\Models\CoreBuilding;
 use App\Models\CorePriceType;
 use App\Models\CoreRoom;
 use App\Models\CoreRoomType;
-use App\Models\JournalVoucher;
-use App\Models\JournalVoucherItem;
 use App\Models\SalesInvoice;
 use App\Models\SalesOrder;
 use App\Models\SalesOrderFacility;
@@ -26,8 +24,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
-
-use function PHPUnit\Framework\matches;
 
 class BookingController extends Controller
 {
@@ -218,22 +214,10 @@ class BookingController extends Controller
         <td class='text-center'><button type='button' class='btn btn-outline-danger btn-sm' onclick='deleteBooked(".$room->room_id.")'>Hapus</button></td>
         </tr>
         ";
-        if($request->ci==1){
-            $qty=collect(Session::get('checkin-room-data-qty'));
-            $qty->put($request->room_id,1);
-            Session::put('checkin-room-data-qty',$qty->toArray());
-            Session::push('checkin-room-data',$request->room_id);
-        }elseif($request->ci==2){
-            $qty=collect(Session::get('edit-booked-room-data-qty'));
-            $qty->put($request->room_id,1);
-            Session::put('edit-booked-room-data-qty',$qty->toArray());
-            Session::push('edit-booked-room-data',$request->room_id);
-        }else{
-            $qty=collect(Session::get('booked-room-data-qty'));
-            $qty->put($request->room_id,1);
-            Session::put('booked-room-data-qty',$qty->toArray());
-            Session::push('booked-room-data',$request->room_id);
-        }
+        $qty =$this->getQtyBySession('data',$request->ci);
+        $qty->put($request->room_id,1);
+        $this->putQtyToSession('data',$request->ci,$qty->toArray());
+        $this->pushDataToSession('data',$request->ci,$request->room_id);
         return response($data);
     }
     public function addPersonBooked(Request $request ) {
@@ -283,14 +267,24 @@ class BookingController extends Controller
                 return Session::put('booked-room-'.$type,$data);
         }
     }
+    private function pushDataToSession($type,$ci,$data) {
+        switch ($ci) {
+            case 1:
+                return Session::push('checkin-room-'.$type,$data);
+            case 2:
+                return Session::push('edit-booked-room-'.$type,$data);
+            default:
+                return Session::push('booked-room-'.$type,$data);
+        }
+    }
     private function getQtyBySession($type,$ci) {
         switch ($ci) {
             case 1:
-                return Session::get('checkin-room-'.$type.'-qty');
+                return collect(Session::get('checkin-room-'.$type.'-qty'));
             case 2:
-                return Session::get('edit-booked-room-'.$type.'-qty');
+                return collect(Session::get('edit-booked-room-'.$type.'-qty'));
             default:
-                return Session::get('booked-room-'.$type.'-qty');
+                return collect(Session::get('booked-room-'.$type.'-qty'));
         }
     }
     private function putQtyToSession($type,$ci,$data) {
@@ -421,22 +415,10 @@ class BookingController extends Controller
         <td class='text-center'><button type='button' class='btn btn-outline-danger btn-sm' onclick='deleteFacilityItm(".$facility->room_facility_id.")'>Hapus</button></td>
         </tr>
         ";
-        if($request->ci==1){
-            $qty=collect(Session::get('checkin-room-facility-qty'));
-            $qty->put($request->room_facility_id,1);
-            Session::put('checkin-room-facility-qty',$qty->toArray());
-            Session::push('checkin-room-facility',$request->room_facility_id);
-        }elseif($request->ci==2){
-            $qty=collect(Session::get('edit-booked-room-facility-qty'));
-            $qty->put($request->room_id,1);
-            Session::put('edit-booked-room-facility-qty',$qty->toArray());
-            Session::push('edit-booked-room-facility',$request->room_id);
-        }else{
-            $qty=collect(Session::get('booked-room-facility-qty'));
-            $qty->put($request->room_facility_id,1);
-            Session::put('booked-room-facility-qty',$qty->toArray());
-            Session::push('booked-room-facility',$request->room_facility_id);
-        }
+        $qty =$this->getQtyBySession('facility',$request->ci);
+        $qty->put($request->room_facility_id,1);
+        $this->putQtyToSession('facility',$request->ci,$qty->toArray());
+        $this->pushDataToSession('facility',$request->ci,$request->room_facility_id);
         return response($data);
     }
     public function changeFacilityQty(Request $request) {
@@ -459,9 +441,7 @@ class BookingController extends Controller
     public function addMenuItem(Request $request) {
         $data = '';
         $menu = SalesRoomMenu::find($request->room_menu_id);
-        $menutype = [
-            1 => 'Breakfast', 2 => 'Lunch', 3 => 'Dinner'
-        ];
+        $menutype = AppHelper::menuType();
         $no = $request->no + 1;
         $data = "
         <tr class='menu-item menu-item-".$request->room_menu_id."' id='menu-item-".$request->room_menu_id."'>
@@ -489,38 +469,16 @@ class BookingController extends Controller
         <td class='text-center'><button type='button' class='btn btn-outline-danger btn-sm' onclick='deleteMenuItm(".$menu->room_menu_id.")'>Hapus</button></td>
         </tr>
         ";
-        if($request->ci==1){
-            $qty=collect(Session::get('checkin-room-menu-qty'));
-            $qty->put($request->room_menu_id,1);
-            Session::put('checkin-room-menu-qty',$qty->toArray());
-            Session::push('checkin-room-menu',$request->room_menu_id);
-        }elseif($request->ci==2){
-            $qty=collect(Session::get('edit-booked-room-menu-qty'));
-            $qty->put($request->room_id,1);
-            Session::put('edit-booked-room-menu-qty',$qty->toArray());
-            Session::push('edit-booked-room-menu',$request->room_id);
-        }else{
-            $qty=collect(Session::get('booked-room-menu-qty'));
-            $qty->put($request->room_menu_id,1);
-            Session::put('booked-room-menu-qty',$qty->toArray());
-            Session::push('booked-room-menu',$request->room_menu_id);
-        }
+        $qty =$this->getQtyBySession('menu',$request->ci);
+        $qty->put($request->room_menu_id,1);
+        $this->putQtyToSession('menu',$request->ci,$qty->toArray());
+        $this->pushDataToSession('menu',$request->ci,$request->room_menu_id);
         return response($data);
     }
     public function changeMenuQty(Request $request) {
-        if($request->ci==1){
-            $qty=collect(Session::get('checkin-room-menu-qty'));
-            $qty->put($request->id,$request->qty);
-            Session::put('checkin-room-menu-qty',$qty->toArray());
-        }elseif($request->ci==2){
-            $qty=collect(Session::get('edit-booked-room-menu-qty'));
-            $qty->put($request->id,$request->qty);
-            Session::put('edit-booked-room-menu-qty',$qty->toArray());
-        }else{
-            $qty=collect(Session::get('booked-room-menu-qty'));
-            $qty->put($request->id,$request->qty);
-            Session::put('booked-room-menu-qty',$qty->toArray());
-        }
+        $qty =$this->getQtyBySession('menu',$request->ci);
+        $qty->put($request->id,$request->qty);
+        $this->putQtyToSession('menu',$request->ci,$qty->toArray());
         return $qty;
     }
     public function processAdd(Request $request) {
@@ -778,9 +736,6 @@ class BookingController extends Controller
     }
     public function edit($sales_order_id) {
         $ci = 2;
-        dump(preg_match('/[A-Z]/', 'BookingFull Book', $matches));
-        dump(preg_replace('/[^A-Z]/', '','Booking Full Book' ));
-        dump($matches);
         $data =SalesOrder::find($sales_order_id);
         if(empty(Session::get('edit-booked-room-data'))&&empty(Session::get('edit-booked-room-menu'))&&empty(Session::get('edit-booked-room-facility'))){
             $this->setEditSession($sales_order_id);
