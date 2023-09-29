@@ -33,11 +33,13 @@ class SalesInvoiceReportController extends Controller
         } else {
             $end_date = Session::get('end_date');
         }
-        $data = SalesInvoice::join('sales_invoice_item','sales_invoice.sales_invoice_id','=','sales_invoice_item.sales_invoice_id')
+        $data = SalesInvoice::select('*')
+        ->join('sales_invoice_item','sales_invoice.sales_invoice_id','sales_invoice_item.sales_invoice_id')
         ->where('sales_invoice.sales_invoice_date','>=',$start_date)
         ->where('sales_invoice.sales_invoice_date','<=',$end_date)
         ->where('sales_invoice.company_id', Auth::user()->company_id)
         ->where('sales_invoice.data_state',0)
+        // ->where('sales_invoice_item.data_state',0)
         ->get();
         return view('content.SalesInvoiceReport.ListSalesInvoiceReport', compact('data','start_date','end_date'));
     }
@@ -94,11 +96,13 @@ class SalesInvoiceReportController extends Controller
         } else {
             $end_date = Session::get('end_date');
         }
-        $data = SalesInvoice::join('sales_invoice_item','sales_invoice.sales_invoice_id','=','sales_invoice_item.sales_invoice_id')
+        $data = SalesInvoice::select('*')
+        ->join('sales_invoice_item','sales_invoice.sales_invoice_id','sales_invoice_item.sales_invoice_id')
         ->where('sales_invoice.sales_invoice_date','>=',$start_date)
         ->where('sales_invoice.sales_invoice_date','<=',$end_date)
         ->where('sales_invoice.company_id', Auth::user()->company_id)
         ->where('sales_invoice.data_state',0)
+            // ->where('sales_invoice_item.data_state',0)
         ->get();
 
         $pdf = new TCPDF('L', PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
@@ -197,7 +201,8 @@ class SalesInvoiceReportController extends Controller
         } else {
             $end_date = Session::get('end_date');
         }
-        $data = SalesInvoice::join('sales_invoice_item','sales_invoice.sales_invoice_id','=','sales_invoice_item.sales_invoice_id')
+        $data = SalesInvoice::select('*')
+        ->join('sales_invoice_item','sales_invoice.sales_invoice_id','sales_invoice_item.sales_invoice_id')
         ->where('sales_invoice.sales_invoice_date','>=',$start_date)
         ->where('sales_invoice.sales_invoice_date','<=',$end_date)
         ->where('sales_invoice.company_id', Auth::user()->company_id)

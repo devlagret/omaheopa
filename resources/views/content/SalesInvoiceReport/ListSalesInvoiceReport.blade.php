@@ -114,6 +114,10 @@
                 <tbody>
                   <?php $no=1; ?>
                   @foreach ($data as $row)
+                  @php
+                                    $subtotal =  $row['quantity']  * $row['item_unit_price'];
+                                    $subtotalafdiscount =  $row['quantity']  * $row['item_unit_price'] - $row['discount_percentage'] ;
+                  @endphp
                   <tr>
                     <td>{{ $no++ }}</td>
                     <td>{{ $row['sales_invoice_no'] }}</td>
@@ -122,9 +126,9 @@
                     <td>{{ $SIRC->getItemUnitName($row['item_unit_id']) }}</td>
                     <td>{{ $row['quantity'] }}</td>
                     <td style="text-align: right">{{ number_format($row['item_unit_price'],2,'.',',') }}</td>
-                    <td style="text-align: right">{{ number_format($row['subtotal_amount'],2,'.',',') }}</td>
+                    <td style="text-align: right">{{ number_format($subtotal,2,'.',',') }}</td>
                     <td style="text-align: right">{{ number_format($row['discount_amount'],2,'.',',') }}</td>
-                    <td style="text-align: right">{{ number_format($row['subtotal_amount_after_discount'],2,'.',',') }}</td>
+                    <td style="text-align: right">{{ number_format($subtotalafdiscount,2,'.',',') }}</td>
                   </tr> 
                   @endforeach
                 </tbody>
