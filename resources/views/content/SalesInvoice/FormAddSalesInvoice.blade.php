@@ -19,8 +19,84 @@
 			}
 		});
 	}
+    function changeCategory(id, el) {
+            loadingWidget();
+            var merchant_id = $("#" + id).val();
+            $('#merchant_id').val(merchant_id);
+            console.log(id);
+            $.ajax({
+                type: "POST",
+                url: "{{ route('get-item-category') }}",
+                dataType: "html",
+                data: {
+                    'merchant_id': merchant_id,
+                    '_token': '{{ csrf_token() }}',
+                },
+                success: function(return_data) {
+                        function_elements_add(id, merchant_id);
+                        $('#' + el).html(return_data);
+                        changeItem($('#' + el).val());
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            });
+    }
 
+    function changeItem(category) {
+        loadingWidget();
+        var id = $("#merchant_id").val();
+        var no = $('.pkg-itm').length;
+        $.ajax({
+            type: "POST",
+            url: "{{ route('get-merchant-item') }}",
+            dataType: "html",
+            data: {
+                'no': no,
+                'merchant_id': id,
+                'item_category_id': category,
+                '_token': '{{ csrf_token() }}',
+            },
+            success: function(return_data) {
+                $('#item_id').val(1);
+                $('#item_id').html(return_data);
+                changeSatuan();
+                function_elements_add('item_category_id', category);
+            }
+        });
+    }
+    function changeSatuan() {
+        var item_id = $("#item_id").val();
+        loadingWidget();
+        $.ajax({
+            type: "POST",
+            url: "{{ route('get-item-unit') }}",
+            dataType: "html",
+            data: {
+                'item_id': item_id,
+                '_token': '{{ csrf_token() }}',
+            },
+            success: function(return_data) {
+                $('#item_unit').val(1);
+                $('#item_unit').html(return_data);
+                function_elements_add('item_id', item_id);
+            },
+            complete: function() {
+                loadingWidget(0);
+                setTimeout(function() {
+                    loadingWidget(0);
+                }, 200);
+            },
+            error: function(data) {
+                console.log(data);
+            }
+        });
+    }
+    function getItmPrice(){
+        item_id = $('#item_id').val();
+    }
     $(document).ready(function(){
+        changeCategory('merchant_id_view','item_category_id')
         $("#item_unit_price").change(function(){
             var unit_price = $("#item_unit_price").val();
             var quantity   = $('#quantity').val();
@@ -111,7 +187,9 @@
                 }
             });
 		});
-
+        if ($('#merchant_id_view').val()!=''){
+            $('#merchant_id').val($('#merchant_id_view'));
+        }
 
 
     });
@@ -141,9 +219,9 @@
 		});
 
 
-        $("#item_unit_id").change(function(){
+        $("#item_unit").change(function(){
             var item_category_id 	= $("#item_category_id").val();
-            var item_unit_id 	= $("#item_unit_id").val();
+            var item_unit 	= $("#item_unit").val();
 			var item_id 	= $("#item_id").val();
 
             // console.log(item_id);
@@ -153,7 +231,7 @@
                     dataType: "html",
                     data: {
                         'item_category_id'	: item_category_id,
-                        'item_unit_id'	    : item_unit_id,
+                        'item_unit_id'	    : item_unit,
                         'item_id'	        : item_id,
                         '_token'            : '{{csrf_token()}}',
                     },
@@ -184,7 +262,7 @@
     function processAddArraySalesInvoice(){
         var item_category_id		        = document.getElementById("item_category_id").value;
         var item_id		                    = document.getElementById("item_id").value;
-        var item_unit_id		            = document.getElementById("item_unit_id").value;
+        var item_unit_id		            = document.getElementById("item_unit").value;
         var item_unit_price		            = document.getElementById("item_unit_price").value;
         var quantity                        = document.getElementById("quantity").value;
         var subtotal_amount                 = document.getElementById("subtotal_amount").value;
@@ -196,7 +274,7 @@
             type: "POST",
             url : "{{route('add-array-sales-invoice')}}",
             data: {
-                'item_category_id'                  : item_category_id,
+                'item_category_id'                  : item_category_id, 
                 'item_id'    		                : item_id, 
                 'item_unit_id'                      : item_unit_id,
                 'item_unit_price'                   : item_unit_price,
@@ -293,20 +371,42 @@
                 <h6 class="col-md-8 mt-2 mb-2"><b>Data Penjualan Barang</b></h6>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <a class="text-dark">Nama Kategori Wahana<a class='red'> *</a></a>
-                        {!! Form::select('item_category_id', $categorys, 0, ['class' => 'selection-search-clear select-form', 'id' => 'item_category_id', 'name' => 'item_category_id']) !!}
+                        <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
+                        {!! Form::select('merchant_id', $merchant, $sessiondata['merchant_id'] ?? '', [
+                            'class' => 'selection-search-clear select-form',
+                            'name' => 'merchant_id_view',
+                            'id' => 'merchant_id_view',
+                            'onchange' => 'changeCategory(this.id,`item_category_id`)',
+                            'autofocus' => 'autofocus',
+                        ]) !!}
+                        <input type="hidden" name="merchant_id" id="merchant_id_view"/>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <a class="text-dark">Kategori Barang / Paket<a class='red'> *</a></a>
+                        <select class="selection-search-clear required select-form"
+                        placeholder="Masukan Kategori Barang" name="item_category_id"
+                        id="item_category_id" onchange="changeItem(this.value)">
+                    </select>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">Nama Barang<a class='red'> *</a></a>
-                        {!! Form::select('item_id', $items, 0, ['class' => 'selection-search-clear select-form', 'id' => 'item_id', 'name' => 'item_id']) !!}
+                        <select class="selection-search-clear required select-form"
+                        placeholder="Masukan Nama Barang" name="item_id" id="item_id"
+                        onchange="changeSatuan()">
+                        </select>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">Satuan Barang<a class='red'> *</a></a>
-                        {!! Form::select('item_unit_id', $units, 0, ['class' => 'selection-search-clear select-form', 'id' => 'item_unit_id', 'name' => 'item_unit_id']) !!}
+                        <select class="selection-search-clear required select-form"
+                        placeholder="Masukan Kategori Barang" name="item_unit"
+                        id="item_unit" onchange="function_elements_add(this.name, this.value)">
+                        </select>
                     </div>
                 </div>
                 <div class="col-md-6">
