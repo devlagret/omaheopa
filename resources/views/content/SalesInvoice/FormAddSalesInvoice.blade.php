@@ -96,6 +96,9 @@
         item_id = $('#item_id').val();
     }
     $(document).ready(function(){
+        if ($('#merchant_id_view').val()!=''){
+            $('#merchant_id').val($('#merchant_id_view').val());
+        }
         changeCategory('merchant_id_view','item_category_id')
         $("#item_unit_price").change(function(){
             var unit_price = $("#item_unit_price").val();
@@ -187,11 +190,6 @@
                 }
             });
 		});
-        if ($('#merchant_id_view').val()!=''){
-            $('#merchant_id').val($('#merchant_id_view'));
-        }
-
-
     });
 
 
@@ -237,8 +235,7 @@
                     },
                     success: function(return_data){
                         $('#item_unit_price').val(return_data);
-                        console.log(return_data);  
-                   
+                        console.log(return_data);
                     },
                     error: function(data)
                     {
@@ -247,17 +244,6 @@
                     }
                 });
 		});
-
-
-
-
-
-
-
-
-
-
-
 
     function processAddArraySalesInvoice(){
         var item_category_id		        = document.getElementById("item_category_id").value;
@@ -364,10 +350,8 @@
                 <div class="form-group">
                     <a class="text-dark">Pelanggan</a>
                     <input class="form-control input-bb" name="customer_name" id="customer_name" type="text" autocomplete="off" value="" onChange="function_elements_add(this.name, this.value);"/>
-                    <input class="form-control input-bb" hidden name="merchant_id" id="merchant_id" type="text" autocomplete="off" value="{{ Auth::user()->merchant_id }}"/>
                 </div>
             </div>
-            
                 <h6 class="col-md-8 mt-2 mb-2"><b>Data Penjualan Barang</b></h6>
                 <div class="col-md-6">
                     <div class="form-group">
@@ -379,7 +363,7 @@
                             'onchange' => 'changeCategory(this.id,`item_category_id`)',
                             'autofocus' => 'autofocus',
                         ]) !!}
-                        <input type="hidden" name="merchant_id" id="merchant_id_view"/>
+                        <input type="hidden" name="merchant_id" id="merchant_id"/>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -412,6 +396,7 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">Harga Per Barang<a class='red'> *</a></a>
+                        <input class="form-control input-bb" name="item_unit_price_view" id="item_unit_price_view" type="text" autocomplete="off" readonly/>
                         <input class="form-control input-bb" name="item_unit_price" id="item_unit_price" type="text" autocomplete="off" readonly/>
                     </div>
                 </div>
@@ -448,10 +433,10 @@
                         <input class="form-control input-bb" name="subtotal_amount_after_discount" id="subtotal_amount_after_discount" type="text" autocomplete="off" value="" hidden/>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col">
                     <div class="form-group">
                         <div class="form-actions float-center mt-3">
-                            <a  type="submit" name="Save" class="btn btn-primary btn-block" title="Save" onclick="processAddArraySalesInvoice()"><i class="fa fa-plus"></i> Tambah</a>
+                            <a  type="submit" name="Save" class="btn btn-primary btn-lg btn-block" title="Save" onclick="processAddArraySalesInvoice()"><i class="fa fa-plus"></i> Tambah</a>
                         </div>
                     </div>
                 </div>
