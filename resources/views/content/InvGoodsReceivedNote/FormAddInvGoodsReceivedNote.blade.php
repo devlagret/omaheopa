@@ -162,7 +162,7 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">Nama Gudang</a>
-                        <input class="form-control input-bb" type="text" name="warehouse_id_view" id="warehouse_id_view" value="{{$InvGoodsReceivedNote->getInvWarehouseName($purchaseInvoice['warehouse_id'])}}" readonly/>
+                        <input class="form-control input-bb" type="text" name="warehouse_id_view" id="warehou ?? ''se_id_view" value="{{$InvGoodsReceivedNote->getInvWarehouseName($purchaseInvoice['warehouse_id'])}}" readonly/>
                         <input class="form-control input-bb" type="hidden" name="warehouse_id" id="warehouse_id" value="{{$purchaseInvoice['warehouse_id']}}" readonly/>
                     </div>
                 </div>
@@ -176,14 +176,14 @@
                     </section>
                     <input type ="date" class="form-control form-control-inline input-medium date-picker input-date" data-date-format="dd-mm-yyyy" type="text" name="goods_received_note_date" id="goods_received_note_date" onChange="function_elements_add(this.name, this.value);" value="" style="width: 15rem;"/>
                 </div>
-                {{-- <div class="col-md-6">
+                <div class="col-md-6">
                     <div class="form-group">
-                        <a class="text-dark">No. Faktur
+                        <a class="text-dark">Merchant
                             <span class="required text-danger">
                             </span></a>
-                        <input class="form-control input-bb" type="text" name="faktur_no" id="faktur_no" />
+                        <input class="form-control input-bb" type="text" name="merchant_id_view" id="merchant_id_view" value="{{ $InvGoodsReceivedNote->getMerchantName($merchant_id) ?? '' }}" readonly />
                     </div>
-                </div> --}}
+                </div>
                 <div class="col-md-6">
                     <b>File Gambar Kwitansi</b><br/>
                     <input type="file" name="receipt_image" id="receipt_image" value="" accept="image/*"/>
