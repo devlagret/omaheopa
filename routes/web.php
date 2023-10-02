@@ -527,7 +527,7 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
  Route::prefix('hotel-item')->name('hi.')->group(function () {
     Route::get('/', [HotelItemController::class, 'index'])->name('index');
     Route::get('/add', [HotelItemController::class, 'add'])->name('add');
-    Route::get('/process-add/{sales_order_id}/{source?}', [HotelItemController::class, 'processAdd'])->name('process-add');
+    Route::post('/process-add', [HotelItemController::class, 'processAdd'])->name('process-add');
     Route::get('/edit/{sales_order_id}', [HotelItemController::class, 'edit'])->name('edit');
     Route::post('/process-edit', [HotelItemController::class, 'processEdit'])->name('process-edit');
     Route::get('/delete/{sales_order_id}', [HotelItemController::class, 'delete'])->name('delete');

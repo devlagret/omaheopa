@@ -23,6 +23,83 @@
             console.log('foo');
             $('#room_name').val('');
         }
+        function changeCategory(id, el) {
+            loadingWidget();
+            var merchant_id = $("#" + id).val();
+            $('#merchant_id').val(merchant_id);
+            console.log(id);
+            $.ajax({
+                type: "POST",
+                url: "{{ route('get-item-category') }}",
+                dataType: "html",
+                data: {
+                    'merchant_id': merchant_id,
+                    '_token': '{{ csrf_token() }}',
+                },
+                success: function(return_data) {
+                    function_elements_add(id, merchant_id);
+                    $('#' + el).html(return_data);
+                    changeItem($('#' + el).val());
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            });
+        }
+
+        function changeItem(category) {
+            loadingWidget();
+            var id = $("#merchant_id").val();
+            var no = $('.pkg-itm').length;
+            $.ajax({
+                type: "POST",
+                url: "{{ route('get-merchant-item') }}",
+                dataType: "html",
+                data: {
+                    'no': no,
+                    'merchant_id': id,
+                    'item_category_id': category,
+                    '_token': '{{ csrf_token() }}',
+                },
+                success: function(return_data) {
+                    $('#item_id').val(1);
+                    $('#item_id').html(return_data);
+                    console.log('ci c')
+                    changeSatuan();
+                    function_elements_add('item_category_id', category);
+                }
+            });
+        }
+        function changeSatuan() {
+            var item_id = $("#item_id").val();
+            loadingWidget();
+            $.ajax({
+                type: "POST",
+                url: "{{ route('get-item-unit') }}",
+                dataType: "html",
+                data: {
+                    'item_id': item_id,
+                    '_token': '{{ csrf_token() }}',
+                },
+                success: function(return_data) {
+                    $('#item_unit').val(1);
+                    $('#item_unit').html(return_data);
+                    function_elements_add('item_id', item_id);
+                },
+                complete: function() {
+                    loadingWidget(0);
+                    setTimeout(function() {
+                        loadingWidget(0);
+                    }, 200);
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            });
+        }
+        $(document).ready(function() {
+            changeCategory('merchant_id_view', 'item_category_id');
+        });
     </script>
 @stop
 @section('content_header')
@@ -30,8 +107,8 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ url('home') }}">Beranda</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('room.index') }}">Daftar Kamar</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Tambah Kamar</li>
+            <li class="breadcrumb-item"><a href="{{ route('hi.index') }}">Daftar Penggunaan Barang</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Tambah Penggunaan Barang</li>
         </ol>
     </nav>
 
@@ -40,7 +117,7 @@
 @section('content')
 
     <h3 class="page-title">
-        Form Tambah Kamar
+        Form Tambah Penggunaan Barang
     </h3>
     <br />
     @if (session('msg'))
@@ -59,7 +136,7 @@
     <div class="card border border-dark">
         <div class="card-header border-dark bg-dark">
             <h5 class="mb-0 float-left">
-                Form Tambah Kamar
+                Form Tambah Penggunaan Barang
             </h5>
             <div class="float-right">
                 <button onclick="location.href='{{ route('room.index') }}'" name="Find" class="btn btn-sm btn-info"
@@ -76,56 +153,57 @@
         }
         ?>
 
-        <form method="post" action="{{ route('room.process-add') }}" enctype="multipart/form-data">
+        <form method="post" action="{{ route('hi.process-add') }}" enctype="multipart/form-data">
             @csrf
             <div class="card-body">
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane fade show active" id="room">
                         <div class="row form-group mt-5">
-                            <div class="col">
-                                <div class="form-group">
-                                    <a class="text-dark">Nama Kamar<a class='red'> *</a></a>
-                                    <input placeholder="Masukan nama kamar" required class="form-control input-bb required"
-                                        name="room_name" id="room_name" type="text" autocomplete="off"
-                                        onchange="function_elements_add(this.name, this.value)" required
-                                        value="{{ old('room_name', $sessiondata['room_name'] ?? '') }}" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row form-group mt-5">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <a class="text-dark">Tipe Kamar<a class='red'> *</a></a>
-                                    {!! Form::select('room_type_id', $roomtype, $sessiondata['room_type_id'] ?? '', [
-                                        'class' => 'form-control selection-search-clear select-form required',
-                                        'name' => 'room_type_id',
-                                        'id' => 'room_type_id',
-                                        'onchange' => 'function_elements_add(this.name, this.value)',
+                                    <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
+                                    {!! Form::select('merchant_id', $merchant, $sessiondata['merchant_id'] ?? '', [
+                                        'class' => 'selection-search-clear select-form',
+                                        'name' => 'merchant_id_view',
+                                        'id' => 'merchant_id_view',
+                                        'onchange' => 'changeCategory(this.id,`item_category_id`)',
+                                        'autofocus' => 'autofocus',
+                                        $merchant->count()==1?"disabled":''
                                     ]) !!}
+                                    <input type="hidden" name="merchant_id" id="merchant_id" />
                                 </div>
                             </div>
-                        </div>
-                        <div class="row form-group mt-5">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <a class="text-dark">Bangunan<a class='red'> *</a></a>
-                                    {!! Form::select('building_id', $building, $sessiondata['building_id'] ?? '', [
-                                        'class' => 'form-control selection-search-clear select-form required',
-                                        'name' => 'building_id',
-                                        'id' => 'building_id',
-                                        'onchange' => 'function_elements_add(this.name, this.value)',
-                                    ]) !!}
+                                    <a class="text-dark">Kategori Barang / Paket<a class='red'> *</a></a>
+                                    <select class="selection-search-clear required select-form"
+                                        placeholder="Masukan Kategori Barang" name="item_category_id" id="item_category_id"
+                                        onchange="changeItem(this.value)">
+                                    </select>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row form-group mt-5">
-                            <div class="col">
+                            <div class="col-md-6">
                                 <div class="form-group">
-                                    <a class="text-dark">Fasilitas Kamar</a>
-                                    <textarea placeholder="Masukan fasilitas kamar" class="form-control input-bb"
-                                        name="room_facility" id="room_facility" type="text" autocomplete="off"
-                                        onchange="function_elements_add(this.name, this.value)"
-                                       >{{ old('room_facility', $sessiondata['room_facility'] ?? '') }}</textarea>
+                                    <a class="text-dark">Nama Barang<a class='red'> *</a></a>
+                                    <select class="selection-search-clear required select-form" placeholder="Masukan Nama Barang"
+                                        name="item_id" id="item_id" onchange="changeSatuan()">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <a class="text-dark">Satuan Barang<a class='red'> *</a></a>
+                                    <select class="selection-search-clear required select-form"
+                                        placeholder="Masukan Kategori Barang" name="item_unit" id="item_unit">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <a class="text-dark">Jumlah<a class='red'> *</a></a>
+                                    <input class="form-control input-bb" type="number" min="1" value="1"
+                                        placeholder="Masukan Jumlah Barang" name="quantity" id="quantity">
+                                </input>
                                 </div>
                             </div>
                         </div>

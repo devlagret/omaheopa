@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\StockHelper;
+use App\Models\InvtItemUnit;
 use App\Models\InvtItemUsage;
+use App\Models\SalesMerchant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +24,12 @@ class HotelItemController extends Controller
     }
     public function add() {
         $sessiondata = Session::get('h-item-data');
-        return view('content.HotelItem.FormAddUsage.blade',compact('sessiondata'));
+        $merchant   = SalesMerchant::where('data_state', 0);
+        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
+            $merchant->where('merchant_id',Auth::user()->merchant_id);
+        }
+        $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
+        return view('content.HotelItem.FormAddUsage',compact('sessiondata','merchant'));
     }
     public function elementsAdd(Request $request){
         $sessiondata = Session::get('h-item-data');
@@ -29,6 +37,8 @@ class HotelItemController extends Controller
         Session::put('building-data', $sessiondata);
     }
     public function processAdd(Request $request) {
+        dump(StockHelper::find($request->item_id)->add(1,'BTL'));
+        return $request->all();
         try {
             DB::beginTransaction();
             InvtItemUsage::create([

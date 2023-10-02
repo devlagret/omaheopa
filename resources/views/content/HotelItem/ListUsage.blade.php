@@ -112,7 +112,7 @@
                 </thead>
                 <tbody>
                     <?php $no = 1; ?>
-                  @foreach ($booking as $row)
+                  @foreach ($usage as $row)
                       <tr>
                         <td class="text-center">{{ $no++ }}</td>
                         <td class="text-center">{{ $row->checkin_date }}</td>
