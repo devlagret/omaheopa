@@ -116,13 +116,13 @@
                   @foreach ($usage as $row)
                       <tr>
                         <td class="text-center">{{ $no++ }}</td>
-                        <td class="text-center">{{ $row->date }}</td>
+                        <td class="text-center">{{ date('d-m-Y H:i',strtotime($row->created_at)) }}</td>
                         <td>{{ $row->item->item_name }}</td>
                         <td>{{ number_format($row->quantity).' '.$row->unit->item_unit_name}}</td>
                         <td>{{ $row->usage_remark}}</td>
                         <td style="text-align: center">
                             <a type="button" class="btn btn-outline-warning btn-sm" href="{{ route('hi.edit',$row->invt_item_usage_id) }}">Edit</a>
-                            <button type="button" onclick="$('this').attr('disabled');check('{{$row->item_name}}','{{ route('hi.delete',$row->invt_item_usage_id) }}')" class="btn btn-outline-danger btn-sm" >Hapus</button>
+                            <button type="button" onclick="$('this').attr('disabled');check('{{$row->item->item_name}}','{{ route('hi.delete',$row->invt_item_usage_id) }}')" class="btn btn-outline-danger btn-sm" >Hapus</button>
                         </td>
                       </tr>
                   @endforeach

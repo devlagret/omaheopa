@@ -46,7 +46,7 @@ function check(name,uri){
     <div class="col-md-3 col-sm-6 col-12">
             <a class="text-body"href="{{route('restore.table',$key)}}">
             <div class="info-box text-black">
-                <span class="info-box-icon bg-info"><i class="far fa fa-light fa-table"></i></span>
+                <span class="info-box-icon bg-info"><i class="fa fa-light fa-table"></i></span>
                 <div class="info-box-content">
                     <span class="info-box-number">Tabel '{{$key}}'</span>
                     <span class="info-box-text">Data Dihapus : <b> {{$val}} </b></span>

@@ -85,8 +85,8 @@
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function(return_data) {
-                    $('#item_unit').val(1);
-                    $('#item_unit').html(return_data);
+                    $('#item_unit_id').val(1);
+                    $('#item_unit_id').html(return_data);
                     function_elements_add('item_id', item_id);
                 },
                 complete: function() {
@@ -145,7 +145,7 @@
                 Form Tambah Penggunaan Barang
             </h5>
             <div class="float-right">
-                <button onclick="location.href='{{ route('room.index') }}'" name="Find" class="btn btn-sm btn-info"
+                <button onclick="location.href='{{ route('hi.index') }}'" name="Find" class="btn btn-sm btn-info"
                     title="Back"><i class="fa fa-angle-left"></i> Kembali</button>
             </div>
         </div>
@@ -159,7 +159,7 @@
         }
         ?>
 
-        <form method="post" action="{{ route('hi.process-add') }}" enctype="multipart/form-data">
+        <form method="post" action="{{ route('hi.process-edit') }}" enctype="multipart/form-data">
             @csrf
             <div class="card-body">
                 <div class="tab-content">
@@ -168,7 +168,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
-                                    {!! Form::select('merchant_id', $merchant, $sessiondata['merchant_id'] ?? '', [
+                                    {!! Form::select('merchant_id', $merchant, $sessiondata['merchant_id'] ?? $data->merchant_id, [
                                         'class' => 'selection-search-clear select-form',
                                         'name' => 'merchant_id_view',
                                         'id' => 'merchant_id_view',
@@ -177,12 +177,13 @@
                                         $merchant->count()==1?"disabled":''
                                     ]) !!}
                                     <input type="hidden" name="merchant_id" id="merchant_id" />
+                                    <input type="hidden" name="invt_item_usage_id" id="invt_item_usage_id" value="{{$data->invt_item_usage_id}}"/>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <a class="text-dark">Kategori Barang / Paket<a class='red'> *</a></a>
-                                    <select class="selection-search-clear required select-form"
+                                    <select class="selection-search-clear required select-form" value="{{$data->item->item_category_id}}"
                                         placeholder="Masukan Kategori Barang" required name="item_category_id" id="item_category_id"
                                         onchange="changeItem(this.value)">
                                     </select>
@@ -191,7 +192,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <a class="text-dark">Nama Barang<a class='red'> *</a></a>
-                                    <select class="selection-search-clear required select-form" required placeholder="Masukan Nama Barang"
+                                    <select class="selection-search-clear required select-form" required value="{{$data->item_id}}" placeholder="Masukan Nama Barang"
                                         name="item_id" id="item_id" onchange="changeSatuan()">
                                     </select>
                                 </div>
@@ -200,7 +201,7 @@
                                 <div class="form-group">
                                     <a class="text-dark">Satuan Barang<a class='red'> *</a></a>
                                     <select class="selection-search-clear required select-form"
-                                        placeholder="Masukan Kategori Barang" required name="item_unit_id" id="item_unit_id">
+                                        placeholder="Masukan Satuan Barang" value="{{$data->item_unit_id}}" required name="item_unit_id" id="item_unit_id">
                                     </select>
                                 </div>
                             </div>
@@ -208,7 +209,7 @@
                                 <div class="form-group">
                                     <a class="text-dark">Jumlah<a class='red'> *</a></a>
                                     <input class="form-control input-bb required" required type="number" min="1" value="1"
-                                        placeholder="Masukan Jumlah Barang" name="quantity" id="quantity">
+                                        placeholder="Masukan Jumlah Barang" value="{{$data->quantity}}" name="quantity" id="quantity">
                                 </input>
                                 </div>
                             </div>
@@ -216,7 +217,7 @@
                                 <div class="form-group">
                                     <a class="text-dark">Keterangan</a>
                                     <input class="form-control input-bb" type="text"
-                                        placeholder="Masukan Keterangan Penggunaan" autocomplete="off" name="usage_remark" id="usage_remark">
+                                        placeholder="Masukan Keterangan Penggunaan" value="{{$data->usage_remark}}" autocomplete="off"  name="usage_remark" id="usage_remark">
                                 </input>
                                 </div>
                             </div>

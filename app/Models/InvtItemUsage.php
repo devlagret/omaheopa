@@ -19,7 +19,7 @@ class InvtItemUsage extends Model
         return $this->belongsTo(SalesMerchant::class,'merchant_id','merchant_id');
     }
     public function unit(){
-        return $this->hasMany(InvtItemUnit::class,'item_unit_id','item_unit_id');
+        return $this->belongsTo(InvtItemUnit::class,'item_unit_id','item_unit_id');
     }
     protected $guarded = [
         'created_at',
