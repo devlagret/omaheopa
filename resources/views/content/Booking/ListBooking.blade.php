@@ -112,13 +112,14 @@
 
     <div class="card-body">
         <div class="table-responsive">
-            <table id="example" style="width:100%" class="table table-striped table-bordered table-hover table-full-width">
+            <table style="width:100%" class="table datatables table-striped table-bordered table-hover table-full-width display nowarp">
                 <thead>
                     <tr>
                         <th style="text-align: center; width: 3%">No </th>
-                        <th style="text-align: center; width: 10%">Tanggal Check-In</th>
-                        <th style="text-align: center; width: 10%">Tanggal Check-Out</th>
+                        <th style="text-align: center; width: 10%">Tgl Check-In</th>
+                        <th style="text-align: center; width: 10%">Tgl Check-Out</th>
                         <th style="text-align: center; width: 20%">Atas Nama</th>
+                        <th style="text-align: center; width: 10%">No Hp</th>
                         <th style="text-align: center; width: 10%">Kamar Dipesan</th>
                         <th style="text-align: center; width: 10%">Harga</th>
                         <th style="text-align: center; width: 10%">Uang Muka</th>
@@ -133,14 +134,15 @@
                         <td class="text-center">{{ $row->checkin_date }}</td>
                         <td class="text-center">{{ $row->checkout_date }}</td>
                         <td>{{ $row->sales_order_name }}</td>
-                        <td>{{ $row->rooms->count() }}</td>
+                        <td class="text-center">{{ $row->phone_number }}</td>
+                        <td class="text-center">{{ $row->rooms->count() }}</td>
                         <td>{{ number_format($row->sales_order_price) }}</td>
                         <td>{{ number_format($row->down_payment) }}</td>
                         <td style="text-align: center">
                             @if (!$row->sales_order_status)
-                          <a type="button" class="btn btn-outline-primary btn-sm" href="{{ route('booking.rescedule',$row->sales_order_id) }}">Rescedule</a>
-                          <a type="button" class="btn btn-outline-warning btn-sm" href="{{ route('booking.edit',$row->sales_order_id) }}">Edit</a>
-                          <a type="button" class="btn btn-outline-danger btn-sm" onclick="check('{{ $row->sales_order_name}}', '{{route('booking.delete',$row->sales_order_id)}}')">Hapus</a>
+                          <a type="button" class="btn btn-outline-primary my-1 btn-sm" href="{{ route('booking.rescedule',$row->sales_order_id) }}">Rescedule</a>
+                          <a type="button" class="btn btn-outline-warning my-1 btn-sm" href="{{ route('booking.edit',$row->sales_order_id) }}">Edit</a>
+                          <a type="button" class="btn btn-outline-danger my-1 btn-sm" onclick="check('{{ $row->sales_order_name}}', '{{route('booking.delete',$row->sales_order_id)}}')">Hapus</a>
                           @else
                           @if($row->sales_order_type==0)
                           <div class="px-1 rounded-pill mx-auto bg-info mb-2" style="font-size:0.9rem;"> Sudah Bayar Uang Muka </div>
@@ -148,7 +150,7 @@
                           <div class="text-center px-auto w-75 rounded-pill mx-auto bg-info" style="font-size:0.9rem;">Langsung Check-In</div>
                           @endif
                           @endif
-                            <a type="button" class="btn btn-outline-dark btn-sm" href="{{ route('booking.detail',$row->sales_order_id) }}">Detail</a>
+                            <a type="button" class="btn btn-outline-dark my-1 btn-sm" href="{{ route('booking.detail',$row->sales_order_id) }}">Detail</a>
                         </td>
                       </tr>
                   @endforeach

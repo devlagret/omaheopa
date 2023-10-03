@@ -242,7 +242,15 @@
                         </div>
                         <div class="row">
                             <h5 class="col">
+                                Alamat : {{ $data->address }}
+                            </h5>
+                            <h5 class="col">
                                 Uang Muka : Rp {{ number_format($data->down_payment, 2) }}
+                            </h5>
+                        </div>
+                        <div class="row">
+                            <h5 class="col">
+                                No Hp : {{ $data->phone_number }}
                             </h5>
                         </div>
                         @isset($rsc)

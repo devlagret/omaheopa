@@ -1030,13 +1030,31 @@ if (empty($paket)) {
                     </div>
                     <div role="tabpanel" class="tab-pane" id="room">
                         <div class="row form-group">
-                            <div class="col">
+                            <div class="col-md-6">
                                 <div class="form-group">
                                     <a class="text-dark">Atas Nama<a class='red'> *</a></a>
                                     <input class="form-control required input-bb" required name="atas_nama"
                                         id="atas_nama" type="text" autocomplete="off"
                                         onchange="function_elements_add(this.name, this.value)"
                                         value="{{ $sessiondata['atas_nama'] ?? '' }}" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <a class="text-dark">No HP</a>
+                                    <input class="form-control input-bb" name="phone_number"
+                                        id="phone_number" type="text" autocomplete="off"
+                                        onchange="function_elements_add(this.name, this.value)"
+                                        value="{{ $sessiondata['phone_number'] ?? '' }}" />
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group">
+                                    <a class="text-dark">Alamat</a>
+                                    <textarea  class="form-control input-bb" name="address"
+                                        id="address" autocomplete="off"
+                                        onchange="function_elements_add(this.name, this.value)"
+                                        >{{ $sessiondata['address'] ?? '' }}</textarea >
                                 </div>
                             </div>
                         </div>

@@ -600,6 +600,8 @@ class BookingController extends Controller
                 'sales_order_type' => $request->sales_order_type,
                 'order_date' => Carbon::now()->format('Y-m-d'),
                 'sales_order_name' => $field['atas_nama'],
+                'phone_number' => $request->phone_number,
+                'address' => $request->address,
                 'created_id'    => Auth::id(),
                 'company_id'    => Auth::user()->company_id,
                 'sales_order_token' => $token->toString(),
@@ -925,7 +927,8 @@ class BookingController extends Controller
             $order->sales_order_status = $sales_order_status;
             $order->sales_order_type = $request->sales_order_type;
             $order->sales_order_name =  $field['atas_nama'];
-
+            $order->phone_number = $request->phone_number;
+            $order->address      = $request->address;
             $order->save();
             SalesOrderRoom::where('sales_order_id',$order->sales_order_id)->delete();
             SalesOrderFacility::where('sales_order_id',$order->sales_order_id)->delete();
