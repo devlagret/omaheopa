@@ -25,6 +25,9 @@
         }
         function changeCategory(id, el) {
             loadingWidget();
+            if($('#'+id).val()!=''){
+                $('#merchant_id').val($('#'+id).val());
+            }
             var merchant_id = $("#" + id).val();
             $('#merchant_id').val(merchant_id);
             console.log(id);
@@ -98,6 +101,9 @@
             });
         }
         $(document).ready(function() {
+            if($('#merchant_id_view').val()!=''){
+                $('#merchant_id').val($('#merchant_id_view').val());
+            }
             changeCategory('merchant_id_view', 'item_category_id');
         });
     </script>
@@ -177,7 +183,7 @@
                                 <div class="form-group">
                                     <a class="text-dark">Kategori Barang / Paket<a class='red'> *</a></a>
                                     <select class="selection-search-clear required select-form"
-                                        placeholder="Masukan Kategori Barang" name="item_category_id" id="item_category_id"
+                                        placeholder="Masukan Kategori Barang" required name="item_category_id" id="item_category_id"
                                         onchange="changeItem(this.value)">
                                     </select>
                                 </div>
@@ -185,7 +191,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <a class="text-dark">Nama Barang<a class='red'> *</a></a>
-                                    <select class="selection-search-clear required select-form" placeholder="Masukan Nama Barang"
+                                    <select class="selection-search-clear required select-form" required placeholder="Masukan Nama Barang"
                                         name="item_id" id="item_id" onchange="changeSatuan()">
                                     </select>
                                 </div>
@@ -194,15 +200,23 @@
                                 <div class="form-group">
                                     <a class="text-dark">Satuan Barang<a class='red'> *</a></a>
                                     <select class="selection-search-clear required select-form"
-                                        placeholder="Masukan Kategori Barang" name="item_unit" id="item_unit">
+                                        placeholder="Masukan Kategori Barang" required name="item_unit_id" id="item_unit_id">
                                     </select>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <a class="text-dark">Jumlah<a class='red'> *</a></a>
-                                    <input class="form-control input-bb" type="number" min="1" value="1"
+                                    <input class="form-control input-bb required" required type="number" min="1" value="1"
                                         placeholder="Masukan Jumlah Barang" name="quantity" id="quantity">
+                                </input>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <a class="text-dark">Keterangan</a>
+                                    <input class="form-control input-bb" type="text"
+                                        placeholder="Masukan Keterangan Penggunaan" autocomplete="off" name="usage_remark" id="usage_remark">
                                 </input>
                                 </div>
                             </div>

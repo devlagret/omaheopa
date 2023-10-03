@@ -5,7 +5,7 @@
 @section('js')
 <script>
     function check(name,uri){
-      if(confirm(`Yakin Ingin Menghapus Booking Atas Nama '`+name+`' ?`)){
+      if(confirm(`Yakin Ingin Menghapus Penggunaan Item '`+name+`' ?`)){
         window.location.href = uri;
       }
     }
@@ -104,10 +104,11 @@
                 <thead>
                     <tr>
                         <th style="text-align: center; width: 3%">No </th>
-                        <th style="text-align: center; width: 10%">Tanggal</th>
-                        <th style="text-align: center; width: 10%">Nama Barang</th>
-                        <th style="text-align: center; width: 20%">Jumlah</th>
-                        <th style="text-align: center; width: 15%">Aksi</th>
+                        <th style="text-align: center; width: 8%">Tanggal</th>
+                        <th style="text-align: center; width: 15%">Nama Barang</th>
+                        <th style="text-align: center; width: 5%">Jumlah</th>
+                        <th style="text-align: center; width: 20%">Keterangan</th>
+                        <th style="text-align: center; width: 10%">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -115,11 +116,13 @@
                   @foreach ($usage as $row)
                       <tr>
                         <td class="text-center">{{ $no++ }}</td>
-                        <td class="text-center">{{ $row->checkin_date }}</td>
-                        <td>{{ $row->sales_order_name }}</td>
-                        <td>{{ $row->rooms->count() }}</td>
+                        <td class="text-center">{{ $row->date }}</td>
+                        <td>{{ $row->item->item_name }}</td>
+                        <td>{{ number_format($row->quantity).' '.$row->unit->item_unit_name}}</td>
+                        <td>{{ $row->usage_remark}}</td>
                         <td style="text-align: center">
-                        
+                            <a type="button" class="btn btn-outline-warning btn-sm" href="{{ route('hi.edit',$row->invt_item_usage_id) }}">Edit</a>
+                            <button type="button" onclick="$('this').attr('disabled');check('{{$row->item_name}}','{{ route('hi.delete',$row->invt_item_usage_id) }}')" class="btn btn-outline-danger btn-sm" >Hapus</button>
                         </td>
                       </tr>
                   @endforeach

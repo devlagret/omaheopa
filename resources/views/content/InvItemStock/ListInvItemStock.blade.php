@@ -142,7 +142,7 @@
 <div class="card border border-dark">
     <div class="card-header bg-dark clearfix">
         <h5 class="mb-0 float-left">
-            Daftar
+            Daftar <i class="fa fa-circle-plus"></i>
         </h5>
         <div class="form-actions float-right">
             <button onclick="location.href='{{ url('item-stock/export') }}'" name="Find" class="btn btn-sm btn-info" title="Export Excel"><i class="fa fa-print"></i> Export</button>
@@ -159,16 +159,17 @@
                         <th width="13%" style='text-align:center'>Kategori Barang</th>
                         <th width="15%" style='text-align:center'>Nama Barang</th>
                         {{-- <th width="10%" style='text-align:center'>Grade</th> --}}
-                        <th width="10%" style='text-align:center'>Qty</th>
                         {{-- <th width="10%" style='text-align:center'>Unit</th> --}}
                         <th width="10%" style='text-align:center'>Gudang</th>
                         <th width="10%" style='text-align:center'>Tanggal Datang</th>
+                        <th width="10%" style='text-align:center'>Qty</th>
                         {{-- <th width="8%" style='text-align:center'>Aksi</th> --}}
                     </tr>
                 </thead>
                 <tbody>
-                    <?php $no = 1; ?>
+                    <?php $no = 1; $l = 1;?>
                     @foreach($invitemstock as $stock)
+                    @php $id @endphp
                     <tr>
                         <td style='text-align:center'>{{$no}}</td>
                         <td>{{$stock->item->merchant->merchant_name}}</td>
@@ -179,16 +180,25 @@
                         <?php } else {?>
                             <td>{{$InvItemStock->getCoreGradeName($stock['item_id'])}}</td>
                         <?php } ?> --}}
-                        <td>{{$stock->last_balance." ".$stock->unit->item_unit_name}}</td>
                         <td>{{$stock->warehouse->warehouse_name}}</td>
                         <td>{{date('d/m/Y', strtotime($stock['created_at']))}}</td>
+                        <td>{{number_format($stock->last_balance)." ".$stock->unit->item_unit_name}}</td>
                         {{-- <td class="">
                             <a type="button" class="btn btn-outline-warning btn-sm" href="{{ url('/inv-item-stock/edit/'.$stock['item_stock_id']) }}">Edit</a>
                             <a type="button" class="btn btn-outline-danger btn-sm" href="{{ url('/inv-item-stock/delete-inv-item-stock/'.$stock['item_stock_id']) }}">Hapus</a>
                         </td> --}}
                     </tr>
-                    <?php $no++; ?>
+                    <?php $no++; $l++?>
                     @endforeach
+                    <tr>
+                        <td style='text-align:center'>no</td>
+                        <td>warehouse</td>
+                        <td>merchant<i class="fa fa-solid fa-circle-plus"></i></td>
+                        <td>cat</td>
+                        <td>item</td>
+                        <td>date</td>
+                        <td>qty</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
