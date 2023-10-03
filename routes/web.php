@@ -14,6 +14,7 @@ use App\Http\Controllers\AcctProfitLossYearReportController;
 use App\Http\Controllers\AcctReceiptsController;
 use App\Http\Controllers\AcctReceiptsReportController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\CardStockItemController;
 use App\Http\Controllers\CheckInCheckOutController;
 use App\Http\Controllers\CoreBuildingController;
 use App\Http\Controllers\CoreDivisionController;
@@ -29,7 +30,7 @@ use App\Http\Controllers\SalesMerchantController;
 use App\Http\Controllers\SalesRoomMenuController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\HotelItemController;
+use App\Http\Controllers\ItemUsageController;
 use App\Http\Controllers\InvGoodsReceivedNoteController;
 use App\Http\Controllers\InvItemStockController;
 use App\Http\Controllers\InvtItemBarcodeController;
@@ -524,16 +525,24 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
     Route::post('/process-edit', [PreferenceCompanyController::class, 'processEditCCTime'])->name('process-edit-cc-time');
 });
  // Hotel item usage pages
- Route::prefix('hotel-item')->name('hi.')->group(function () {
-    Route::get('/', [HotelItemController::class, 'index'])->name('index');
-    Route::get('/add', [HotelItemController::class, 'add'])->name('add');
-    Route::post('/process-add', [HotelItemController::class, 'processAdd'])->name('process-add');
-    Route::get('/edit/{sales_order_id}', [HotelItemController::class, 'edit'])->name('edit');
-    Route::post('/process-edit', [HotelItemController::class, 'processEdit'])->name('process-edit');
-    Route::get('/delete/{sales_order_id}', [HotelItemController::class, 'delete'])->name('delete');
-    Route::post('/elements-add', [HotelItemController::class, 'elementsAdd'])->name('elements-add');
-    Route::post('/filter', [HotelItemController::class, 'filter'])->name('filter');
-    Route::post('/filter-add', [HotelItemController::class, 'filterAdd'])->name('filter-add');
+ Route::prefix('item-usage')->name('hi.')->group(function () {
+    Route::get('/', [ItemUsageController::class, 'index'])->name('index');
+    Route::get('/add', [ItemUsageController::class, 'add'])->name('add');
+    Route::post('/process-add', [ItemUsageController::class, 'processAdd'])->name('process-add');
+    Route::get('/edit/{invt_item_usage_id}', [ItemUsageController::class, 'edit'])->name('edit');
+    Route::post('/process-edit', [ItemUsageController::class, 'processEdit'])->name('process-edit');
+    Route::get('/delete/{invt_item_usage_id}', [ItemUsageController::class, 'delete'])->name('delete');
+    Route::post('/elements-add', [ItemUsageController::class, 'elementsAdd'])->name('elements-add');
+    Route::post('/filter', [ItemUsageController::class, 'filter'])->name('filter');
+    Route::post('/filter-add', [ItemUsageController::class, 'filterAdd'])->name('filter-add');
+});
+ // Stock Card pages
+ Route::prefix('card-stock-item')->name('sc.')->group(function () {
+    Route::get('/', [CardStockItemController::class, 'index'])->name('index');
+    Route::get('/print/{item_stock_id}', [CardStockItemController::class, 'delete'])->name('delete');
+    Route::post('/elements-add', [CardStockItemController::class, 'elementsAdd'])->name('elements-add');
+    Route::post('/filter', [CardStockItemController::class, 'filter'])->name('filter');
+    Route::get('/reset-filter', [CardStockItemController::class, 'resetFilter'])->name('filter-reset');
 });
 Route::prefix('log')->name('log.')->group(function () {
     Route::resource('system', SystemLogsController::class)->only(['index', 'destroy']);
