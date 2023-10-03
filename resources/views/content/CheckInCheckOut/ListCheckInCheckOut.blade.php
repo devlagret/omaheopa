@@ -270,6 +270,7 @@
                         <th style="text-align: center; width: 10%">Tanggal Check-In</th>
                         <th style="text-align: center; width: 10%">Tanggal Check-Out</th>
                         <th style="text-align: center; width: 20%">Atas Nama</th>
+                        <th style="text-align: center; width: 10%">No Hp</th>
                         <th style="text-align: center; width: 10%">Kamar Dipesan</th>
                         <th style="text-align: center; width: 10%">Uang Muka</th>
                         <th style="text-align: center; width: 10%">Total</th>
@@ -284,6 +285,7 @@
                         <td>{{ $row->checkin_date }}</td>
                         <td>{{ $row->checkout_date }}</td>
                         <td>{{ $row->sales_order_name }}</td>
+                        <td class="text-center">{{ $row->phone_number }}</td>
                         <td>{{ $row->rooms->count() }}</td>
                         <td>
                             @if($row->sales_order_type==0)

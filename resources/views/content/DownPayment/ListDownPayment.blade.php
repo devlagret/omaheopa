@@ -97,6 +97,7 @@
                         <th style="text-align: center; width: 10%">Tanggal Check-In</th>
                         <th style="text-align: center; width: 10%">Tanggal Check-Out</th>
                         <th style="text-align: center; width: 20%">Atas Nama</th>
+                        <th style="text-align: center; width: 10%">No Hp</th>
                         <th style="text-align: center; width: 10%">Kamar Dipesan</th>
                         <th style="text-align: center; width: 10%">Uang Muka</th>
                         <th style="text-align: center; width: 10%">Status</th>
@@ -110,6 +111,7 @@
                         <td class="text-center">{{ $row->checkin_date }}</td>
                         <td class="text-center">{{ $row->checkout_date }}</td>
                         <td>{{ $row->sales_order_name }}</td>
+                        <td class="text-center">{{ $row->phone_number }}</td>
                         <td>{{ $row->rooms->count() }}</td>
                         <td>{{ number_format($row->down_payment) }}</td>
                         <td style="text-align: center">
