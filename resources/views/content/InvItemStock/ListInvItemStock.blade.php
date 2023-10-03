@@ -106,6 +106,11 @@
         <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
             <div class="card-body">
                 <div class = "row form-group">
+                    {{-- <div class = "col-md-3">
+                        <a class="text-dark">Wahama / Merchant</a>
+                        <br/>
+                        {!! Form::select('merchant_id',  $merchant, $merchant_id, ['class' => 'selection-search-clear select-form', 'id' => 'merchant_id', 'name'=>'merchant_id']) !!}
+                    </div> --}}
                     <div class = "col-md-4">
                         <a class="text-dark">Kategori</a>
                         <br/>
@@ -142,7 +147,7 @@
 <div class="card border border-dark">
     <div class="card-header bg-dark clearfix">
         <h5 class="mb-0 float-left">
-            Daftar <i class="fa fa-circle-plus"></i>
+            Daftar
         </h5>
         <div class="form-actions float-right">
             <button onclick="location.href='{{ url('item-stock/export') }}'" name="Find" class="btn btn-sm btn-info" title="Export Excel"><i class="fa fa-print"></i> Export</button>
@@ -190,15 +195,6 @@
                     </tr>
                     <?php $no++; $l++?>
                     @endforeach
-                    <tr>
-                        <td style='text-align:center'>no</td>
-                        <td>warehouse</td>
-                        <td>merchant<i class="fa fa-solid fa-circle-plus"></i></td>
-                        <td>cat</td>
-                        <td>item</td>
-                        <td>date</td>
-                        <td>qty</td>
-                    </tr>
                 </tbody>
             </table>
         </div>

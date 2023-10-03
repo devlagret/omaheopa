@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\SalesMerchant;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
@@ -44,7 +45,11 @@ class InvItemStockController extends Controller
         ->join('sales_merchant', 'sales_merchant.merchant_id', 'invt_item_category.merchant_id')
         ->where('invt_item_category.data_state', 0)
         ->pluck('item_name', 'item_category_id');
-
+        $merchant   = SalesMerchant::where('data_state', 0);
+        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
+            $merchant->where('merchant_id',Auth::user()->merchant_id);
+        }
+        $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
         $invitem        = InvtItem::where('data_state', 0)->pluck('item_name', 'item_id');
 
         // $coregrade          = CoreGrade::where('data_state', 0)->pluck('grade_name', 'grade_id');
@@ -58,6 +63,8 @@ class InvItemStockController extends Controller
         $grade_id           = Session::get('filtergradeid');
         
         $warehouse_id       = Session::get('filterwarehouseid');
+
+        $merchant_id       = Session::get('filtermerchantid');
         
         $invitemstock       = InvtItemStock::with('item.merchant','unit','category','warehouse')
         // ->join('')
@@ -71,10 +78,13 @@ class InvItemStockController extends Controller
         if($warehouse_id||$warehouse_id!=null||$warehouse_id!=''){
             $invitemstock   = $invitemstock->where('invt_item_stock.warehouse_id', $warehouse_id);
         }
+        if($merchant_id||$warehouse_id!=null||$warehouse_id!=''){
+            $invitemstock   = $invitemstock->where('invt_item_stock.warehouse_id', $warehouse_id);
+        }
         $invitemstock       = $invitemstock->get();
        // dd($invitemstock);
 
-        return view('content/InvItemStock/ListInvItemStock',compact('invitemstock', 'invitemcategory', 'invitem', 'invwarehouse', 'item_category_id', 'item_id', 'grade_id', 'warehouse_id'));
+        return view('content.InvItemStock.ListInvItemStock',compact('invitemstock', 'merchant','merchant_id','invitemcategory', 'invitem', 'invwarehouse', 'item_category_id', 'item_id', 'grade_id', 'warehouse_id'));
     }
 
     // public function  getCoreGradeName($item_id){
@@ -100,7 +110,8 @@ class InvItemStockController extends Controller
         print_r('|||warehouse_id'.$warehouse_id);
         // exit;
 
-        Session::put('filteritemcategoryid', $item_category_id);
+        Session::put('filtermerchantid', $item_category_id);
+        Session::put('filteritemcategoryid', $request->merchant_id)
         Session::put('filteritemid', $item_id);
         Session::put('filtergradeid', $grade_id);
         Session::put('filterwarehouseid', $warehouse_id);
