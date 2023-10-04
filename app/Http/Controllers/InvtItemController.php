@@ -31,11 +31,9 @@ class InvtItemController extends Controller
         Session::forget('items');
         Session::forget('paket');
 
-        $data = InvtItem::with('merchant')->join('invt_item_category', 'invt_item_category.item_category_id', '=', 'invt_item.item_category_id')
-            ->where('invt_item.data_state', '=', 0)
-            ->where('invt_item.company_id', Auth::user()->company_id);
+        $data = InvtItem::with('merchant')->where('company_id', Auth::user()->company_id);
         if(Auth::id()!=1||Auth::user()->merchant_id!=null){
-                $data->where('invt_item.merchant_id',Auth::user()->merchant_id);
+                $data->where('merchant_id',Auth::user()->merchant_id);
         }
             $data =$data->get();
         return view('content.InvtItem.ListInvtItem', compact('data'));
@@ -70,7 +68,7 @@ class InvtItemController extends Controller
             $merchant->where('merchant_id',Auth::user()->merchant_id);
         }
         $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
-        $allmerchant   = SalesMerchant::where('data_state', 0)->get()->pluck('merchant_name', 'merchant_id');
+        $allmerchant   = SalesMerchant::get()->pluck('merchant_name', 'merchant_id');
         $invtitm   = InvtItem::where('data_state', 0)
             ->get()
             ->pluck('item_name', 'item_id');
@@ -148,7 +146,7 @@ class InvtItemController extends Controller
                     'company_id'            => Auth::user()->company_id,
                     'created_id'            => Auth::id(),
                 ]);
-                $item = InvtItem::orderBy('created_at', 'DESC')->where('company_id',Auth::user()->company_id)->where('data_state',0)->first();
+                $item = InvtItem::orderBy('created_at', 'DESC')->where('company_id',Auth::user()->company_id)->first();
             foreach ($warehouse as $key => $val) {
                 InvtItemStock::create([
                     'company_id'        => $item['company_id'],
@@ -194,7 +192,7 @@ class InvtItemController extends Controller
         $counts = collect();
         $items = Session::get('items');
         $msg = '';
-        $invtpaket = InvtItemPackage::where('data_state', '0')->where('item_id',$item_id)->get();
+        $invtpaket = InvtItemPackage::where('item_id',$item_id)->get();
         $pkg = InvtItemPackage::where('package_item_id',$item_id)->get()->count();
         if($pkg){
             $msg ='Ada paket yang menggunakan item ini';
@@ -258,7 +256,7 @@ class InvtItemController extends Controller
             'item_name'         => 'required',
             'item_id'         => 'required',
         ],['item_category_id.integer'=>'Wahana / Merchant Tidak Memiliki Kategori']);
-        $paket= InvtItemPackage::where('data_state',0)->where('item_id',$fields['item_id']);
+        $paket= InvtItemPackage::where('item_id',$fields['item_id']);
         try{
         DB::beginTransaction();
         $table       = InvtItem::findOrFail($fields['item_id']);
@@ -266,8 +264,8 @@ class InvtItemController extends Controller
         for($l=1;$l<=4;$l++){
             if($table['item_unit_id'.$l] != $request['item_unit_id'.$l]){
                 if($table['item_unit_id'.$l]!=null && $request['item_unit_id'.$l]==null){
-                    if($packageitem->where('data_state',0)->where('item_unit_id',$table['item_unit_id'.$l])->get()->count()){
-                    return redirect()->back()->withErrors('Ada Paket yang Menggunankan Item "'.$table->item_name.'" Dengan Satuan "'.$packageitem->where('data_state',0)->where('item_unit_id',$table['item_unit_id'.$l])->first()->unit->item_unit_name.'". Harap Tidak Menghapus Satuan Tersebut.' );
+                    if($packageitem->where('item_unit_id',$table['item_unit_id'.$l])->get()->count()){
+                    return redirect()->back()->withErrors('Ada Paket yang Menggunankan Item "'.$table->item_name.'" Dengan Satuan "'.$packageitem->where('item_unit_id',$table['item_unit_id'.$l])->first()->unit->item_unit_name.'". Harap Tidak Menghapus Satuan Tersebut.' );
                 }
                 }
                 /*if($table['item_unit_id'.$l]!=null&&$request->used_in_package){
@@ -464,14 +462,14 @@ class InvtItemController extends Controller
     }
     public function checkDeleteItem($item_id) {
 
-        $pkg = InvtItemPackage::where('data_state','0')->where('item_id',$item_id)->get()->count();
+        $pkg = InvtItemPackage::where('item_id',$item_id)->get()->count();
         if($pkg){
            return response(1);
         }
         return response(0);
     }
     public function getItemCost(Request $request) {
-        $itm = InvtItem::where('data_state','0')->where('item_id',$request->item_id)->first();
+        $itm = InvtItem::where('item_id',$request->item_id)->first();
         for ( $a = 1 ; $a <= 4; $a++) {
             if( $itm['item_unit_id'.$a] != null && $itm['item_unit_id'.$a]==$request->item_unit){
                 return  ['cost'=>$itm['item_unit_cost'.$a],'price'=>$itm['item_unit_price'.$a]];

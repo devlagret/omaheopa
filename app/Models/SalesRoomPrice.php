@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Scopes\NotDeletedScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -23,4 +24,8 @@ class SalesRoomPrice extends Model
         'created_at',
         'updated_at'
     ];
+    protected static function booted()
+    {
+        static::addGlobalScope(new NotDeletedScope);
+    }
 }

@@ -39,7 +39,7 @@ class InvItemStockController extends Controller
      */
     public function index()
     {
-        // $invitemcategory    = InvtItemCategory::where('data_state', 0)->pluck('item_category_name', 'item_category_id');
+        // $invitemcategory    = InvtItemCategory::pluck('item_category_name', 'item_category_id');
 
         $invitemcategory = InvtItemCategory::select('item_category_id',DB::raw('CONCAT(invt_item_category.item_category_name, " ", sales_merchant.merchant_name) AS item_name'))
         ->join('sales_merchant', 'sales_merchant.merchant_id', 'invt_item_category.merchant_id')
@@ -50,11 +50,11 @@ class InvItemStockController extends Controller
             $merchant->where('merchant_id',Auth::user()->merchant_id);
         }
         $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
-        $invitem        = InvtItem::where('data_state', 0)->pluck('item_name', 'item_id');
+        $invitem        = InvtItem::pluck('item_name', 'item_id');
 
-        // $coregrade          = CoreGrade::where('data_state', 0)->pluck('grade_name', 'grade_id');
+        // $coregrade          = CoreGrade::pluck('grade_name', 'grade_id');
 
-        $invwarehouse       = InvtWarehouse::where('data_state', 0)->pluck('warehouse_name', 'warehouse_id');
+        $invwarehouse       = InvtWarehouse::pluck('warehouse_name', 'warehouse_id');
 
         $item_category_id   = Session::get('filteritemcategoryid');
 
@@ -111,7 +111,7 @@ class InvItemStockController extends Controller
         // exit;
 
         Session::put('filtermerchantid', $item_category_id);
-        Session::put('filteritemcategoryid', $request->merchant_id)
+        Session::put('filteritemcategoryid', $request->merchant_id);
         Session::put('filteritemid', $item_id);
         Session::put('filtergradeid', $grade_id);
         Session::put('filterwarehouseid', $warehouse_id);
@@ -260,11 +260,11 @@ class InvItemStockController extends Controller
         ->where('invt_item_category.data_state', 0)
         ->pluck('item_name', 'item_category_id');
 
-        $invitem        = InvtItem::where('data_state', 0)->pluck('item_name', 'item_id');
+        $invitem        = InvtItem::pluck('item_name', 'item_id');
 
-        // $coregrade          = CoreGrade::where('data_state', 0)->pluck('grade_name', 'grade_id');
+        // $coregrade          = CoreGrade::pluck('grade_name', 'grade_id');
 
-        $invwarehouse       = InvtWarehouse::where('data_state', 0)->pluck('warehouse_name', 'warehouse_id');
+        $invwarehouse       = InvtWarehouse::pluck('warehouse_name', 'warehouse_id');
 
         $item_category_id   = Session::get('filteritemcategoryid');
 

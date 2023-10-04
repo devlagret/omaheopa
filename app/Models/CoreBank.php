@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Scopes\NotDeletedScope;
 use Illuminate\Database\Eloquent\Model;
 
 class CoreBank extends Model
@@ -36,4 +37,8 @@ class CoreBank extends Model
      *
      * @var array
      */
+    protected static function booted()
+    {
+        static::addGlobalScope(new NotDeletedScope);
+    }
 }

@@ -48,7 +48,6 @@ class StockHelper{
         $item = InvtItem::find($item_id);
         self::$item = $item;
         self::$data = InvtItemStock::where('company_id',Auth::user()->company_id)
-        ->where('data_state',0)
         ->where('item_id',$item_id)->orderByDesc('item_stock_id')->first();
         $qty = self::$data->last_balance;
         $sh = new StockHelper();
