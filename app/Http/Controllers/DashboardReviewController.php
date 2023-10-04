@@ -390,9 +390,6 @@ class DashboardReviewController extends PublicController
             $service_id      = Session::get('service_id');
         }
 
-        $coreservice = CoreService::where('data_state', 0)->get();
-        $coresection = CoreSection::where('data_state', 0)->get();
-        
         $transservicedisposition = TransServiceDisposition::where('data_state','=',0)
         ->where('created_at','>=',$start_date)
         ->where('created_at','<=',$end_date)
