@@ -30,9 +30,12 @@ class CardStockItemController extends Controller
         ->where('transaction_date', '>=', $filter['start_date']??Carbon::now()->format('Y-m-d'))
         ->where('transaction_date', '<=', $filter['end_date']??Carbon::now()->format('Y-m-d'))
         ->get();
-        return view('content.CardStockItem.ListCardStockItem',compact('filter','data'));
+        return view('content.CardStockItem.ListCardStockItem',compact('filter','data','mutation'));
     }
-
+    public function table(Request $request){
+    return response()->json(['draw'=>$request->draw,"recordsTotal"=>1000 ,
+    "recordsFiltered"=>1000,'data'=>[['no'=>1,'merchant'=>'tes','item_category_name'=>'tess','item_name'=>'tst','item_unit_name'=>'foo','opening_stock'=>'bar','stock_in'=>'bazz','stock_out'=>'tesss','last_balence'=>20,'action'=>"<button>add</button>"]]]);
+    }
     public function tableStockCardStockItem(Request $request)
     {
         if(!$start_date = Session::get('start_date')){

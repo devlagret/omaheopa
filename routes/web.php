@@ -544,6 +544,7 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
     Route::post('/elements-add', [CardStockItemController::class, 'elementsAdd'])->name('elements-add');
     Route::post('/filter', [CardStockItemController::class, 'filter'])->name('filter');
     Route::get('/reset-filter', [CardStockItemController::class, 'resetFilter'])->name('filter-reset');
+    Route::get('/table', [CardStockItemController::class, 'table'])->name('table');
 });
 Route::prefix('log')->name('log.')->group(function () {
     Route::resource('system', SystemLogsController::class)->only(['index', 'destroy']);
