@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 
 class CardStockItemController extends Controller
 {
@@ -24,6 +25,10 @@ class CardStockItemController extends Controller
 
     public function index()
     {
+        // InvtItemMutation::select(DB::raw('SUM(stock_out) as stock_out'))
+        // ->where('item_id',3)
+        // ->where('company_id', Auth::user()->company_id)
+        // ->get()->dd();
         $filter = Session::get('filter-card');
         $data = InvtItemStock::with('item.merchant','category','unit')->get();
         $mutation = InvtItemMutation::where('company_id', Auth::user()->company_id)
@@ -32,98 +37,105 @@ class CardStockItemController extends Controller
         ->get();
         return view('content.CardStockItem.ListCardStockItem',compact('filter','data','mutation'));
     }
-    public function table(Request $request){
-    return response()->json(['draw'=>$request->draw,"recordsTotal"=>1000 ,
-    "recordsFiltered"=>1000,'data'=>[['no'=>1,'merchant'=>'tes','item_category_name'=>'tess','item_name'=>'tst','item_unit_name'=>'foo','opening_stock'=>'bar','stock_in'=>'bazz','stock_out'=>'tesss','last_balence'=>20,'action'=>"<button>add</button>"]]]);
-    }
-    public function tableStockCardStockItem(Request $request)
+    public function table(Request $request)
     {
-        if(!$start_date = Session::get('start_date')){
-            $start_date = date('Y-m-d');
-        } else {
-            $start_date = Session::get('start_date');
-        }
-        if(!$end_date = Session::get('end_date')){
-            $end_date = date('Y-m-d');
-        } else {
-            $end_date = Session::get('end_date');
-        }
-
-        $data_item = InvtItemStock::where('invt_item_stock.data_state',0)
-        ->join('invt_item','invt_item.item_id','=','invt_item_stock.item_id')
-        ->join('invt_item_unit','invt_item_unit.item_unit_id','=','invt_item_stock.item_unit_id')
-        ->join('invt_item_category','invt_item_category.item_category_id','=','invt_item_stock.item_category_id')
-        ->where('invt_item_stock.company_id', Auth::user()->company_id)->where('invt_item.data_state',0);
+        $filter = Session::get('filter-card');
+        $sd = $filter['start_date']??Carbon::now()->format('Y-m-d');
+        $ed = $filter['end_date']??Carbon::now()->format('Y-m-d');
+        $data_item = InvtItemStock::addSelect([
+        'opening_balance' => InvtItemMutation::select('opening_balance')
+        ->whereColumn('item_id', 'invt_item_stock.item_id')
+        ->where('company_id', Auth::user()->company_id)
+        ->where('transaction_date', '>=', $sd)
+        ->where('transaction_date', '<=', $ed)
+        ->limit(1),
+        'stock_in' => InvtItemMutation::select(DB::raw('SUM(stock_in) as stock_in'))
+        ->whereColumn('item_id', 'invt_item_stock.item_id')
+        ->where('company_id', Auth::user()->company_id)
+        ->where('transaction_date', '>=', $sd)
+        ->where('transaction_date', '<=', $ed),
+        'stock_out'=>InvtItemMutation::select(DB::raw('SUM(stock_out) as stock_out'))
+        ->whereColumn('item_id', 'invt_item_stock.item_id')
+        ->where('company_id', Auth::user()->company_id)
+        ->where('transaction_date', '>=', $sd)
+        ->where('transaction_date', '<=', $ed),
+        'last_balence'=> InvtItemMutation::select('last_balence')
+        ->whereColumn('item_id', 'invt_item_stock.item_id')
+        ->where('company_id', Auth::user()->company_id)
+        ->where('transaction_date', '>=', $sd)
+        ->where('transaction_date', '<=', $ed)
+        ->orderByDesc('item_mutation_id')
+        ->limit(1)
+        ])->with('item.merchant','unit','category')
+        ->where('company_id', Auth::user()->company_id);
 
         $draw 				= 		$request->get('draw');
         $start 				= 		$request->get("start");
         $rowPerPage 		= 		$request->get("length");
         $orderArray 	    = 		$request->get('order');
         $columnNameArray 	= 		$request->get('columns');
-        $searchArray 		= 		$request->get('search');
-        $columnIndex 		= 		$orderArray[0]['column'];
-        $columnName 		= 		$columnNameArray[$columnIndex]['data'];
-        $columnSortOrder 	= 		$orderArray[0]['dir'];
-        $searchValue 		= 		$searchArray['value'];
-        $valueArray         = explode (" ",$searchValue);
-
-        $users = $data_item;
-        $total = $users->count();
-
-        $totalFilter = $data_item;
-        if (!empty($searchValue)) {
-            if (count($valueArray) != 1) {
-                foreach ($valueArray as $key => $val) {
-                    $totalFilter = $totalFilter->where('invt_item.item_name','like','%'.$val.'%');
-                }
-            } else {
-                $totalFilter = $totalFilter->where('invt_item.item_name','like','%'.$searchValue.'%');
-            }
+        $searchValue 		= 		$request->search['value'];
+        $sort=collect();
+        foreach ($orderArray as $key => $or){
+            $sort->push([$columnNameArray[$or['column']]['data'],$or['dir']]);
         }
-        $totalFilter = $totalFilter->count();
+        // $totalFilter = $data_item;
+        // if (!empty($searchValue)) {
+        //     if (count($valueArray) != 1) {
+        //         foreach ($valueArray as $key => $val) {
+        //             $totalFilter = $totalFilter->where('invt_item.item_name','like','%'.$val.'%');
+        //         }
+        //     } else {
+        //         $totalFilter = $totalFilter->where('invt_item.item_name','like','%'.$searchValue.'%');
+        //     }
+        // }
+        // $totalFilter = $totalFilter->count();
 
 
         $arrData = $data_item;
+        // if (!empty($searchValue)) {
+        //     if (count($valueArray) != 1) {
+        //         foreach ($valueArray as $key => $val) {
+        //             $arrData = $arrData->where('item_name','like','%'.$val.'%');
+        //         }
+        //     } else {
+        //         $arrData = $arrData->where('item_name','like','%'.$searchValue.'%');
+        //     }
+        // }
         $arrData = $arrData->skip($start)->take($rowPerPage);
-        $arrData = $arrData->orderBy($columnName, $columnSortOrder);
-
-        if (!empty($searchValue)) {
-            if (count($valueArray) != 1) {
-                foreach ($valueArray as $key => $val) {
-                    $arrData = $arrData->where('invt_item.item_name','like','%'.$val.'%');
-                }
-            } else {
-                $arrData = $arrData->where('invt_item.item_name','like','%'.$searchValue.'%');
-            }
-        }
-
         $arrData = $arrData->get();
 
-         $no = $start;
-        $data = array();
+        $no = $start;
+        $data = collect();
         foreach ($arrData as $key => $val) {
             $no++;
-            $row                        = array();
-            $row['no']                  = "<div class='text-center'>".$no.".</div>";
-            $row['item_category_name']  = $val['item_category_name'];
-            $row['item_name']           = $val['item_name'];
-            $row['item_unit_name']      = $val['item_unit_name'];
-            $row['opening_stock']       = $this->getOpeningStock($val['item_category_id'], $val['item_id'], $val['item_unit_id']);
-            $row['stock_in']            = $this->getStockIn($val['item_category_id'], $val['item_id'], $val['item_unit_id']);
-            $row['stock_out']           = $this->getStockOut($val['item_category_id'], $val['item_id'], $val['item_unit_id']);
-            $row['last_balence']        = $this->getLastBalance($val['item_category_id'], $val['item_id'], $val['item_unit_id']);
-            $row['action']              = "<div class='text-center'><a type='button' href='".url('card-stock-item/print/'.$val['item_stock_id'])."' class='btn btn-secondary btn-sm'><i class='fa fa-file-pdf'></i> Kartu Stok</a></div>";
+            $row                        = collect();
+            $row->put('no', "<div class='text-center'>".$no.".</div>");
+            $row->put('merchant', $val->item->merchant->merchant_name);
+            $row->put('item_category_name', $val->category->item_category_name);
+            $row->put('item_name', $val->item->item_name);
+            $row->put('item_unit_name', $val->unit->item_unit_name);
+            $row->put('opening_stock', $val->opening_balance??0);
+            $row->put('stock_in', $val->stock_in??0);
+            $row->put('stock_out', $val->stock_out??0);
+            $row->put('last_balence', $val->last_balence??0);
+            $row->put('action', "<div class='text-center'><a type='button' href='".route('sc.print',$val->item_stock_id)."' class='btn btn-secondary btn-sm'><i class='fa fa-file-pdf'></i> Kartu Stok</a></div>");
 
-            $data[] = $row;
+            $data->push($row);
         }
+        $data= $data->filter(function ($item) use($searchValue){
+            return preg_match("/".$searchValue."/i",$item);
+        });
+        $data = $data->sortBy($sort->toArray());
+        $totalFilter = $data->count();
         $response = array(
             "draw"              => intval($draw),
-            "recordsTotal"      => $total,
+            "recordsTotal"      => $data_item->count(),
             "recordsFiltered"   => $totalFilter,
             "data"              => $data,
         );
 
-        return json_encode($response);
+        return response()->json($response);
     }
 
     public function getOpeningStock($item_category_id, $item_id, $item_unit_id)
@@ -155,79 +167,6 @@ class CardStockItemController extends Controller
             return 0;
         }
     }
-
-    public function getStockIn($item_category_id, $item_id, $item_unit_id)
-    {
-        if(!$start_date = Session::get('start_date')){
-            $start_date = date('Y-m-d');
-        } else {
-            $start_date = Session::get('start_date');
-        }
-        if(!$end_date = Session::get('end_date')){
-            $end_date = date('Y-m-d');
-        } else {
-            $end_date = Session::get('end_date');
-        }
-
-        $data = InvtItemMutation::select('stock_in')
-        ->where('data_state',0)
-        ->where('item_id', $item_id)
-        ->where('item_category_id', $item_category_id)
-        ->where('item_unit_id', $item_unit_id)
-        ->where('company_id', Auth::user()->company_id)
-        ->where('transaction_date', '>=', $start_date)
-        ->where('transaction_date', '<=', $end_date)
-        ->get();
-
-        $stockin = 0;
-
-        if (empty($data)) {
-            return $stockin;
-        } else {
-            foreach ($data as $key => $val) {
-                $stockin += $val['stock_in'];
-            }
-
-            return $stockin;
-        }
-    }
-
-    public function getStockOut($item_category_id, $item_id, $item_unit_id)
-    {
-        if(!$start_date = Session::get('start_date')){
-            $start_date = date('Y-m-d');
-        } else {
-            $start_date = Session::get('start_date');
-        }
-        if(!$end_date = Session::get('end_date')){
-            $end_date = date('Y-m-d');
-        } else {
-            $end_date = Session::get('end_date');
-        }
-
-        $data = InvtItemMutation::select('stock_out')
-        ->where('data_state',0)
-        ->where('item_id', $item_id)
-        ->where('item_category_id', $item_category_id)
-        ->where('item_unit_id', $item_unit_id)
-        ->where('company_id', Auth::user()->company_id)
-        ->where('transaction_date', '>=', $start_date)
-        ->where('transaction_date', '<=', $end_date)
-        ->get();
-
-        $stockout = 0;
-
-        if (empty($data)) {
-            return $stockout;
-        } else {
-            foreach ($data as $key => $val) {
-                $stockout += $val['stock_out'];
-            }
-
-            return $stockout;
-        }
-    }
-
     public function getLastBalance($item_category_id, $item_id, $item_unit_id)
     {
         if(!$start_date = Session::get('start_date')){
