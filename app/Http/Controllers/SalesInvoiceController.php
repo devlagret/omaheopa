@@ -211,12 +211,12 @@ class SalesInvoiceController extends Controller
                     'created_id'                        => Auth::id(),
                     'updated_id'                        => Auth::id()
                 );
-                dump([(int) $val['quantity'],$val['item_unit_id']]);
-                $qty = (int) $val['quantity'];
-                dump(StockHelper::find($val['item_id']));
-                dump(StockHelper::find(3)->sub(5,$val['item_unit_id']));
-                dump(StockHelper::find($val['item_id']));
-                dd($dataarray); 
+                // dump([(int) $val['quantity'],$val['item_unit_id']]);
+                // $qty = (int) $val['quantity'];
+                // dump(StockHelper::find($val['item_id']));
+                // dump(StockHelper::find(3)->sub(5,$val['item_unit_id']));
+                // dump(StockHelper::find($val['item_id']));
+                // dd($dataarray); 
                 StockHelper::find($val['item_id'])->sub((int)$val['quantity'],$val['item_unit_id']);
                 SalesInvoiceItem::create($dataarray);
                 // $stock_item = InvtItemStock::where('item_id',$dataarray['item_id'])

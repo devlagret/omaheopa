@@ -105,14 +105,14 @@ class InvGoodsReceivedNoteController extends Controller
         if($merchant == null){
 
         $purchaseorder = PurchaseInvoice::select('purchase_invoice.*','purchase_invoice_item.*')
-        ->where('purchase_invoice_item.data_state','=',0)
+        ->where('purchase_invoice.data_state','=',0)
         ->where('purchase_invoice.invt_goods_received_status','=',0)
         ->join('purchase_invoice_item','purchase_invoice.purchase_invoice_id','purchase_invoice_item.purchase_invoice_id')
         ->where('purchase_invoice_item.quantity', '>', 0)
         ->get();
         }else{
             $purchaseorder = PurchaseInvoice::select('purchase_invoice.*','purchase_invoice_item.*')
-            ->where('purchase_invoice_item.data_state','=',0)
+            ->where('purchase_invoice.data_state','=',0)
             ->where('purchase_invoice.invt_goods_received_status','=',0)
             ->join('purchase_invoice_item','purchase_invoice.purchase_invoice_id','purchase_invoice_item.purchase_invoice_id')
             ->where('purchase_invoice_item.quantity', '>', 0)
@@ -484,9 +484,9 @@ class InvGoodsReceivedNoteController extends Controller
 
 			
 
-            // $purchaseInvoice = PurchaseInvoice::findOrFail($invgoodsreceivednote['purchase_invoice_id']);
-            // $purchaseInvoice->invt_goods_received_status = 1;
-            // $purchaseInvoice->save();
+            $purchaseInvoice = PurchaseInvoice::findOrFail($invgoodsreceivednote['purchase_invoice_id']);
+            $purchaseInvoice->invt_goods_received_status = 1;
+            $purchaseInvoice->save();
 
             $msg = 'Tambah Penerimaan Barang Berhasil';
             return redirect('/goods-received-note')->with('msg',$msg);

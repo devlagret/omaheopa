@@ -255,11 +255,17 @@ class InvItemStockController extends Controller
 
     public function export(){
 
-        $invitemcategory = InvtItemCategory::select('item_category_id',DB::raw('CONCAT(invt_item_category.item_category_name, " ", sales_merchant.merchant_name) AS item_name'))
-        ->join('sales_merchant', 'sales_merchant.merchant_id', 'invt_item_category.merchant_id')
-        ->where('invt_item_category.data_state', 0)
-        ->pluck('item_name', 'item_category_id');
+        $invitemcategory    = InvtItemCategory::pluck('item_category_name', 'item_category_id');
 
+        // $invitemcategory = InvtItemCategory::select('item_category_id',DB::raw('CONCAT(invt_item_category.item_category_name, " ", sales_merchant.merchant_name) AS item_name'))
+        // ->join('sales_merchant', 'sales_merchant.merchant_id', 'invt_item_category.merchant_id')
+        // ->where('invt_item_category.data_state', 0)
+        // ->pluck('item_name', 'item_category_id');
+        $merchant   = SalesMerchant::where('sales_merchant.data_state', 0);
+        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
+            $merchant->where('sales_merchant.merchant_id',Auth::user()->merchant_id);
+        }
+        $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
         $invitem        = InvtItem::pluck('item_name', 'item_id');
 
         // $coregrade          = CoreGrade::pluck('grade_name', 'grade_id');
@@ -273,10 +279,11 @@ class InvItemStockController extends Controller
         $grade_id           = Session::get('filtergradeid');
         
         $warehouse_id       = Session::get('filterwarehouseid');
+
+        $merchant_id       = Session::get('filtermerchantid');
         
-        $invitemstock       = InvtItemStock::select('invt_item_stock.*')
-        // ->join('')
-        ->where('invt_item_stock.data_state','=',0);
+        $invitemstock       = InvtItemStock::with('item.merchant','unit','category','warehouse')
+        ->where('invt_item_stock.data_state',0);
         if($item_category_id||$item_category_id!=null||$item_category_id!=''){
             $invitemstock   = $invitemstock->where('invt_item_stock.item_category_id', $item_category_id);
         }
@@ -286,8 +293,11 @@ class InvItemStockController extends Controller
         if($warehouse_id||$warehouse_id!=null||$warehouse_id!=''){
             $invitemstock   = $invitemstock->where('invt_item_stock.warehouse_id', $warehouse_id);
         }
+        if($merchant_id||$warehouse_id!=null||$warehouse_id!=''){
+            $invitemstock   = $invitemstock->where('invt_item_stock.warehouse_id', $warehouse_id);
+        }
         $invitemstock       = $invitemstock->get();
-
+    //    dd($invitemstock);
         $spreadsheet = new Spreadsheet();
 
         if(count($invitemstock)>=0){

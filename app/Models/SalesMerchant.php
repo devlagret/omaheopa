@@ -21,8 +21,8 @@ class SalesMerchant extends Model
         'updated_at',
         'deleted_at'
     ];
-    protected static function booted()
-    {
-        static::addGlobalScope(new NotDeletedScope);
-    }
+    // protected static function booted()
+    // {
+    //     static::addGlobalScope(new NotDeletedScope);
+    // }
 }

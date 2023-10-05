@@ -20,8 +20,8 @@ class InvtItemCategory extends Model
         'updated_at',
         'created_at'
     ];
-    protected static function booted()
-    {
-        static::addGlobalScope(new NotDeletedScope);
-    }
+    // protected static function booted()
+    // {
+    //     static::addGlobalScope(new NotDeletedScope);
+    // }
 }
