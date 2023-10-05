@@ -14,16 +14,15 @@ class InvtWarehouseController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-
     }
 
     public function index()
     {
         Session::forget('warehouses');
-        $data = InvtWarehouse::with('merchant')->where('data_state','=',0)
-        ->where('company_id', Auth::user()->company_id);
-        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
-            $data->where('merchant_id',Auth::user()->merchant_id);
+        $data = InvtWarehouse::with('merchant')->where('data_state', '=', 0)
+            ->where('company_id', Auth::user()->company_id);
+        if (Auth::id() != 1 || Auth::user()->merchant_id != null) {
+            $data->where('merchant_id', Auth::user()->merchant_id);
         }
         $data = $data->get();
         return view('content.InvtWarehouse.ListInvtWarehouse', compact('data'));
@@ -33,17 +32,17 @@ class InvtWarehouseController extends Controller
     {
         $warehouses = Session::get('warehouses');
         $merchant   = SalesMerchant::where('data_state', 0);
-        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
-            $merchant->where('merchant_id',Auth::user()->merchant_id);
+        if (Auth::id() != 1 || Auth::user()->merchant_id != null) {
+            $merchant->where('merchant_id', Auth::user()->merchant_id);
         }
         $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
-        return view('content.InvtWarehouse.FormAddInvtWarehouse', compact('warehouses','merchant'));
+        return view('content.InvtWarehouse.FormAddInvtWarehouse', compact('warehouses', 'merchant'));
     }
 
     public function addElementsWarehouse(Request $request)
     {
         $warehouses  = Session::get('warehouses');
-        if(!$warehouses || $warehouses == ''){
+        if (!$warehouses || $warehouses == '') {
             $warehouses['warehouse_code'] = '';
             $warehouses['warehouse_name'] = '';
             $warehouses['warehouse_phone'] = '';
@@ -74,7 +73,7 @@ class InvtWarehouseController extends Controller
             'updated_id'        => Auth::id(),
         ]);
 
-        if($data->save()){
+        if ($data->save()) {
             $msg = "Tambah Gudang Berhasil";
             return redirect('/warehouse/')->with('msg', $msg);
         } else {
@@ -85,13 +84,13 @@ class InvtWarehouseController extends Controller
 
     public function editWarehouse($warehouse_id)
     {
-        $data   = InvtWarehouse::where('warehouse_id',$warehouse_id)->first();
+        $data   = InvtWarehouse::where('warehouse_id', $warehouse_id)->first();
         $merchant   = SalesMerchant::where('data_state', 0);
-        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
-            $merchant->where('merchant_id',Auth::user()->merchant_id);
+        if (Auth::id() != 1 || Auth::user()->merchant_id != null) {
+            $merchant->where('merchant_id', Auth::user()->merchant_id);
         }
         $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
-        return view('content.InvtWarehouse.FormEditInvtWarehouse', compact('data','merchant'));
+        return view('content.InvtWarehouse.FormEditInvtWarehouse', compact('data', 'merchant'));
     }
 
     public function processEditWarehouse(Request $request)
@@ -112,12 +111,12 @@ class InvtWarehouseController extends Controller
         $table->warehouse_address   = $fields['warehouse_address'];
         $table->updated_id          = Auth::id();
 
-        if($table->save()){
+        if ($table->save()) {
             $msg = "Ubah Gudang Berhasil";
-            return redirect('/warehouse')->with('msg',$msg);
+            return redirect('/warehouse')->with('msg', $msg);
         } else {
             $msg = "Ubah Gudang Gagal";
-            return redirect('/warehouse')->with('msg',$msg);
+            return redirect('/warehouse')->with('msg', $msg);
         }
     }
 
@@ -127,12 +126,12 @@ class InvtWarehouseController extends Controller
         $table->data_state = 1;
         $table->updated_id = Auth::id();
 
-        if($table->save()){
+        if ($table->save()) {
             $msg = "Hapus Gudang Berhasil";
-            return redirect('/warehouse')->with('msg',$msg);
+            return redirect('/warehouse')->with('msg', $msg);
         } else {
             $msg = "Hapus Gudang Gagal";
-            return redirect('/warehouse')->with('msg',$msg);
+            return redirect('/warehouse')->with('msg', $msg);
         }
     }
 
@@ -140,5 +139,22 @@ class InvtWarehouseController extends Controller
     {
         Session::forget('warehouses');
         return redirect('/warehouse/add-warehouse');
+    }
+
+    //check warehouse
+    public function checkWarehouse(Request $request)
+    {
+        $datawarehouse = InvtWarehouse::select('*')
+            ->where('merchant_id', $request->merchant_id)
+            ->where('data_state', 0)
+            ->first();
+
+        if ($datawarehouse == null) {
+            $return_data =  '';
+            return $return_data;
+        } else {
+            $return_data = 1;
+            return $return_data;
+        }
     }
 }

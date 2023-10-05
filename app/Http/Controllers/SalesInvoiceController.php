@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\JournalHelper;
+use App\Helpers\StockHelper;
 use App\Http\Controllers\Controller;
 use App\Models\AcctAccount;
 use App\Models\AcctAccountSetting;
@@ -219,6 +220,8 @@ class SalesInvoiceController extends Controller
                 //     $table->save();
 
                 // }
+                //stock update
+                StockHelper::find($dataarray['item_id'])->sub($dataarray['quantity'],$dataarray['item_unit_id']);
             }
 
             $account_setting_name = 'sales_cash_account';
