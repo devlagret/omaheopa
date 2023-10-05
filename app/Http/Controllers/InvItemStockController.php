@@ -39,12 +39,12 @@ class InvItemStockController extends Controller
      */
     public function index()
     {
-        // $invitemcategory    = InvtItemCategory::pluck('item_category_name', 'item_category_id');
+        $invitemcategory    = InvtItemCategory::pluck('item_category_name', 'item_category_id');
 
-        $invitemcategory = InvtItemCategory::select('item_category_id',DB::raw('CONCAT(invt_item_category.item_category_name, " ", sales_merchant.merchant_name) AS item_name'))
-        ->join('sales_merchant', 'sales_merchant.merchant_id', 'invt_item_category.merchant_id')
-        ->where('invt_item_category.data_state', 0)
-        ->pluck('item_name', 'item_category_id');
+        // $invitemcategory = InvtItemCategory::select('item_category_id',DB::raw('CONCAT(invt_item_category.item_category_name, " ", sales_merchant.merchant_name) AS item_name'))
+        // ->join('sales_merchant', 'sales_merchant.merchant_id', 'invt_item_category.merchant_id')
+        // ->where('invt_item_category.data_state', 0)
+        // ->pluck('item_name', 'item_category_id');
         $merchant   = SalesMerchant::where('data_state', 0);
         if(Auth::id()!=1||Auth::user()->merchant_id!=null){
             $merchant->where('merchant_id',Auth::user()->merchant_id);

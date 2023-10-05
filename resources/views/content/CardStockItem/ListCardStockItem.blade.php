@@ -6,27 +6,26 @@
     <script>
         var table;
         $(document).ready(function(){
-            // table =  $('#myDataTable').DataTable({
-     
-            //  "processing": true,
-            //  "serverSide": true,
-            //  "pageLength": 5,
-            //  "lengthMenu": [ [5, 15, 20, 10000], [5, 15, 20, "All"] ],
-            //  "order": [[2, 'asc']],
-            //  "ajax": "{{ url('card-stock-item/table-stock') }}",
-            //  "columns":[
-            //     {data: 'no'},
-            //     {data: 'item_category_name'},
-            //     {data: 'item_name'},
-            //     {data: 'item_unit_name'},
-            //     {data: 'opening_stock'},
-            //     {data: 'stock_in'},
-            //     {data: 'stock_out'},
-            //     {data: 'last_balence'},
-            //     {data: 'action'},
-            //  ],
+            table =  $('#tabel-card').DataTable({
+             "processing": true,
+             "serverSide": true,
+             "pageLength": 5,
+             "lengthMenu": [ [5, 15, 20, 10000], [5, 15, 20, "All"] ],
+             "ajax": "{{ route('sc.table') }}",
+             "columns":[
+                {data: 'no'},
+                {data: 'merchant'},
+                {data: 'item_category_name'},
+                {data: 'item_name'},
+                {data: 'item_unit_name'},
+                {data: 'opening_stock'},
+                {data: 'stock_in'},
+                {data: 'stock_out'},
+                {data: 'last_balence'},
+                {data: 'action'},
+             ],
         
-            //  });
+             });
         });
     </script>
 @endsection
@@ -108,7 +107,7 @@
 
     <div class="card-body">
         <div class="table-responsive">
-            <table style="width:100%" class="table table-striped table-bordered datatables table-hover table-full-width">
+            <table style="width:100%" id="tabel-card" class="table table-striped table-bordered table-hover table-full-width">
                 <thead>
                     <tr>
                         <th width="5%" style='text-align:center'>No</th>
@@ -126,6 +125,7 @@
                 <tbody>
                   <?php $no = 1 ?>
                   @foreach ($data as $val)
+                    $mutation->firstWhere('')
                     <tr>
                         <td class="text-center">{{ $no++ }}</td>
                         <td class="text-center">{{ $val->item->merchant->merchant_name }}</td>
