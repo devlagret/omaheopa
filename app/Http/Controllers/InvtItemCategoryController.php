@@ -29,7 +29,7 @@ class InvtItemCategoryController extends Controller
         ;
         $admin = 1;
         //filter prepend
-        $merchant   = SalesMerchant::where('data_state', 0)->get()->pluck('merchant_name', 'merchant_id')->prepend('Tampil Semua',0);
+        $merchant   = SalesMerchant::get()->pluck('merchant_name', 'merchant_id')->prepend('Tampil Semua',0);
         if(Auth::id()!=1||Auth::user()->merchant_id!=null){
             $data->where('merchant_id',Auth::user()->merchant_id);
         $admin = 0;
@@ -168,7 +168,7 @@ class InvtItemCategoryController extends Controller
     }
     
     public function checkDeleteItemCategory($item_category_id) {
-        $pkg = InvtItem::where('data_state','0')->where('item_category_id',$item_category_id)->get()->count();
+        $pkg = InvtItem::where('item_category_id',$item_category_id)->get()->count();
         if($pkg){
            return response(1);
         }

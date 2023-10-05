@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Scopes\NotDeletedScope;
 use Illuminate\Database\Eloquent\Model;
 
 class PurchasePaymentTransfer extends Model
@@ -27,5 +28,8 @@ class PurchasePaymentTransfer extends Model
      */
     protected $hidden = [
     ];
-
+    protected static function booted()
+    {
+        static::addGlobalScope(new NotDeletedScope);
+    }
 }

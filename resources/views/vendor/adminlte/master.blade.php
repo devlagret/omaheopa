@@ -241,6 +241,7 @@
                         error: function (data) {
                             console.log(data);
                             $(".popover-body").html("<em class='text-danger'>Error ... </em>");
+                            $("[data-toggle=popover]").popover("update");
                         }
                     });
                 });

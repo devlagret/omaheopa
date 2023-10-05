@@ -17,7 +17,7 @@ class SalesCustomerController extends Controller
 
     public function index()
     {
-        $data = SalesCustomer::where('data_state',0)->where('company_id', Auth::user()->company_id)->get();
+        $data = SalesCustomer::where('company_id', Auth::user()->company_id)->get();
         return view('content.SalesCustomer.ListSalesCustomer', compact('data'));
     }
 

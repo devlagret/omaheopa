@@ -74,7 +74,7 @@ class InvWarehouseTransferController extends Controller
     }
 
     public function search(){
-        $purchaseinvoice = PurchaseInvoice::where('data_state', 0)->get();
+        $purchaseinvoice = PurchaseInvoice::get();
 
         return view('content/InvWarehouseTransfer/SearchPurchaseInvoice', compact('purchaseinvoice'));
     }

@@ -531,7 +531,7 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
     Route::get('/add', [ItemUsageController::class, 'add'])->name('add');
     Route::post('/process-add', [ItemUsageController::class, 'processAdd'])->name('process-add');
     Route::get('/edit/{invt_item_usage_id}', [ItemUsageController::class, 'edit'])->name('edit');
-    Route::post('/process-edit', [ItemUsageController::class, 'processEdit'])->name('process-edit');
+    Route::post('/process-edit', [ItemUsageController::class, 'processEdit'])->name('process-   ');
     Route::get('/delete/{invt_item_usage_id}', [ItemUsageController::class, 'delete'])->name('delete');
     Route::post('/elements-add', [ItemUsageController::class, 'elementsAdd'])->name('elements-add');
     Route::post('/filter', [ItemUsageController::class, 'filter'])->name('filter');
@@ -540,7 +540,7 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
  // Stock Card pages
  Route::prefix('card-stock-item')->name('sc.')->group(function () {
     Route::get('/', [CardStockItemController::class, 'index'])->name('index');
-    Route::get('/print/{item_stock_id}', [CardStockItemController::class, 'delete'])->name('delete');
+    Route::get('/print/{item_stock_id}', [CardStockItemController::class, 'delete'])->name('print');
     Route::post('/elements-add', [CardStockItemController::class, 'elementsAdd'])->name('elements-add');
     Route::post('/filter', [CardStockItemController::class, 'filter'])->name('filter');
     Route::get('/reset-filter', [CardStockItemController::class, 'resetFilter'])->name('filter-reset');

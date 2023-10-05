@@ -29,7 +29,7 @@ class AcctAccountSettingController extends Controller
             '0' => 'Debit',
             '1' => 'Kredit'
         );
-        $data= AcctAccountSetting::where('data_state',0)->where('company_id',Auth::user()->company_id)->get();
+        $data= AcctAccountSetting::where('company_id',Auth::user()->company_id)->get();
         return view('content.AcctAccountSetting.AcctAccountSetting',compact('accountlist','status','data'));
     }
 

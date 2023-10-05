@@ -25,13 +25,13 @@ class InvtStockAdjustmentReportController extends Controller
     
     public function index()
     {
-        $invitemcategory    = InvtItemCategory::where('data_state', 0)->pluck('item_category_name', 'item_category_id');
+        $invitemcategory    = InvtItemCategory::pluck('item_category_name', 'item_category_id');
 
-        $invitemtype        = InvtItem::where('data_state', 0)->pluck('item_type_name', 'item_type_id');
+        $invitemtype        = InvtItem::pluck('item_type_name', 'item_type_id');
 
-        // $coregrade          = CoreGrade::where('data_state', 0)->pluck('grade_name', 'grade_id');
+        // $coregrade          = CoreGrade::pluck('grade_name', 'grade_id');
 
-        $invwarehouse       = InvtWarehouse::where('data_state', 0)->pluck('warehouse_name', 'warehouse_id');
+        $invwarehouse       = InvtWarehouse::pluck('warehouse_name', 'warehouse_id');
 
         $item_category_id   = Session::get('filteritemcategoryid');
 

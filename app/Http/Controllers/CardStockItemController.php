@@ -25,7 +25,11 @@ class CardStockItemController extends Controller
     public function index()
     {
         $filter = Session::get('filter-card');
-        $data = null;
+        $data = InvtItemStock::with('item.merchant','category','unit')->get();
+        $mutation = InvtItemMutation::where('company_id', Auth::user()->company_id)
+        ->where('transaction_date', '>=', $filter['start_date']??Carbon::now()->format('Y-m-d'))
+        ->where('transaction_date', '<=', $filter['end_date']??Carbon::now()->format('Y-m-d'))
+        ->get();
         return view('content.CardStockItem.ListCardStockItem',compact('filter','data'));
     }
 
@@ -462,13 +466,13 @@ class CardStockItemController extends Controller
     }
     public function hotFix() {
         $collect = 0;
-        $item = InvtItem::where('data_state',0)->orderBy('item_id','ASC')->get('item_id');
+        $item = InvtItem::orderBy('item_id','ASC')->get('item_id');
         DB::beginTransaction();
         try{
             foreach ($item as $val){
-            $stok = InvtItemStock::where('data_state',0)->where("item_id",$val->item_id)->get();
+            $stok = InvtItemStock::where("item_id",$val->item_id)->get();
            foreach ($stok as $valstok){
-            $mutation = InvtItemMutation::where('data_state',0)->where("item_id",$val->item_id)->where('item_unit_id',$valstok->item_unit_id)
+            $mutation = InvtItemMutation::where("item_id",$val->item_id)->where('item_unit_id',$valstok->item_unit_id)
             ->where('item_category_id',$valstok->item_category_id)->orderByDesc('item_mutation_id')->first();
             if($mutation!=null&&($mutation->last_balence!=$valstok->last_balance)){ $collect++;
                 if($mutation->last_balence < $valstok->last_balance){

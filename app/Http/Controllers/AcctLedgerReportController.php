@@ -230,7 +230,7 @@ class AcctLedgerReportController extends Controller
         for($i=($year_now-2); $i<($year_now+2); $i++){
             $yearlist[$i] = $i;
         } 
-        $accountlist = AcctAccount::where('data_state',0)->where('company_id',Auth::user()->company_id)->get()->pluck('account_name','account_id');
+        $accountlist = AcctAccount::where('company_id',Auth::user()->company_id)->get()->pluck('account_name','account_id');
         $account = AcctAccount::where('data_state',0)
         ->where('company_id', Auth::user()->company_id)
         ->where('account_id', $account_id)
@@ -425,7 +425,7 @@ class AcctLedgerReportController extends Controller
         for($i=($year_now-2); $i<($year_now+2); $i++){
             $yearlist[$i] = $i;
         } 
-        $accountlist = AcctAccount::where('data_state',0)->where('company_id',Auth::user()->company_id)->get()->pluck('account_name','account_id');
+        $accountlist = AcctAccount::where('company_id',Auth::user()->company_id)->get()->pluck('account_name','account_id');
         $account = AcctAccount::where('data_state',0)
         ->where('company_id', Auth::user()->company_id)
         ->where('account_id', $account_id)
