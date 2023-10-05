@@ -22,7 +22,7 @@ class StockHelper{
      */
     public function add(int $quantity = 1,int|string $unit=null){
         $data = self::$data;
-        $data->last_balance = ($data->last_balance + (abs($quantity)* is_null($unit)?$unit = self::$item['item_default_quantity1']:$unit = $this->getDefaultQty($unit)));
+        $data->last_balance = ($data->last_balance + (abs($quantity)* (is_null($unit)?$unit = self::$item['item_default_quantity1']:$unit = $this->getDefaultQty($unit))));
         return $data->save();
     }
     /**
@@ -34,7 +34,7 @@ class StockHelper{
      */
     public function sub(int $quantity = 1,int|string $unit=null){
         $data = self::$data;
-        $data->last_balance = ($data->last_balance - (abs($quantity)* is_null($unit)?$unit = self::$item['item_default_quantity1']:$unit = $this->getDefaultQty($unit)));
+        $data->last_balance = ($data->last_balance - (abs($quantity) * (is_null($unit)?$unit = self::$item['item_default_quantity1']:$unit = $this->getDefaultQty($unit))));
         return $data->save();
     }
     /**
