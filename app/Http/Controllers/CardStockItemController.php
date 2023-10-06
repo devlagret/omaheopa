@@ -25,10 +25,6 @@ class CardStockItemController extends Controller
 
     public function index()
     {
-        // InvtItemMutation::select(DB::raw('SUM(stock_out) as stock_out'))
-        // ->where('item_id',3)
-        // ->where('company_id', Auth::user()->company_id)
-        // ->get()->dd();
         $filter = Session::get('filter-card');
         $data = InvtItemStock::with('item.merchant','category','unit')->get();
         $mutation = InvtItemMutation::where('company_id', Auth::user()->company_id)
@@ -105,21 +101,20 @@ class CardStockItemController extends Controller
         $arrData = $arrData->skip($start)->take($rowPerPage);
         $arrData = $arrData->get();
 
-        $no = $start;
+        $no = $start+1;
         $data = collect();
-        foreach ($arrData as $key => $val) {
-            $no++;
-            $row                        = collect();
-            $row->put('no', "<div class='text-center'>".$no.".</div>");
-            $row->put('merchant', $val->item->merchant->merchant_name);
-            $row->put('item_category_name', $val->category->item_category_name);
-            $row->put('item_name', $val->item->item_name);
-            $row->put('item_unit_name', $val->unit->item_unit_name);
-            $row->put('opening_stock', $val->opening_balance??0);
-            $row->put('stock_in', $val->stock_in??0);
-            $row->put('stock_out', $val->stock_out??0);
-            $row->put('last_balence', $val->last_balence??0);
-            $row->put('action', "<div class='text-center'><a type='button' href='".route('sc.print',$val->item_stock_id)."' class='btn btn-secondary btn-sm'><i class='fa fa-file-pdf'></i> Kartu Stok</a></div>");
+        foreach ($arrData as $val) {
+            $row= collect();
+            $row->push("<div class='text-center'>".$no++.".</div>");
+            $row->push($val->item->merchant->merchant_name);
+            $row->push($val->category->item_category_name);
+            $row->push($val->item->item_name);
+            $row->push($val->unit->item_unit_name);
+            $row->push($val->opening_balance??0);
+            $row->push($val->stock_in??0);
+            $row->push($val->stock_out??0);
+            $row->push($val->last_balence??0);
+            $row->push("<div class='text-center'><a type='button' href='".route('sc.print',$val->item_stock_id)."' class='btn btn-secondary btn-sm'><i class='fa fa-file-pdf'></i> Kartu Stok</a></div>");
 
             $data->push($row);
         }
@@ -135,30 +130,23 @@ class CardStockItemController extends Controller
             "data"              => $data,
         );
 
-        return response()->json($response);
+        return response($response);
     }
 
     public function getOpeningStock($item_category_id, $item_id, $item_unit_id)
     {
-        if(!$start_date = Session::get('start_date')){
-            $start_date = date('Y-m-d');
-        } else {
-            $start_date = Session::get('start_date');
-        }
-        if(!$end_date = Session::get('end_date')){
-            $end_date = date('Y-m-d');
-        } else {
-            $end_date = Session::get('end_date');
-        }
+        $filter = Session::get('filter-card');
+        $sd = $filter['start_date']??Carbon::now()->format('Y-m-d');
+        $ed = $filter['end_date']??Carbon::now()->format('Y-m-d');
 
-        $data = InvtItemMutation::select('opening_balence')
+        $data = InvtItemMutation::select('opening_balance')
         ->where('data_state',0)
         ->where('item_id', $item_id)
         ->where('item_category_id', $item_category_id)
         ->where('item_unit_id', $item_unit_id)
         ->where('company_id', Auth::user()->company_id)
-        ->where('transaction_date', '>=', $start_date)
-        ->where('transaction_date', '<=', $end_date)
+        ->where('transaction_date', '>=', $sd)
+        ->where('transaction_date', '<=', $ed)
         ->first();
 
         if (!empty($data)) {
@@ -167,95 +155,25 @@ class CardStockItemController extends Controller
             return 0;
         }
     }
-    public function getLastBalance($item_category_id, $item_id, $item_unit_id)
-    {
-        if(!$start_date = Session::get('start_date')){
-            $start_date = date('Y-m-d');
-        } else {
-            $start_date = Session::get('start_date');
-        }
-        if(!$end_date = Session::get('end_date')){
-            $end_date = date('Y-m-d');
-        } else {
-            $end_date = Session::get('end_date');
-        }
-
-        $data = InvtItemMutation::select('last_balence')
-        ->where('data_state',0)
-        ->where('item_id', $item_id)
-        ->where('item_category_id', $item_category_id)
-        ->where('item_unit_id', $item_unit_id)
-        ->where('company_id', Auth::user()->company_id)
-        ->where('transaction_date', '>=', $start_date)
-        ->where('transaction_date', '<=', $end_date)
-        ->orderBy('item_mutation_id', 'DESC')
-        ->first();
-
-        if (!empty($data)) {
-            return (int)$data['last_balence'];
-        } else {
-            return 0;
-        }
-    }
-
     public function filter(Request $request)
     {
-        $filter = Session::get('filter-cards');
-        $filter[$request->name] = $request->value;
-        Session::put('filter-cards', $filter);
+        $filter = Session::get('filter-card');
+        $filter['start_date'] = $request->start_date;
+        $filter['end_date'] = $request->end_date;
+        Session::put('filter-card', $filter);
         return redirect()->route('sc.index');
     }
-
     public function resetFilter()
     {
         Session::forget('filter-card');
         return redirect()->route('sc.index');
     }
-
-    public function getItemName($item_id)
+    public function print($item_stock_id)
     {
-        $data = InvtItem::where('item_id', $item_id)
-        ->where('data_state', 0)
-        ->where('company_id', Auth::user()->company_id)
-        ->first();
-
-        return $data['item_name'];
-    }
-
-    public function getItemUnitName($item_unit_id)
-    {
-        $data = InvtItemUnit::where('item_unit_id', $item_unit_id)
-        ->where('data_state', 0)
-        ->where('company_id', Auth::user()->company_id)
-        ->first();
-
-        return $data['item_unit_name'];
-    }
-
-    public function getWarehouseName($warehouse_id)
-    {
-        $data = InvtWarehouse::where('warehouse_id', $warehouse_id)
-        ->where('data_state',0)
-        ->where('company_id', Auth::user()->company_id)
-        ->first();
-
-        return $data['warehouse_name'];
-    }
-
-    public function printCardStockItem($item_stock_id)
-    {
-        if(!$start_date = Session::get('start_date')){
-            $start_date = date('Y-m-d');
-        } else {
-            $start_date = Session::get('start_date');
-        }
-        if(!$end_date = Session::get('end_date')){
-            $end_date = date('Y-m-d');
-        } else {
-            $end_date = Session::get('end_date');
-        }
-
-        $data_stock = InvtItemStock::where('item_stock_id', $item_stock_id)
+        $filter = Session::get('filter-card');
+        $sd = $filter['start_date']??Carbon::now()->format('Y-m-d');
+        $ed = $filter['end_date']??Carbon::now()->format('Y-m-d');
+        $data_stock = InvtItemStock::with('warehouse','item','unit')->where('item_stock_id', $item_stock_id)
         ->where('data_state',0)
         ->where('company_id', Auth::user()->company_id)
         ->first();
@@ -265,8 +183,8 @@ class CardStockItemController extends Controller
         ->where('item_category_id', $data_stock['item_category_id'])
         ->where('item_unit_id', $data_stock['item_unit_id'])
         ->where('company_id', Auth::user()->company_id)
-        ->where('transaction_date', '>=', $start_date)
-        ->where('transaction_date', '<=', $end_date)
+        ->where('transaction_date', '>=', $sd)
+        ->where('transaction_date', '<=', $ed)
         ->get();
 
         $pdf = new TCPDF(['P', PDF_UNIT, 'F4', true, 'UTF-8', false]);
@@ -329,17 +247,17 @@ class CardStockItemController extends Controller
             <tr>
                 <td width=\"13%\">Gudang</td>
                 <td width=\"2%\">:</td>
-                <td width=\"85%\">".$this->getWarehouseName($data_stock['warehouse_id'])."</td>
+                <td width=\"85%\">".$data_stock->warehouse->warehouse_name."</td>
             </tr>
             <tr>
                 <td width=\"13%\">Periode</td>
                 <td width=\"2%\">:</td>
-                <td width=\"85%\">".date('d-m-Y', strtotime($start_date))." s/d ".date('d-m-Y', strtotime($end_date))."</td>
+                <td width=\"85%\">".date('d-m-Y', strtotime($sd))." s/d ".date('d-m-Y', strtotime($ed))."</td>
             </tr>
             <tr>
                 <td width=\"13%\">Nama Barang</td>
                 <td width=\"2%\">:</td>
-                <td width=\"85%\">".$this->getItemName($data_stock['item_id'])." - ".$this->getItemUnitName($data_stock['item_unit_id'])."</td>
+                <td width=\"85%\">".$data_stock->item->item_name." - ".$data_stock->unit->item_unit_name."</td>
             </tr>
         ";
 
@@ -367,7 +285,7 @@ class CardStockItemController extends Controller
         <table width=\"100%\" cellspacing=\"0\" cellpadding=\"1\" border=\"0\">
             <tr>
                 <td width=\"5%\"><div style=\"text-align: center; font-weight: bold;\"></div></td>
-                <td width=\"15%\"><div style=\"text-align: left; font-weight: bold;\">".date('d-m-Y', strtotime($start_date))."</div></td>
+                <td width=\"15%\"><div style=\"text-align: left; font-weight: bold;\">".date('d-m-Y', strtotime($sd))."</div></td>
                 <td width=\"65%\"><div style=\"text-align: left; font-weight: bold;\">Saldo Awal</div></td>
                 <td width=\"15%\"><div style=\"text-align: right; font-weight: bold;\">".$this->getOpeningStock($data_stock['item_category_id'], $data_stock['item_id'], $data_stock['item_unit_id'])."</div></td>
             </tr>

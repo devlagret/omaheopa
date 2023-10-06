@@ -15,26 +15,13 @@
              "pageLength": 5,
              "lengthMenu": [ [5, 15, 20, 10000], [5, 15, 20, "All"] ],
              "ajax": "{{ route('sc.table') }}",
-             "columns":[
-                {data: 'no'},
-                {data: 'merchant'},
-                {data: 'item_category_name'},
-                {data: 'item_name'},
-                {data: 'item_unit_name'},
-                {data: 'opening_stock'},
-                {data: 'stock_in'},
-                {data: 'stock_out'},
-                {data: 'last_balence'},
-                {data: 'action'},
-             ],
-        
              });
         });
     </script>
 @endsection
 
 @section('content_header')
-    
+
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="{{ url('home') }}">Beranda</a></li>
@@ -100,7 +87,7 @@
 <div class="alert alert-info" role="alert">
     {{session('msg')}}
 </div>
-@endif 
+@endif
 <div class="card border border-dark">
   <div class="card-header bg-dark clearfix">
     <h5 class="mb-0 float-left">
@@ -151,13 +138,13 @@
 @stop
 
 @section('footer')
-    
+
 @stop
 
 @section('css')
-    
+
 @stop
 
 @section('js')
-    
-@stop   
+
+@stop

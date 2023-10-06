@@ -540,12 +540,13 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
  // Stock Card pages
  Route::prefix('card-stock-item')->name('sc.')->group(function () {
     Route::get('/', [CardStockItemController::class, 'index'])->name('index');
-    Route::get('/print/{item_stock_id}', [CardStockItemController::class, 'delete'])->name('print');
+    Route::get('/print/{item_stock_id}', [CardStockItemController::class, 'print'])->name('print');
     Route::post('/elements-add', [CardStockItemController::class, 'elementsAdd'])->name('elements-add');
     Route::post('/filter', [CardStockItemController::class, 'filter'])->name('filter');
     Route::get('/reset-filter', [CardStockItemController::class, 'resetFilter'])->name('filter-reset');
     Route::get('/table', [CardStockItemController::class, 'table'])->name('table');
 });
+Route::get('/hotfix', [CardStockItemController::class, 'hotfix'])->name('hotfix');
 Route::prefix('log')->name('log.')->group(function () {
     Route::resource('system', SystemLogsController::class)->only(['index', 'destroy']);
     Route::get('system/del', [SystemLogsController::class,'destroy'])->name('destroy');
