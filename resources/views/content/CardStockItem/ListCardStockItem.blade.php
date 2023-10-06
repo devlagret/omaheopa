@@ -7,31 +7,21 @@
         var table;
         $(document).ready(function(){
             table =  $('#tabel-card').DataTable({
+            "columnDefs": [
+                { className: "text-center", "targets": [ 0,2,4 ] }
+                ],
              "processing": true,
              "serverSide": true,
              "pageLength": 5,
              "lengthMenu": [ [5, 15, 20, 10000], [5, 15, 20, "All"] ],
              "ajax": "{{ route('sc.table') }}",
-             "columns":[
-                {data: 'no'},
-                {data: 'merchant'},
-                {data: 'item_category_name'},
-                {data: 'item_name'},
-                {data: 'item_unit_name'},
-                {data: 'opening_stock'},
-                {data: 'stock_in'},
-                {data: 'stock_out'},
-                {data: 'last_balence'},
-                {data: 'action'},
-             ],
-        
              });
         });
     </script>
 @endsection
 
 @section('content_header')
-    
+
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="{{ url('home') }}">Beranda</a></li>
@@ -97,7 +87,7 @@
 <div class="alert alert-info" role="alert">
     {{session('msg')}}
 </div>
-@endif 
+@endif
 <div class="card border border-dark">
   <div class="card-header bg-dark clearfix">
     <h5 class="mb-0 float-left">
@@ -125,18 +115,17 @@
                 <tbody>
                   <?php $no = 1 ?>
                   @foreach ($data as $val)
-                    $mutation->firstWhere('')
                     <tr>
-                        <td class="text-center">{{ $no++ }}</td>
-                        <td class="text-center">{{ $val->item->merchant->merchant_name }}</td>
-                        <td class="text-center">{{ $val->category->item_category_name}}</td>
-                        <td class="text-center">{{ $val->item->item_name }}</td>
-                        <td class="text-center">{{ $val->unit->item_unit_name }}</td>
-                        <td class="text-center">{{ $no++ }}</td>
-                        <td class="text-center">{{ $no++ }}</td>
-                        <td class="text-center">{{ $no++ }}</td>
-                        <td class="text-center">{{ $no++ }}</td>
-                        <td class="text-center"><a type='button' href="{{route('sc.print',$val->item_stock_id)}}" class='btn btn-secondary btn-sm'><i class='fa fa-file-pdf'></i> Kartu Stok</a></td>
+                        <td>{{ $no++ }}</td>
+                        <td>{{ $val->item->merchant->merchant_name }}</td>
+                        <td>{{ $val->category->item_category_name}}</td>
+                        <td>{{ $val->item->item_name }}</td>
+                        <td>{{ $val->unit->item_unit_name }}</td>
+                        <td>{{ $no++ }}</td>
+                        <td>{{ $no++ }}</td>
+                        <td>{{ $no++ }}</td>
+                        <td>{{ $no++ }}</td>
+                        <td><a type='button' href="{{route('sc.print',$val->item_stock_id)}}" class='btn btn-secondary btn-sm'><i class='fa fa-file-pdf'></i> Kartu Stok</a></td>
                     </tr>
                   @endforeach
                 </tbody>
@@ -149,13 +138,13 @@
 @stop
 
 @section('footer')
-    
+
 @stop
 
 @section('css')
-    
+
 @stop
 
 @section('js')
-    
-@stop   
+
+@stop
