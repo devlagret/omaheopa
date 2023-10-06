@@ -26,10 +26,10 @@ class PurchasePaymentItem extends Model
      *
      * @var array
      */
-    protected $hidden = [
-    ];
-    protected static function booted()
-    {
-        static::addGlobalScope(new NotDeletedScope);
-    }
+    // protected $hidden = [
+    // ];
+    // protected static function booted()
+    // {
+    //     static::addGlobalScope(new NotDeletedScope);
+    // }
 }

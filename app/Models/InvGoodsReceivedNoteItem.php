@@ -28,8 +28,8 @@ class InvGoodsReceivedNoteItem extends Model
      */
     protected $hidden = [
     ];
-    protected static function booted()
-    {
-        static::addGlobalScope(new NotDeletedScope);
-    }
+    // protected static function booted()
+    // {
+    //     static::addGlobalScope(new NotDeletedScope);
+    // }
 }

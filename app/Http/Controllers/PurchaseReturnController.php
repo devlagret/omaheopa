@@ -81,6 +81,7 @@ class PurchaseReturnController extends Controller
             ->where('invt_goods_received_note.data_state', '=', 0)
             ->where('invt_goods_received_note.return_status', '=', 0)
             ->where('invt_goods_received_note_item.merchant_id',Auth::user()->merchant_id)
+            ->groupBy('invt_goods_received_note.goods_received_note_id')
             ->get();
         //  dd($GoodsReceivedNote);
 
@@ -218,29 +219,29 @@ class PurchaseReturnController extends Controller
                 $purchaseinvoiceitem->quantity_return    = $temprequest['quantity_return_' . $i];
                 $purchaseinvoiceitem->save();
 
-                // InvtItemStock::create([
-                //     'goods_received_note_id'            =>   '',
-                //     'goods_received_note_item_id'       =>   '',
-                //     'item_stock_date'                   =>   \Carbon\Carbon::now(), # new \Datetime()
-                //     'purchase_order_item_id'            =>   $temprequest['purchase_order_item_id_' . $i],
-                //     'warehouse_id'                      =>   7,
-                //     'item_category_id'                  =>   $temprequest['item_category_id_' . $i],
-                //     'item_id'                           =>   $temprequest['item_id_' . $i],
-                //     'item_unit_id'                      =>   $temprequest['item_unit_id_' . $i],
-                //     'item_total'                        =>   '',
-                //     'item_unit_id_default'              =>   $temprequest['item_unit_id_' . $i],
-                //     'item_default_quantity_unit'        =>   1,
-                //     'quantity_unit'                     =>   $temprequest['quantity_return_' . $i],
-                //     'item_weight_default'               =>   '',
-                //     'item_weight_unit'                  =>   '',
-                //     'package_id'                        =>   '',
-                //     'package_total'                     =>   '',
-                //     'package_unit_id'                   =>   '',
-                //     'package_price'                     =>   '',
-                //     'data_state'                        =>   0,
-                //     'created_id'                        =>   Auth::id(),
-                //     'created_at'                        =>   \Carbon\Carbon::now(),
-                // ]);
+                InvtItemStock::create([
+                    'goods_received_note_id'            =>   '',
+                    'goods_received_note_item_id'       =>   '',
+                    'item_stock_date'                   =>   \Carbon\Carbon::now(), # new \Datetime()
+                    'purchase_order_item_id'            =>   $temprequest['purchase_order_item_id_' . $i],
+                    'warehouse_id'                      =>   7,
+                    'item_category_id'                  =>   $temprequest['item_category_id_' . $i],
+                    'item_id'                           =>   $temprequest['item_id_' . $i],
+                    'item_unit_id'                      =>   $temprequest['item_unit_id_' . $i],
+                    'item_total'                        =>   '',
+                    'item_unit_id_default'              =>   $temprequest['item_unit_id_' . $i],
+                    'item_default_quantity_unit'        =>   1,
+                    'quantity_unit'                     =>   $temprequest['quantity_return_' . $i],
+                    'item_weight_default'               =>   '',
+                    'item_weight_unit'                  =>   '',
+                    'package_id'                        =>   '',
+                    'package_total'                     =>   '',
+                    'package_unit_id'                   =>   '',
+                    'package_price'                     =>   '',
+                    'data_state'                        =>   0,
+                    'created_id'                        =>   Auth::id(),
+                    'created_at'                        =>   \Carbon\Carbon::now(),
+                ]);
 
 
 
