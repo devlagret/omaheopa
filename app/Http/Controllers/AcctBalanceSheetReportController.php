@@ -780,7 +780,6 @@ class AcctBalanceSheetReportController extends Controller
                         if (empty($last_balance10)){
                             $last_balance10 = 0;
                         }
-
                         $account_amount10_top[$valLeft['report_no']] = $last_balance10;
 
                     } else {
@@ -981,7 +980,7 @@ class AcctBalanceSheetReportController extends Controller
                         if (empty($last_balance210)){
                             $last_balance210 = 0;
                         }
-
+                        
                         $account_amount210_top[$valRight['report_no']] = $last_balance210;
 
                     } else {

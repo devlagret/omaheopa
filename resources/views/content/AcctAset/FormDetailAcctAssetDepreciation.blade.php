@@ -116,7 +116,7 @@
                     <div class="form-group">
                         <a class="text-dark">Nilai Perolehan<a class='red'> *</a></a>
                         <input class="form-control input-bb" name="purchase_return_supplier" id="purchase_return_supplier"
-                            type="text" autocomplete="off" value="{{ $acctasset['asset_depreciation_book_value'] }}"
+                            type="text" autocomplete="off" value="{{ number_format((int)$acctasset['asset_depreciation_book_value']) }}"
                             readonly />
                     </div>
                 </div>
@@ -210,9 +210,9 @@
                                     <td>{{ $row['asset_depreciation_item_year_to'] }}</td>
                                     <td>{{ $monthdepreciation }}</td>
                                     <td style="text-align: right">{{ $row['asset_depreciation_item_year'] }}</td>
-                                    <td>{{ $row['asset_depreciation_item_amount'] }}</td>
-                                    <td style="text-align: right">{{ $row['asset_depreciation_item_accumulation_amount'] }}</td>
-                                    <td style="text-align: right">{{ $row['asset_depreciation_item_book_value'] }}</td>
+                                    <td>{{ number_format((int)$row['asset_depreciation_item_amount']) }}</td>
+                                    <td style="text-align: right">{{ number_format((int)$row['asset_depreciation_item_accumulation_amount']) }}</td>
+                                    <td style="text-align: right">{{ number_format((int)$row['asset_depreciation_item_book_value']) }}</td>
 
                                     <?php if($row['asset_depreciation_item_journal_status'] == 0){ ?>
                                         <td align='center'>

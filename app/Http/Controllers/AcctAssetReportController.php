@@ -43,6 +43,8 @@ class AcctAssetReportController extends Controller
             $sesi['year_period']		= date('Y');
         }
 
+        // dump($sesi['year_period']);
+
         if(empty($sesi['year'])){
             $sesi['year']		= date('Y');
         
@@ -64,10 +66,10 @@ class AcctAssetReportController extends Controller
 
         // dump($sesi);
         
-        $last_year 		= Session::get('year_period') - 1;
+        $last_year 		= $sesi['year_period'] - 1;
 		$prosentase		= $this->ProsentasePenyusutan();
         $acctasset = $this->getAcctAsset($sesi['branch_id'], $sesi['year']);
-        // echo json_encode($last_year);exit;
+        // echo json_encode($acctasset);exit;
         
         foreach ($acctasset as $key => $val) {
             $tahun_perolehan 					= substr($val['asset_purchase_date'],0,4);
@@ -114,8 +116,8 @@ class AcctAssetReportController extends Controller
 				}
 
 
-				$depreciation_amount 				= $this->getAssetDepreciationAmountTotal($val['asset_id'], $sesi['year_period']);
-                // echo json_encode($depreciation_amount);exit;
+				$depreciation_amount 		= $this->getAssetDepreciationAmountTotal($val['asset_id'], $sesi['year_period']);
+                // echo json_encode($val['asset_id']);exit;
 
 				$data_assetreport[$key] = array (
 					'asset_date'									=> $val['asset_purchase_date'],
@@ -128,7 +130,7 @@ class AcctAssetReportController extends Controller
 					'asset_purchase_value_then'						=> $nilai_perolehan_tahun_lalu,
 					'asset_purchase_value_now'						=> $nilai_perolehan_tahun_ini,
 					'asset_estimated_lifespan'						=> $val['asset_estimated_lifespan'],
-					'asset_estimated_lifespan_percentage'			=> $prosentase[($val['asset_estimated_lifespan'])],
+					'asset_estimated_lifespan_percentage'			=> $val['asset_estimated_lifespan'],    
 					'asset_depreciation_amount'						=> $depreciation_amount,
 					'asset_depreciation_accumulation_last_year'		=> $accumulation_amount_last_year,
 					'asset_depreciation_book_value_last_year'		=> $book_value_last_year,
@@ -149,12 +151,10 @@ class AcctAssetReportController extends Controller
         ->join('acct_asset_depreciation', 'acct_asset_depreciation.asset_depreciation_id','acct_asset_depreciation_item.asset_depreciation_id')
         ->where('acct_asset_depreciation_item.asset_depreciation_item_journal_status', 1)
         ->where('acct_asset_depreciation.asset_id', $asset_id)
-        ->whereNotNull('acct_asset_depreciation_item.asset_depreciation_item_accumulation_amount')
         ->where('acct_asset_depreciation_item.asset_depreciation_item_year','<=', $year)
+        ->whereNotNull('acct_asset_depreciation_item.asset_depreciation_item_accumulation_amount')
         ->get();
-        // dump($asset_id);
-        // dump($data);
-        // echo json_encode($data);exit;
+      
         return $data[0]['asset_depreciation_item_accumulation_amount'];
 
     }

@@ -384,6 +384,7 @@
                                                 }	
                                             echo "
                                                 </tr>";
+                                            
                                             echo "
                                                 <tr>";
 
@@ -421,6 +422,65 @@
                                                 }
 
                                             echo "			
+                                                </tr>";
+
+                                echo "
+                                <tr>";
+                                    
+                                if($val['report_type2']	== 11){
+                                    
+                                    $expenditure_subtotal 	= $total_account_amount210;
+
+                                    $account_amount210_top[$val['report_no']] = $expenditure_subtotal;
+                                }
+                                 echo "			
+                                                </tr>";
+                                echo "
+                                                <tr>";
+
+                                                if($val['report_type2'] == 12){
+                                                    if(!empty($val['report_formula2']) && !empty($val['report_operator2'])){
+                                                        $report_formula2 	= explode('#', $val['report_formula2']);
+                                                        $report_operator2 	= explode('#', $val['report_operator2']);
+
+                                                        $total_account_amount210	= 0;
+                                                        for($i = 0; $i < count($report_formula2); $i++){
+                                                            if($report_operator2[$i] == '-'){
+                                                                if($total_account_amount210 == 0 ){
+                                                                    $total_account_amount210 = $total_account_amount210 + $account_amount210_top[$report_formula2[$i]];
+                                                                } else {
+                                                                    $total_account_amount210 = $total_account_amount210 - $account_amount210_top[$report_formula2[$i]];
+                                                                }
+                                                            } else if($report_operator2[$i] == '+'){
+                                                                if($total_account_amount210 == 0){
+                                                                    $total_account_amount210 = $total_account_amount210 + $account_amount210_top[$report_formula2[$i]];
+                                                                } else {
+                                                                    $total_account_amount210 = $total_account_amount210 + $account_amount210_top[$report_formula2[$i]];
+                                                                }
+                                                            }
+                                                            
+                                                        }
+
+                                                        // $grand_total_account_amount2 = $grand_total_account_amount2 + $total_account_amount210;
+
+                                                        
+                                                    }
+                                                    
+                                                }
+                                
+                            echo "
+                                </tr>";
+
+                                echo "
+                                <tr>";
+                                    
+                                if($val['report_type2']	== 12){
+                                    
+                                    $expenditure_subtotal 	= $total_account_amount210;
+
+                                    $account_amount210_top[$val['report_no']] = $expenditure_subtotal;
+                                }
+                                 echo "			
                                                 </tr>";
 
                                         echo "
@@ -494,7 +554,7 @@
 
                                                     echo "
                                                         <td><div style='font-weight:".$report_bold2."'>".$report_tab2."".$val['account_name2']."</div></td>
-                                                        <td style='text-align:right'><div style='font-weight:".$report_bold2."'>".number_format($total_account_amount2+$total_account_amount210, 2)."</div></td>
+                                                        <td style='text-align:right'><div style='font-weight:".$report_bold2."'>".number_format($total_account_amount2, 2)."</div></td>
                                                         ";
                                                     // echo "
                                                     //     <td><div style='font-weight:".$report_bold2."'>".$report_tab2."".$val['account_name2']."</div></td>
