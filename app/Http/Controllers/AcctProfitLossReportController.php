@@ -44,7 +44,7 @@ class AcctProfitLossReportController extends Controller
         ->get();
 
         $expenditure = AcctProfitLossReport::select('report_tab','report_bold','report_type','account_name','account_id','account_code','report_no','report_formula','report_operator')
-        ->where('data_state',0)
+        ->whereIn('data_state',['0','1'])
         ->where('account_type_id',3)
         ->where('company_id', Auth::user()->company_id)
         ->get();
@@ -522,9 +522,14 @@ class AcctProfitLossReportController extends Controller
         ->where('account_type_id',3)
         ->where('company_id', Auth::user()->company_id)
         ->get();
-
+        
+        $hidden = AcctProfitLossReport::select('report_tab','report_bold','report_type','account_name','account_id','account_code','report_no','report_formula','report_operator')
+        ->where('data_state',1)
+        ->where('report_type',4)
+        ->where('company_id', Auth::user()->company_id)
+        ->get();
         $spreadsheet = new Spreadsheet();
-
+        // echo json_encode($hidden);exit;
         // if(!empty($sales_invoice || $purchase_invoice || $expenditure)){
             $spreadsheet->getProperties()->setCreator("MOZAIC")
                                         ->setLastModifiedBy("MOZAIC")
@@ -603,6 +608,14 @@ class AcctProfitLossReportController extends Controller
                         $j++;
                     }
 
+                    if($valTop['report_type']	== 4){
+                        $account_subtotal 	= $this->getAmountAccount($valTop['account_id']);
+
+                        $account_amount[$valTop['report_no']] = $account_subtotal;
+
+                        $j++;
+                    }
+
 
                     if($valTop['report_type'] == 5){
                         if(!empty($valTop['report_formula']) && !empty($valTop['report_operator'])){
@@ -671,10 +684,19 @@ class AcctProfitLossReportController extends Controller
                 
             }
 
-            // $j--;
-
+            foreach($hidden as $keyBottom => $val){
+                if ($val['report_type'] == 4) {
+                    $account_subtotal = $this->getAmountAccount($val['account_id']);
+                    if(!empty($val['report_type'] == 4)){
+                        
+                $account_amount1[$val['report_no']] = $account_subtotal;
+            }
+        }
+        }
+        
             foreach($expenditure as $keyBottom => $valBottom){
-                if(is_numeric($keyTop)){
+
+                if(is_numeric($keyBottom)){
                     
                     $spreadsheet->setActiveSheetIndex(0);
                     $spreadsheet->getActiveSheet()->getStyle('B'.$j.':C'.$j)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
@@ -720,7 +742,7 @@ class AcctProfitLossReportController extends Controller
                         $account_amount[$valBottom['report_no']] = $account_subtotal;
                     }
 
-
+                
                     if($valBottom['report_type'] == 5){
                         if(!empty($valBottom['report_formula']) && !empty($valBottom['report_operator'])){
                             $report_formula 	= explode('#', $valBottom['report_formula']);
@@ -730,15 +752,15 @@ class AcctProfitLossReportController extends Controller
                             for($i = 0; $i < count($report_formula); $i++){
                                 if($report_operator[$i] == '-'){
                                     if($total_account_amount == 0 ){
-                                        $total_account_amount = $total_account_amount + $account_amount[$report_formula[$i]];
+                                        $total_account_amount = $total_account_amount + $account_amount1[$report_formula[$i]];
                                     } else {
-                                        $total_account_amount = $total_account_amount - $account_amount[$report_formula[$i]];
+                                        $total_account_amount = $total_account_amount - $account_amount1[$report_formula[$i]];
                                     }
                                 } else if($report_operator[$i] == '+'){
                                     if($total_account_amount == 0){
-                                        $total_account_amount = $total_account_amount + $account_amount[$report_formula[$i]];
+                                        $total_account_amount = $total_account_amount + $account_amount1[$report_formula[$i]];
                                     } else {
-                                        $total_account_amount = $total_account_amount + $account_amount[$report_formula[$i]];
+                                        $total_account_amount = $total_account_amount + $account_amount1[$report_formula[$i]];
                                     }
                                 }
                             }
@@ -746,6 +768,13 @@ class AcctProfitLossReportController extends Controller
                             $spreadsheet->getActiveSheet()->setCellValue('B'.$j, $report_tab.$valBottom['account_name']);
                             $spreadsheet->getActiveSheet()->setCellValue('C'.$j, $report_tab.$total_account_amount);
                         }
+                    }
+
+                    if($valBottom['report_type'] == 5){
+                        $expenditure_subtotal 	= $total_account_amount;
+
+
+                        $account_amount[$valBottom['report_no']] = $expenditure_subtotal;
                     }
 
                     if($valBottom['report_type'] == 6){
@@ -775,7 +804,11 @@ class AcctProfitLossReportController extends Controller
                         }
 
                     }
-                            
+
+                    if($valBottom['report_type'] == 6){
+                        $expenditure_subtotal 	= $grand_total_account_amount2;
+                                    $account_amount[$valBottom['report_no']] = $expenditure_subtotal;
+                    }
 
                 }else{
                     continue;
@@ -793,9 +826,10 @@ class AcctProfitLossReportController extends Controller
 
             $shu = $grand_total_account_amount1 - $grand_total_account_amount2;
 
-            $spreadsheet->getActiveSheet()->setCellValue('B'.($j), "RUGI / LABA");
-            $spreadsheet->getActiveSheet()->setCellValue('C'.($j), $shu);
-            $j++;
+            // $spreadsheet->getActiveSheet()->setCellValue('B'.($j), "RUGI / LABA");
+            // $spreadsheet->getActiveSheet()->setCellValue('C'.($j), $shu);
+            // $j++;
+
             $spreadsheet->getActiveSheet()->mergeCells('B'.$j.':C'.$j);
             $spreadsheet->getActiveSheet()->getStyle('B'.$j)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
             $sheet->setCellValue('B'.$j, Auth::user()->name.", ".date('d-m-Y H:i'));

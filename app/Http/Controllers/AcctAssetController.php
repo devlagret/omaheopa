@@ -162,7 +162,7 @@ class AcctAssetController extends Controller
         AcctAsset::create($data);
         
                     $depreciation_month 		= $data['asset_estimated_lifespan'] * 12;
-					$depreciation_start_month 	= date('m', strtotime('+1 months', strtotime($data['asset_purchase_date'])));
+					$depreciation_start_month 	= date('m', strtotime('0 months', strtotime($data['asset_purchase_date'])));
 					$depreciation_start_year 	= date('Y', strtotime($data['asset_purchase_date']));
 					$depreciation_end_month		= date('m', strtotime('+'.$depreciation_month.' months', strtotime($data['asset_purchase_date'])));
 					$depreciation_end_year		= date('Y', strtotime('+'.$data['asset_estimated_lifespan'].' years', strtotime($data['asset_purchase_date'])));
