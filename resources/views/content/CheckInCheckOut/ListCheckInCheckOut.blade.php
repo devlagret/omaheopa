@@ -89,6 +89,11 @@
                 }
             });
     }
+    function proses(name,uri){
+        if(confirm(`Yakin Ingin Memproes Check-in atas nama '`+name+`' ?`)){
+        window.location.href = uri;
+        }
+    }
 
     $(document).ready(function() {
         $('#pinalty_view').change(function() {
@@ -126,14 +131,15 @@
             var total = button.data('total');
             $(this).find('#use_penalty').val(0);
             $(this).find('#pinalty_view').prop('required',false);
-            console.log('foo');
-            if(id!=''){
+            $(this).find('#total_w_pinalty_view').prop('required',false);
+            if(id!=''&&$(this).find('#total_amount_view').val()==''){
                 $(this).find('#id_modal').val(id);
                 $(this).find('#total_amount_view').val(toRp(total));
                 $(this).find('#total_amount').val(total);
             }
             if(button.data('penalty')){
                 $(this).find('#pinalty_view').prop('required',true);
+                $(this).find('#total_w_pinalty_view').prop('required',true);
                 $(this).find('#use_penalty').val(1);
                 $(this).find('#total-label').html('Subtotal');
                 $(this).find('#penalty').show();
@@ -273,6 +279,8 @@
                         <th style="text-align: center; width: 10%">No Hp</th>
                         <th style="text-align: center; width: 10%">Kamar Dipesan</th>
                         <th style="text-align: center; width: 10%">Uang Muka</th>
+                        <th style="text-align: center; width: 10%">Subtotal</th>
+                        <th style="text-align: center; width: 10%">Perpanjangan</th>
                         <th style="text-align: center; width: 10%">Total</th>
                         <th style="text-align: center; width: 20%">Aksi</th>
                     </tr>
@@ -295,16 +303,18 @@
                             @endif
                         </td>
                         <td>{{ number_format($row->sales_order_price) }}</td>
+                        <td>{{ number_format($row->invoice->extend_price-$row->sales_order_price) }}</td>
+                        <td>{{ number_format($row->invoice->extend_price) }}</td>
                         <td style="text-align: center">
                             @if ($row->sales_order_status==1)
-                            <a type="button" class="btn btn-outline-success btn-sm" onclick="proses('{{ $row->sales_order_name}}','{{route('dp.process-add',$row->sales_order_id)}}')">Check-in</a>
+                            <a type="button" class="btn btn-outline-success btn-sm" onclick="proses('{{ $row->sales_order_name}}','{{route('cc.checkin',$row->sales_order_id)}}')">Check-in</a>
                             @elseif ($row->sales_order_status==2)
                             <a type="button" class="btn btn-outline-danger btn-sm" onclick="checkout('{{ $row->sales_order_id}}',{{$row->sales_order_price}})">Check-Out</a>
                             <a type="button" class="btn btn-outline-primary btn-sm" href="{{route('cc.extend',$row->sales_order_id)}}">Perpanjangan</a>
                             @else
                                 <div class="w-75 px-1 rounded-pill mx-auto bg-info">Sudah Check-Out</div>
                             @endif
-                            @if($row->sales_order_type==1&& $row->checkin_date == date('Y-m-d'))
+                            @if($row->sales_order_status!=3&&$row->checkin_date <= date('Y-m-d'))
                             <a type="button" class="btn btn-outline-secondary btn-sm" onclick="check('{{ $row->sales_order_name}}','{{route('cc.delete',$row->sales_order_id)}}')">Batal</a>
                             @endif
                         </td>
@@ -385,7 +395,7 @@
                     :
                 </div>
                 <div class="col-8">
-                    <input class="form-control required input-bb" required autocomplete="off" id="total_w_pinalty_view" name="pinalty_view" />
+                    <input class="form-control required input-bb" required autocomplete="off" id="total_w_pinalty_view" name="total_w_pinalty_view" />
                     <input class="form-control input-bb" id="total_w_pinalty" name="total_w_pinalty" hidden/>
                 </div>
             </div>

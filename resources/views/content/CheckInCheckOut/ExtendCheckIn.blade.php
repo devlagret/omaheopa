@@ -6,11 +6,11 @@
 @section('js')
 <script>
     function check(id){
+        subtotal();
         loadingWidget();
         var checkout_date = $('#checkout_date').val();
         var checkout_date_old = $('#checkout_date_old').val();
         var checkin_date = $('#checkin_date').val();
-        if(checkout_date==checkout_date_old){console.log({checkout_date,checkout_date_old});loadingWidget(0);return 0;}
         $.ajax({
                 type: "POST",
                 url: "{{ route('cc.check-extend') }}",
@@ -49,6 +49,90 @@
                 }
             });
     }
+    function changeDate(name = null, value = null) {
+            var start_date = moment($("#checkin_date").val());
+            var end_date = moment($("#checkout_date").val());
+            var days = end_date.diff(start_date, 'days');
+            if (days <= 0) {
+                // alert("Tanggal Check-Out Tidak Boleh Sebelum Tanggal Check-In");
+                $("#checkout_date").val(start_date.format('Y-MM-DD'));
+                end_date = moment($("#checkout_date").val());
+                days = 1;
+            }
+            $("#days_booked").val(days);
+            subtotal();
+        }
+
+        function subtotal() {
+            let sbstotal = 0;
+            let total = 0;
+            var days = $("#days_booked").val();
+            $(".room_price_price").each(function() {
+                sbstotal = Number($(this).val()) * days;
+                $("#booked-room-sbs-" + $(this).data('id')).html('Rp ' + toRp(sbstotal));
+                total += sbstotal;
+            });
+            $("#sbs-room-view").html('Rp '+toRp(total));
+            $("#subtotal_all_room").val(toRp(total));
+            $("#sbs-room").val(total);
+            count_total();
+            return total;
+        }
+
+        function count_total() {
+            var subtotal_room = $("#sbs-room").val();
+            var subtotal_facility = $("#sbs-facility").val();
+            var subtotal_menu = $("#sbs-menu").val();
+            var discount_percentage = $("#discount_percentage_total").val();
+            if (discount_percentage > 100) {
+                discount_percentage = 100;
+                $("#discount_percentage_total").val(discount_percentage);
+            }
+            if (discount_percentage < 0) {
+                discount_percentage = 0;
+                $("#discount_percentage_total").val(discount_percentage);
+            }
+            sbsAll = Number(subtotal_room) + Number(subtotal_facility) + Number(subtotal_menu);
+            $("#subtotal_all_view").val(toRp(sbsAll));
+            $("#subtotal_all").val(sbsAll);
+            diskon = (sbsAll * discount_percentage) / 100;
+            $("#discount_amount_view").val(toRp(diskon));
+            $("#discount_amount").val(diskon);
+            if (discount_percentage == '') {
+                $("#discount_amount_view").val('');
+                $("#discount_amount").val('');
+            }
+            $("#total_amount_view").val(toRp(sbsAll - diskon));
+            $("#total_amount").val(sbsAll - diskon);
+            $('#change_amount_view').attr('min', sbsAll - diskon);
+            if ($("#payed_amount").val() != '') {
+                $("#change_amount_view").val(toRp($("#payed_amount").val() - $('#total_amount').val()));
+                $("#change_amount").val($("#payed_amount").val() - $('#total_amount').val());
+                $("#payed_amount_view").val(toRp($("#payed_amount").val()));
+            }
+        }
+        $(document).ready(function() {
+           changeDate();
+            $("#discount_amount_view").change(function() {
+                $("#discount_amount").val(this.value);
+                $("#discount_amount_view").val(toRp(this.value));
+                var discount_percentage = (parseInt($(this).val()) / parseInt($("#total_amount").val())) *
+                    100;
+                $("#discount_percentage_total").val(discount_percentage);
+                count_total();
+            });
+            if ($("#down_payment").val() != '') {
+                $("#down_payment_view").val(toRp($("#down_payment").val()));
+            }
+            $('#subtotal_all_view').change(function (e) {
+                $('#total_amount_view').val(toRp(this.value));
+                $('#total_amount').val(this.value);
+                $('#subtotal_all').val(this.value);
+                $(this).val(toRp(this.value));
+            });
+            $('#subtotal_all_menu').val(toRp($('#sbs-menu').val()));
+            $('#subtotal_all_facility').val(toRp($('#sbs-facility').val()));
+        });
 </script>
 @stop
 
@@ -97,55 +181,12 @@
             <div class="card-body">
                 <div class="card">
                     <div class="card-body">
-                        <form action="{{route('cc.process-extend')}}" id="form-extend" method="post">
-                            @csrf
-                            <input type="hidden" name="sales_order_id" id="sales_order_id" value="{{$data->sales_order_id}}">
-                        <div class="row form-group">
-                            <div class="col-md-6">
-                                <div class="form-group form-md-line-input">
-                                    <section class="control-label">Tanggal Check-In
-                                        <span class="required text-danger">
-                                            *
-                                        </span>
-                                    </section>
-                                    <input type="date"
-                                        class="form-control form-control-inline input-medium date-picker input-date"
-                                        data-date-format="dd-mm-yyyy" type="text" name="checkin_date" readonly id="checkin_date"
-                                        value="{{ $data->checkin_date ?? date('Y-m-d') }}" style="width: 15rem;" />
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group form-md-line-input">
-                                    <section class="control-label">Tanggal Check-Out
-                                        <span class="required text-danger">
-                                            *
-                                        </span>
-                                    </section>
-                                    <input type="date"
-                                        class="form-control form-control-inline input-medium date-picker input-date"
-                                        data-date-format="dd-mm-yyyy" type="text" name="checkout_date" id="checkout_date"
-                                        value="{{ $sessiondata['checkout_date'] ?? $data->checkout_date }}" min="{{$data->checkout_date}}" style="width: 15rem;" />
-                                    <input type="text" name="checkout_date_old" id="checkout_date_old" value="{{$data->checkout_date}}" hidden/>
-                                    <input type="text" name="days_booked" id="days_booked" hidden/>
-                                </div>
-                            </div>
-                            <div class="col d-none">
-                                <div class="form-group">
-                                    <a class="text-dark">Malam<a class='red'> *</a></a>
-                                    <input class="form-control required input-bb" required form="form-barang" name="night"
-                                        id="night" type="number" min="0" autocomplete="off"
-                                        onchange="function_elements_add(this.name, this.value)"
-                                        value="{{ $sessiondata['night'] ?? '' }}" />
-                                </div>
-                            </div>
-                        </div>
-
                                 <div class="row">
                                     <h5 class="col">
                                         Atas Nama : {{ $data->sales_order_name }}
                                     </h5>
                                     <h5 class="col">
-                                        Subtotal : Rp {{ number_format(empty($data->discount)?$data->sales_order_price:$data->sales_order_price/(100-$data->discount)*100,2)  }}
+                                        Subtotal : Rp {{ number_format(is_null($data->invoice->extend_price)?(empty($data->discount)?($data->sales_order_price):($data->sales_order_price)/(100-$data->discount)*100):(empty($data->invoice->extend_discount)?($data->invoice->extend_price):($data->invoice->extend_price)/(100-$data->invoice->extend_discount)*100),2)  }}
                                     </h5>
                                 </div>
                                 <div class="row">
@@ -161,21 +202,151 @@
                                         Tanggal Check-Out : Rp {{ date('d-m-Y', strtotime($data->checkout_date)) }}
                                     </h5>
                                     <h5 class="col">
-                                        Total :  {{ number_format($data->sales_order_price,2) }}
+                                        Total :  Rp {{ number_format($data->invoice->extend_price??$data->sales_order_price, 2) }}
                                     </h5>
                                 </div>
                                 <div class="row">
                                     <h5 class="col">
+                                        Alamat : {{ $data->address }}
+                                    </h5>
+                                    <h5 class="col">
                                         Uang Muka : Rp {{ number_format($data->down_payment,2) }}
                                     </h5>
                                 </div>
-                                <div class="float-right">
-                                    <button type="reset" name="reset" class="btn btn-danger"
-                                    title="Reset"><i class="fa fa-times"></i> Reset</button>
-                                    <button type="button" onclick="check('{{$data->sales_order_id}}')" name="simpan" class="btn btn-info"
-                                    title="Simpan"><i class="fa fa-save"></i> Simpan</button>
+                                <div class="row">
+                                    <h5 class="col">
+                                        No Hp : {{ $data->phone_number }}
+                                    </h5>
+                                    @isset($data->invoice->extend_discount)
+                                    <h5 class="col">
+                                        Diskon Perpanjangan : {{ $data->invoice->extend_discount }} %
+                                    </h5>
+                                    @endisset
                                 </div>
-                        </form>
+                                @isset($data->invoice->extend_price)
+                                <div class="row">
+                                    <h5 class="col">
+                                        Diperpanjang Sebanyak : {{ $data->extend->groupBy('checkout_date_new')->get()->count() }} Kali
+                                    </h5>
+                                </div>
+                                @endisset
+                                <form action="{{ route('cc.process-extend') }}" id="form-extend" method="post">
+                                    <div class="card border border-dark mt-4" id="card-total-all">
+                                        <div class="card-header bg-dark clearfix">
+                                            <h5 class="mb-0 float-left">
+                                                Perpanjangan
+                                            </h5>
+                                            {{-- <div class="form-actions float-right">
+                                                    <button onclick="location.href='{{ route('booking.index') }}'" name="Find" class="btn btn-sm btn-info"
+                                                        title="Back"><i class="fa fa-angle-left"></i> Kembali</button>
+                                                </div> --}}
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row justify-content-end">
+                                                @csrf
+                                                <input type="hidden" name="sales_order_id" id="sales_order_id"
+                                                    value="{{ $data->sales_order_id }}">
+                                                <input type="date" name="checkin_date" id="checkin_date"
+                                                    value="{{ $data->checkin_date }}" hidden />
+                                                <div class="col">
+                                                <div class="col form-group form-md-line-input" id="date-out">
+                                                    <section class="control-label">Tanggal Check-Out
+                                                        <span class="required text-danger">
+                                                            *
+                                                        </span>
+                                                    </section>
+                                                    <input type="date"
+                                                        class="form-control form-control-inline input-medium date-picker input-date"
+                                                        data-date-format="dd-mm-yyyy"  name="checkout_date"
+                                                        id="checkout_date" min="{{$data->checkout_date}}"
+                                                        value="{{ $sessiondata['checkout_date'] ??$data->checkout_date }}"
+                                                        onchange="changeDate(this.name,this.value)" style="width: 15rem;" />
+                                                    <input type="text" name="checkout_date_old" id="checkout_date_old"
+                                                        value="{{$data->checkout_date }}" hidden />
+                                                    <input type="text" name="days_booked" id="days_booked" hidden />
+                                                </div>
+                                                </div>
+                                            </div>
+                                            <div class="row d-none">
+                                                <div class="form-group">
+                                                    <a class="text-dark">Malam<a class='red'> *</a></a>
+                                                    <input class="form-control required input-bb" required form="form-barang"
+                                                        name="night" id="night" type="number" min="0"
+                                                        autocomplete="off
+                                                        value="{{ $sessiondata['night'] ?? '' }}" />
+                                                </div>
+                                            </div>
+                                            {{-- <div class="row"> --}}
+                                                <div class="row mb-3">
+                                                    <div class="col-3">
+                                                        <a class="text-dark col-form-label">Sub Total</a>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        :
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <input class="form-control input-bb" type="text" id="subtotal_all_view"
+                                                            name="subtotal_all_view" autocomplete="off"  />
+                                                        <input class="form-control input-bb" type="hidden" id="subtotal_all"
+                                                            name="subtotal_all" autocomplete="off"  />
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <div class="col-3">
+                                                        <a class="text-dark col-form-label">Diskon (%)</a>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        :
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <input type="number" min="0" max="100"
+                                                            class="form-control input-bb" value="{{$data->invoice->extend_discount??0}}"
+                                                            id="discount_percentage_total" name="discount_percentage_total"
+                                                            autocomplete="off" onchange="count_total()" />
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <div class="col-3">
+                                                        <a class="text-dark col-form-label">Jumlah Diskon</a>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        :
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <input type="text" class="form-control input-bb"
+                                                            id="discount_amount_view" name="discount_amount_view"
+                                                            autocomplete="off" />
+                                                        <input type="hidden" class="form-control input-bb" id="discount_amount"
+                                                            name="discount_amount" autocomplete="off" />
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <div class="col-3">
+                                                        <a class="text-dark col-form-label">Total</a><a class='red'> *</a></a>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        :
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <input class="form-control input-bb" id="total_amount_view"
+                                                            name="total_amount_view" autocomplete="off" readonly />
+                                                        <input class="form-control input-bb" id="total_amount" type="hidden"
+                                                            name="total_amount" autocomplete="off" />
+                                                    </div>
+                                                </div>
+                                            {{-- </div> --}}
+                                            <br>
+                                            <div class="row form-actions float-right">
+                                                <button type="reset" name="Reset" class="btn btn-danger" autocomplete="off"
+                                                    id="form-reset"><i class="fa fa-times"></i> Batal</button>
+                                                <button type="button" name="Save" id="save-btn" class="btn btn-success button-prevent"
+                                                    onclick="$(this).prop('disabled',true);check('{{ $data->sales_order_id }}');"
+                                                    title="Save"><i class="fa fa-check"></i> Simpan</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+
                     </div>
                 </div>
                 <div class="card border border-dark">
@@ -206,7 +377,7 @@
                                     <tbody>
                                         <?php $no = 1;$total=0; $days= $carbon::parse($data->checkin_date)->diffInDays($carbon::parse($data->checkout_date));?>
                                         @foreach ($data->rooms as $val)
-                                            <tr>
+                                            <tr id="booked-room" data-id="{{ $val->sales_order_room_id }}">
                                                 @php
                                                     $rooms = $room->where('room_id', $val->room_id)->first();
                                                     $total += $val->room_price*$days;
@@ -221,8 +392,13 @@
                                                 </td>
                                                 <td>
                                                     {{number_format($val->room_price,2)}}
+                                                    <input class="room_price_price" type="hidden"
+                                                        name="room_price_price[]"
+                                                        id="room_price_price_{{ $val->sales_order_room_id }}"
+                                                        data-id="{{ $val->sales_order_room_id }}"
+                                                        value="{{ $val->room_price }}" />
                                                 </td>
-                                                <td>
+                                                <td id="booked-room-sbs-{{ $val->sales_order_room_id }}">
                                                     {{number_format($val->room_price*$days,2)}}
                                                 </td>
                                             </tr>
@@ -232,7 +408,9 @@
                                         <tr>
                                             <td colspan="6  " class="font-weight-bold text-center fs-4">Subtotal</td>
                                             <td colspan="2" class="font-weight-bold text-center fs-4">
-                                            <h5><b>Rp {{number_format($total,2)}}</b> -</h5>
+                                            <h5><b id="sbs-room-view">Rp {{number_format($total,2)}}</b> -</h5>
+                                            <input type="hidden" name="sbs-room" id="sbs-room"
+                                            value="{{ $total }}" />
                                             </td>
                                         </tr>
                                     </tfoot>
@@ -290,7 +468,8 @@
                                             <td colspan="4" class="font-weight-bold text-center fs-4">Subtotal</td>
                                             <td colspan="2" class="font-weight-bold text-center fs-4">
                                                 <h5><b>Rp {{number_format($total2,2)}}</b> -</h5>
-
+                                                <input type="hidden" name="sbs-facility" id="sbs-facility"
+                                                value="{{ $total2 }}" />
                                             </td>
                                         </tr>
                                     </tfoot>
@@ -348,7 +527,8 @@
                                             <td colspan="4" class="font-weight-bold text-center fs-4">Subtotal</td>
                                             <td colspan="2" class="font-weight-bold text-center fs-4">
                                                 <h5><b>Rp {{number_format($total3,2)}}</b> -</h5>
-
+                                                <input type="hidden" name="sbs-menu" id="sbs-menu"
+                                                value="{{ $total3 }}" />
                                             </td>
                                         </tr>
                                     </tfoot>

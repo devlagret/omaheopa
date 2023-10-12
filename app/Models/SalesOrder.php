@@ -22,6 +22,12 @@ class SalesOrder extends Model
     public function menus() {
         return $this->hasMany(SalesOrderMenu::class,'sales_order_id','sales_order_id');
     }
+    public function invoice() {
+        return $this->belongsTo(SalesInvoice::class,'sales_invoice_id','sales_invoice_id');
+    }
+    public function extend() {
+        return $this->belongsTo(SalesOrderRoomExtension::class,'sales_order_id','sales_order_id');
+    }
     protected $guarded = [
         'updated_at',
         'created_at',

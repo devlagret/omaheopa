@@ -28,7 +28,7 @@ class DownPaymentController extends Controller
     public function index() {
         $status = AppHelper::status();
         $filter = Session::get('filter-dp');
-        $booking = SalesOrder::with('rooms')->where('data_state',0)
+        $booking = SalesOrder::with('rooms','invoice')->where('data_state',0)
         ->where('sales_order_status','!=',0)
         ->where('sales_order_type','=',0)
         ->where('checkin_date','>=',$filter['start_date']??Carbon::now()->format('Y-m-d'))
@@ -69,6 +69,7 @@ class DownPaymentController extends Controller
             SalesInvoice::create([
                 'total_amount' => $order->sales_order_price,
                 'sales_invoice_token' => $token,
+                'customer_name' => $order->sales_order_name,
                 'sales_invoice_date' => Carbon::now()->format('Y-m-d'),
                 'created_id' => Auth::id(),
                 'company_id' => Auth::user()->company_id,

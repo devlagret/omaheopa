@@ -121,8 +121,10 @@
                         <th style="text-align: center; width: 20%">Atas Nama</th>
                         <th style="text-align: center; width: 10%">No Hp</th>
                         <th style="text-align: center; width: 10%">Kamar Dipesan</th>
-                        <th style="text-align: center; width: 10%">Harga</th>
                         <th style="text-align: center; width: 10%">Uang Muka</th>
+                        <th style="text-align: center; width: 10%">Subtotal</th>
+                        <th style="text-align: center; width: 10%">Perpanjangan</th>
+                        <th style="text-align: center; width: 10%">Total</th>
                         <th style="text-align: center; width: 15%">Aksi</th>
                     </tr>
                 </thead>
@@ -136,8 +138,10 @@
                         <td>{{ $row->sales_order_name }}</td>
                         <td class="text-center">{{ $row->phone_number }}</td>
                         <td class="text-center">{{ $row->rooms->count() }}</td>
-                        <td>{{ number_format($row->sales_order_price) }}</td>
                         <td>{{ number_format($row->down_payment) }}</td>
+                        <td>{{ number_format($row->sales_order_price) }}</td>
+                        <td>{{ number_format($row->invoice->extend_price-$row->sales_order_price) }}</td>
+                        <td>{{ number_format($row->invoice->extend_price) }}</td>
                         <td style="text-align: center">
                             @if (!$row->sales_order_status)
                           <a type="button" class="btn btn-outline-primary my-1 btn-sm" href="{{ route('booking.rescedule',$row->sales_order_id) }}">Rescedule</a>

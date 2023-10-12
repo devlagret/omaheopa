@@ -37,7 +37,7 @@ class CheckInCheckOutController extends Controller
         Session::put('cc-token',Str::uuid());
         $this->resetSession();
         $filter = Session::get('filter-cc');
-        $booking = SalesOrder::with('rooms')->where('data_state',0)
+        $booking = SalesOrder::with('rooms','invoice')->where('data_state',0)
         ->where('sales_order_status','!=',0)
         ->where('checkin_date','>=',$filter['start_date']??Carbon::now()->format('Y-m-d'))
         ->where('checkin_date','<=',$filter['end_date']??Carbon::now()->format('Y-m-d'))
@@ -91,7 +91,7 @@ class CheckInCheckOutController extends Controller
     }
     public function extend($sales_order_id) {
         Session::put('extend-token');
-        $data = SalesOrder::with(['rooms','facilities','menus'])->find($sales_order_id);
+        $data = SalesOrder::with(['rooms','facilities','menus','invoice','extend'])->find($sales_order_id);
         $room = CoreRoom::with(['price','roomType','building'])->whereIn('room_id',$data->rooms->pluck('room_id'))->get();
         $facility = SalesRoomFacility::whereIn('room_facility_id',$data->facilities->pluck('room_facility_id'))->get();
         $menu = SalesRoomMenu::whereIn('room_menu_id',$data->menus->pluck('room_menu_id'))->get();
@@ -123,41 +123,61 @@ class CheckInCheckOutController extends Controller
             report('['.Carbon::now().'] : Doubleclik at checkin extend');
             return redirect()->route('cc.index')->with('msg','Perpanjangan Berhasil');
         }
-        $so = SalesOrder::with('rooms')->where('sales_order_id','!=',$request->sales_order_id)->where('checkin_date','<',$request->checkout_date)
-        ->where('checkin_date','>',$request->checkin_date)
-        // ->where('checkout_date','>',$request->checkout_date)
-        ->get();
-        dump($dataroom);
-        foreach($so as $val){
-            foreach($val->rooms->whereIn('room_id',$dataroom) as $row){
-                dump($row);
-            }
-        }
+        $invoice = SalesInvoice::find($data->sales_invoice_id);
+        // $so = SalesOrder::with('rooms')->where('sales_order_id','!=',$request->sales_order_id)->where('checkin_date','<',$request->checkout_date)
+        // ->where('checkin_date','>',$request->checkin_date)
+        // // ->where('checkout_date','>',$request->checkout_date)
+        // ->get();
+        // dump($dataroom);
+        // foreach($so as $val){
+        //     foreach($val->rooms->whereIn('room_id',$dataroom) as $row){
+        //         dump($row);
+        //     }
+        // }
         // return response('',202);
         try{
             DB::beginTransaction();
-            SalesOrderRoomExtension::create([
-                'checkout_date'=>$request->checkout_date_old,
-                'checkout_date_new'=>$request->checkout_date,
-                'sales_order_id'=>$request->sales_order_id,
-                'created_id'=>Auth::id(),
-            ]);
-            $data->checkout_date;
-            $data->save();
+            $invoice->extend_discount = $request->discount_percentage_total;
+            $invoice->extend_price = $request->total_amount;
+            $invoice->save();
+            if($request->checkout_date_old!=$request->checkout_date){
+                SalesOrderRoomExtension::create([
+                    'checkout_date'=>$request->checkout_date_old,
+                    'checkout_date_new'=>$request->checkout_date,
+                    'sales_order_id'=>$request->sales_order_id,
+                    'created_id'=>Auth::id(),
+                ]);
+                $data->checkout_date=$request->checkout_date;
+                $data->save();
+            }
             DB::commit();
-            return redirect()->route('index')->with('msg','Data Berhasil Diinput');
+            return redirect()->route('cc.index')->with('msg','Data Berhasil Diinput');
         }catch(\Exception $e){
             DB::rollBack();
             report($e);
-            return redirect()->route('index')->with('msg','Data Gagal Diinput');
+            return redirect()->route('cc.index')->with('msg','Data Gagal Diinput');
         }
     }
     public function check(Request $request){
         $pref = PreferenceCompany::find(Auth::user()->company_id,['checkin_time','checkout_time']);
         $now = Carbon::now()->format('Y-m-d');
-        $order = SalesOrder::find($request->sales_order_id);
-        $sales = SalesInvoice::find($order->sales_invoice_id);
-        return response()->json(['status'=>Carbon::now()->format('H:i:s')>$pref->checkout_time,'late'=>$now>Carbon::parse($order->checkout_date),'diff'=>Carbon::parse($order->checkout_date)->diffInDays($now),'needtopay'=>$order->sales_order_price-$order->down_payment]);
+        $order = SalesOrder::with('invoice')->find($request->sales_order_id);
+        return response()->json(['status'=>Carbon::now()->format('H:i:s')>$pref->checkout_time,'late'=>$now>Carbon::parse($order->checkout_date),'diff'=>Carbon::parse($order->checkout_date)->diffInDays($now),'needtopay'=>is_null($order->invoice->extend_price)?$order->sales_order_price-$order->down_payment:$order->invoice->extend_price-$order->down_payment]);
+    }
+    public function processCheckin($sales_order_id){
+        try{
+            DB::beginTransaction();
+            $order = SalesOrder::find($sales_order_id);
+            $order->sales_order_status= 2;
+            $order->save();
+            DB::commit();
+            return redirect()->back()->with('msg','Check-In Berhasil');
+        }catch(\Exception $e){
+            DB::rollBack();
+            // return dump($e);s
+            report($e);
+            return redirect()->back()->with('msg','Check-In Gagal');
+        }
     }
     public function processCheckOut(Request $request) {
         $token = Session::get('cc-token');
@@ -187,7 +207,7 @@ class CheckInCheckOutController extends Controller
                 JournalHelper::make($token,'Check-Out',['hotel_account','hotel_cash_account'],$total_amount,'SO');
             //
             }
-            $invoice->paid_amount = $field['payed_amount'];
+            $invoice->paid_amount = $field['paid_amount'];
             $invoice->change_amount = $request->change_amount;
             $invoice->update_id = Auth::id();
 
@@ -373,14 +393,18 @@ class CheckInCheckOutController extends Controller
         return 1;
     }
     public function delete($sales_order_id) {
+        try{
         $order=SalesOrder::find($sales_order_id);
         $si = SalesInvoice::find($order->sales_invoice_id);
         $si->data_state = 1;
+        $si->save();
         $order->data_state = '1';
         $order->deleted_id = Auth::id();
-        if($order->save()&&$si->save()){if($order->delete()){
-           return redirect()->route('cc.index')->with(['type'=>'success','msg'=>'Pembatalan Check-in Berhasil']);
-        };}
+        $order->save();$order->delete();
+        return redirect()->route('cc.index')->with(['type'=>'success','msg'=>'Pembatalan Check-in Berhasil']);
+        }catch(\Exception $e){
+            report($e);
         return redirect()->route('cc.index')->with(['type'=>'danger','msg'=>'Pembatalan Check-in Gagal']);
+        }
     }
 }

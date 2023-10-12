@@ -41,7 +41,7 @@ class BookingController extends Controller
             'booked-room-menu-qty','booked-room-facility',
             'booked-room-facility-qty']);
         $this->resetUpdateSession();
-        $booking = SalesOrder::with('rooms')->where('data_state',0)
+        $booking = SalesOrder::with('rooms','invoice')->where('data_state',0)
         ->where('sales_order_type','!=',1)
         ->where('sales_order_type','!=',2)
         ->where('checkin_date','>=',$filter['start_date']??Carbon::now()->format('Y-m-d'))
@@ -507,7 +507,7 @@ class BookingController extends Controller
         if(empty(Session::get('booking-token'))){
             return redirect()->route('booking.index')->with('msg','Tambah Booking Kamar Berhasil -');
         }
-        dump($request->all());
+        // dump($request->all());
         $field = $request->validate([
             'atas_nama' => 'required',
         ],['atas_nama.required' => 'Nama Pemesan Diperlukan']);
@@ -677,7 +677,7 @@ class BookingController extends Controller
         return 1;
     }
     public function detail($sales_order_id){
-        $data = SalesOrder::with(['rooms','facilities','menus'])->find($sales_order_id);
+        $data = SalesOrder::with(['rooms','facilities','menus','invoice'])->find($sales_order_id);
         $room = CoreRoom::with(['price','roomType','building'])->whereIn('room_id',$data->rooms->pluck('room_id'))->get();
         $facility = SalesRoomFacility::whereIn('room_facility_id',$data->facilities->pluck('room_facility_id'))->get();
         $menu = SalesRoomMenu::whereIn('room_menu_id',$data->menus->pluck('room_menu_id'))->get();

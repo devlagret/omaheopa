@@ -143,7 +143,7 @@
             }
         }
         $(document).ready(function() {
-            changeDate();
+           {{ isset($rsc)?' changeDate();':null}}
             $("#discount_amount_view").change(function() {
                 $("#discount_amount").val(this.value);
                 $("#discount_amount_view").val(toRp(this.value));
@@ -220,8 +220,7 @@
                                 Atas Nama : {{ $data->sales_order_name }}
                             </h5>
                             <h5 class="col">
-                                Subtotal : Rp
-                                {{ number_format(empty($data->discount) ? $data->sales_order_price : ($data->sales_order_price / (100 - $data->discount)) * 100, 2) }}
+                                Subtotal : Rp {{ number_format(is_null($data->invoice->extend_price)?(empty($data->discount)?($data->sales_order_price):($data->sales_order_price)/(100-$data->discount)*100):(empty($data->invoice->extend_discount)?($data->invoice->extend_price):($data->invoice->extend_price)/(100-$data->invoice->extend_discount)*100),2)  }}
                             </h5>
                         </div>
                         <div class="row">
@@ -237,7 +236,7 @@
                                 Tanggal Check-Out : Rp {{ date('d-m-Y', strtotime($data->checkout_date)) }}
                             </h5>
                             <h5 class="col">
-                                Total : {{ number_format($data->sales_order_price, 2) }}
+                                Total :  Rp {{ number_format($data->invoice->extend_price??$data->sales_order_price, 2) }}
                             </h5>
                         </div>
                         <div class="row">
@@ -252,6 +251,11 @@
                             <h5 class="col">
                                 No Hp : {{ $data->phone_number }}
                             </h5>
+                            @isset($data->invoice->extend_discount)
+                            <h5 class="col">
+                                Diskon Perpanjangan : {{ $data->invoice->extend_discount }} %
+                            </h5>
+                            @endisset
                         </div>
                         @isset($rsc)
                             <form action="{{ route('booking.process-rescedule') }}" id="form-rescedule" method="post">

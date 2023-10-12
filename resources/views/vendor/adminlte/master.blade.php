@@ -198,7 +198,7 @@
                 rupiah = rupiah.split('').reverse().join('')
                     .replace(/(\d{3}(?!$))/g, '$1,')
                     .split('').reverse().join('');
-                return rupiah + ',' + cents.slice(0, 2);
+                return rupiah + '.' + cents.slice(0, 2);
             }
             $(document).ready(function() {
                 $('#example').dataTable({

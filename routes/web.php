@@ -508,6 +508,7 @@ Route::get('/cash-disbursement-report/export',[AcctDisbursementReportController:
  Route::prefix('checkin-checkout')->name('cc.')->group(function () {
     Route::get('/', [CheckInCheckOutController::class, 'index'])->name('index');
     Route::get('/add', [CheckInCheckOutController::class, 'add'])->name('add');
+    Route::get('/checkin/{sales_order_id?}', [CheckInCheckOutController::class, 'processCheckin'])->name('checkin');
     Route::post('/check', [CheckInCheckOutController::class, 'check'])->name('check');
     Route::post('/check-ext', [CheckInCheckOutController::class, 'checkExtend'])->name('check-extend');
     Route::post('/get-penalty', [CheckInCheckOutController::class, 'getPenalty'])->name('get-penalty');
