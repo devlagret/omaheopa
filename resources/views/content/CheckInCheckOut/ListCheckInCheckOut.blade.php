@@ -272,17 +272,17 @@
             <table id="example" style="width:100%" class="table table-striped table-bordered table-hover table-full-width">
                 <thead>
                     <tr>
-                        <th style="text-align: center; width: 5%">No </th>
-                        <th style="text-align: center; width: 10%">Tanggal Check-In</th>
-                        <th style="text-align: center; width: 10%">Tanggal Check-Out</th>
-                        <th style="text-align: center; width: 20%">Atas Nama</th>
+                        <th style="text-align: center; width: 3%">No </th>
+                        <th style="text-align: center; width: 9%">Tgl Check-In</th>
+                        <th style="text-align: center; width: 10%">Tgl Check-Out</th>
+                        <th style="text-align: center; width: 10%">Atas Nama</th>
                         <th style="text-align: center; width: 10%">No Hp</th>
                         <th style="text-align: center; width: 10%">Kamar Dipesan</th>
-                        <th style="text-align: center; width: 10%">Uang Muka</th>
-                        <th style="text-align: center; width: 10%">Subtotal</th>
-                        <th style="text-align: center; width: 10%">Perpanjangan</th>
-                        <th style="text-align: center; width: 10%">Total</th>
-                        <th style="text-align: center; width: 20%">Aksi</th>
+                        <th style="text-align: center; width: 9%">Uang Muka</th>
+                        <th style="text-align: center; width: 9%">Subtotal</th>
+                        <th style="text-align: center; width: 9%">Perpanjangan</th>
+                        <th style="text-align: center; width: 9%">Total</th>
+                        <th style="text-align: center; width: 15%">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -303,8 +303,8 @@
                             @endif
                         </td>
                         <td>{{ number_format($row->sales_order_price) }}</td>
-                        <td>{{ number_format($row->invoice->extend_price-$row->sales_order_price) }}</td>
-                        <td>{{ number_format($row->invoice->extend_price) }}</td>
+                        <td>{{ is_null($row->invoice->extend_price)?'-':number_format($row->invoice->extend_price-$row->sales_order_price) }}</td>
+                        <td>{{ number_format($row->invoice->extend_price??$row->sales_order_price) }}</td>
                         <td style="text-align: center">
                             @if ($row->sales_order_status==1)
                             <a type="button" class="btn btn-outline-success btn-sm" onclick="proses('{{ $row->sales_order_name}}','{{route('cc.checkin',$row->sales_order_id)}}')">Check-in</a>

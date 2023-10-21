@@ -113,7 +113,7 @@
                         <td>{{ $row->sales_order_name }}</td>
                         <td class="text-center">{{ $row->phone_number }}</td>
                         <td>{{ $row->rooms->count() }}</td>
-                        <td>{{ number_format($row->down_payment) }}</td>
+                        <td>{{ number_format($row->down_payment)??'-' }}</td>
                         <td style="text-align: center">
                           <div class="w-75 px-1 rounded-pill mx-auto bg-success">Sudah Dibayar</div>
                         </td>
