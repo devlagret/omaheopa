@@ -46,7 +46,7 @@ class APIController extends Controller
     /**
      * Show the application dashboard.
      *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * @return mixed
      */
     public function login(Request $request){
         $fields = $request->validate([

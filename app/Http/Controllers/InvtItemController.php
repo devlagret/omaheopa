@@ -241,7 +241,6 @@ class InvtItemController extends Controller
     }
     public function processEditItem(Request $request)
     {
-        dump($request->all());
         $itm="Barang";
         $warehouse = InvtWarehouse::where('data_state',0)
             ->where('company_id',Auth::user()->company_id)
