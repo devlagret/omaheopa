@@ -45,8 +45,8 @@ class SalesMerchantController extends Controller
         return view('content.SalesMerchant.FormEditSalesMerchant',compact('sessiondata','merchant'));
     }
     public function processEdit(Request $request){
-        $fields = $request->validate(['merchant_name'=> 'required',]);
-        $merchanttype = SalesMerchant::find($request->merchant_id);
+        $fields = $request->validate(['merchant_name'=> 'required']);
+        $merchanttype = SalesMerchant::find($request->mid);
         $merchanttype->merchant_name = $fields['merchant_name'];
         $merchanttype->updated_id = Auth::id();
         if($merchanttype->save()){

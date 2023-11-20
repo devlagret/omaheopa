@@ -99,7 +99,7 @@ function check(name,uri){
                     @foreach($data as $row)
                     <tr>
                         <td style='text-align:center'>{{ $no++ }}</td>
-                        <td>{{ $row['item_category_name'] }}</td>
+                        <td>{{ $row->category->item_category_name }}</td>
                         <td>{{ $row['item_code'] }}</td>
                         <td>{{ $row->merchant->merchant_name }}</td>
                         <td>{{ $row['item_name'] }}</td>
