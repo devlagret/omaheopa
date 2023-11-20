@@ -91,7 +91,7 @@
             }
         ?>
 
-    <form method="post" action="/item-category/process-edit-item-category" enctype="multipart/form-data">
+    <form method="post" action="{{route('process-edit-item-category')}}" enctype="multipart/form-data">
         @csrf
         <div class="card-body">
             <div class="row form-group">
