@@ -24,7 +24,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 
-class SalesInvoiceController extends Controller
+class SalesTiketController extends Controller
 {
     public function __construct()
     {
@@ -48,7 +48,7 @@ class SalesInvoiceController extends Controller
         $data = SalesInvoice::where('data_state',0)
         ->where('sales_invoice_date','>=',$start_date)
         ->where('sales_invoice_date','<=',$end_date)
-        ->where('sales_status',0)
+        ->where('sales_status',1)
         ->where('company_id', Auth::user()->company_id)
         ->get();
         // dd($data);

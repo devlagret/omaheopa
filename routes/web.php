@@ -59,6 +59,7 @@ use App\Http\Controllers\SalesInvoicebyItemReportController;
 use App\Http\Controllers\SalesInvoiceByUserReportController;
 use App\Http\Controllers\SalesInvoiceByYearReportController;
 use App\Http\Controllers\SalesInvoiceController;
+use App\Http\Controllers\SalesTiketController;
 use App\Http\Controllers\SalesInvoiceReportController;
 use App\Http\Controllers\SalesRoomFacilityController;
 use App\Http\Controllers\SalesRoomPriceController;
@@ -164,6 +165,22 @@ Route::post('/sales-invoice/select-data-unit', [SalesInvoiceController::class, '
 Route::post('/sales-invoice/filter',[SalesInvoiceController::class, 'filterSalesInvoice'])->name('filter-sales-invoice');
 Route::post('/sales-invoice/select-data-unit-price', [SalesInvoiceController::class, 'getUnitPrice'])->name('select-data-unit-price');
 Route::post('/sales-invoice/item', [SalesInvoiceController::class, 'getCoreItem'])->name('select-item-category-sales');
+
+Route::get('/sales-tiket',[SalesTiketController::class, 'index'])->name('sales-tiket');
+Route::get('/sales-tiket/add', [SalesTiketController::class,'addSalesInvoice'])->name('add-sales-tiket');
+Route::post('/sales-tiket/add-elements', [SalesTiketController::class,'addElementsSalesInvoice'])->name('add-elements-sales-tiket');
+Route::post('/sales-tiket/process-add', [SalesTiketController::class, 'processAddSalesInvoice'])->name('process-add-sales-tiket');
+Route::get('/sales-tiket/reset-add',[SalesTiketController::class, 'resetSalesInvoice'])->name('add-reset-sales-tiket');
+Route::post('/sales-tiket/add-array',[SalesTiketController::class,'addArraySalesInvoice'])->name('add-array-sales-tiket');
+Route::get('/sales-tiket/delete-array/{record_id}',[SalesTiketController::class,'deleteArraySalesInvoice'])->name('delete-array-sales-tiket');
+Route::get('/sales-tiket/detail/{sales_invoice_id}',[SalesTiketController::class, 'detailSalesInvoice'])->name('detail-sales-tiket');
+Route::get('/sales-tiket/delete/{sales_invoice_id}',[SalesTiketController::class, 'deleteSalesInvoice'])->name('delete-sales-tiket');
+Route::get('/sales-tiket/filter-reset',[SalesTiketController::class, 'filterResetSalesInvoice'])->name('filter-reset-sales-tiket');
+Route::post('/sales-tiket/filter',[SalesTiketController::class, 'filterSalesInvoice'])->name('filter-sales-tiket');
+Route::post('/sales-tiket/select-data-unit', [SalesTiketController::class, 'getSelectDataUnit'])->name('select-data-unit-sales-tiket');
+Route::post('/sales-tiket/filter',[SalesTiketController::class, 'filterSalesInvoice'])->name('filter-sales-tiket');
+Route::post('/sales-tiket/select-data-unit-price', [SalesTiketController::class, 'getUnitPrice'])->name('select-data-unit-price');
+Route::post('/sales-tiket/item', [SalesTiketController::class, 'getCoreItem'])->name('select-item-category-sales');
 
 Route::get('/purchase-invoice', [PurchaseInvoiceController::class, 'index'])->name('purchase-invoice');
 Route::get('/purchase-invoice/add', [PurchaseInvoiceController::class, 'addPurchaseInvoice'])->name('add-purchase-invoice');
