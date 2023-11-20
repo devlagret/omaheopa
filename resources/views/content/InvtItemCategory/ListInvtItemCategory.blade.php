@@ -92,7 +92,7 @@
                         <td style='text-align:center'>{{ $no++ }}</td>
                         <td>{{ $row['item_category_code'] }}</td>
                         <td>{{ $row['item_category_name'] }}</td>
-                        <td>{{ $row->merchant->merchant_name }}</td>
+                        <td>{{ $row->merchant->merchant_name??'Kategori Umum' }}</td>
                         <td class="">
                             <a type="button" class="btn btn-outline-warning btn-sm" href="{{ url('/item-category/edit-category/'.$row['item_category_id']) }}">Edit</a>
                             <button type="button" onclick="$('this').attr('disabled');check('{{$row->item_category_name}}','{{ route('delete-item-category',$row->item_category_id) }}','{{$row->item_category_id}}')" class="btn btn-outline-danger btn-sm" >Hapus</button>
