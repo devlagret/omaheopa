@@ -41,7 +41,7 @@ class InvtItemCategoryController extends Controller
         return view('content.InvtItemCategory.ListInvtItemCategory', compact('data','merchant','admin','sessiondata'));
     }
     public function filter(Request $request){
-       Session::put('cat-filter',$request->merchant_id);
+       Session::put('cat-filter',$request->mid);
         return redirect()->route('item-category');
     }
     public function addItemCategory($merchant_id = null)

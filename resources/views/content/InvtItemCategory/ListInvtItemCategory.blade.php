@@ -43,10 +43,10 @@
                     <div class="form-group">
                             <div class="form-group">
                                 <a class="text-dark">Merchant<a class='red'> *</a></a>
-                                {!! Form::select('merchant_id', $merchant, $sessiondata ?? '', [
+                                {!! Form::select('mid', $merchant, $sessiondata ?? '', [
                                     'class' => 'selection-search-clear required select-form',
-                                    'name' => 'merchant_id',
-                                    'id' => 'merchant_id',
+                                    'name' => 'mid',
+                                    'id' => 'mid',
                                     'autofocus'=>'autofocus',
                                 ]) !!}
                         </div>
