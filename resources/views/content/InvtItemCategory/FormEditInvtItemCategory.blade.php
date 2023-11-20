@@ -30,6 +30,20 @@
             if($('#merchant_id_view').val()!=''){
                 $('#merchant_id').val($('#merchant_id_view').val());
             }
+            if($('#check-general').is(":checked")){
+                $('#input-merhant').hide();
+                function_elements_add('check-general', 'checked')
+            }else{
+                $('#input-merhant').show();
+                function_elements_add('check-general', '')
+            }
+             $('#check-general').click(function (e) { 
+            if($(this).is(":checked")){
+                $('#input-merhant').hide();
+            }else{
+                $('#input-merhant').show();
+            }
+        });
             $("#merchant_id_view").change(function() {
             $('#merchant_id').val(this.value);
             function_elements_add(this.name, this.value)
@@ -91,7 +105,7 @@
             }
         ?>
 
-    <form method="post" action="/item-category/process-edit-item-category" enctype="multipart/form-data">
+    <form method="post" action="{{route('process-edit-item-category')}}" enctype="multipart/form-data">
         @csrf
         <div class="card-body">
             <div class="row form-group">
@@ -109,7 +123,7 @@
                     </div>
                 </div>
                     <div class="col-md-6">
-                        <div class="form-group">
+                        <div class="form-group" id="input-merhant">
                             <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
                             {!! Form::select('merchant_id', $merchant, $datacategory['merchant_id'] ?$datacategory['merchant_id']:$data->merchant_id, [
                                 'class' => 'form-control selection-search-clear select-form required '.($merchant->count()==1||!empty($pkg)?"disabled":""),
@@ -120,6 +134,14 @@
                             ]) !!}
                         <input type="hidden" name="merchant_id" id="merchant_id">
 
+                        </div>
+                    </div>
+                    <div class="col-md-6 align-items-center row">
+                        <div class="form-group my-auto col">
+                            <div class="form-check">
+                            <input class="form-check-input" name="check-general" id="check-general" {{$datacategory['check-general']??$data->item_category_type?'checked':''}} {{($merchant->count()==1||!empty($pkg)?"disabled":'')}} type="checkbox">
+                            <label class="form-check-label">Kategori Umum</label>
+                            </div>
                         </div>
                     </div>
                 <div class="col-md-8 mt-3">

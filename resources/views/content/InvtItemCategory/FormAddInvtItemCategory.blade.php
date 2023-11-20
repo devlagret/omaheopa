@@ -33,6 +33,20 @@
         if($('#merchant_id_view').val()!=''){
             $('#merchant_id').val($('#merchant_id_view').val());
         }
+        if($('#check-general').is(":checked")){
+                $('#input-merhant').hide();
+            }else{
+                $('#input-merhant').show();
+            }
+        $('#check-general').click(function (e) { 
+            if($(this).is(":checked")){
+                function_elements_add('check-general', 'checked')
+                $('#input-merhant').hide();
+            }else{
+                $('#input-merhant').show();
+                function_elements_add('check-general', '')
+            }
+        });
         $("#merchant_id_view").change(function() {
             $('#merchant_id').val(this.value);
             function_elements_add(this.name, this.value)
@@ -51,7 +65,18 @@
   </nav>
 
 @stop
-
+@section('styles')
+<style>
+  input[type=checkbox]
+{
+  /* Double-sized Checkboxes */
+  -ms-transform: scale(1.1); /* IE */
+  -moz-transform: scale(1.1); /* FF */
+  -webkit-transform: scale(1.1); /* Safari and Chrome */
+  -o-transform: scale(1.1); /* Opera */
+}
+</style>
+@stop
 @section('content')
 
 <h3 class="page-title">
@@ -110,15 +135,23 @@
                     </div>
                 </div>
                     <div class="col-md-6">
-                        <div class="form-group">
+                        <div class="form-group" id="input-merhant">
                             <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
-                            {!! Form::select('merchant_id', $merchant, $datacategory['merchant_id_view'] ?? '', [
+                            {!! Form::select('merchant_id', $merchant, $datacategory['merchant_id_view'] ?? $sessiondata??'', [
                                 'class' => 'form-control selection-search-clear select-form required '.($merchant->count() == 1||$datacategory['from_item']?'disabled':''),
                                 'name' => 'merchant_id_view',
                                 'id' => 'merchant_id_view',
                                 $merchant->count() == 1||$datacategory['from_item']?'disabled':''
                             ]) !!}
                                 <input type="hidden" name="merchant_id" id="merchant_id"/>
+                        </div>
+                    </div>
+                    <div class="col-md-6 align-items-center row">
+                        <div class="form-group my-auto col">
+                            <div class="form-check">
+                            <input class="form-check-input" name="check_general" id="check-general" type="checkbox" {{$datacategory['check-general']??''}} />
+                            <label class="form-check-label">Kategori Umum</label>
+                            </div>
                         </div>
                     </div>
                 <div class="col-md-8 mt-3">

@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\InvtItem;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use App\Models\SalesMerchant;
 use App\Models\InvtItemCategory;
 use App\Models\InvtItemPackageItem;
-use App\Models\SalesMerchant;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
 class InvtItemCategoryController extends Controller
@@ -22,6 +23,7 @@ class InvtItemCategoryController extends Controller
 
     public function index()
     {
+        Session::forget('cat-token');
         Session::forget('datacategory');
         $sessiondata = Session::get('cat-filter');
         $data = InvtItemCategory::with('merchant')->where('data_state', 0)
@@ -29,25 +31,33 @@ class InvtItemCategoryController extends Controller
         ;
         $admin = 1;
         //filter prepend
-        $merchant   = SalesMerchant::get()->pluck('merchant_name', 'merchant_id')->prepend('Tampil Semua',0);
+        $merchant   = SalesMerchant::get()->pluck('merchant_name', 'merchant_id')->prepend('Tampil Semua',0)->prepend('Kategori Umum',-1);
         if(Auth::id()!=1||Auth::user()->merchant_id!=null){
             $data->where('merchant_id',Auth::user()->merchant_id);
         $admin = 0;
         }
         if(isset($sessiondata)&&$sessiondata){
-            $data->where('merchant_id',$sessiondata);
+            if($sessiondata<0){
+                $data->whereNull('merchant_id');
+            }else{
+                $data->where('merchant_id',$sessiondata);
+            }
         }
         $data =$data->get();
         return view('content.InvtItemCategory.ListInvtItemCategory', compact('data','merchant','admin','sessiondata'));
     }
     public function filter(Request $request){
-       Session::put('cat-filter',$request->merchant_id);
+       Session::put('cat-filter',$request->mid);
         return redirect()->route('item-category');
     }
     public function addItemCategory($merchant_id = null)
     {
+       if(empty(Session::get('cat-token'))){
+        Session::put('cat-token',Str::uuid());
+       }
         $datacategory = Session::get('datacategory');
         $url = 'item-category';
+        $sessiondata = Session::get('cat-filter');
         $merchant = SalesMerchant::where('data_state','0');
         if(Auth::id()!=1||Auth::user()->merchant_id!=null){
             $merchant->where('merchant_id',Auth::user()->merchant_id);
@@ -61,7 +71,7 @@ class InvtItemCategoryController extends Controller
             $datacategory['from_item']  = 1;
             $url = 'add-item';
         }
-        return view('content.InvtItemCategory.FormAddInvtItemCategory',compact('datacategory','merchant','url'));
+        return view('content.InvtItemCategory.FormAddInvtItemCategory',compact('datacategory','sessiondata','merchant','url'));
     }
 
     public function elementsAddItemCategory(Request $request)
@@ -86,29 +96,42 @@ class InvtItemCategoryController extends Controller
 
     public function processAddItemCategory(Request $request)
     {
+        $token = Session::get('cat-token');
+        if(empty($token)&&!$request->from_item){
+            $msg = 'Tambah Kategori Berhasil';
+            return redirect()->route('item-category')->with('msg',$msg);
+        }
         $fields = $request->validate([
             'item_category_code'     => 'required',
             'item_category_name'     => 'required',
             'merchant_id'     => 'required',
         ]);
-
+        $mid=$fields['merchant_id'];
+        $type=0;
+        if($request->check_general){
+         $mid=null;$type=1;
+        }
         $data = InvtItemCategory::create([
             'item_category_code'        => $fields['item_category_code'],
             'item_category_name'        => $fields['item_category_name'],
-            'merchant_id'               => $fields['merchant_id'],
+            'item_category_type'        => $type,
+            'merchant_id'               => $mid,
+            'item_category_token'       => $token,
             'item_category_remark'      => $request->item_category_remark,
             'company_id'                => Auth::user()->company_id,
             'created_id'                => Auth::id(),
         ]);
         if($data->save()){
+            Session::forget('cat-token');
             if($request->from_item){
                 return redirect()->route('add-item')->with(['msg'=>'Tambah Kategori Berhasil','merchant_id'=>$fields['merchant_id']]);
             }
             $msg = 'Tambah Kategori Berhasil';
-            return redirect('/item-category/')->with('msg',$msg);
+            return redirect()->route('item-category')->with('msg',$msg);
         } else {
+            Session::forget('cat-token');
             $msg = 'Tambah Kategori Gagal';
-            return redirect('/item-category/')->with('msg',$msg);
+            return redirect()->route('item-category')->with('msg',$msg);
         }
     }
 
@@ -166,7 +189,7 @@ class InvtItemCategoryController extends Controller
             return redirect('/item-category')->with('msg', $msg);
         }
     }
-    
+
     public function checkDeleteItemCategory($item_category_id) {
         $pkg = InvtItem::where('item_category_id',$item_category_id)->get()->count();
         if($pkg){

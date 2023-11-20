@@ -69,7 +69,7 @@
 
     <form method="post" action="{{ route('sales-merchant.process-edit') }}" enctype="multipart/form-data">
         @csrf
-        <input  name="merchant_id" id="merchant_id" type="hidden"value="{{$merchant->merchant_id}}"/>
+        <input autocomplete="off" name="mid" id="mid" type="hidden" value="{{$merchant->merchant_id}}"/>
         <div class="card-body">
               <div class="tab-content">
                 <div role="tabpanel" class="tab-pane fade show active" id="sales-merchant">
