@@ -14,8 +14,8 @@ class AcctProfitLossReport extends Model
     protected $guarded = [
         'last_update'
     ];
-    protected static function booted()
-    {
-        static::addGlobalScope(new NotDeletedScope);
-    }
+    // protected static function booted()
+    // {
+    //     static::addGlobalScope(new NotDeletedScope);
+    // }
 }
