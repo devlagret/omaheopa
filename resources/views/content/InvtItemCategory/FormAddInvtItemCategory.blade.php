@@ -112,7 +112,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
-                            {!! Form::select('merchant_id', $merchant, $datacategory['merchant_id_view'] ?? '', [
+                            {!! Form::select('merchant_id', $merchant, $datacategory['merchant_id_view'] ?? $sessiondata??'', [
                                 'class' => 'form-control selection-search-clear select-form required '.($merchant->count() == 1||$datacategory['from_item']?'disabled':''),
                                 'name' => 'merchant_id_view',
                                 'id' => 'merchant_id_view',

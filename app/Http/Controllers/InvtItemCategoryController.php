@@ -48,6 +48,7 @@ class InvtItemCategoryController extends Controller
     {
         $datacategory = Session::get('datacategory');
         $url = 'item-category';
+        $sessiondata = Session::get('cat-filter');
         $merchant = SalesMerchant::where('data_state','0');
         if(Auth::id()!=1||Auth::user()->merchant_id!=null){
             $merchant->where('merchant_id',Auth::user()->merchant_id);
@@ -61,7 +62,7 @@ class InvtItemCategoryController extends Controller
             $datacategory['from_item']  = 1;
             $url = 'add-item';
         }
-        return view('content.InvtItemCategory.FormAddInvtItemCategory',compact('datacategory','merchant','url'));
+        return view('content.InvtItemCategory.FormAddInvtItemCategory',compact('datacategory','sessiondata','merchant','url'));
     }
 
     public function elementsAddItemCategory(Request $request)
