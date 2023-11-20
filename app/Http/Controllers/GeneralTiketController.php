@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 
-class InvtItemController extends Controller
+class GeneralTiketController extends Controller
 {
     public function __construct()
     {
@@ -31,12 +31,12 @@ class InvtItemController extends Controller
         Session::forget('items');
         Session::forget('paket');
 
-        $data = InvtItem::with('merchant','category')->where('company_id', Auth::user()->company_id);
+        $data = InvtItem::with('merchant')->where('item_status',1)->where('company_id', Auth::user()->company_id);
         if(Auth::id()!=1||Auth::user()->merchant_id!=null){
                 $data->where('merchant_id',Auth::user()->merchant_id);
         }
             $data =$data->get();
-        return view('content.InvtItem.ListInvtItem', compact('data'));
+        return view('content.GeneralTiket.ListGeneralTiket', compact('data'));
     }
 
     public function addItem()
@@ -53,7 +53,7 @@ class InvtItemController extends Controller
         }
         }
         // dump($itemnya[1]);
-        $paket = InvtItem::with('category','merchant')->wherein('item_id',$counts)->where('item_status',0)->get();
+        $paket = InvtItem::with('category','merchant')->wherein('item_id',$counts)->get();
         // exit;
         $itemunits  = InvtItemUnit::where('data_state', 0)
         ->where('company_id', Auth::user()->company_id)
@@ -73,7 +73,7 @@ class InvtItemController extends Controller
             ->get()
             ->pluck('item_name', 'item_id');
         $canAddCategory=!empty(User::with('group.maping.menu')->find(Auth::id())->group->maping->where('id_menu',SystemMenu::where('id','item-category')->first()->id_menu));
-        return view('content.InvtItem.FormAddInvtItem', compact('category','pktitem','allmerchant', 'itemunits', 'items', 'merchant','invtitm','canAddCategory','paket','counts','unit'));
+        return view('content.GeneralTiket.FormAddGeneralTiket', compact('category','pktitem','allmerchant', 'itemunits', 'items', 'merchant','invtitm','canAddCategory','paket','counts','unit'));
     }
 
     public function addItemElements(Request $request)
@@ -97,34 +97,32 @@ class InvtItemController extends Controller
         Session::put('items', $items);
     }
 
-    public function processAddItem(Request $request)
+    public function processAddTiket(Request $request)
     {
-        if(empty(Session::get('token'))){return redirect('/item')->with('msg', "Tambah Barang Berhasil");}
+        if(empty(Session::get('token'))){return redirect('/general-ticket')->with('msg', "Tambah Barang Berhasil");}
         // dump($request->all());
         // dump(Session::get('paket'));exit;
             $fields = $request->validate([
-                'item_category_id'  => 'required|integer',
                 'item_code'         => 'required',
                 'item_name'         => 'required',
-                'item_unit_id1'         => 'required',
-            ],['item_category_id.integer'=>'Wahana / Merchant Tidak Memiliki Kategori',
-        'item_unit_id1.required' => 'Harap Masukan Satuan 1. (Jika satuan 1 sudah dimasukan tapi masih muncul error ini, maka coba refresh halaman web ini)'
-        ]);
-            $warehouse = InvtWarehouse::where('data_state',0)
-            ->where('company_id',Auth::user()->company_id)
-            ->where('merchant_id',$request->merchant_id)
-            ->get();
-            if(!$warehouse->count()){
-                return redirect('/item/add-item')->with('msg','Merchant Tidak Memiliki Warehouse, Harap Tambah Warehouse.');
-            }
+                'item_unit_id1'     => 'required',
+            ]);
+            // $warehouse = InvtWarehouse::where('data_state',0)
+            // ->where('company_id',Auth::user()->company_id)
+            // ->where('merchant_id',$request->merchant_id)
+            // ->get();
+            // if(!$warehouse->count()){
+            //     return redirect('/item/add-item')->with('msg','Merchant Tidak Memiliki Warehouse, Harap Tambah Warehouse.');
+            // }
+            
+        
             DB::beginTransaction();
             try {
                 $data = InvtItem::create([
-                    'item_category_id'      => $fields['item_category_id'],
                     'item_code'             => $fields['item_code'],
                     'item_name'             => $fields['item_name'],
-                    'merchant_id'           => $request->merchant_id,
                     'item_remark'           => $request->item_remark,
+                    'item_status'           => 1,
                     // * Kemasan
                     'item_unit_id1'         => $request->item_unit_id1,
                     'item_default_quantity1'=> $request->item_default_quantity1,
@@ -146,20 +144,21 @@ class InvtItemController extends Controller
                     'company_id'            => Auth::user()->company_id,
                     'created_id'            => Auth::id(),
                 ]);
-                $item = InvtItem::orderBy('created_at', 'DESC')->where('company_id',Auth::user()->company_id)->first();
-            foreach ($warehouse as $key => $val) {
+                // echo json_encode($data);exit;
+                $item = InvtItem::orderBy('created_at', 'DESC')->where('item_status',1)->where('company_id',Auth::user()->company_id)->first();
+                // echo json_encode($item);exit;
+
                 InvtItemStock::create([
                     'company_id'        => $item['company_id'],
-                    'warehouse_id'      => $val['warehouse_id'],
+                    'warehouse_id'      => 1,
                     'item_id'           => $item['item_id'],
                     'item_unit_id'      => $request['item_unit_id1'],
-                    'item_category_id'  => $item['item_category_id'],
+                    // 'item_category_id'  => $item['item_category_id'],
                     'last_balance'      => 0,
                     'updated_id'        => Auth::id(),
                     'created_id'        => Auth::id(),
                 ]);
-            }
-            $itm = "Barang";
+            $itm = "";
             if(!empty(Session::get('paket'))){
                 $itm = "Paket";
                 $paket = collect(Session::get('paket'));
@@ -175,12 +174,13 @@ class InvtItemController extends Controller
                 DB::commit();
                 Session::forget('token');
                 $msg    = "Tambah ".$itm." Berhasil";
-                return redirect('/item')->with('msg', $msg);
+                return redirect('/general-ticket')->with('msg', $msg);
             } catch (\Exception $e) {
                 report($e);
+                dd($e); 
                 Session::forget('token');
-                $msg  = "Tambah ".$itm." Gagal";
-                return redirect('/item')->with('msg', $msg);
+                $msg  = "Tambah  Gagal";
+                return redirect('/general-ticket')->with('msg', $msg);
             }
 
     }
