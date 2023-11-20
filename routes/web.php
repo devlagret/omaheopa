@@ -124,21 +124,21 @@ Route::get('/item/delete-item/{item_id}', [InvtItemController::class, 'deleteIte
 Route::get('/item/check-delete-item/{item_id}', [InvtItemController::class, 'checkDeleteItem'])->name('check-delete-item');
 
 Route::get('/general-ticket',[GeneralTiketController::class, 'index'])->name('general-ticket');
-Route::post('/general-ticket/unit',[GeneralTiketController::class, 'getItemUnit'])->name('get-item-unit');
-Route::post('/general-ticket/cost',[GeneralTiketController::class, 'getItemCost'])->name('get-item-cost');
-Route::post('/general-ticket/cost/process-edit',[GeneralTiketController::class, 'processEditCost'])->name('process-edit-cost-item');
-Route::post('/general-ticket/category',[GeneralTiketController::class, 'getCategory'])->name('get-item-category');
+Route::post('/general-ticket/unit',[GeneralTiketController::class, 'getItemUnit'])->name('get-tiket-unit');
+Route::post('/general-ticket/cost',[GeneralTiketController::class, 'getItemCost'])->name('get-tiket-cost');
+Route::post('/general-ticket/cost/process-edit',[GeneralTiketController::class, 'processEditCost'])->name('process-edit-cost-tiket');
+Route::post('/general-ticket/category',[GeneralTiketController::class, 'getCategory'])->name('get-tiket-category');
 Route::post('/merchant/general-ticket/',[GeneralTiketController::class, 'getMerchantItem'])->name('get-merchant-item');
 Route::get('/general-ticket/add-kemasan',[GeneralTiketController::class, 'addKemasan'])->name('add-kemasan');
 Route::get('/general-ticket/remove-kemasan',[GeneralTiketController::class, 'removeKemasan'])->name('remove-kemasan');
-Route::get('/general-ticket/add-item', [GeneralTiketController::class, 'addItem'])->name('add-item');
-Route::get('/general-ticket/add-reset', [GeneralTiketController::class, 'addResetItem'])->name('add-reset-item');
-Route::post('/general-ticket/add-item-elements', [GeneralTiketController::class, 'addItemElements'])->name('add-item-elements');
+Route::get('/general-ticket/add-tiket', [GeneralTiketController::class, 'addItem'])->name('add-tiket');
+Route::get('/general-ticket/add-reset-tiket', [GeneralTiketController::class, 'addResetItem'])->name('add-reset-tiket');
+Route::post('/general-ticket/add-tiket-elements', [GeneralTiketController::class, 'addItemElements'])->name('add-tiket-elements');
 Route::post('/general-ticket/process-add-tiket', [GeneralTiketController::class,'processAddTiket'])->name('process-add-tiket');
-Route::get('/general-ticket/edit-item/{item_id}', [GeneralTiketController::class, 'editItem'])->name('edit-item');
-Route::post('/general-ticket/process-edit-item', [GeneralTiketController::class, 'processEditItem'])->name('process-edit-item');
-Route::get('/general-ticket/delete-item/{item_id}', [GeneralTiketController::class, 'deleteItem'])->name('delete-item');
-Route::get('/general-ticket/check-delete-item/{item_id}', [GeneralTiketController::class, 'checkDeleteItem'])->name('check-delete-item');
+Route::get('/general-ticket/edit-item/{item_id}', [GeneralTiketController::class, 'editItem'])->name('edit-tiket');
+Route::post('/general-ticket/process-edit-tiket', [GeneralTiketController::class, 'processEditItem'])->name('process-edit-tiket');
+Route::get('/general-ticket/delete-tiket/{item_id}', [GeneralTiketController::class, 'deleteItem'])->name('delete-tiket');
+Route::get('/general-ticket/check-delete-tiket/{item_id}', [GeneralTiketController::class, 'checkDeleteItem'])->name('check-delete-tiket');
 
 Route::get('/warehouse',[InvtWarehouseController::class, 'index'])->name('warehouse');
 Route::get('/warehouse/add-warehouse', [InvtWarehouseController::class, 'addWarehouse'])->name('add-warehouse');
