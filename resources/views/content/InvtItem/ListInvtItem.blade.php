@@ -101,7 +101,7 @@ function check(name,uri){
                         <td style='text-align:center'>{{ $no++ }}</td>
                         <td>{{ $row->category->item_category_name }}</td>
                         <td>{{ $row['item_code'] }}</td>
-                        <td>{{ $row->merchant->merchant_name }}</td>
+                        <td>{{ $row->merchant->merchant_name??'Kategori Umum' }}</td>
                         <td>{{ $row['item_name'] }}</td>
                         <td class='text-center'><a type='button' class='btn btn-outline-dark btn-sm' href="{{route('item-barcode.index', $row['item_id'])}}"><i class='fa fa-barcode'></i> Barcode</a></td>
                         <td class="text-center">

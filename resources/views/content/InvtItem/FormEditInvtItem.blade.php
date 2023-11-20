@@ -54,12 +54,15 @@ if (empty($pktitem)) {
         }
 
         function changeCategory(id, el, from_paket = 0) {
-            loading();
+            console.log($('#'+id).val());
             if($('#'+id).val()!=''){
                 $('#merchant_id').val($('#'+id).val());
+            } else if ($('#'+id).val()===null||$('#'+id).val()===undefined ){
+                loading(0);
+                return 0;
             }
+                loading();
             var merchant_id = $("#" + id).val();
-            console.log(id);
             $.ajax({
                 type: "POST",
                 url: "{{ route('get-item-category') }}",
@@ -140,14 +143,15 @@ if (empty($pktitem)) {
             });
         }
         $(document).ready(function() {
-            if($('#merchant_id_view').val()!=''){
-                $('#merchant_id').val($('#merchant_id_view').val());
-            }
             changeCategory('merchant_id', 'item_category_id');
             changeCategory('package_merchant_id', 'package_item_category', 1);
             checkKemasan();
             if ($('#package_price_view').val() != '') {
                 formatRp();
+            }
+            if($('#merchant_id_view').val()!=''){
+                console.log($('#merchant_id_view').val());
+                $('#merchant_id').val($('#merchant_id_view').val());
             }
         });
     </script>
@@ -231,7 +235,7 @@ if (empty($pktitem)) {
                                             'class' => 'selection-search-clear required select-form '.($merchant->count()==1||!empty($pkg)?"disabled":""),
                                             'name' => 'merchant_id_view',
                                             'id' => 'merchant_id_view',
-                                            'onchange' => 'changeCategory(`' . route('get-item-category') . '`,`' . csrf_token() . '`)',
+                                            'onchange' => 'changeCategory(this.id,"item_category_id")',
                                             'form' => 'form-barang',
                                             'required',
                                             $merchant->count()==1||!empty($pkg)?"disabled":''
