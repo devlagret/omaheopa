@@ -157,4 +157,17 @@ class InvtWarehouseController extends Controller
             return $return_data;
         }
     }
+    public function checkWarehouseDtl(Request $request)
+    {
+        $datawarehouse = InvtWarehouse::where('merchant_id', $request->merchant_id)
+            ->where('data_state', 0)
+            ->first();
+            
+        if ($datawarehouse == null) {
+            $datamerchant = SalesMerchant::find($request->merchant_id);
+            return response(['count'=>0,'merchant'=>$datamerchant->merchant_name]);
+        } else {
+            return response(['count'=>1]);
+        }
+    }
 }

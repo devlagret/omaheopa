@@ -149,6 +149,7 @@ Route::get('/warehouse/edit-warehouse/{warehouse_id}',[InvtWarehouseController::
 Route::post('/warehouse/process-edit-warehouse', [InvtWarehouseController::class, 'processEditWarehouse'])->name('process-edit-warehouse');
 Route::get('/warehouse/delete-warehouse/{warehouse_id}', [InvtWarehouseController::class, 'deleteWarehouse'])->name('delete-warehouse');
 Route::post('/warehouse/check-warehouse/', [InvtWarehouseController::class, 'checkWarehouse'])->name('check-warehouse');
+Route::post('/warehouse/check-warehouse-detail/', [InvtWarehouseController::class, 'checkWarehouseDtl'])->name('check-warehouse-dtl');
 
 Route::get('/sales-invoice',[SalesInvoiceController::class, 'index'])->name('sales-invoice');
 Route::get('/sales-invoice/add', [SalesInvoiceController::class,'addSalesInvoice'])->name('add-sales-invoice');

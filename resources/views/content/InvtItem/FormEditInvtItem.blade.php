@@ -142,6 +142,39 @@ if (empty($pktitem)) {
                 }
             });
         }
+           function checkMerchant() { 
+            if($('#item_default_quantity_0').val()=='') {
+                $('#navigator-itm li:nth-child(2) a').tab('show');
+                $('item_default_quantity_0').focus();
+                alert('Harap Masukan Satuan')
+                return 0;
+            }
+            var id = $("#merchant_id").val();
+            $("#create_warehouse").val(0);
+            $.ajax({
+                type: "post",
+                url: "{{route('check-warehouse-dtl')}}",
+                data: {'merchant_id':id,
+                '_token': '{{ csrf_token() }}'},
+                dataType: "json",
+                success: function (response) {
+                    console.log(response);
+                    if (response.count == 0) {
+                        $("#mname").html(response.merchant);
+                        $("#wname").html(response.merchant);
+                        $('#confirmModal').modal('show')
+                    }else{
+                        $("#create_warehouse").val(0);
+                        $('#form-barang').submit();
+                    }
+                }
+            });
+        }
+        function save(){
+            $("#create_warehouse").val(1);
+            $('#confirmModal').modal('hide')
+            $('#form-barang').submit();
+        }
         $(document).ready(function() {
             changeCategory('merchant_id', 'item_category_id');
             changeCategory('package_merchant_id', 'package_item_category', 1);
@@ -149,6 +182,14 @@ if (empty($pktitem)) {
             if ($('#package_price_view').val() != '') {
                 formatRp();
             }
+            $("#simpan-brg").click(function (e) { 
+                e.preventDefault();
+                checkMerchant();
+            });
+            $("#confirm-save-w-whs").click(function (e) { 
+                e.preventDefault();
+                save();
+            });
             if($('#merchant_id_view').val()!=''){
                 console.log($('#merchant_id_view').val());
                 $('#merchant_id').val($('#merchant_id_view').val());
@@ -241,8 +282,8 @@ if (empty($pktitem)) {
                                             $merchant->count()==1||!empty($pkg)?"disabled":''
                                         ],
                                     ) !!}
-                                    <input type="hidden" name="merchant_id" id="merchant_id">
-
+                                     <input type="hidden" form="form-barang" name="merchant_id" id="merchant_id">
+                                     <input type="hidden" form="form-barang" name="create_warehouse" value="0" id="create_warehouse">
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -485,7 +526,7 @@ if (empty($pktitem)) {
                 <div class="form-actions float-right">
                     <button type="reset" name="Reset" class="btn btn-danger" onclick="reset_add();"><i
                             class="fa fa-times"></i> Batal</button>
-                    <button type="submit" id="simpan-brg" name="Save" class="btn btn-primary" title="Save"><i
+                    <button type="button" id="simpan-brg" class="btn btn-primary" ><i
                             class="fa fa-check"></i>
                         Simpan</button>
                 </div>
@@ -494,6 +535,26 @@ if (empty($pktitem)) {
     </form>
     </div>
 
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="confirmModalLabel">Perhatian !</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p class="d-inline">Wahana "<b class="d-inline" id="mname">Merchant</b>" tidak memiliki gudang. Apakah anda ingin sistem mebuat gudang otomatis?</p> <small>(Gudang akan diberi nama "<b class="d-inline">Gudang <div class="d-inline" id="wname">Merchant</div></b>")</small>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+              <a type="button" href="{{route('add-warehouse')}}" class="btn btn-info">Buat Gudang Manual</a>
+              <button type="button" class="btn btn-primary" id="confirm-save-w-whs">Ya</button>
+            </div>
+          </div>
+        </div>
+      </div>
 @stop
 
 @section('footer')

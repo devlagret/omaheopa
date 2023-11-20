@@ -120,8 +120,8 @@
                 Form Tambah
             </h5>
             <div class="float-right">
-                <button onclick="location.href='{{ url('warehouse') }}'" name="Find" class="btn btn-sm btn-info"
-                    title="Back"><i class="fa fa-angle-left"></i> Kembali</button>
+                <a href='{{ url()->previous() }}' type="button" name="Back" class="btn btn-sm btn-info"
+                    title="Back"><i class="fa fa-angle-left"></i> Kembali</a>
             </div>
         </div>
 
