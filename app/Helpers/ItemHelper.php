@@ -22,7 +22,7 @@ class ItemHelper extends AppHelper
         }else{
         $category->where('merchant_id', $request->merchant_id);
         }
-        $category->get();
+        $category = $category->get();
         $lastCategoryId ?? $lastCategoryId = $category->first()->item_category_id;
         foreach ($category as $val) {
             $data .= "<option value='$val[item_category_id]' " . ($lastCategoryId == $val['item_category_id'] ? 'selected' : '') . ">$val[item_category_name]</option>\n";
@@ -33,7 +33,7 @@ class ItemHelper extends AppHelper
         return response($data);
         }catch(\Exception $e){
         report($e);
-        return response($data);
+        return response($e);
         }
     }
     /**
