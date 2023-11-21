@@ -2020,7 +2020,6 @@ class APIController extends Controller
                 ],401);  
             }
 
-
             // $account_setting_name = 'sales_cash_account';
             // $account_id = $this->getAccountId($account_setting_name);
             // $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
