@@ -2,22 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Models\InvtItem;
-use App\Models\InvtItemCategory;
-use App\Models\InvtItemPackage;
-use App\Models\InvtItemStock;
+use Faker\Provider\Uuid;
+use App\Models\SystemMenu;
+use App\Helpers\ItemHelper;
+use Illuminate\Support\Str;
 use App\Models\InvtItemUnit;
+use Illuminate\Http\Request;
+use App\Models\InvtItemStock;
 use App\Models\InvtWarehouse;
 use App\Models\SalesMerchant;
-use App\Models\SystemMenu;
-use App\Models\User;
-use Faker\Provider\Uuid;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\InvtItemPackage;
+use App\Models\InvtItemCategory;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Str;
 
 class InvtItemController extends Controller
 {
@@ -383,25 +384,14 @@ class InvtItemController extends Controller
     }
     public function getCategory(Request $request)
     {
-        $data = '';
         $items = Session::get('items');
-        $category = InvtItemCategory::select('item_category_id', 'item_category_name')
-            ->where('merchant_id', $request->merchant_id)
-            ->where('data_state', 0)
-            ->get();
         $items['item_category_id'] ?? $items['item_category_id'] = 1;
         $ctg = $items['item_category_id'];
         if($request->from_paket){
             $items['package_item_category'] ?? $items['package_item_category'] = 1;
             $ctg = $items['package_item_category'];
         }
-        foreach ($category as $val) {
-            $data .= "<option value='$val[item_category_id]' " . ($ctg == $val['item_category_id'] ? 'selected' : '') . ">$val[item_category_name]</option>\n";
-        }
-        if ($category->count() == 0) {
-            $data = "<option>Wahana / Merchant Tidak Memiliki Kategori</option>\n";
-        }
-        return response($data);
+        return response(ItemHelper::getCategory($ctg,$request));
     }
     public function addKemasan()
     {
