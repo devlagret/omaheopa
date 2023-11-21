@@ -20,7 +20,7 @@ class StockHelper{
      * @param integer|string|null $unit
      * @return bool
      */
-    public function add(int $quantity = 1,int|string $unit=null){
+    public function add(int $quantity = 1,$unit=null){
         $data = self::$data;
         $data->last_balance = ($data->last_balance + (abs($quantity)* (is_null($unit)?$unit = self::$item['item_default_quantity1']:$unit = $this->getDefaultQty($unit))));
         return $data->save();
@@ -32,7 +32,7 @@ class StockHelper{
      * @param integer|string|null $unit
      * @return bool
      */
-    public function sub(int $quantity = 1,int|string $unit=null){
+    public function sub(int $quantity = 1,$unit=null){
         $data = self::$data;
         $data->last_balance = ($data->last_balance - (abs($quantity) * (is_null($unit)?$unit = self::$item['item_default_quantity1']:$unit = $this->getDefaultQty($unit))));
         return $data->save();
@@ -44,7 +44,7 @@ class StockHelper{
      * @param integer|string|null $unit_id if null get the first unit (unit id|unit code)
      * @return StockHelper
      */
-    public static function find(int $item_id, int|string $unit=null){
+    public static function find(int $item_id, $unit=null){
         $item = InvtItem::find($item_id);
         self::$item = $item;
         self::$data = InvtItemStock::where('company_id',Auth::user()->company_id)
@@ -54,7 +54,7 @@ class StockHelper{
         $sh->setdata($unit);
         return $sh;
     }
-    protected function getDefaultQty(int|String $unit){
+    protected function getDefaultQty($unit){
         $unit_id = $this->getUnitId($unit);
         for($i = 1;$i<=3;$i++){
             if(self::$item['item_unit_id'.$i]==$unit_id){
@@ -62,7 +62,7 @@ class StockHelper{
             }
         }
     }
-    protected function getUnitId(int|String $unit){
+    protected function getUnitId($unit){
         if(is_int($unit)||(int)$unit){
             return (int)$unit;
         }elseif(is_string($unit)){
