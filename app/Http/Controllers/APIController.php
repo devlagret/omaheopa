@@ -64,7 +64,7 @@ class APIController extends Controller
             ],401);
         }
         // $request->session()->regenerate();
-        $user = User::find(Auth::id());
+        $user = User::with('group')->find(Auth::id());
         $login_log = array(
             'user_id'          => $user['user_id'],
             'company_id'       => $user['company_id'],
