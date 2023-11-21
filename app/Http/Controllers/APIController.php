@@ -61,12 +61,12 @@ class APIController extends Controller
 
 
         //Check password
-        if(!Auth::attempt($fields)){
+        if(!Auth::attempt(['name'=>$fields['username'],'password'=>$fields['password']])){
             return response([
                 'message' => 'Username / Password Tidak Sesuai'
             ],401);
         }
-        $request->session()->regenerate();
+        // $request->session()->regenerate();
         $user = User::find(Auth::id());
         $login_log = array(
             'user_id'          => $user['user_id'],

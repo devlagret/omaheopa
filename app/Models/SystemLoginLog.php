@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class SystemLoginLog extends Model
 {
     // use HasFactory;
-    protected $table        = 'system_login_log';
-    protected $primaryKey   = 'login_log_id';
+    protected $table        = 'system_log_user';
+    protected $primaryKey   = 'user_log_id';
     protected $guarded = [
         'updated_at',
         'created_at'
