@@ -114,11 +114,22 @@ class InvtItemController extends Controller
             ->where('company_id',Auth::user()->company_id)
             ->where('merchant_id',$request->merchant_id)
             ->get();
-            if(!$warehouse->count()){
-                return redirect('/item/add-item')->with('msg','Merchant Tidak Memiliki Warehouse, Harap Tambah Warehouse.');
-            }
             DB::beginTransaction();
             try {
+                $merchant=SalesMerchant::find($request->merchant_id);
+                $warehousecode = preg_replace('/[^A-Z]/', '',$merchant->merchant_name);
+                if(!$warehouse->count()){
+                    if($request->create_warehouse==1){
+                        InvtWarehouse::create([
+                            'merchant_id'=>$request->merchant_id,
+                            'warehouse_code'=>"GD{$warehousecode}",
+                            'warehouse_name'=>"Gudang {$merchant->merchant_name}",
+                            'created_id'=>Auth::id()
+                        ]);
+                    }else{
+                        return redirect('/item/add-item')->with('msg','Merchant Tidak Memiliki Warehouse, Harap Tambah Warehouse.');
+                    }
+                }
                 $data = InvtItem::create([
                     'item_category_id'      => $fields['item_category_id'],
                     'item_code'             => $fields['item_code'],
@@ -246,9 +257,7 @@ class InvtItemController extends Controller
             ->where('company_id',Auth::user()->company_id)
             ->where('merchant_id',$request->merchant_id)
             ->get();
-        if(!$warehouse->count()){
-            return redirect('/item/add-item')->with('msg','Merchant Tidak Memiliki Warehouse, Harap Tambah Warehouse.');
-        }
+
         $fields = $request->validate([
             'item_category_id'  => 'required|integer',
             'item_code'         => 'required',
@@ -257,6 +266,21 @@ class InvtItemController extends Controller
         ],['item_category_id.integer'=>'Wahana / Merchant Tidak Memiliki Kategori']);
         $paket= InvtItemPackage::where('item_id',$fields['item_id']);
         try{
+        $merchant=SalesMerchant::find($request->merchant_id);
+        $warehousecode = preg_replace('/[^A-Z]/', '',$merchant->merchant_name);
+
+        if(!$warehouse->count()){
+            if($request->create_warehouse==1){
+                InvtWarehouse::create([
+                    'merchant_id'=>$request->merchant_id,
+                    'warehouse_code'=>"GD{$warehousecode}",
+                    'warehouse_name'=>"Gudang {$merchant->merchant_name}",
+                    'created_id'=>Auth::id()
+                ]);
+            }else{
+                return redirect('/item/add-item')->with('msg','Merchant Tidak Memiliki Warehouse, Harap Tambah Warehouse.');
+            }
+        }
         DB::beginTransaction();
         $table       = InvtItem::findOrFail($fields['item_id']);
         $packageitem = InvtItemPackage::with('unit')->where('package_item_id',$fields['item_id']);
