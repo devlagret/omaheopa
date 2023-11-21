@@ -53,7 +53,7 @@ Dashboard
                         <?php foreach($menus as $menu){
                             if($menu['id']=='purchase-invoice'){
                         ?>
-                            <li class="list-group-item main-menu-item-b" onClick="location.href='{{route('purchase-invoice')}}'"> <i class="fa fa-angle-right"></i> Pembelian</li>
+                            <li class="list-group-item main-menu-item-b" onClick="location.href='{{route('pi.index')}}'"> <i class="fa fa-angle-right"></i> Pembelian</li>
                         <?php   }
                             if($menu['id']=='purchase-return'){
                         ?>
