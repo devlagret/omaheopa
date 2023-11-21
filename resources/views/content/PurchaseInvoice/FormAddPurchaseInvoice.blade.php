@@ -21,7 +21,6 @@
             loadingWidget();
             var merchant_id = $("#" + id).val();
             $('#merchant_id').val(merchant_id);
-            console.log(id);
             $.ajax({
                 type: "POST",
                 url: "{{ route('pi.get-category') }}",
@@ -34,6 +33,7 @@
                     function_elements_add(id, merchant_id);
                     $('#' + el).html(return_data);
                     changeItem($('#' + el).val());
+                    changeWarehouse(id);
                 },
                 error: function(data) {
                     console.log(data);
@@ -58,7 +58,6 @@
             success: function(return_data) {
                 $('#item_id').val(1);
                 $('#item_id').html(return_data);
-                console.log('ci c')
                 changeSatuan();
                 function_elements_add('item_category_id', category);
             }
@@ -69,7 +68,7 @@
             loadingWidget();
             $.ajax({
                 type: "POST",
-                url: "{{ route('get-item-unit') }}",
+                url: "{{ route('pi.get-unit') }}",
                 dataType: "html",
                 data: {
                     'item_id': item_id,
@@ -109,10 +108,13 @@
                 loadingWidget(0);
                 $('#item_unit_cost_view').val(return_data == '' ? '' : toRp(return_data.cost));
                 $('#item_unit_cost').val(return_data.cost);
+                function_elements_add('item_unit', item_unit);
                 setTimeout(function(){ loadingWidget(0); }, 200);
-
+                
             },
             error: function(data) {
+                $('#item_unit_cost_view').val('');
+                $('#item_unit_cost').val('');
                 console.log(data);
                 loadingWidget(0);
                 setTimeout(function(){ loadingWidget(0); }, 200);
@@ -121,6 +123,32 @@
             }
         });
     }
+    function changeWarehouse(id) { 
+        var merchant_id = $("#" + id).val();
+            loadingWidget();
+            $.ajax({
+                type: "POST",
+                url: "{{ route('pi.get-whs') }}",
+                dataType: "html",
+                data: {
+                    'merchant_id': merchant_id,
+                    '_token': '{{ csrf_token() }}',
+                },
+                success: function(return_data) {
+                    $('#warehouse_id').val(1);
+                    $('#warehouse_id').html(return_data);
+                },
+                complete: function() {
+                    loadingWidget(0);
+                    setTimeout(function() {
+                        loadingWidget(0);
+                    }, 200);
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            });
+     }
     $(document).ready(function(){
         $("#quantity").change(function(){
             var quantity = $("#quantity").val();
@@ -275,6 +303,10 @@
             e.preventDefault();
             changeCategory(this.id,'item_category_id');
         });
+        $('#add_purchase_item').click(function (e) { 
+            e.preventDefault();
+            processAddArrayPurchaseInvoice();
+        });
     });
 
     function process_change_cost() {
@@ -301,7 +333,7 @@
     }
 
     function processAddArrayPurchaseInvoice(){
-        var item_packge_id		            = document.getElementById("item_packge_id").value;
+        var item_id		                    = document.getElementById("item_id").value;
         var item_unit_cost		            = document.getElementById("item_unit_cost").value;
         var quantity                        = document.getElementById("quantity").value;
         var discount_percentage             = document.getElementById("discount_percentage").value;
@@ -309,12 +341,13 @@
         var subtotal_amount_after_discount  = document.getElementById("subtotal_amount_after_discount").value;
         var subtotal_amount                 = document.getElementById("subtotal_amount").value;
         var item_expired_date               = document.getElementById("item_expired_date").value;
-
+        var warehouse_id                    = document.getElementById("warehouse_id").value;
+        if(quantity==''||quantity==0){alert('Masukan Jumlah Barang yang dibeli!');$('#quantity').focus(); return 0;}
         $.ajax({
             type: "POST",
             url : "{{route('pi.add-array')}}",
             data: {
-                'item_packge_id'    	            : item_packge_id,
+                'item_id'    	            : item_id,
                 'item_unit_cost'                    : item_unit_cost,
                 'quantity'                          : quantity,
                 'discount_percentage'               : discount_percentage,
@@ -467,7 +500,7 @@
 
     $(document).ready(function(){
         var total_amount = parseInt($('#subtotal_amount_total').val());
-        var tax_ppn_percentage = parseInt($('#tax_ppn_percentage').val());
+        var tax_ppn_percentage = parseInt($('#tax_ppn_percentage').val())||0;
         var discount_amount_total = parseInt($('#discount_amount_total').val()) || 0;
         var shortover_amount = parseInt($('#shortover_amount').val()) || 0;
         var total_amount_after_diskon = total_amount - discount_amount_total;
@@ -806,8 +839,9 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <a class="text-dark">Nama Gudang<a class='red'> *</a></a>
-                            {!! Form::select('warehouse_id', $warehouses, $datases['warehouse_id'] ??'', ['class' => 'form-control selection-search-clear select-form', 'id' => 'warehouse_id', 'name' => 'warehouse_id', 'onchange' => 'function_elements_add(this.name, this.value)']) !!}
-
+                            <select class="selection-search-clear required select-form" onchange="function_elements_add(this.name,this.value)"
+                                placeholder="Masukan Kategori Barang" name="warehouse_id" id="warehouse_id">
+                            </select>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -886,7 +920,7 @@
             <div class="card-footer text-muted">
                 <div class="form-actions float-right">
                             <a class="btn btn-secondary">Tambah Barang Baru</a>
-                    <button type="button" name="Add" class="btn btn-success" title="Add"> Tambah</button>
+                    <button type="button" id="add_purchase_item" class="btn btn-success" title="Add"> Tambah</button>
                 </div>
             </div>
         </div>
@@ -914,37 +948,31 @@
                                 </tr>
                             </thead>
                             <tbody>
-                            <?php
-                            $quantity = 0;
-                            $subtotal_amount = 0;
-                                if(!is_array($arraydatases)){
-                                    echo "<tr><th colspan='6' style='text-align  : center !important;'>Data Kosong</th></tr>";
-                                } else {
-                                    foreach ($arraydatases AS $key => $val){
-                                        echo"
+                            @php
+                                $quantity = 0;
+                                $subtotal_amount = 0;
+                            @endphp
+                            @if(empty($arraydatases))
+                                <tr><th colspan='6' style='text-align  : center !important;'>Data Kosong</th></tr>
+                            @else
+                            @foreach ($arraydatases as $key => $val)
                                         <tr>
-                                                    <td style='text-align  : left !important;'>".$PurchaseInvoice->getItemName($val['item_id'])."</td>
-                                                    <td style='text-align  : right !important;'>".$val['quantity']."</td>
-                                                    <td style='text-align  : right !important;'>".number_format($val['item_unit_cost'],2,',','.')."</td>
-                                                    <td style='text-align  : right !important;'>".number_format($val['subtotal_amount_after_discount'],2,',','.')."</td>
-                                                    <td style='text-align  : right !important;'>".date('d-m-Y', strtotime($val['item_expired_date']))."</td>";
-                                                    ?>
-
+                                                    <td style='text-align  : left !important;'>{{$val['item_name']}}</td>
+                                                    <td style='text-align  : right !important;'>{{$val['quantity']}}</td>
+                                                    <td style='text-align  : right !important;'>{{number_format($val['item_unit_cost'],2,',','.')}}</td>
+                                                    <td style='text-align  : right !important;'>{{number_format($val['subtotal_amount_after_discount'],2,',','.')}}</td>
+                                                    <td style='text-align  : right !important;'>{{date('d-m-Y', strtotime($val['item_expired_date']))}}</td>
                                                     <td style='text-align  : center'>
                                                         <a href="{{route('pi.delete-array', ['record_id' => $key])}}" name='Reset' class='btn btn-danger btn-sm' onclick="return confirm('Apakah Anda Yakin Ingin Menghapus Data Ini ?')"></i> Hapus</a>
                                                     </td>
-
-                                                    <?php
-                                                    echo"
                                                 </tr>
-                                            ";
+                            @php    
+                            $quantity += $val['quantity'];
+                            $subtotal_amount += $val['subtotal_amount_after_discount'];
+                            @endphp
 
-                                        $quantity += $val['quantity'];
-                                        $subtotal_amount += $val['subtotal_amount_after_discount'];
-
-                                    }
-                                }
-                            ?>
+                            @endforeach
+                            @endif
                                 <tr>
                                     <td colspan="2">Sub Total</td>
                                     <td style='text-align  : right !important;'>

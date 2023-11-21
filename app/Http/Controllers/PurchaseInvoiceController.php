@@ -29,77 +29,76 @@ class PurchaseInvoiceController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-
     }
 
     public function index()
     {
-        if(!$start_date = Session::get('start_date')){
+        if (!$start_date = Session::get('start_date')) {
             $start_date = date('Y-m-d');
-        }else{
+        } else {
             $start_date = Session::get('start_date');
         }
-        if(!$end_date = Session::get('end_date')){
+        if (!$end_date = Session::get('end_date')) {
             $end_date = date('Y-m-d');
-        }else{
+        } else {
             $end_date = Session::get('end_date');
         }
         Session::forget('datases');
         Session::forget('items');
         Session::forget('arraydatases');
-        $data = PurchaseInvoice::where('data_state',0)
-        ->where('company_id', Auth::user()->company_id)
-        ->where('purchase_invoice_date', '>=', $start_date)
-        ->where('purchase_invoice_date', '<=', $end_date)
-        ->get();
-        return view('content.PurchaseInvoice.ListPurchaseInvoice', compact('data','start_date','end_date'));
+        $data = PurchaseInvoice::where('data_state', 0)
+            ->where('company_id', Auth::user()->company_id)
+            ->where('purchase_invoice_date', '>=', $start_date)
+            ->where('purchase_invoice_date', '<=', $end_date)
+            ->get();
+        return view('content.PurchaseInvoice.ListPurchaseInvoice', compact('data', 'start_date', 'end_date'));
     }
 
     public function addPurchaseInvoice()
     {
-        $categorys = InvtItemCategory::where('data_state',0)
-        ->where('company_id', Auth::user()->company_id)
-        ->get()
-        ->pluck('item_category_name', 'item_category_id');
+        $categorys = InvtItemCategory::where('data_state', 0)
+            ->where('company_id', Auth::user()->company_id)
+            ->get()
+            ->pluck('item_category_name', 'item_category_id');
         $items     = Session::get('items');
-        $warehouses = InvtWarehouse::where('data_state',0)
-        ->where('company_id', Auth::user()->company_id)
-        ->get()
-        ->pluck('warehouse_name','warehouse_id');
-        $suppliers = CoreSupplier::where('data_state',0)
-        ->where('company_id', Auth::user()->company_id)
-        ->get()
-        ->pluck('supplier_name','supplier_id');
-        
+        $warehouses = InvtWarehouse::where('data_state', 0)
+            ->where('company_id', Auth::user()->company_id)
+            ->get()
+            ->pluck('warehouse_name', 'warehouse_id');
+        $suppliers = CoreSupplier::where('data_state', 0)
+            ->where('company_id', Auth::user()->company_id)
+            ->get()
+            ->pluck('supplier_name', 'supplier_id');
+
         $merchant   = SalesMerchant::where('data_state', 0);
-        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
-            $merchant->where('merchant_id',Auth::user()->merchant_id);
+        if (Auth::id() != 1 || Auth::user()->merchant_id != null) {
+            $merchant->where('merchant_id', Auth::user()->merchant_id);
         }
         $purchase_payment_method = array(
             0 => 'Tunai',
             1 => 'Hutang Supplier'
         );
-        $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id')->prepend('Barang Umum',0);
+        $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id')->prepend('Barang Umum', 0);
         $datases = Session::get('datases');
-        $arraydatases = Session::get('arraydatases');
-        return view('content.PurchaseInvoice.FormAddPurchaseInvoice', compact('merchant','suppliers','items','warehouses','datases','arraydatases','purchase_payment_method'));
+        $arraydatases = Session::get('purchase-item');
+        return view('content.PurchaseInvoice.FormAddPurchaseInvoice', compact('merchant', 'suppliers', 'items', 'warehouses', 'datases', 'arraydatases', 'purchase_payment_method'));
     }
 
     public function detailPurchaseInvoice($purchase_invoice_id)
     {
-        $warehouses = InvtWarehouse::where('data_state',0)
-        ->where('company_id', Auth::user()->company_id)
-        ->get()
-        ->pluck('warehouse_name','warehouse_id');
+        $warehouses = InvtWarehouse::where('data_state', 0)
+            ->where('company_id', Auth::user()->company_id)
+            ->get()
+            ->pluck('warehouse_name', 'warehouse_id');
         $purchaseinvoice = PurchaseInvoice::where('purchase_invoice_id', $purchase_invoice_id)->first();
         $purchaseinvoiceitem = PurchaseInvoiceItem::where('purchase_invoice_id', $purchase_invoice_id)->get();
-        return view('content.PurchaseInvoice.DetailPurchaseInvoice', compact('purchaseinvoice','warehouses','purchaseinvoiceitem'));
+        return view('content.PurchaseInvoice.DetailPurchaseInvoice', compact('purchaseinvoice', 'warehouses', 'purchaseinvoiceitem'));
     }
 
     public function addElementsPurchaseInvoice(Request $request)
     {
         $datases = Session::get('datases');
-        if(!$datases || $datases == ''){
+        if (!$datases || $datases == '') {
             $datases['purchase_invoice_supplier']   = '';
             $datases['warehouse_id']                = '';
             $datases['purchase_invoice_date']       = '';
@@ -107,49 +106,36 @@ class PurchaseInvoiceController extends Controller
             $datases['supplier_id']     = '';
         }
         $datases[$request->name] = $request->value;
-        Session::put('items',$datases);
-        $datases = Session::put('datases', $datases);
+        Session::put('datases', $datases);
     }
 
     public function addArrayPurchaseInvoice(Request $request)
     {
-        $arraydatases = array(
-            'merchant_id'       => $request->merchant_id,
-            'warehouse_id'      => $request->warehouse_id,
-            'item_category_id'  => $request->item_category,
-            'item_id'           => $request->item_id,
-            'item_unit_id'      => $request->item_unit,
-            'item_unit_cost'    => $request->item_unit_cost,
-            'quantity'          => $request->quantity,
-            'subtotal_amount'   => $request->subtotal_amount,
-            'item_expired_date' => $request->item_expired_date,
-            'subtotal_amount_after_discount' => $request->subtotal_amount_after_discount
-        );
-        $lastdatases = Session::get('arraydatases');
-        if($lastdatases !== null){
-            array_push($lastdatases, $arraydatases);
-            Session::put('arraydatases', $lastdatases);
-        } else {
-            $lastdatases = [];
-            array_push($lastdatases, $arraydatases);
-            Session::push('arraydatases', $arraydatases);
-        }
-
+        $itmdata = InvtItem::find($request->item_id);
+        $data = collect(Session::get('purchase-item'));
+        $item = collect();
+        $item->put('item_id', $request->item_id);
+        $item->put('merchant_id', $request->merchant_id);
+        $item->put('warehouse_id', $request->warehouse_id);
+        $item->put('item_name', $itmdata->item_name);
+        $item->put('item_category_id', $request->item_category);
+        $item->put('item_unit_id', $request->item_unit);
+        $item->put('item_unit_cost', $request->item_unit_cost);
+        $item->put('quantity', $request->quantity);
+        $item->put('subtotal_amount', $request->subtotal_amount);
+        $item->put('item_expired_date', $request->item_expired_date);
+        $item->put('subtotal_amount_after_discount', $request->subtotal_amount_after_discount);
+        $item->put('warehouse_id', $request->warehouse_id);
+        $data->put($request->item_id, $item);
+        Session::put('purchase-item', $data->toArray());
         return redirect('/purchase-invoice/add');
     }
 
     public function deleteArrayPurchaseInvoice($record_id)
     {
-        $arrayBaru			= array();
-        $dataArrayHeader	= Session::get('arraydatases');
-
-        foreach($dataArrayHeader as $key=>$val){
-            if($key != $record_id){
-                $arrayBaru[$key] = $val;
-            }
-        }
-        Session::forget('arraydatases');
-        Session::put('arraydatases', $arrayBaru);
+        $data = collect(Session::get('purchase-item'));
+        $data->forget($record_id);
+        Session::put('purchase-item', $data->toArray());
 
         return redirect('/purchase-invoice/add');
     }
@@ -167,14 +153,14 @@ class PurchaseInvoiceController extends Controller
             'purchase_invoice_remark'   => 'required',
             'subtotal_item'             => 'required',
             'subtotal_amount_total'     => 'required',
-            'total_amount'              => 'required',  
+            'total_amount'              => 'required',
             'paid_amount'               => 'required',
             'owing_amount'              => 'required'
         ]);
-        if (empty($request->discount_percentage_total)){
+        if (empty($request->discount_percentage_total)) {
             $discount_percentage_total = 0;
             $discount_amount_total = 0;
-        }else{
+        } else {
             $discount_percentage_total = $request->discount_percentage_total;
             $discount_amount_total = $request->discount_amount_total;
         }
@@ -207,7 +193,7 @@ class PurchaseInvoiceController extends Controller
             'created_id'                    => Auth::id(),
             'updated_id'                    => Auth::id()
         );
-        if(PurchaseInvoice::create($datases) && JournalVoucher::create($journal)){
+        if (PurchaseInvoice::create($datases) && JournalVoucher::create($journal)) {
             // if(PurchaseInvoice::create($datases)){
             $purchase_invoice_id = PurchaseInvoice::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
             $arraydatases = Session::get('arraydatases');
@@ -240,12 +226,12 @@ class PurchaseInvoiceController extends Controller
                 );
 
                 PurchaseInvoiceItem::create($dataarray);
-                $stock_item = InvtItemStock::where('item_id',$dataarray['item_id'])
-                ->where('warehouse_id', $dataStock['warehouse_id'])
-                ->where('item_category_id',$dataarray['item_category_id'])
-                ->where('item_unit_id', $dataarray['item_unit_id'])
-                ->where('company_id', Auth::user()->company_id)
-                ->first();
+                $stock_item = InvtItemStock::where('item_id', $dataarray['item_id'])
+                    ->where('warehouse_id', $dataStock['warehouse_id'])
+                    ->where('item_category_id', $dataarray['item_category_id'])
+                    ->where('item_unit_id', $dataarray['item_unit_id'])
+                    ->where('company_id', Auth::user()->company_id)
+                    ->first();
                 // if(isset($stock_item)){
                 //     $table = InvtItemStock::findOrFail($stock_item['item_stock_id']);
                 //     $table->last_balance = $dataStock['last_balance'] + $stock_item['last_balance'];
@@ -261,7 +247,7 @@ class PurchaseInvoiceController extends Controller
             $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
             $account_default_status = $this->getAccountDefaultStatus($account_id);
             $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
-            if ($account_setting_status == 0){
+            if ($account_setting_status == 0) {
                 $debit_amount = $fields['total_amount'];
                 $credit_amount = 0;
             } else {
@@ -287,7 +273,7 @@ class PurchaseInvoiceController extends Controller
             $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
             $account_default_status = $this->getAccountDefaultStatus($account_id);
             $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
-            if ($account_setting_status == 0){
+            if ($account_setting_status == 0) {
                 $debit_amount = $fields['total_amount'];
                 $credit_amount = 0;
             } else {
@@ -309,10 +295,10 @@ class PurchaseInvoiceController extends Controller
             JournalVoucherItem::create($journal_credit);
 
             $msg = 'Tambah Pembelian Berhasil';
-            return redirect('/purchase-invoice/add')->with('msg',$msg);
+            return redirect('/purchase-invoice/add')->with('msg', $msg);
         } else {
             $msg = 'Tambah Pembelian Gagal';
-            return redirect('/purchase-invoice/add')->with('msg',$msg);
+            return redirect('/purchase-invoice/add')->with('msg', $msg);
         }
     }
 
@@ -344,13 +330,13 @@ class PurchaseInvoiceController extends Controller
 
     public function getTransactionModuleID($transaction_module_code)
     {
-        $data = PreferenceTransactionModule::where('transaction_module_code',$transaction_module_code)->first();
+        $data = PreferenceTransactionModule::where('transaction_module_code', $transaction_module_code)->first();
         return $data['transaction_module_id'] ?? '';
     }
 
     public function getTransactionModuleName($transaction_module_code)
     {
-        $data = PreferenceTransactionModule::where('transaction_module_code',$transaction_module_code)->first();
+        $data = PreferenceTransactionModule::where('transaction_module_code', $transaction_module_code)->first();
 
         return $data['transaction_module_name'];
     }
@@ -358,8 +344,8 @@ class PurchaseInvoiceController extends Controller
     public function getAccountSettingStatus($account_setting_name)
     {
         $data = AcctAccountSetting::where('company_id', Auth::user()->company_id)
-        ->where('account_setting_name', $account_setting_name)
-        ->first();
+            ->where('account_setting_name', $account_setting_name)
+            ->first();
 
         return $data['account_setting_status'];
     }
@@ -367,32 +353,57 @@ class PurchaseInvoiceController extends Controller
     public function getAccountId($account_setting_name)
     {
         $data = AcctAccountSetting::where('company_id', Auth::user()->company_id)
-        ->where('account_setting_name', $account_setting_name)
-        ->first();
+            ->where('account_setting_name', $account_setting_name)
+            ->first();
 
         return $data['account_id'];
     }
 
     public function getAccountDefaultStatus($account_id)
     {
-        $data = AcctAccount::where('account_id',$account_id)->first();
+        $data = AcctAccount::where('account_id', $account_id)->first();
 
         return $data['account_default_status'];
     }
     public function getCategory(Request $request)
     {
         $items = Session::get('datases');
-        $g=0;
-        if($request->merchant_id==0){
-            $g=1;
+        $g = 0;
+        if ($request->merchant_id == 0) {
+            $g = 1;
         }
-        return response(ItemHelper::getCategory($items['item_category_id']??null,$request,$g));
+        return response(ItemHelper::getCategory($items['item_category_id'] ?? null, $request, $g));
     }
-    public function getUnit(Request $request) {
-         // content
-    }
-    public function getItem(Request $request) {
+    public function getUnit(Request $request)
+    {
         $items = Session::get('datases');
-        return response(ItemHelper::getCategory($items['item_id']??null,$request));
+        return response(ItemHelper::getItemUnit($items['item_unit'] ?? null, $request));
+    }
+    public function getItem(Request $request)
+    {
+        $items = Session::get('datases');
+        return response(ItemHelper::getCategory($items['item_id'] ?? null, $request));
+    }
+    public function getWarehouse(Request $request)
+    {
+        $items = Session::get('datases');
+        $data = '';
+        try {
+            $warehouse = InvtWarehouse::select('warehouse_id', 'warehouse_name')
+                ->where('merchant_id', $request->merchant_id)
+                ->orWhereNull('merchant_id')
+                ->get();
+            $items['warehouse_id'] ?? $items['warehouse_id'] = $warehouse->first()->warehouse_id;
+            foreach ($warehouse as $val) {
+                $data .= "<option value='{$val['warehouse_id']}' " . ($items['warehouse_id'] == $val['warehouse_id'] ? 'selected' : '') . ">{$val['warehouse_name']}</option>\n";
+            }
+            if ($warehouse->count() == 0) {
+                $data = "<option>Wahana / Merchant Tidak Memiliki Gudang</option>\n";
+            }
+            return response($data);
+        } catch (\Exception $e) {
+            report($e);
+            return response($e);
+        }
     }
 }
