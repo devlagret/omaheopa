@@ -153,7 +153,7 @@ class GeneralTiketController extends Controller
                     'warehouse_id'      => 1,
                     'item_id'           => $item['item_id'],
                     'item_unit_id'      => 1,
-                    // 'item_category_id'  => $item['item_category_id'],
+                    'item_category_id'  => null,
                     'last_balance'      => 0,
                     'updated_id'        => Auth::id(),
                     'created_id'        => Auth::id(),
@@ -177,7 +177,7 @@ class GeneralTiketController extends Controller
                 return redirect('/general-ticket')->with('msg', $msg);
             } catch (\Exception $e) {
                 report($e);
-                dd($e); 
+                // dd($e);
                 Session::forget('token');
                 $msg  = "Tambah  Gagal";
                 return redirect('/general-ticket')->with('msg', $msg);
