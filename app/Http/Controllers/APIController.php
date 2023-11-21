@@ -1917,17 +1917,18 @@ class APIController extends Controller
     //API TIKET Penjualan UMUM
     public function getSalesTiket()
     {
-        $date           = date('Y-m-d');
-        $items          = InvtItem::where('data_state', 0)
+        // $date           = date('Y-m-d');
+        $items          = InvtItem::select('*')
+        ->where('data_state', 0)
         ->where('company_id', Auth::user()->company_id)
         ->where('item_status',1)
-        ->get()
-        ->pluck('item_name','item_id');
+        ->get();
+        // ->pluck('item_name','item_id');
         
         if($items){
             return response([
                 'data' => $items,
-                'date' => $date
+                // 'date' => $date
             ],201);
         }else{
             return response([
