@@ -2,26 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\AcctAccount;
-use App\Models\AcctAccountSetting;
-use App\Models\CoreSupplier;
 use App\Models\InvtItem;
-use App\Models\InvtItemCategory;
-use App\Models\InvtItemStock;
+use App\Helpers\ItemHelper;
+use App\Models\AcctAccount;
+use App\Models\CoreSupplier;
 use App\Models\InvtItemUnit;
-use App\Models\InvtWarehouse;
-use App\Models\JournalVoucher;
-use App\Models\JournalVoucherItem;
-use App\Models\PreferenceTransactionModule;
-use App\Models\PurchaseInvoice;
-use App\Models\PurchaseInvoiceItem;
-use App\Models\SalesMerchant;
 use Illuminate\Http\Request;
+use App\Models\InvtItemStock;
+use App\Models\InvtWarehouse;
+use App\Models\SalesMerchant;
+use App\Models\JournalVoucher;
+use App\Models\PurchaseInvoice;
+use App\Models\InvtItemCategory;
+use App\Models\AcctAccountSetting;
+use App\Models\JournalVoucherItem;
+use App\Models\PurchaseInvoiceItem;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
-
 use function PHPUnit\Framework\isEmpty;
+
+use Illuminate\Support\Facades\Session;
+use App\Models\PreferenceTransactionModule;
 
 class PurchaseInvoiceController extends Controller
 {
@@ -74,10 +75,14 @@ class PurchaseInvoiceController extends Controller
         if(Auth::id()!=1||Auth::user()->merchant_id!=null){
             $merchant->where('merchant_id',Auth::user()->merchant_id);
         }
-        $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
+        $purchase_payment_method = array(
+            0 => 'Tunai',
+            1 => 'Hutang Supplier'
+        );
+        $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id')->prepend('Barang Umum',0);
         $datases = Session::get('datases');
         $arraydatases = Session::get('arraydatases');
-        return view('content.PurchaseInvoice.FormAddPurchaseInvoice', compact('merchant','suppliers','items','warehouses','datases','arraydatases'));
+        return view('content.PurchaseInvoice.FormAddPurchaseInvoice', compact('merchant','suppliers','items','warehouses','datases','arraydatases','purchase_payment_method'));
     }
 
     public function detailPurchaseInvoice($purchase_invoice_id)
@@ -311,27 +316,6 @@ class PurchaseInvoiceController extends Controller
         }
     }
 
-    public function getMerchantName($merchant_id)
-    {
-        $data = SalesMerchant::where('merchant_id', $merchant_id)->first();
-
-        return $data['merchant_name'];
-    }
-
-    public function getWarehouseName($warehouse_id)
-    {
-        $data = InvtWarehouse::where('warehouse_id', $warehouse_id)->first();
-
-        return $data['warehouse_name'];
-    }
-
-    public function getItemName($item_id)
-    {
-        $data = InvtItem::where('item_id', $item_id)->first();
-
-        return $data['item_name'];
-    }
-
     public function filterPurchaseInvoice(Request $request)
     {
         $start_date = $request->start_date;
@@ -395,11 +379,20 @@ class PurchaseInvoiceController extends Controller
 
         return $data['account_default_status'];
     }
-
-    public function getSupplierName($supplier_id)
+    public function getCategory(Request $request)
     {
-        $data = CoreSupplier::where('supplier_id',$supplier_id)->first();
-
-        return $data['supplier_name'];
+        $items = Session::get('datases');
+        $g=0;
+        if($request->merchant_id===0){
+            $g=1;
+        }
+        return response(ItemHelper::getCategory($items['item_category_id'],$request,$g));
+    }
+    public function getUnit(Request $request) {
+         // content
+    }
+    public function getItem(Request $request) {
+        $items = Session::get('datases');
+        return response(ItemHelper::getCategory($items['item_id'],$request));
     }
 }
