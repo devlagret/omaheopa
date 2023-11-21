@@ -792,7 +792,7 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
-                            {!! Form::select('merchant_id', $merchant, $datases['merchant_id_view   '] ?? '', [
+                            {!! Form::select('merchant_id', $merchant, $datases['merchant_id_view'] ?? '', [
                                 'class' => 'selection-search-clear select-form',
                                 'name' => 'merchant_id_view',
                                 'id' => 'merchant_id_view',
@@ -837,15 +837,15 @@
                    
                     <div class="col-md-6">
                         <div class="form-group">
-                            <a class="text-dark">Jumlah<a class='red'> *</a></a>
-                            <input class="form-control input-bb text-right" name="quantity" id="quantity" type="text" autocomplete="off" value=""/>
+                            <a class="text-dark">Biaya Barang Satuan<a class='red'> *</a></a>
+                            <input style="text-align: right" class="form-control input-bb" name="item_unit_cost_view" id="item_unit_cost_view" type="text" autocomplete="off" value=""/>
+                            <input class="form-control input-bb" name="item_unit_cost" id="item_unit_cost" type="text" autocomplete="off" value="" hidden/>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <a class="text-dark">Biaya Barang Satuan<a class='red'> *</a></a>
-                            <input style="text-align: right" class="form-control input-bb" name="item_unit_cost_view" id="item_unit_cost_view" type="text" autocomplete="off" value=""/>
-                            <input class="form-control input-bb" name="item_unit_cost" id="item_unit_cost" type="text" autocomplete="off" value="" hidden/>
+                            <a class="text-dark">Jumlah<a class='red'> *</a></a>
+                            <input class="form-control input-bb text-right" name="quantity" id="quantity" type="text" autocomplete="off" value=""/>
                         </div>
                     </div>
                     <div class="col-md-6">

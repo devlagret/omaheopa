@@ -383,16 +383,16 @@ class PurchaseInvoiceController extends Controller
     {
         $items = Session::get('datases');
         $g=0;
-        if($request->merchant_id===0){
+        if($request->merchant_id==0){
             $g=1;
         }
-        return response(ItemHelper::getCategory($items['item_category_id'],$request,$g));
+        return response(ItemHelper::getCategory($items['item_category_id']??null,$request,$g));
     }
     public function getUnit(Request $request) {
          // content
     }
     public function getItem(Request $request) {
         $items = Session::get('datases');
-        return response(ItemHelper::getCategory($items['item_id'],$request));
+        return response(ItemHelper::getCategory($items['item_id']??null,$request));
     }
 }
