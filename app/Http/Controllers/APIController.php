@@ -58,7 +58,11 @@ class APIController extends Controller
         ]);
 
         // Check username
-
+        $user = User::select('system_user.*', 'system_user_group.user_group_name', 'preference_company.guest_state')
+        ->join('system_user_group', 'system_user_group.user_group_id', 'system_user.user_group_id')
+        ->join('preference_company', 'preference_company.company_id', 'system_user.company_id')
+        ->where('name', $fields['username'])
+        ->first();
 
         //Check password
         if(!Auth::attempt(['name'=>$fields['username'],'password'=>$fields['password']])){
