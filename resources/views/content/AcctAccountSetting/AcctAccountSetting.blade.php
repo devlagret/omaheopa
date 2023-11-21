@@ -81,112 +81,71 @@
                         </td>
                     </tr>
 
-                    {{-- <tr>
-                        <th colspan="3" style="text-align: center !important ;width: 100% !important">Pembelian Kredit</th>
-                        </tr>
-                        <tr>
-                            <th style="text-align: left !important; width: 40% !important">Pembelian</th>
-                            <td style="text-align: left !important; width: 30% !important">
-                                {!! Form::select(0, $accountlist,0,['class' => 'selection-search-clear select-form','name'=>'purchase_payment_account_id','id'=>'purchase_payment_account_id']) !!}
-                            </td>
-                            <td style="text-align: left !important; width: 30% !important">
-                                {!! Form::select(0, $status,0,['class' => 'selection-search-clear select-form','name'=>'purchase_payment_account_status','id'=>'purchase_payment_account_status']) !!}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th style="text-align: left !important; width: 40% !important">Hutang</th>
-                            <td style="text-align: left !important; width: 30% !important">
-                                {!! Form::select(0, $accountlist,0,['class' => 'selection-search-clear select-form','name'=>'account_payable_account_id','id'=>'account_payable_account_id']) !!}
-                            </td>
-                            <td style="text-align: left !important; width: 30% !important">
-                                {!! Form::select(0, $status,0,['class' => 'selection-search-clear select-form','name'=>'account_payable_account_status','id'=>'account_payable_account_status']) !!}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th colspan="3" style="text-align: center !important ;width: 100% !important">Pembayaran Hutang Tunai</th>
-                        </tr>
-                        <tr>
-                            <th style="text-align: left !important; width: 40% !important">Hutang Pembelian</th>
-                            <td style="text-align: left !important; width: 30% !important">
-                                {!! Form::select(0, $accountlist,0,['class' => 'selection-search-clear select-form','name'=>'account_payable_cash_account_id','id'=>'account_payable_cash_account_id']) !!}
-                            </td>
-                            <td style="text-align: left !important; width: 30% !important">
-                                {!! Form::select(0, $status,0,['class' => 'selection-search-clear select-form','name'=>'account_payable_cash_account_status','id'=>'account_payable_cash_account_status']) !!}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th style="text-align: left !important; width: 40% !important">Akun Kas</th>
-                            <td style="text-align: left !important; width: 30% !important">
-                                {!! Form::select(0, $accountlist,0,['class' => 'selection-search-clear select-form','name'=>'cash_purchase_payment_account_id','id'=>'cash_purchase_payment_account_id']) !!}
-                            </td>
-                            <td style="text-align: left !important; width: 30% !important">
-                                {!! Form::select(0, $status,0,['class' => 'selection-search-clear select-form','name'=>'cash_purchase_payment_account_status','id'=>'cash_purchase_payment_account_status']) !!}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th colspan="3" style="text-align: center !important ;width: 100% !important">Pembayaran Hutang Bank</th>
-                        </tr>
-                        <tr>
-                            <th style="text-align: left !important; width: 40% !important">Hutang Pembelian</th>
-                            <td style="text-align: left !important; width: 30% !important">
-                                {!! Form::select(0, $accountlist,0,['class' => 'selection-search-clear select-form','name'=>'account_payable_bank_account_id','id'=>'account_payable_bank_account_id']) !!}
-                            </td>
-                            <td style="text-align: left !important; width: 30% !important">
-                                {!! Form::select(0, $status,0,['class' => 'selection-search-clear select-form','name'=>'account_payable_bank_account_status','id'=>'account_payable_bank_account_status']) !!}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th style="text-align: left !important; width: 40% !important">Akun Bank</th>
-                            <td style="text-align: left !important; width: 30% !important">
-                                {!! Form::select(0, $accountlist,0,['class' => 'selection-search-clear select-form','name'=>'bank_purchase_payment_account_id','id'=>'bank_purchase_payment_account_id']) !!}
-                            </td>
-                            <td style="text-align: left !important; width: 30% !important">
-                                {!! Form::select(0, $status,0,['class' => 'selection-search-clear select-form','name'=>'bank_purchase_payment_account_status','id'=>'bank_purchase_payment_account_status']) !!}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th colspan="3" style="text-align: center !important ;width: 100% !important">Pembayaran Hutang Giro</th>
-                        </tr>
-                        <tr>
-                            <th style="text-align: left !important; width: 40% !important">Hutang Pembelian</th>
-                            <td style="text-align: left !important; width: 30% !important">
-                                {!! Form::select(0, $accountlist,0,['class' => 'selection-search-clear select-form','name'=>'giro_purchase_payment_account_id','id'=>'giro_purchase_payment_account_id']) !!}
-                            </td>
-                            <td style="text-align: left !important; width: 30% !important">
-                                {!! Form::select(0, $status,0,['class' => 'selection-search-clear select-form','name'=>'giro_purchase_payment_account_status','id'=>'giro_purchase_payment_account_status']) !!}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th style="text-align: left !important; width: 40% !important">Hutang Wasel</th>
-                            <td style="text-align: left !important; width: 30% !important">
-                                {!! Form::select(0, $accountlist,0,['class' => 'selection-search-clear select-form','name'=>'account_payable_giro_account_id','id'=>'account_payable_giro_account_id']) !!}
-                            </td>
-                            <td style="text-align: left !important; width: 30% !important">
-                                {!! Form::select(0, $status,0,['class' => 'selection-search-clear select-form','name'=>'account_payable_giro_account_status','id'=>'account_payable_giro_account_status']) !!}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th colspan="3" style="text-align: center !important ;width: 100% !important">Pencairan Giro</th>
-                        </tr>
-                        <tr>
-                            <th style="text-align: left !important; width: 40% !important">Hutang Pembelian</th>
-                            <td style="text-align: left !important; width: 30% !important">
-                                {!! Form::select(0, $accountlist,0,['class' => 'selection-search-clear select-form','name'=>'giro_purchase_liquefaction_id','id'=>'giro_purchase_liquefaction_id']) !!}
-                            </td>
-                            <td style="text-align: left !important; width: 30% !important">
-                                {!! Form::select(0, $status,0,['class' => 'selection-search-clear select-form','name'=>'giro_purchase_liquefaction_account_status','id'=>'giro_purchase_liquefaction_account_status']) !!}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th style="text-align: left !important; width: 40% !important">Akun Bank</th>
-                            <td style="text-align: left !important; width: 30% !important">
-                                {!! Form::select(0, $accountlist,0,['class' => 'selection-search-clear select-form','name'=>'bank_purchase_liquefaction_account_id','id'=>'bank_purchase_liquefaction_account_id']) !!}
-                            </td>
-                            <td style="text-align: left !important; width: 30% !important">
-                                {!! Form::select(0, $status,0,['class' => 'selection-search-clear select-form','name'=>'bank_purchase_liquefaction_account_status','id'=>'bank_purchase_liquefaction_account_status']) !!}
-                            </td>
-                        </tr>
-                    --}}
+                    <tr>
+                        <th colspan="3" style="text-align: center !important ;width: 100% !important">Pembelian Hutang</th>
+                    </tr>
+                    <tr>
+                        <th style="text-align: left !important; width: 40% !important">Pembelian</th>
+                        <td style="text-align: left !important; width: 30% !important">
+                            {!! Form::select(0, $accountlist, $data->where('account_setting_name','purchase_payable_account')->pluck('account_id')??'',['class' => 'selection-search-clear select-form','name'=>'purchase_payable_account_id','id'=>'purchase_payable_account_id']) !!}
+                        </td>
+                        <td style="text-align: left !important; width: 30% !important">
+                            {!! Form::select(0, $status, $data->where('account_setting_name','purchase_payable_account')->pluck('account_setting_status')??'',['class' => 'selection-search-clear select-form','name'=>'purchase_payable_account_status','id'=>'purchase_payable_account_status']) !!}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th style="text-align: left !important; width: 40% !important">Hutang</th>
+                        <td style="text-align: left !important; width: 30% !important">
+                            {!! Form::select(0, $accountlist, $data->where('account_setting_name','purchase_cash_payable_account')->pluck('account_id')??'',['class' => 'selection-search-clear select-form','name'=>'purchase_cash_payable_account_id','id'=>'purchase_cash_payable_account_id']) !!}
+                        </td>
+                        <td style="text-align: left !important; width: 30% !important">
+                            {!! Form::select(0, $status, $data->where('account_setting_name','purchase_cash_payable_account')->pluck('account_setting_status')??'',['class' => 'selection-search-clear select-form','name'=>'purchase_cash_payable_account_status','id'=>'purchase_cash_payable_account_status']) !!}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th colspan="3" style="text-align: center !important ;width: 100% !important">Pembayaran Hutang Tunai</th>
+                    </tr>
+                    <tr>
+                        <th style="text-align: left !important; width: 40% !important">Hutang</th>
+                        <td style="text-align: left !important; width: 30% !important">
+                            {!! Form::select(0, $accountlist, $data->where('account_setting_name','purchase_payment_account')->pluck('account_id')??'',['class' => 'selection-search-clear select-form','name'=>'purchase_payment_account_id','id'=>'purchase_payment_account_id']) !!}
+                        </td>
+                        <td style="text-align: left !important; width: 30% !important">
+                            {!! Form::select(0, $status, $data->where('account_setting_name','purchase_payment_account')->pluck('account_setting_status')??'',['class' => 'selection-search-clear select-form','name'=>'purchase_payment_account_status','id'=>'purchase_payment_account_status']) !!}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th style="text-align: left !important; width: 40% !important">Kas</th>
+                        <td style="text-align: left !important; width: 30% !important">
+                            {!! Form::select(0, $accountlist, $data->where('account_setting_name','purchase_cash_payment_account')->pluck('account_id')??'',['class' => 'selection-search-clear select-form','name'=>'purchase_cash_payment_account_id','id'=>'purchase_cash_payment_account_id']) !!}
+                        </td>
+                        <td style="text-align: left !important; width: 30% !important">
+                            {!! Form::select(0, $status, $data->where('account_setting_name','purchase_cash_payment_account')->pluck('account_setting_status')??'',['class' => 'selection-search-clear select-form','name'=>'purchase_cash_payment_account_status','id'=>'purchase_cash_payment_account_status']) !!}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th colspan="3" style="text-align: center !important ;width: 100% !important">Pembayaran Hutang Non Tunai</th>
+                    </tr>
+                    <tr>
+                        <th style="text-align: left !important; width: 40% !important">Hutang</th>
+                        <td style="text-align: left !important; width: 30% !important">
+                            {!! Form::select(0, $accountlist, $data->where('account_setting_name','purchase_non_cash_payment_account')->pluck('account_id')??'',['class' => 'selection-search-clear select-form','name'=>'purchase_non_cash_payment_account_id','id'=>'purchase_non_cash_payment_account_id']) !!}
+                        </td>
+                        <td style="text-align: left !important; width: 30% !important">
+                            {!! Form::select(0, $status, $data->where('account_setting_name','purchase_non_cash_payment_account')->pluck('account_setting_status')??'',['class' => 'selection-search-clear select-form','name'=>'purchase_non_cash_payment_account_status','id'=>'purchase_non_cash_payment_account_status']) !!}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th style="text-align: left !important; width: 40% !important">Kas</th>
+                        <td style="text-align: left !important; width: 30% !important">
+                            {!! Form::select(0, $accountlist, $data->where('account_setting_name','purchase_non_cash_cash_payment_account')->pluck('account_id')??'',['class' => 'selection-search-clear select-form','name'=>'purchase_non_cash_cash_payment_account_id','id'=>'purchase_non_cash_cash_payment_account_id']) !!}
+                        </td>
+                        <td style="text-align: left !important; width: 30% !important">
+                            {!! Form::select(0, $status, $data->where('account_setting_name','purchase_non_cash_cash_payment_account')->pluck('account_setting_status')??'',['class' => 'selection-search-clear select-form','name'=>'purchase_non_cash_cash_payment_account_status','id'=>'purchase_non_cash_cash_payment_account_status']) !!}
+                        </td>
+                    </tr>
 
                     <tr>
                         <th colspan="3" style="text-align: center !important ;width: 100% !important">Retur Pembelian</th>
