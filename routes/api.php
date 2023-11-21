@@ -57,6 +57,11 @@ Route::group(['middleware'=> ['auth:sanctum']], function(){
     Route::post('/dashboard/print', [APIController::class, 'getDashboardPrintData']);
 
     Route::post('/login-state', [APIController::class, 'getLoginState']);
+
+    //API Tiket Umum
+    Route::post('/general-tiket/postSalesTiket', [APIController::class, 'postSalesTiket']);
+    Route::get('/general-tiket/getSalesTiket', [APIController::class, 'getSalesTiket']);
+
 });
 
 Route::post('/login', [APIController::class, 'login']); 

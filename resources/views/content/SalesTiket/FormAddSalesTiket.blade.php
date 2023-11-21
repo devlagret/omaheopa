@@ -9,7 +9,7 @@
             // console.log("value " + value);
             $.ajax({
                 type: "POST",
-                url: "{{ route('add-elements-sales-invoice') }}",
+                url: "{{ route('add-elements-sales-tiket') }}",
                 data: {
                     'name': name,
                     'value': value,
@@ -19,23 +19,77 @@
             });
         }
 
-        function changeCategory(id, el) {
+        // function changeCategory(id, el) {
+        //     loadingWidget();
+        //     var item_id = $("#" + id).val();
+        //     $('#item_id').val(item_id);
+        //     console.log(id);
+        //     $.ajax({
+        //         type: "POST",
+        //         url: "{{ route('get-tiket-item') }}",
+        //         dataType: "html",
+        //         data: {
+        //             'item_id': item_id,
+        //             '_token': '{{ csrf_token() }}',
+        //         },
+        //         success: function(return_data) {
+        //             function_elements_add(id, item_id);
+        //             $('#' + el).html(return_data);
+        //             changeItem($('#' + el).val());
+        //         },
+        //         error: function(data) {
+        //             console.log(data);
+        //         }
+        //     });
+        // }
+
+        // function changeItem() {
+        //     loadingWidget();
+        //     var item_id = $("#item_id_view").val();
+        //     $('#item_id').val(item_id);
+        //     console.log(item_id)
+        //     $.ajax({
+        //         type: "POST",
+        //         url: "{{ route('get-tiket-unit') }}",
+        //         dataType: "html",
+        //         data: {
+        //             'item_id': item_id,
+        //             // 'item_category_id': category,
+        //             '_token': '{{ csrf_token() }}',
+        //         },
+        //         success: function(return_data) {
+        //             console.log(return_data)
+        //             $('#item_unit').val(1);
+        //             $('#item_unit').html(return_data);
+        //             console.log('ci c')
+        //             changeSatuan();
+        //             // function_elements_add('item_category_id', category);
+        //         }
+        //     });
+        // }
+
+        function changeSatuan() {
+            var item_id = $("#item_id_view").val();
             loadingWidget();
-            var merchant_id = $("#" + id).val();
-            $('#merchant_id').val(merchant_id);
-            console.log(id);
             $.ajax({
                 type: "POST",
-                url: "{{ route('get-item-category') }}",
+                url: "{{ route('get-tiket-unit') }}",
                 dataType: "html",
                 data: {
-                    'merchant_id': merchant_id,
+                    'item_id': item_id,
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function(return_data) {
-                    function_elements_add(id, merchant_id);
-                    $('#' + el).html(return_data);
-                    changeItem($('#' + el).val());
+                    $('#item_unit').val(1);
+                    $('#item_unit').html(return_data);
+                    changeCost();
+                    function_elements_add('item_id', item_id);
+                },
+                complete: function() {
+                    loadingWidget(0);
+                    setTimeout(function() {
+                        loadingWidget(0);
+                    }, 200);
                 },
                 error: function(data) {
                     console.log(data);
@@ -43,37 +97,13 @@
             });
         }
 
-        function changeItem(category) {
-            loadingWidget();
-            var id = $("#merchant_id").val();
-            var no = $('.pkg-itm').length;
-            $.ajax({
-                type: "POST",
-                url: "{{ route('get-merchant-item') }}",
-                dataType: "html",
-                data: {
-                    'no': no,
-                    'merchant_id': id,
-                    'item_category_id': category,
-                    '_token': '{{ csrf_token() }}',
-                },
-                success: function(return_data) {
-                    $('#item_id').val(1);
-                    $('#item_id').html(return_data);
-                    console.log('ci c')
-                    changeSatuan();
-                    function_elements_add('item_category_id', category);
-                }
-            });
-        }
-
         function changeCost() {
             loadingWidget();
             var item_unit = $("#item_unit").val();
-            var item_id = $("#item_id").val();
+            var item_id = $("#item_id_view").val();
             $.ajax({
                 type: "POST",
-                url: "{{ route('get-item-cost') }}",
+                url: "{{ route('get-tiket-cost') }}",
                 dataType: "json",
                 data: {
                     'item_id': item_id,
@@ -102,7 +132,7 @@
             item_id = $('#item_id').val();
         }
         $(document).ready(function() {
-            changeCategory('merchant_id_view', 'item_category_id')
+            // changeCategory('item_id_view')
             $("#item_unit_price").change(function() {
                 var unit_price = $("#item_unit_price").val();
                 var quantity = $('#quantity').val();
@@ -165,20 +195,20 @@
 
 
 
-            $("#item_category_id").change(function() {
-                var item_category_id = $("#item_category_id").val();
+            $("#item_id").change(function() {
+                var item_id = $("#item_id").val();
 
                 $.ajax({
                     type: "POST",
-                    url: "{{ route('select-item-category-sales') }}",
+                    url: "{{ route('select-item-category-sales-tiket') }}",
                     dataType: "html",
                     data: {
-                        'item_category_id': item_category_id,
+                        'item_id': item_id,
                         '_token': '{{ csrf_token() }}',
                     },
                     success: function(return_data) {
                         // console.log(item_category_id);
-                        $('#item_id').html(return_data);
+                        $('#item_category_id').html(return_data);
                         $('#item_unit').html('');
                         $('#item_unit_price').val('');
                         $('#quantity').val('');
@@ -192,8 +222,8 @@
                     }
                 });
             });
-            if ($('#merchant_id_view').val() != '') {
-                $('#merchant_id').val($('#merchant_id_view').val());
+            if ($('#item_id_view').val() != '') {
+                $('#item_id').val($('#item_id_view').val());
             }
 
 
@@ -222,50 +252,9 @@
             });
         });
 
-
-        function changeSatuan() {
-            var item_id = $("#item_id").val();
-            loadingWidget();
-            $.ajax({
-                type: "POST",
-                url: "{{ route('get-item-unit') }}",
-                dataType: "html",
-                data: {
-                    'item_id': item_id,
-                    '_token': '{{ csrf_token() }}',
-                },
-                success: function(return_data) {
-                    $('#item_unit').val(1);
-                    $('#item_unit').html(return_data);
-                    changeCost();
-                    function_elements_add('item_id', item_id);
-                },
-                complete: function() {
-                    loadingWidget(0);
-                    setTimeout(function() {
-                        loadingWidget(0);
-                    }, 200);
-                },
-                error: function(data) {
-                    console.log(data);
-                }
-            });
-        }
-
-
-
-
-
-
-
-
-
-
-
-
         function processAddArraySalesInvoice() {
-            var item_category_id = document.getElementById("item_category_id").value;
-            var item_id = document.getElementById("item_id").value;
+            // var item_category_id = document.getElementById("item_category_id").value;
+            var item_id = document.getElementById("item_id_view").value;
             var item_unit_id = document.getElementById("item_unit").value;
             var item_unit_price = document.getElementById("item_unit_price").value;
             var quantity = document.getElementById("quantity").value;
@@ -276,9 +265,9 @@
 
             $.ajax({
                 type: "POST",
-                url: "{{ route('add-array-sales-invoice') }}",
+                url: "{{ route('add-array-sales-tiket') }}",
                 data: {
-                    'item_category_id': item_category_id,
+                    // 'item_category_id': item_category_id,
                     'item_id': item_id,
                     'item_unit_id': item_unit_id,
                     'item_unit_price': item_unit_price,
@@ -312,8 +301,8 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ url('home') }}">Beranda</a></li>
-            <li class="breadcrumb-item"><a href="{{ url('sales-invoice') }}">Daftar Penjualan</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Tambah Penjualan</li>
+            <li class="breadcrumb-item"><a href="{{ url('sales-tiket') }}">Daftar Tiket</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Tambah Tiket</li>
         </ol>
     </nav>
 
@@ -322,7 +311,7 @@
 @section('content')
 
     <h3 class="page-title">
-        Form Tambah Penjualan
+        Form Tambah Tiket
     </h3>
     <br />
     @if (session('msg'))
@@ -344,7 +333,7 @@
                 Form Tambah
             </h5>
             <div class="float-right">
-                <button onclick="location.href='{{ url('sales-invoice') }}'" name="Find" class="btn btn-sm btn-info"
+                <button onclick="location.href='{{ url('sales-tiket') }}'" name="Find" class="btn btn-sm btn-info"
                     title="Back"><i class="fa fa-angle-left"></i> Kembali</button>
             </div>
         </div>
@@ -355,13 +344,13 @@
         // }
         ?>
 
-        <form method="post" action="{{ route('process-add-sales-invoice') }}" enctype="multipart/form-data">
+        <form method="post" action="{{ route('process-add-sales-tiket') }}" enctype="multipart/form-data">
             @csrf
             <div class="card-body">
                 <div class="row form-group">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <a class="text-dark">Tanggal Invoice Penjualan<a class='red'> *</a></a>
+                            <a class="text-dark">Tanggal Penjualan Tiket<a class='red'> *</a></a>
                             <input style="width: 40%" class="form-control input-bb" name="sales_invoice_date"
                                 id="sales_invoice_date" type="date" autocomplete="off" value="{{ $date }}" />
                         </div>
@@ -372,44 +361,38 @@
                             <input class="form-control input-bb" name="customer_name" id="customer_name" type="text"
                                 autocomplete="off" value=""
                                 onChange="function_elements_add(this.name, this.value);" />
-                            <input class="form-control input-bb"  name="merchant_id" id="merchant_id" type="text"
-                                autocomplete="off" value="{{ Auth::user()->merchant_id }}" />
+                                
+                            {{-- <input class="form-control input-bb" name="item_id" id="item_id" type="text"
+                                autocomplete="off" value="{{ Auth::user()->item_id }}" /> --}}
                         </div>
                     </div>
 
-                    <h6 class="col-md-8 mt-2 mb-2"><b>Data Penjualan Barang</b></h6>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
-                            {!! Form::select('merchant_id', $merchant, $sessiondata['merchant_id'] ?? '', [
-                                'class' => 'selection-search-clear select-form',
-                                'name' => 'merchant_id_view',
-                                'id' => 'merchant_id_view',
-                                'onchange' => 'changeCategory(this.id,`item_category_id`)',
-                                'autofocus' => 'autofocus',
-                                $merchant->count()==1?"disabled":''
-                            ]) !!}
-                            <input type="hidden" name="merchant_id" id="merchant_id" />
+                    <h6 class="col-md-8 mt-2 mb-2"><b>Data Penjualan Tiket</b></h6>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <a class="text-dark">Nama Tiket<a class='red'> *</a></a>
+                                {!! Form::select('item_id', $items, $sessiondata['item_id'] ?? '', [
+                                    'class' => 'selection-search-clear required select-form',
+                                    'name' => 'item_id_view',
+                                    'id' => 'item_id_view',
+                                    'onchange' => 'changeSatuan()',
+                                    'autofocus' => 'autofocus',
+                                ]) !!}
+                            <input type="text" name="item_id" id="item_id " hidden/>
+
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-6">
+                    {{-- <div class="col-md-6">
                         <div class="form-group">
                             <a class="text-dark">Kategori Barang / Paket<a class='red'> *</a></a>
                             <select class="selection-search-clear required select-form"
                                 placeholder="Masukan Kategori Barang" name="item_category_id" id="item_category_id"
-                                onchange="changeItem(this.value)">
+                                onchange="changeSatuan()">
                             </select>
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <a class="text-dark">Nama Barang<a class='red'> *</a></a>
-                            <select class="selection-search-clear required select-form" placeholder="Masukan Nama Barang"
-                                name="item_id" id="item_id" onchange="changeSatuan()">
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
+                    </div> --}}
+                    
+                    {{-- <div class="col-md-6">
                         <div class="form-group">
                             <a class="text-dark">Satuan Barang<a class='red'> *</a></a>
                             <select class="selection-search-clear required select-form"
@@ -417,10 +400,29 @@
                                 onchange="changeCost()">
                             </select>
                         </div>
-                    </div>
+                    </div> --}}
+{{-- 
                     <div class="col-md-6">
                         <div class="form-group">
-                            <a class="text-dark">Harga Per Barang<a class='red'> *</a></a>
+                            <a class="text-dark">Nama Barang<a class='red'> *</a></a>
+                            <select class="selection-search-clear required select-form" placeholder="Masukan Nama Barang"
+                                name="item_unit" id="item_unit" onchange="changeSatuan()">
+                            </select>
+                        </div>
+                    </div> --}}
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <a class="text-dark" hidden>Satuan Tiket<a class='red'hidden> *</a></a>
+                            <input class="form-control input-bb"
+                                placeholder="Masukan Kategori Barang" name="item_unit" id="item_unit"
+                                onchange="changeCost()" hidden>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <a class="text-dark">Harga Per Tiket<a class='red'> *</a></a>
                             <input class="form-control input-bb" name="item_unit_price_view" id="item_unit_price_view" type="text"
                                 autocomplete="off" readonly />
                                 <input class="form-control input-bb" name="item_unit_price" id="item_unit_price" type="text"
@@ -506,7 +508,7 @@
                     <table class="table table-bordered table-advance table-hover">
                         <thead class="thead-light">
                             <tr>
-                                <th style='text-align:center'>Barang</th>
+                                <th style='text-align:center'>Tiket </th>
                                 <th style='text-align:center'>Quantity</th>
                                 <th style='text-align:center'>Harga</th>
                                 <th style='text-align:center'>Subtotal</th>

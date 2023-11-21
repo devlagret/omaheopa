@@ -447,7 +447,7 @@ if (empty($paket)) {
                                     @endif
                                     <h5 class="mt-3"><b>Kemasan {{ $x }}</b></h5>
                                     <div class="row form-group mt-2">
-                                        <div class="col-md-3">
+                                        {{-- <div class="col-md-3">
                                             <div class="form-group">
                                                 <a class="text-dark">Satuan Barang {{ $x }}<a class='red'>
                                                         *</a></a>
@@ -459,7 +459,7 @@ if (empty($paket)) {
                                                     'form' => 'form-barang',
                                                 ]) !!}
                                             </div>
-                                        </div>
+                                        </div> --}}
                                         <div class="col-md-3">
                                             <div class="form-group">
                                                 <a class="text-dark">Kuantitas Standar {{ $x }}<a

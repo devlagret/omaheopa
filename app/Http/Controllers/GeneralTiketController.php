@@ -105,7 +105,7 @@ class GeneralTiketController extends Controller
             $fields = $request->validate([
                 'item_code'         => 'required',
                 'item_name'         => 'required',
-                'item_unit_id1'     => 'required',
+                // 'item_unit_id1'     => 'required',
             ]);
             // $warehouse = InvtWarehouse::where('data_state',0)
             // ->where('company_id',Auth::user()->company_id)
@@ -124,19 +124,19 @@ class GeneralTiketController extends Controller
                     'item_remark'           => $request->item_remark,
                     'item_status'           => 1,
                     // * Kemasan
-                    'item_unit_id1'         => $request->item_unit_id1,
+                    'item_unit_id1'         => 1,
                     'item_default_quantity1'=> $request->item_default_quantity1,
                     'item_unit_price1'      => $request->item_unit_price1,
                     'item_unit_cost1'       => $request->item_unit_cost1,
-                    'item_unit_id2'         => $request->item_unit_id2,
+                    'item_unit_id2'         => 1,
                     'item_default_quantity2'=> $request->item_default_quantity2,
                     'item_unit_price2'      => $request->item_unit_price2,
                     'item_unit_cost2'       => $request->item_unit_cost2,
-                    'item_unit_id3'         => $request->item_unit_id3,
+                    'item_unit_id3'         => 1,
                     'item_default_quantity3'=> $request->item_default_quantity3,
                     'item_unit_price3'      => $request->item_unit_price3,
                     'item_unit_cost3'       => $request->item_unit_cost3,
-                    'item_unit_id4'         => $request->item_unit_id4,
+                    'item_unit_id4'         => 1,
                     'item_default_quantity4'=> $request->item_default_quantity4,
                     'item_unit_price4'      => $request->item_unit_price4,
                     'item_unit_cost4'       => $request->item_unit_cost4,
@@ -152,7 +152,7 @@ class GeneralTiketController extends Controller
                     'company_id'        => $item['company_id'],
                     'warehouse_id'      => 1,
                     'item_id'           => $item['item_id'],
-                    'item_unit_id'      => $request['item_unit_id1'],
+                    'item_unit_id'      => 1,
                     // 'item_category_id'  => $item['item_category_id'],
                     'last_balance'      => 0,
                     'updated_id'        => Auth::id(),
@@ -363,7 +363,7 @@ class GeneralTiketController extends Controller
         $data = '';
         $items = Session::get('items');
         $category = InvtItemCategory::select('item_category_id', 'item_category_name')
-            ->where('merchant_id', $request->merchant_id)
+            ->where('item_category_type',1)
             ->where('data_state', 0)
             ->get();
         $items['item_category_id'] ?? $items['item_category_id'] = 1;
@@ -418,13 +418,15 @@ class GeneralTiketController extends Controller
         $items['kemasan'] = $items['kemasan'] - 1;
         Session::put('items', $items);
     }
-    public function getMerchantItem(Request $request){
+    public function getTiketItem(Request $request){
         $data = '';
         $items = Session::get('items');
         try{
-        $item = InvtItem::select('item_id', 'item_name')
-            ->where('merchant_id', $request->merchant_id)
-            ->where('item_category_id', $request->item_category_id)
+        $item = InvtItem::select('item_id', 'item_name','item_status')
+            // ->where('merchant_id', $request->merchant_id)
+            // ->where('item_category_id', $request->item_category_id)
+            ->where('item_id', $request->item_id)
+            ->where('item_status',1)
             ->where('data_state', 0)
             ->get();
         $items['package_item_id'] ?? $items['package_item_id'] = 1;
@@ -450,13 +452,14 @@ class GeneralTiketController extends Controller
         $items['package_item_unit'] ?? $items['package_item_unit'] = 1;
         for ( $a = 1 ; $a <= 4; $a++) {
             if( $item['item_unit_id'.$a] != null){
+                
             $data .= "<option value='".$item['item_unit_id'.$a]."' " . ($items['package_item_unit'] == $item['item_unit_id'.$a] ? 'selected' : '') .">".$unit->where('item_unit_id',$item['item_unit_id'.$a])->pluck('item_unit_name')[0]."</option>\n";
             }
         }
         return response($data);
     }catch(\Exception $e){
         error_log(strval($e));
-        return response($data);
+        return response('error');
 
     }
     }
@@ -471,7 +474,7 @@ class GeneralTiketController extends Controller
     public function getItemCost(Request $request) {
         $itm = InvtItem::where('item_id',$request->item_id)->first();
         for ( $a = 1 ; $a <= 4; $a++) {
-            if( $itm['item_unit_id'.$a] != null && $itm['item_unit_id'.$a]==$request->item_unit){
+            if( !empty($itm['item_unit_id'.$a]) && $itm['item_unit_id'.$a]==$request->item_unit){
                 return  ['cost'=>$itm['item_unit_cost'.$a],'price'=>$itm['item_unit_price'.$a]];
             }
         }

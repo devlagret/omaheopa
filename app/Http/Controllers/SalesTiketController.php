@@ -52,37 +52,38 @@ class SalesTiketController extends Controller
         ->where('company_id', Auth::user()->company_id)
         ->get();
         // dd($data);
-        return view('content.SalesInvoice.ListSalesInvoice',compact('data', 'start_date', 'end_date'));
+        return view('content.SalesTiket.ListSalesTiket',compact('data', 'start_date', 'end_date'));
     }
 
-    public function addSalesInvoice()
+    public function addSalesTiket()
     {
         $arraydatases   = Session::get('arraydatases');
         $date           = date('Y-m-d');
         $items          = InvtItem::where('data_state', 0)
         ->where('company_id', Auth::user()->company_id)
+        ->where('item_status',1)
         ->get()
         ->pluck('item_name','item_id');
         $units          = InvtItemUnit::where('data_state', 0)
         ->where('company_id', Auth::user()->company_id)
         ->get()
         ->pluck('item_unit_name','item_unit_id');
-        $merchant   = SalesMerchant::where('data_state', 0);
-        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
-            $merchant->where('merchant_id',Auth::user()->merchant_id);
-        }
-        $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
+        // $items   = InvtItem::where('data_state', 0);
+        // if(Auth::id()!=1||Auth::user()->items_id!=null){
+        //     $items->where('item_id',Auth::user()->items_id);
+        // }
+        // $items = $items->get()->pluck('item_name', 'item_id');
         $customers = SalesCustomer::where('data_state',0)
-        // ->where('company_id', Auth::user()->company_id)
+        ->where('company_id', Auth::user()->company_id)
         ->get()
         ->pluck('customer_name','customer_id');
-        return view('content.SalesInvoice.FormAddSalesInvoice',compact('date','items','units','arraydatases','customers','merchant'));
+        return view('content.SalesTiket.FormAddSalesTiket',compact('date','units','arraydatases','customers','items'));
     }
 
-    public function addArraySalesInvoice(Request $request)
+    public function addArraySalesTiket(Request $request)
     {
         $request->validate([
-            'item_category_id'                  => 'required',
+            // 'item_category_id'                  => 'required',
             'item_unit_id'                      => 'required',
             'item_id'                           => 'required',
             'item_unit_price'                   => 'required',
@@ -98,7 +99,7 @@ class SalesTiketController extends Controller
             $discount_amount = $request->discount_amount;
         }
         $arraydatases = array(
-            'item_category_id'                  => $request->item_category_id,
+            // 'item_category_id'                  => $request->item_category_id,
             'item_unit_id'                      => $request->item_unit_id,
             'item_id'                           => $request->item_id,
             'item_unit_price'                   => $request->item_unit_price,
@@ -123,9 +124,9 @@ class SalesTiketController extends Controller
         // $salesinvoice = Session::get('salesinvoice');
         // Session::push('salesinvoice', $salesinvoice);
 
-        return redirect('/sales-invoice/add');
+        return redirect('/sales-tiket/add');
     }
-    public function deleteArraySalesInvoice($record_id)
+    public function deleteArraySalesTiket($record_id)
     {
         $arrayBaru = array();
         $dataArrayHeader = Session::get('arraydatases');
@@ -139,9 +140,9 @@ class SalesTiketController extends Controller
         Session::forget('arraydatases');
         Session::put('arraydatases', $arrayBaru);
 
-        return redirect('/sales-invoice/add');
+        return redirect('/sales-tiket/add');
     }
-    public function processAddSalesInvoice(Request $request)
+    public function processAddSalesTiket(Request $request)
     {
         // dd($request->all());
         $transaction_module_code = 'SI';
@@ -163,7 +164,7 @@ class SalesTiketController extends Controller
         }
         $data = array(
             'customer_name'             => $request->customer_name,
-            'merchant_id'               => $request->merchant_id,
+            // 'merchant_id'               => $request->merchant_id,
             'sales_invoice_date'        => $fields['sales_invoice_date'],
             'subtotal_item'             => $fields['subtotal_item'],
             'subtotal_amount'           => $fields['subtotal_amount1'],
@@ -172,6 +173,7 @@ class SalesTiketController extends Controller
             'total_amount'              => $fields['total_amount'],
             'paid_amount'               => $fields['paid_amount'],
             'change_amount'             => $fields['change_amount'],
+            'sales_status'              => 1,
             'company_id'                => Auth::user()->company_id,
             'created_id'                => Auth::id(),
             'updated_id'                => Auth::id()
@@ -199,7 +201,7 @@ class SalesTiketController extends Controller
             foreach ($arraydatases as $key => $val) {
                 $dataarray = array(
                     'sales_invoice_id'                  => $sales_invoice_id['sales_invoice_id'],
-                    'item_category_id'                  => $val['item_category_id'],
+                    // 'item_category_id'                  => 13, 
                     'item_unit_id'                      => $val['item_unit_id'],
                     'item_id'                           => $val['item_id'],
                     'quantity'                          => $val['quantity'],
@@ -290,11 +292,11 @@ class SalesTiketController extends Controller
             // );
             // JournalVoucherItem::create($journal_credit);
 
-            $msg = 'Tambah Invoice Penjualan Berhasil';
-            return redirect('/sales-invoice/add')->with('msg',$msg);
+            $msg = 'Tambah Tiket Penjualan Berhasil';
+            return redirect('/sales-tiket/add')->with('msg',$msg);
         } else {
-            $msg = 'Tambah Invoice Penjualan Gagal';
-            return redirect('/sales-invoice/add')->with('msg',$msg);
+            $msg = 'Tambah Tiket Penjualan Gagal';
+            return redirect('/sales-tiket/add')->with('msg',$msg);
         }
     }
     public function getCoreItem(Request $request){
@@ -491,7 +493,7 @@ class SalesTiketController extends Controller
             return redirect('/sales-invoice')->with('msg',$msg);
         }
     }
-    public function addElementsSalesInvoice(Request $request)
+    public function addElementsSalesTiket(Request $request)
     {
         $salesinvoice  = Session::get('salesinvoice');
         if(!$salesinvoice || $salesinvoice == ''){
@@ -500,7 +502,7 @@ class SalesTiketController extends Controller
         $salesinvoice[$request->name] = $request->value;
         Session::put('salesinvoice', $salesinvoice);
     }
-    public function filterSalesInvoice(Request $request)
+    public function filterSalesTiket(Request $request)
     {
         $start_date = $request->start_date;
         $end_date = $request->end_date;
@@ -508,14 +510,14 @@ class SalesTiketController extends Controller
         Session::put('start_date',$start_date);
         Session::put('end_date',$end_date);
 
-        return redirect('/sales-invoice');
+        return redirect('/sales-tiket');
     }
     public function filterResetSalesInvoice()
     {
         Session::forget('start_date');
         Session::forget('end_date');
 
-        return redirect('/sales-invoice');
+        return redirect('/sales-tiket');
     }
     public function getTransactionModuleID($transaction_module_code)
     {
