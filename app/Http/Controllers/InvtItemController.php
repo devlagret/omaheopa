@@ -125,7 +125,8 @@ class InvtItemController extends Controller
                             'merchant_id'=>$request->merchant_id,
                             'warehouse_code'=>"GD{$warehousecode}",
                             'warehouse_name'=>"Gudang {$merchant->merchant_name}",
-                            'created_id'=>Auth::id()
+                            'created_id'=>Auth::id(),
+                            'company_id'=>Auth::user()->company_id
                         ]);
                     }else{
                         return redirect('/item/add-item')->with('msg','Merchant Tidak Memiliki Warehouse, Harap Tambah Warehouse.');
