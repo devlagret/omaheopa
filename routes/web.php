@@ -128,7 +128,7 @@ Route::post('/general-ticket/unit',[GeneralTiketController::class, 'getItemUnit'
 Route::post('/general-ticket/cost',[GeneralTiketController::class, 'getItemCost'])->name('get-tiket-cost');
 Route::post('/general-ticket/cost/process-edit',[GeneralTiketController::class, 'processEditCost'])->name('process-edit-cost-tiket');
 Route::post('/general-ticket/category',[GeneralTiketController::class, 'getCategory'])->name('get-tiket-category');
-Route::post('/merchant/general-ticket/',[GeneralTiketController::class, 'getMerchantItem'])->name('get-merchant-item');
+Route::post('/merchant/general-ticket/',[GeneralTiketController::class, 'getTiketItem'])->name('get-tiket-item');
 Route::get('/general-ticket/add-kemasan',[GeneralTiketController::class, 'addKemasan'])->name('add-kemasan');
 Route::get('/general-ticket/remove-kemasan',[GeneralTiketController::class, 'removeKemasan'])->name('remove-kemasan');
 Route::get('/general-ticket/add-tiket', [GeneralTiketController::class, 'addItem'])->name('add-tiket');
@@ -167,20 +167,20 @@ Route::post('/sales-invoice/select-data-unit-price', [SalesInvoiceController::cl
 Route::post('/sales-invoice/item', [SalesInvoiceController::class, 'getCoreItem'])->name('select-item-category-sales');
 
 Route::get('/sales-tiket',[SalesTiketController::class, 'index'])->name('sales-tiket');
-Route::get('/sales-tiket/add', [SalesTiketController::class,'addSalesInvoice'])->name('add-sales-tiket');
-Route::post('/sales-tiket/add-elements', [SalesTiketController::class,'addElementsSalesInvoice'])->name('add-elements-sales-tiket');
-Route::post('/sales-tiket/process-add', [SalesTiketController::class, 'processAddSalesInvoice'])->name('process-add-sales-tiket');
+Route::get('/sales-tiket/add', [SalesTiketController::class,'addSalesTiket'])->name('add-sales-tiket');
+Route::post('/sales-tiket/add-elements', [SalesTiketController::class,'addElementsSalesTiket'])->name('add-elements-sales-tiket');
+Route::post('/sales-tiket/process-add', [SalesTiketController::class, 'processAddSalesTiket'])->name('process-add-sales-tiket');
 Route::get('/sales-tiket/reset-add',[SalesTiketController::class, 'resetSalesInvoice'])->name('add-reset-sales-tiket');
-Route::post('/sales-tiket/add-array',[SalesTiketController::class,'addArraySalesInvoice'])->name('add-array-sales-tiket');
+Route::post('/sales-tiket/add-array',[SalesTiketController::class,'addArraySalesTiket'])->name('add-array-sales-tiket');
 Route::get('/sales-tiket/delete-array/{record_id}',[SalesTiketController::class,'deleteArraySalesInvoice'])->name('delete-array-sales-tiket');
 Route::get('/sales-tiket/detail/{sales_invoice_id}',[SalesTiketController::class, 'detailSalesInvoice'])->name('detail-sales-tiket');
-Route::get('/sales-tiket/delete/{sales_invoice_id}',[SalesTiketController::class, 'deleteSalesInvoice'])->name('delete-sales-tiket');
+Route::get('/sales-tiket/delete/{sales_invoice_id}',[SalesTiketController::class, 'deleteSalesTiket'])->name('delete-sales-tiket');
 Route::get('/sales-tiket/filter-reset',[SalesTiketController::class, 'filterResetSalesInvoice'])->name('filter-reset-sales-tiket');
 Route::post('/sales-tiket/filter',[SalesTiketController::class, 'filterSalesInvoice'])->name('filter-sales-tiket');
 Route::post('/sales-tiket/select-data-unit', [SalesTiketController::class, 'getSelectDataUnit'])->name('select-data-unit-sales-tiket');
-Route::post('/sales-tiket/filter',[SalesTiketController::class, 'filterSalesInvoice'])->name('filter-sales-tiket');
+Route::post('/sales-tiket/filter',[SalesTiketController::class, 'filterSalesTiket'])->name('filter-sales-tiket');
 Route::post('/sales-tiket/select-data-unit-price', [SalesTiketController::class, 'getUnitPrice'])->name('select-data-unit-price');
-Route::post('/sales-tiket/item', [SalesTiketController::class, 'getCoreItem'])->name('select-item-category-sales');
+Route::post('/sales-tiket/item', [SalesTiketController::class, 'getCoreItem'])->name('select-item-category-sales-tiket');
 
 Route::get('/purchase-invoice', [PurchaseInvoiceController::class, 'index'])->name('purchase-invoice');
 Route::get('/purchase-invoice/add', [PurchaseInvoiceController::class, 'addPurchaseInvoice'])->name('add-purchase-invoice');

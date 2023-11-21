@@ -62,7 +62,7 @@ function check(name,uri){
         Daftar
     </h5>
     <div class="form-actions float-right">
-        <button onclick="location.href='{{ url('/general-ticket/add-item') }}'" name="Find" class="btn btn-sm btn-info" title="Add Data"><i class="fa fa-plus"></i> Tambah Barang </button>
+        <button onclick="location.href='{{ url('/general-ticket/add-tiket') }}'" name="Find" class="btn btn-sm btn-info" title="Add Data"><i class="fa fa-plus"></i> Tambah Barang </button>
     </div>
   </div>
 
@@ -87,7 +87,7 @@ function check(name,uri){
                         <td>{{ $row['item_name'] }}</td>
                         {{-- <td class='text-center'><a type='button' class='btn btn-outline-dark btn-sm' href="{{route('item-barcode.index', $row['item_id'])}}"><i class='fa fa-barcode'></i> Barcode</a></td> --}}
                         <td class="text-center">
-                            <a type="button" class="btn btn-outline-warning btn-sm" href="{{ url('/item/edit-item/'.$row['item_id']) }}">Edit</a>
+                            <a type="button" class="btn btn-outline-warning btn-sm" href="{{ url('/item/edit-tiket/'.$row['item_id']) }}">Edit</a>
                             <a type="button" class="btn btn-outline-danger btn-sm" onclick="deleteItem('{{$row['item_id']}}','{{$row['item_name']}}')">Hapus</a>
                         </td>
                     </tr>
