@@ -201,7 +201,7 @@ class SalesTiketController extends Controller
             foreach ($arraydatases as $key => $val) {
                 $dataarray = array(
                     'sales_invoice_id'                  => $sales_invoice_id['sales_invoice_id'],
-                    // 'item_category_id'                  => 13, 
+                    'item_category_id'                  => null, 
                     'item_unit_id'                      => $val['item_unit_id'],
                     'item_id'                           => $val['item_id'],
                     'quantity'                          => $val['quantity'],
