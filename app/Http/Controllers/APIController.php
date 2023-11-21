@@ -1915,7 +1915,7 @@ class APIController extends Controller
 
 
     //API TIKET Penjualan UMUM
-    public function addSalesTiket()
+    public function getSalesTiket()
     {
         $date           = date('Y-m-d');
         $items          = InvtItem::where('data_state', 0)
