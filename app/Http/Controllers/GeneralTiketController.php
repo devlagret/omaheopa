@@ -177,7 +177,6 @@ class GeneralTiketController extends Controller
                 return redirect('/general-ticket')->with('msg', $msg);
             } catch (\Exception $e) {
                 report($e);
-                dd($e); 
                 Session::forget('token');
                 $msg  = "Tambah  Gagal";
                 return redirect('/general-ticket')->with('msg', $msg);
