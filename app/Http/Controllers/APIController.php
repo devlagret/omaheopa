@@ -80,7 +80,7 @@ class APIController extends Controller
             'token' => $token,
         ];
 
-        return response($response, 200);
+        return response()->json($response,201);
     }
 
     public function logout(Request $request){
