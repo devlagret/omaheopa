@@ -55,20 +55,16 @@ class APIController extends Controller
         ]);
 
         // Check username
-        $user = User::select('system_user.*', 'system_user_group.user_group_name', 'preference_company.guest_state')
-        ->join('system_user_group', 'system_user_group.user_group_id', 'system_user.user_group_id')
-        ->join('preference_company', 'preference_company.company_id', 'system_user.company_id')
-        ->where('name', $fields['username'])
-        ->first();
+
 
         //Check password
-        if(!Hash::check($fields['password'], $user->password)){
+        if(!Auth::attempt($fields)){
             return response([
                 'message' => 'Username / Password Tidak Sesuai'
             ],401);
         }
-
-        
+        $request->session()->regenerate();
+        $user = User::find(Auth::id());
         $login_log = array(
             'user_id'          => $user['user_id'],
             'company_id'       => $user['company_id'],
@@ -78,7 +74,6 @@ class APIController extends Controller
         );
 
         SystemLoginLog::create($login_log);
-        
         $token = $user->createToken('token-name')->plainTextToken;
         $response = [
             'data'  => $user,
@@ -93,7 +88,7 @@ class APIController extends Controller
         $user_state = User::findOrFail($user['user_id']);
         $user_state->save();
 
-        auth()->user()->tokens()->delete();
+        $user_state->tokens()->delete();
         
         $login_log = array(
             'user_id'          => $user['user_id'],
