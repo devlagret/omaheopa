@@ -13,12 +13,12 @@
                     console.log(msg);
                     if(msg!=0){
                         if(confirm('Barang "'+name+'" dipakai di paket. Anda yakin ingin tetap menghapus?')){
-                         window.location.href = "{{ url('/item/delete-item/') }}"+'/'+id;
+                         window.location.href = "{{ url('/general-ticket/delete-item/') }}"+'/'+id;
                         }
                         return 0;
                     }
                     if(confirm(`Yakin Ingin Menghapus Item dengan nama '`+name+`' ?`)){
-                      window.location.href = "{{ url('/item/delete-item/') }}"+'/'+id;
+                      window.location.href = "{{ url('/general-ticket/delete-tiket/') }}"+'/'+id;
                     }
                     return 0;
 			}

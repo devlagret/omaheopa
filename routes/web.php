@@ -138,7 +138,7 @@ Route::post('/general-ticket/add-tiket-elements', [GeneralTiketController::class
 Route::post('/general-ticket/process-add-tiket', [GeneralTiketController::class,'processAddTiket'])->name('process-add-tiket');
 Route::get('/general-ticket/edit-tiket/{item_id}', [GeneralTiketController::class, 'editTiket'])->name('edit-tiket');
 Route::post('/general-ticket/process-edit-tiket', [GeneralTiketController::class, 'processEditTiket'])->name('process-edit-tiket');
-Route::get('/general-ticket/delete-tiket/{item_id}', [GeneralTiketController::class, 'deleteItem'])->name('delete-tiket');
+Route::get('/general-ticket/delete-tiket/{item_id}', [GeneralTiketController::class, 'deleteTiket'])->name('delete-tiket');
 Route::get('/general-ticket/check-delete-tiket/{item_id}', [GeneralTiketController::class, 'checkDeleteItem'])->name('check-delete-tiket');
 
 Route::get('/warehouse',[InvtWarehouseController::class, 'index'])->name('warehouse');
