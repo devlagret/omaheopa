@@ -136,8 +136,8 @@ Route::get('/general-ticket/add-tiket', [GeneralTiketController::class, 'addItem
 Route::get('/general-ticket/add-reset-tiket', [GeneralTiketController::class, 'addResetItem'])->name('add-reset-tiket');
 Route::post('/general-ticket/add-tiket-elements', [GeneralTiketController::class, 'addItemElements'])->name('add-tiket-elements');
 Route::post('/general-ticket/process-add-tiket', [GeneralTiketController::class,'processAddTiket'])->name('process-add-tiket');
-Route::get('/general-ticket/edit-item/{item_id}', [GeneralTiketController::class, 'editItem'])->name('edit-tiket');
-Route::post('/general-ticket/process-edit-tiket', [GeneralTiketController::class, 'processEditItem'])->name('process-edit-tiket');
+Route::get('/general-ticket/edit-tiket/{item_id}', [GeneralTiketController::class, 'editTiket'])->name('edit-tiket');
+Route::post('/general-ticket/process-edit-tiket', [GeneralTiketController::class, 'processEditTiket'])->name('process-edit-tiket');
 Route::get('/general-ticket/delete-tiket/{item_id}', [GeneralTiketController::class, 'deleteItem'])->name('delete-tiket');
 Route::get('/general-ticket/check-delete-tiket/{item_id}', [GeneralTiketController::class, 'checkDeleteItem'])->name('check-delete-tiket');
 

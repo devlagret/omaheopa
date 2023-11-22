@@ -185,7 +185,7 @@ class GeneralTiketController extends Controller
 
     }
 
-    public function editItem($item_id)
+    public function editTiket($item_id)
     {
         $paket='';
         $pktitem='';
@@ -237,9 +237,9 @@ class GeneralTiketController extends Controller
         for($n=1;$n<=4;$n++){
             $data['item_unit_id'.$n] != null ? $base_kemasan++ : '';
         }
-        return view('content.InvtItem.FormEditInvtItem', compact('data','unit', 'itemunits', 'paket','pktitem','category', 'items', 'merchant', 'base_kemasan','counts','msg','pkg'));
+        return view('content.GeneralTiket.FormEditGeneralTiket', compact('data','unit', 'itemunits', 'paket','pktitem','category', 'items', 'merchant', 'base_kemasan','counts','msg','pkg'));
     }
-    public function processEditItem(Request $request)
+    public function processEditTiket(Request $request)
     {
         dump($request->all());
         $itm="Barang";
