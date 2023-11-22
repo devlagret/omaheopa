@@ -1970,6 +1970,7 @@ class APIController extends Controller
         ->where('data_state', 0)
         ->where('company_id', $company_id['company_id'])
         ->where('sales_status',0)
+        ->orderBy('item_name', 'ASC')
         ->get();
         
         if($sales){
