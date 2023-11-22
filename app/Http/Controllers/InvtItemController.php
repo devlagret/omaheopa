@@ -32,7 +32,7 @@ class InvtItemController extends Controller
         Session::forget('items');
         Session::forget('paket');
 
-        $data = InvtItem::with('merchant','category')->where('item_status',1)->where('company_id', Auth::user()->company_id);
+        $data = InvtItem::with('merchant','category')->where('item_status',0)->where('company_id', Auth::user()->company_id);
         if(Auth::id()!=1||Auth::user()->merchant_id!=null){
                 $data->where('merchant_id',Auth::user()->merchant_id);
         }
