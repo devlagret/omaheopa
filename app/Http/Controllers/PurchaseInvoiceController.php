@@ -232,8 +232,8 @@ class PurchaseInvoiceController extends Controller
          }
         DB::commit();
         Session::forget('purchase-token');
-        // Session::forget('datases');
-        // Session::forget('purchase-item');
+        Session::forget('datases');
+        Session::forget('purchase-item');
         return redirect()->route('pi.add')->with('msg','Tambah Pembelian Berhasil');
     } catch (\Exception $e) {
         DB::rollBack();
