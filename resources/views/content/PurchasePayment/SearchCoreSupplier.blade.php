@@ -53,9 +53,9 @@
                     @foreach($coresupplier as $item)
                     <tr>
                         <td style='text-align:center'>{{$no}}</td>
-                        <td>{{$item['supplier_name']}}</td>
-                        <td>{{$item['supplier_address']}}</td>
-                        <td style='text-align:right'>{{number_format($item['total_owing_amount'],2,',','.')}}</td>
+                        <td>{{$item->supplier->supplier_name}}</td>
+                        <td>{{$item->supplier->supplier_address}}</td>
+                        <td style='text-align:right'>{{number_format(($item['total_owing_amount']-$item['total_return_amount']),2,',','.')}}</td>
                         <td style='text-align:center'>
                             <a type="button" class="btn btn-outline-primary btn-sm" href="{{ url('/purchase-payment/add/'.$item['supplier_id']) }}">Pilih</a>
                         </td>

@@ -15,6 +15,9 @@ class PurchaseInvoice extends Model
         'created_at',
         'updated_at'
     ];
+    public function supplier() {
+        return $this->belongsTo(CoreSupplier::class,'supplier_id','supplier_id');
+    }
     // protected static function booted()
     // {
     //     static::addGlobalScope(new NotDeletedScope);

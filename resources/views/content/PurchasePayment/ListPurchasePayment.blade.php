@@ -33,7 +33,7 @@
 </h3>
 <br/>
 <div id="accordion">
-    <form  method="post" action="{{route('filter-purchase-payment')}}" enctype="multipart/form-data">
+    <form  method="post" action="{{route('purchase-payment.filter')}}" enctype="multipart/form-data">
     @csrf
         <div class="card border border-dark">
         <div class="card-header bg-dark" id="headingOne" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
@@ -98,7 +98,7 @@
         Daftar
     </h5>
     <div class="form-actions float-right">
-        <button onclick="location.href='{{ url('purchase-payment/search') }}'" name="Find" class="btn btn-sm btn-info" title="Add Data"><i class="fa fa-plus"></i> Tambah Pelunasan Hutang Baru</button>
+        <a href='{{ route('purchase-payment.search') }}' name="Add" class="btn btn-sm btn-info" title="Add Data"><i class="fa fa-plus"></i> Tambah Pelunasan Hutang Baru</a>
     </div>
   </div>
 
