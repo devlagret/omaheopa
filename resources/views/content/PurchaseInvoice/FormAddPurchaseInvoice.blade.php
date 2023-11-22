@@ -331,9 +331,10 @@
             }
         });
     }
-
     function processAddArrayPurchaseInvoice(){
         var item_id		                    = document.getElementById("item_id").value;
+        var item_unit		                = document.getElementById("item_unit").value;
+        var merchant_id		                = document.getElementById("merchant_id").value;
         var item_unit_cost		            = document.getElementById("item_unit_cost").value;
         var quantity                        = document.getElementById("quantity").value;
         var discount_percentage             = document.getElementById("discount_percentage").value;
@@ -342,12 +343,16 @@
         var subtotal_amount                 = document.getElementById("subtotal_amount").value;
         var item_expired_date               = document.getElementById("item_expired_date").value;
         var warehouse_id                    = document.getElementById("warehouse_id").value;
+        var item_category_id                = document.getElementById("item_category_id").value;
         if(quantity==''||quantity==0){alert('Masukan Jumlah Barang yang dibeli!');$('#quantity').focus(); return 0;}
         $.ajax({
             type: "POST",
             url : "{{route('pi.add-array')}}",
             data: {
-                'item_id'    	            : item_id,
+                'item_id'    	                    : item_id,
+                'warehouse_id'    	                : warehouse_id,
+                'item_unit'    	                    : item_unit,
+                'merchant_id'    	                : merchant_id,
                 'item_unit_cost'                    : item_unit_cost,
                 'quantity'                          : quantity,
                 'discount_percentage'               : discount_percentage,
@@ -355,6 +360,7 @@
                 'subtotal_amount_after_discount'    : subtotal_amount_after_discount,
                 'subtotal_amount'                   : subtotal_amount,
                 'item_expired_date'                 : item_expired_date,
+                'item_category_id'                  : item_category_id,
                 '_token'                            : '{{csrf_token()}}'
             },
             success: function(msg){
@@ -656,10 +662,59 @@
                 function_elements_add('purchase_invoice_due_day', due_day_date);
             }, 100);
         });
+        $('#purchase_invoice_date').change(function(){
+            var due_date = new Date($('#purchase_invoice_due_date').val());
+            var date_invoice = new Date(this.value);
+            var difference = due_date.getTime() - date_invoice.getTime();
+            var due_day_date = difference / (1000 * 3600 * 24);
+            if(due_date<date_invoice){
+                $('#purchase_invoice_due_date').val(moment(this.value).format('YYYY-MM-DD'));
+            setTimeout(() => {
+                function_elements_add('purchase_invoice_due_date', moment(this.value).format('YYYY-MM-DD'));
+            }, 100);
+            }
+            $('#purchase_invoice_due_date').attr('min',moment(this.value).format('YYYY-MM-DD'));
+            $('#purchase_invoice_due_day').val(moment($('#purchase_invoice_due_date').val()).diff(moment( $('#purchase_invoice_date').val()),'days'));
+            setTimeout(() => {
+                function_elements_add('purchase_invoice_date', moment(this.value).format('YYYY-MM-DD'));
+            }, 100);
+        });
         if($('#merchant_id_view').val()!=''){
             changeCategory('merchant_id_view','item_category_id');
             $('#merchant_id').val($('#merchant_id_view').val());
         }
+        $('#purchase_invoice_date').attr('min', moment().startOf('month').format('YYYY-MM-DD'));
+        $('#purchase_invoice_due_date').attr('min', moment($('#purchase_invoice_date').val()).format('YYYY-MM-DD'));
+        var diff = moment($('#purchase_invoice_due_date').val()).diff(moment( $('#purchase_invoice_date').val()),'days');
+        if(diff<0){
+            $('#purchase_invoice_due_date').val(moment($('#purchase_invoice_date').val()).format('YYYY-MM-DD'));
+            setTimeout(() => {
+                function_elements_add('purchase_invoice_due_date', moment($('#purchase_invoice_date').val()).format('YYYY-MM-DD'));
+            }, 100);
+        }
+        $('#purchase_invoice_due_day').val(diff);
+        const datamdl = {
+            @foreach ($arraydatases as $key => $val)
+                {{$key}}:{"Kategori": "{{$val['item_category_name']??'-'}}",
+                    "Gudang": "{{$val['warehouse_name']??'-'}}",
+                            "Merchant": "{{$val['merchant_name']??'-'}}"
+                            @if (!empty($val['discount_percentage'])||$val['discount_percentage']!=0)
+                            ,"Diskon":"{{$val['discount_amount']}} ({{$val['discount_percentage']}}%)"
+                            @endif
+                            }
+            @endforeach
+            };
+        $('#detailModal').on('show.bs.modal', function (event) {
+            var id = $(event.relatedTarget).data('id')
+             $(this).find('.modal-title').text('Detail Item')
+             $(this).find('.row-body').html('')
+            var arr = datamdl[id];
+            for (var key in arr) {
+                var value = arr[key];
+                 $(this).find('.row-body').append("<div class='col-3'>"+key+"</div><div class='col-auto'>:</div><div class='col-8'>"+value+"</div>");
+             }
+        })
+
     });
     function check() { 
         method = $('#purchase_payment_method').val()
@@ -950,6 +1005,7 @@
                             <tbody>
                             @php
                                 $quantity = 0;
+                                $i=0;
                                 $subtotal_amount = 0;
                             @endphp
                             @if(empty($arraydatases))
@@ -957,18 +1013,20 @@
                             @else
                             @foreach ($arraydatases as $key => $val)
                                         <tr>
-                                                    <td style='text-align  : left !important;'>{{$val['item_name']}}</td>
-                                                    <td style='text-align  : right !important;'>{{$val['quantity']}}</td>
-                                                    <td style='text-align  : right !important;'>{{number_format($val['item_unit_cost'],2,',','.')}}</td>
-                                                    <td style='text-align  : right !important;'>{{number_format($val['subtotal_amount_after_discount'],2,',','.')}}</td>
-                                                    <td style='text-align  : right !important;'>{{date('d-m-Y', strtotime($val['item_expired_date']))}}</td>
+                                                    <td style='text-align  : left !important;'>{{$val['item_name']}} <input type="hidden" name="item[{{$i}}][item_id]" value="{{$val['item_id']}}"/><input type="hidden" name="item[{{$i}}][merchant_id]" value="{{$val['merchant_id']}}"/><input type="hidden" name="item[{{$i}}][item_category_id]" value="{{$val['item_category_id']}}"/></td>
+                                                    <td style='text-align  : right !important;'>{{$val['quantity']}} {{$val['item_unit_name']}}<input type="hidden" name="item[{{$i}}][quantity]" value="{{$val['quantity']}}"/> <input type="hidden" name="item[{{$i}}][item_unit_id]" value="{{$val['item_unit_id']}}"/> </td>
+                                                    <td style='text-align  : right !important;'>{{number_format($val['item_unit_cost'],2,',','.')}}<input type="hidden" name="item[{{$i}}][item_unit_cost]" value="{{$val['item_unit_cost']}}"/> </td>
+                                                    <td style='text-align  : right !important;'>{{number_format($val['subtotal_amount_after_discount'],2,',','.')}}<input type="hidden" name="item[{{$i}}][subtotal_amount]" value="{{$val['subtotal_amount_after_discount']}}"/></td>
+                                                    <td style='text-align  : right !important;'>{{date('d-m-Y', strtotime($val['item_expired_date']))}}<input name="item[{{$i}}][item_expired_date]" hidden type="date" value="{{$val['item_expired_date']}}"/></td>
                                                     <td style='text-align  : center'>
-                                                        <a href="{{route('pi.delete-array', ['record_id' => $key])}}" name='Reset' class='btn btn-danger btn-sm' onclick="return confirm('Apakah Anda Yakin Ingin Menghapus Data Ini ?')"></i> Hapus</a>
+                                                        <a href="{{route('pi.delete-array', ['record_id' => $key])}}" name='Reset' class='btn btn-danger btn-sm' onclick="return confirm('Apakah Anda Yakin Ingin Menghapus Data Ini ?')">Hapus</a>
+                                                        <a  name='Detail' class='btn btn-warning btn-sm' data-toggle="modal" data-target="#detailModal" data-id="{{$key}}"> Detail</a>
                                                     </td>
                                                 </tr>
                             @php    
                             $quantity += $val['quantity'];
                             $subtotal_amount += $val['subtotal_amount_after_discount'];
+                            $i++;
                             @endphp
 
                             @endforeach
@@ -1059,7 +1117,28 @@
     </form>
     </div>
 </div>
-
+<!-- Modal -->
+<div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="detailModalLabel">Modal title</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="row row-body">
+          
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Tutup</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
 @stop
 
 @section('footer')
