@@ -1937,12 +1937,8 @@ class APIController extends Controller
 
     public function getSalesTiketMerchant()
     {
-        $merchant   = SalesMerchant::where('data_state', 0);
-        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
-            $merchant->where('merchant_id',Auth::user()->merchant_id);
-        }
-        $merchant = $merchant->get();
-        
+        $merchant   =InvtItem::with('merchant','category')->where('item_status',0)->get();
+
         if($merchant){
             return response([
                 'data' => $merchant,
@@ -1979,7 +1975,7 @@ class APIController extends Controller
 
     public function getSalesTiket()
     {
-        $items          = InvtItem::select('*')
+        $items  = InvtItem::select('*')
         ->where('data_state', 0)
         ->where('company_id', Auth::user()->company_id)
         ->where('item_status',1)
