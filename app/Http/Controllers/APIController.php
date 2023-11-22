@@ -18,6 +18,7 @@ use App\Models\PreferenceCompany;
 use App\Models\InvtItemCategory;
 use App\Models\InvtItemUnit;
 use App\Models\InvtItem;
+use App\Models\SalesMerchant;
 use App\Models\SalesInvoice;
 use App\Models\SalesInvoiceItem;
 use App\Models\CapitalMoney;
@@ -1913,6 +1914,47 @@ class APIController extends Controller
 
     }
 
+    //API TIKET Penjualan Wahana
+    public function getHistorySalesTiketMerchant()
+    {
+        $sales  = SalesInvoice::select('*')
+        ->where('data_state', 0)
+        ->where('company_id', Auth::user()->company_id)
+        ->where('sales_status',0)
+        ->get();
+        
+        if($sales){
+            return response([
+                'data' => $sales,
+                // 'date' => $date
+            ],201);
+        }else{
+            return response([
+                'message' => 'Data Tidak Ditemukan'
+            ],401);
+        }
+    }
+
+    public function getSalesTiketMerchant()
+    {
+        $merchant   = SalesMerchant::where('data_state', 0);
+        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
+            $merchant->where('merchant_id',Auth::user()->merchant_id);
+        }
+        $merchant = $merchant->get();
+        
+        if($merchant){
+            return response([
+                'data' => $merchant,
+                // 'date' => $date
+            ],201);
+        }else{
+            return response([
+                'message' => 'Data Tidak Ditemukan'
+            ],401);
+        }
+    }
+
 
     //API TIKET Penjualan UMUM
     public function getHistorySalesTiket()
@@ -1920,7 +1962,7 @@ class APIController extends Controller
         $sales  = SalesInvoice::select('*')
         ->where('data_state', 0)
         ->where('company_id', Auth::user()->company_id)
-        ->where('sales_status',1)
+        ->where('sales_status',0)
         ->get();
         
         if($sales){
