@@ -185,24 +185,25 @@ Route::post('/sales-tiket/select-data-unit-price', [SalesTiketController::class,
 Route::post('/sales-tiket/item', [SalesTiketController::class, 'getCoreItem'])->name('select-item-category-sales-tiket');
 
 Route::prefix('purchase-invoice')->name('pi.')->group(function () {
-Route::get('/', [PurchaseInvoiceController::class, 'index'])->name('index');
-Route::get('add', [PurchaseInvoiceController::class, 'addPurchaseInvoice'])->name('add');
-Route::get('add-reset', [PurchaseInvoiceController::class, 'addResetPurchaseInvoice'])->name('add-reset');
-Route::post('add-elements', [PurchaseInvoiceController::class, 'addElementsPurchaseInvoice'])->name('add-elements');
-Route::post('add-array',[PurchaseInvoiceController::class, 'addArrayPurchaseInvoice'])->name('add-array');
-Route::get('delete-array/{record_id}', [PurchaseInvoiceController::class, 'deleteArrayPurchaseInvoice'])->name('delete-array');
-Route::post('process-add', [PurchaseInvoiceController::class, 'processAddPurchaseInvoice'])->name('process-add');
-Route::get('detail/{purchase_invoice_id}',[PurchaseInvoiceController::class, 'detailPurchaseInvoice'])->name('detail-');
-Route::post('filter', [PurchaseInvoiceController::class,'filterPurchaseInvoice'])->name('filter');
-Route::get('filter-reset', [PurchaseInvoiceController::class,'filterResetPurchaseInvoice'])->name('filter-reset-');
-Route::post('process-change-cost', [PurchaseInvoiceController::class,'processChangeCostPurchaseInvoice'])->name('process-change-cost');
-Route::get('note/{purchase_invoice_id?}',[PurchaseInvoiceController::class, 'printNote'])->name('purchase-note');
-Route::get('print-proof-acceptance-item/{purchase_invoice_id?}',[PurchaseInvoiceController::class, 'printProofAcceptanceItem'])->name('print-proof-acceptance-item');
-Route::get('print-proof-expenditure-cash/{purchase_invoice_id?}',[PurchaseInvoiceController::class, 'printProofExpenditureCash'])->name('print-proof-expenditure-cash');
-Route::get('print-proof-purchase/{purchase_invoice_id?}',[PurchaseInvoiceController::class, 'printProofPurchaseItem'])->name('print-proof-purchase');
-Route::post('get-category',[PurchaseInvoiceController::class, 'getCategory'])->name('get-category');
-Route::post('get-item',[PurchaseInvoiceController::class, 'getItem'])->name('get-item');
-Route::post('get-unit',[PurchaseInvoiceController::class, 'getUnit'])->name('get-unit');
+    Route::get('/', [PurchaseInvoiceController::class, 'index'])->name('index');
+    Route::get('add', [PurchaseInvoiceController::class, 'addPurchaseInvoice'])->name('add');
+    Route::get('add-reset', [PurchaseInvoiceController::class, 'addResetPurchaseInvoice'])->name('add-reset');
+    Route::post('add-elements', [PurchaseInvoiceController::class, 'addElementsPurchaseInvoice'])->name('add-elements');
+    Route::post('add-array',[PurchaseInvoiceController::class, 'addArrayPurchaseInvoice'])->name('add-array');
+    Route::get('delete-array/{record_id}', [PurchaseInvoiceController::class, 'deleteArrayPurchaseInvoice'])->name('delete-array');
+    Route::post('process-add', [PurchaseInvoiceController::class, 'processAddPurchaseInvoice'])->name('process-add');
+    Route::get('detail/{purchase_invoice_id}',[PurchaseInvoiceController::class, 'detailPurchaseInvoice'])->name('detail-');
+    Route::post('filter', [PurchaseInvoiceController::class,'filterPurchaseInvoice'])->name('filter');
+    Route::get('filter-reset', [PurchaseInvoiceController::class,'filterResetPurchaseInvoice'])->name('filter-reset-');
+    Route::post('process-change-cost', [PurchaseInvoiceController::class,'processChangeCostPurchaseInvoice'])->name('process-change-cost');
+    Route::get('note/{purchase_invoice_id?}',[PurchaseInvoiceController::class, 'printNote'])->name('purchase-note');
+    Route::get('print-proof-acceptance-item/{purchase_invoice_id?}',[PurchaseInvoiceController::class, 'printProofAcceptanceItem'])->name('print-proof-acceptance-item');
+    Route::get('print-proof-expenditure-cash/{purchase_invoice_id?}',[PurchaseInvoiceController::class, 'printProofExpenditureCash'])->name('print-proof-expenditure-cash');
+    Route::get('print-proof-purchase/{purchase_invoice_id?}',[PurchaseInvoiceController::class, 'printProofPurchaseItem'])->name('print-proof-purchase');
+    Route::post('get-category',[PurchaseInvoiceController::class, 'getCategory'])->name('get-category');
+    Route::post('get-item',[PurchaseInvoiceController::class, 'getItem'])->name('get-item');
+    Route::post('get-unit',[PurchaseInvoiceController::class, 'getUnit'])->name('get-unit');
+    Route::post('get-warehouse',[PurchaseInvoiceController::class, 'getWarehouse'])->name('get-whs');
 });
 
 Route::get('/system-user', [SystemUserController::class, 'index'])->name('system-user');
