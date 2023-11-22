@@ -52,7 +52,7 @@ class ItemHelper extends AppHelper
      * @param integer $withMerchant
      * @return Response
      */
-    public function getItem($lastItmId, Request $request, $withMerchant = 1)
+    public static function getItem($lastItmId, Request $request, $withMerchant = 1)
     {
         $data = '';
         try {
@@ -61,7 +61,7 @@ class ItemHelper extends AppHelper
             if ($withMerchant) {
                 $item->where('merchant_id', $request->merchant_id);
             }
-            $item->get();
+            $item= $item->get();
             $lastItmId ?? $lastItmId = $item->first()->item_id;
             foreach ($item as $val) {
                 $data .= "<option value='$val[item_id]' " . ($lastItmId == $val['item_id'] ? 'selected' : '') . ">$val[item_name]</option>\n";
