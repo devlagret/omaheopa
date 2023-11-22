@@ -188,7 +188,7 @@ class SalesInvoiceController extends Controller
         //     'updated_id'                    => Auth::id(),
         //     'created_id'                    => Auth::id()
         // );
-        dd($data);
+        // dd($data);
         //*jurnal
         // JournalHelper::make(Str::uuid(),'Sales Invoice',['sales_cash_account','sales_account'],$fields['total_amount']);
 
