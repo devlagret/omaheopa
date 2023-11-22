@@ -1950,14 +1950,25 @@ class APIController extends Controller
             ],401);
         }
     }
+    //END API TIKET Penjualan Wahana
 
 
     //API TIKET Penjualan UMUM
-    public function getHistorySalesTiket()
-    {
+    public function getHistorySalesTiket(Request $request)
+    {   
+        $fields = $request->validate([
+            'user_id'           => 'required',
+            // 'item_category_id'  => 'required',
+        ]);
+
+        $company_id = User::select('preference_company.company_id')
+        ->join('preference_company', 'preference_company.company_id', 'system_user.company_id')
+        ->where('system_user.user_id', $fields['user_id'])
+        ->first();
+        
         $sales  = SalesInvoice::select('*')
         ->where('data_state', 0)
-        ->where('company_id', Auth::user()->company_id)
+        ->where('company_id', $company_id['company_id'])
         ->where('sales_status',0)
         ->get();
         
