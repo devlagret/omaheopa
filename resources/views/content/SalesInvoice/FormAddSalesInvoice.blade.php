@@ -372,8 +372,7 @@
                             <input class="form-control input-bb" name="customer_name" id="customer_name" type="text"
                                 autocomplete="off" value=""
                                 onChange="function_elements_add(this.name, this.value);" />
-                            <input class="form-control input-bb"  name="merchant_id" id="merchant_id" type="text"
-                                autocomplete="off" value="{{ Auth::user()->merchant_id }}" />
+                            {{-- <input class="form-control input-bb"  name="merchant_id" id="merchant_id" type="text" value="{{ Auth::user()->merchant_id }}" /> --}}
                         </div>
                     </div>
 

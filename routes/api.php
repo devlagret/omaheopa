@@ -61,6 +61,12 @@ Route::group(['middleware'=> ['auth:sanctum']], function(){
     //API Tiket Umum
     Route::post('/general-tiket/postSalesTiket', [APIController::class, 'postSalesTiket']);
     Route::get('/general-tiket/getSalesTiket', [APIController::class, 'getSalesTiket']);
+    Route::get('/general-tiket/getHistorySalesTiket', [APIController::class, 'getHistorySalesTiket']);
+
+    //API TIKET MERCHANT
+    Route::post('/general-tiket/postSalesTiket', [APIController::class, 'postSalesTiket']);
+    Route::get('/general-tiket/getSalesTiketMerchant', [APIController::class, 'getSalesTiketMerchant']);
+    Route::get('/general-tiket/getHistorySalesTiketMerchant', [APIController::class, 'getHistorySalesTiketMerchant']);
 
 });
 

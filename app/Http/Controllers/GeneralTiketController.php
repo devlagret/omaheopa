@@ -185,7 +185,7 @@ class GeneralTiketController extends Controller
 
     }
 
-    public function editItem($item_id)
+    public function editTiket($item_id)
     {
         $paket='';
         $pktitem='';
@@ -237,9 +237,9 @@ class GeneralTiketController extends Controller
         for($n=1;$n<=4;$n++){
             $data['item_unit_id'.$n] != null ? $base_kemasan++ : '';
         }
-        return view('content.InvtItem.FormEditInvtItem', compact('data','unit', 'itemunits', 'paket','pktitem','category', 'items', 'merchant', 'base_kemasan','counts','msg','pkg'));
+        return view('content.GeneralTiket.FormEditGeneralTiket', compact('data','unit', 'itemunits', 'paket','pktitem','category', 'items', 'merchant', 'base_kemasan','counts','msg','pkg'));
     }
-    public function processEditItem(Request $request)
+    public function processEditTiket(Request $request)
     {
         dump($request->all());
         $itm="Barang";
@@ -326,30 +326,30 @@ class GeneralTiketController extends Controller
         if ($table->save()) {
             DB::commit();
             $msg = "Ubah ".$itm." Berhasil";
-            return redirect('/item')->with('msg', $msg);
+            return redirect('/general-ticket')->with('msg', $msg);
         } else {
             $msg = "Ubah ".$itm." Gagal.";
-            return redirect('/item')->with('msg', $msg);
+            return redirect('/general-ticket')->with('msg', $msg);
         }}catch(\Exception $e){
             report($e);
             DB::rollBack();
             $msg = "Ubah ".$itm." Gagal";
-            return redirect('/item')->with('msg', $msg);
+            return redirect('/general-ticket')->with('msg', $msg);
         }
     }
 
-    public function deleteItem($item_id)
+    public function deleteTiket($item_id)
     {
         $table             = InvtItem::findOrFail($item_id);
         $table->data_state = 1;
         $table->updated_id = Auth::id();
 
         if ($table->save()) {
-            $msg = "Hapus Barang Berhasil";
-            return redirect('/item')->with('msg', $msg);
+            $msg = "Hapus Tiket Berhasil";
+            return redirect('/general-ticket')->with('msg', $msg);
         } else {
-            $msg = "Hapus Barang Gagal";
-            return redirect('/item')->with('msg', $msg);
+            $msg = "Hapus Tiket Gagal";
+            return redirect('/general-ticket')->with('msg', $msg);
         }
     }
 

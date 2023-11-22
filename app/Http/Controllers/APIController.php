@@ -18,6 +18,7 @@ use App\Models\PreferenceCompany;
 use App\Models\InvtItemCategory;
 use App\Models\InvtItemUnit;
 use App\Models\InvtItem;
+use App\Models\SalesMerchant;
 use App\Models\SalesInvoice;
 use App\Models\SalesInvoiceItem;
 use App\Models\CapitalMoney;
@@ -1913,17 +1914,72 @@ class APIController extends Controller
 
     }
 
+    //API TIKET Penjualan Wahana
+    public function getHistorySalesTiketMerchant()
+    {
+        $sales  = SalesInvoice::select('*')
+        ->where('data_state', 0)
+        ->where('company_id', Auth::user()->company_id)
+        ->where('sales_status',0)
+        ->get();
+        
+        if($sales){
+            return response([
+                'data' => $sales,
+                // 'date' => $date
+            ],201);
+        }else{
+            return response([
+                'message' => 'Data Tidak Ditemukan'
+            ],401);
+        }
+    }
+
+    public function getSalesTiketMerchant()
+    {
+        $merchant   =InvtItem::with('merchant','category')->where('item_status',0)->get();
+
+        if($merchant){
+            return response([
+                'data' => $merchant,
+                // 'date' => $date
+            ],201);
+        }else{
+            return response([
+                'message' => 'Data Tidak Ditemukan'
+            ],401);
+        }
+    }
+
 
     //API TIKET Penjualan UMUM
+    public function getHistorySalesTiket()
+    {
+        $sales  = SalesInvoice::select('*')
+        ->where('data_state', 0)
+        ->where('company_id', Auth::user()->company_id)
+        ->where('sales_status',0)
+        ->get();
+        
+        if($sales){
+            return response([
+                'data' => $sales,
+                // 'date' => $date
+            ],201);
+        }else{
+            return response([
+                'message' => 'Data Tidak Ditemukan'
+            ],401);
+        }
+    }
+
     public function getSalesTiket()
     {
-        // $date           = date('Y-m-d');
-        $items          = InvtItem::select('*')
+        $items  = InvtItem::select('*')
         ->where('data_state', 0)
         ->where('company_id', Auth::user()->company_id)
         ->where('item_status',1)
         ->get();
-        // ->pluck('item_name','item_id');
         
         if($items){
             return response([
