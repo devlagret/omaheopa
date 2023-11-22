@@ -26,7 +26,7 @@ class StockHelper{
         return $data->save();
     }
     /**
-     * Substac stock
+     * Substract stock
      *
      * @param integer $quantity (Will converted to absolute value)
      * @param integer|string|null $unit
@@ -35,6 +35,18 @@ class StockHelper{
     public function sub(int $quantity = 1,$unit=null){
         $data = self::$data;
         $data->last_balance = ($data->last_balance - (abs($quantity) * (is_null($unit)?$unit = self::$item['item_default_quantity1']:$unit = $this->getDefaultQty($unit))));
+        return $data->save();
+    }
+    /**
+     * Update stock
+     *
+     * @param integer $quantity (Will converted to absolute value)
+     * @param integer|string|null $unit
+     * @return bool
+     */
+    public function update(int $quantity = 1,$unit=null){
+        $data = self::$data;
+        $data->last_balance = ($data->last_balance - ($quantity * (is_null($unit)?$unit = self::$item['item_default_quantity1']:$unit = $this->getDefaultQty($unit))));
         return $data->save();
     }
     /**
@@ -49,6 +61,7 @@ class StockHelper{
         self::$item = $item;
         self::$data = InvtItemStock::where('company_id',Auth::user()->company_id)
         ->where('item_id',$item_id)->orderByDesc('item_stock_id')->first();
+        self::$data->updated_id=Auth::id();
         $qty = self::$data->last_balance;
         $sh = new StockHelper();
         $sh->setdata($unit);
