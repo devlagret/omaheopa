@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 class JournalHelper extends AppHelper
 {
+    protected static $token;
     /**
      * Make journal voucher and journal voucher item
      *
@@ -17,9 +18,13 @@ class JournalHelper extends AppHelper
      * @param string|null $transaction_module_code
      * @return void
      */
-    public static function make($token,string $journal_voucher_description, array $account_setting_name,int $total_amount,string $transaction_module_code = null){
+    public static function make(string $journal_voucher_description, array $account_setting_name,int $total_amount,string $transaction_module_code = null){
         if(is_null($transaction_module_code)){
             $transaction_module_code = preg_replace('/[^A-Z]/', '',$journal_voucher_description);
+        }
+        $token = self::$token;
+        if(empty($token)){
+            $token = Str::uuid();
         }
         JournalVoucher::create([
             'company_id'                    => Auth::user()->company_id,
@@ -104,5 +109,16 @@ class JournalHelper extends AppHelper
         ]);
         }
         $journal->items()->update(['acct_journal_voucher_item.reverse_state' => 1]);
+    }
+
+    /**
+     * Set the value of token
+     *
+     * @return  self
+     */ 
+    public static function token($token)
+    {
+        self::$token = $token;
+        return new self;
     }
 }
