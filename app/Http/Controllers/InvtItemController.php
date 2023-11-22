@@ -32,7 +32,7 @@ class InvtItemController extends Controller
         Session::forget('items');
         Session::forget('paket');
 
-        $data = InvtItem::with('merchant','category')->where('company_id', Auth::user()->company_id);
+        $data = InvtItem::with('merchant','category')->where('item_status',0)->where('company_id', Auth::user()->company_id);
         if(Auth::id()!=1||Auth::user()->merchant_id!=null){
                 $data->where('merchant_id',Auth::user()->merchant_id);
         }
@@ -114,6 +114,7 @@ class InvtItemController extends Controller
             $warehouse = InvtWarehouse::where('data_state',0)
             ->where('company_id',Auth::user()->company_id)
             ->where('merchant_id',$request->merchant_id)
+            ->orWhereNull('merchant_id')
             ->get();
             DB::beginTransaction();
             try {
@@ -125,7 +126,8 @@ class InvtItemController extends Controller
                             'merchant_id'=>$request->merchant_id,
                             'warehouse_code'=>"GD{$warehousecode}",
                             'warehouse_name'=>"Gudang {$merchant->merchant_name}",
-                            'created_id'=>Auth::id()
+                            'created_id'=>Auth::id(),
+                            'company_id'=>Auth::user()->company_id
                         ]);
                     }else{
                         return redirect('/item/add-item')->with('msg','Merchant Tidak Memiliki Warehouse, Harap Tambah Warehouse.');

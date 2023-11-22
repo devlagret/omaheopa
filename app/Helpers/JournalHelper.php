@@ -2,11 +2,13 @@
 namespace App\Helpers;
 use App\Models\JournalVoucher;
 use App\Models\JournalVoucherItem;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 class JournalHelper extends AppHelper
 {
+    protected static $token;
+    protected static $journal_voucher_date;
     /**
      * Make journal voucher and journal voucher item
      *
@@ -17,9 +19,21 @@ class JournalHelper extends AppHelper
      * @param string|null $transaction_module_code
      * @return void
      */
-    public static function make($token,string $journal_voucher_description, array $account_setting_name,int $total_amount,string $transaction_module_code = null){
+    public static function make(string $journal_voucher_description, array $account_setting_name,int $total_amount,string $transaction_module_code = null){
         if(is_null($transaction_module_code)){
             $transaction_module_code = preg_replace('/[^A-Z]/', '',$journal_voucher_description);
+        }
+        $token = self::$token;
+        if(empty($token)){
+            $token = Str::uuid();
+        }
+        $date = self::$journal_voucher_date;
+        if(empty($date)){
+            $jvd=Carbon::now()->format('Y-m-d');
+            $jvp=Carbon::now()->format('Ym');
+        }else{
+            $jvd=Carbon::parse($date)->format('Y-m-d');
+            $jvp=Carbon::parse($date)->format('Ym');
         }
         JournalVoucher::create([
             'company_id'                    => Auth::user()->company_id,
@@ -28,8 +42,8 @@ class JournalHelper extends AppHelper
             'journal_voucher_title'         => self::getTransactionModule($transaction_module_code)->name??'',
             'transaction_module_id'         => self::getTransactionModule($transaction_module_code)->id??'',
             'transaction_module_code'       => $transaction_module_code,
-            'journal_voucher_date'          => Carbon::now()->format('Y-m-d'),
-            'journal_voucher_period'        => Carbon::now()->format('Ym'),
+            'journal_voucher_date'          => $jvd,
+            'journal_voucher_period'        => $jvp,
             'created_id'                    => Auth::id(),
             'journal_voucher_token'         => $token,
         ]);
@@ -104,5 +118,32 @@ class JournalHelper extends AppHelper
         ]);
         }
         $journal->items()->update(['acct_journal_voucher_item.reverse_state' => 1]);
+    }
+
+    /**
+     * Set the value of token
+     *
+     * @return  self
+     */ 
+    public static function token($token)
+    {
+        self::$token = $token;
+        return new self;
+    }
+
+    /**
+     * Set Journal date
+     *
+     * @return  self
+     */ 
+    public static function date($journal_voucher_date)
+    {
+        $date = Carbon::parse($journal_voucher_date)->format('Ym');
+        $now = Carbon::now()->format('Ym');
+        if($date<$now){
+            throw new \Exception("Can't Back Date");
+        }
+        self::$journal_voucher_date = $journal_voucher_date;
+        return new self;
     }
 }

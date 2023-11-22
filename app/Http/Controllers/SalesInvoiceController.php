@@ -163,7 +163,7 @@ class SalesInvoiceController extends Controller
         }
         $data = array(
             'customer_name'             => $request->customer_name,
-            'merchant_id'               => $request->merchant_id,
+            'merchant_id'               => Auth::user()->merchant_id,
             'sales_invoice_date'        => $fields['sales_invoice_date'],
             'subtotal_item'             => $fields['subtotal_item'],
             'subtotal_amount'           => $fields['subtotal_amount1'],
@@ -188,7 +188,7 @@ class SalesInvoiceController extends Controller
         //     'updated_id'                    => Auth::id(),
         //     'created_id'                    => Auth::id()
         // );
-        
+        // dd($data);
         //*jurnal
         // JournalHelper::make(Str::uuid(),'Sales Invoice',['sales_cash_account','sales_account'],$fields['total_amount']);
 

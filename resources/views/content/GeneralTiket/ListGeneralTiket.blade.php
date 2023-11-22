@@ -13,12 +13,12 @@
                     console.log(msg);
                     if(msg!=0){
                         if(confirm('Barang "'+name+'" dipakai di paket. Anda yakin ingin tetap menghapus?')){
-                         window.location.href = "{{ url('/item/delete-item/') }}"+'/'+id;
+                         window.location.href = "{{ url('/general-ticket/delete-item/') }}"+'/'+id;
                         }
                         return 0;
                     }
                     if(confirm(`Yakin Ingin Menghapus Item dengan nama '`+name+`' ?`)){
-                      window.location.href = "{{ url('/item/delete-item/') }}"+'/'+id;
+                      window.location.href = "{{ url('/general-ticket/delete-tiket/') }}"+'/'+id;
                     }
                     return 0;
 			}
@@ -87,7 +87,7 @@ function check(name,uri){
                         <td>{{ $row['item_name'] }}</td>
                         {{-- <td class='text-center'><a type='button' class='btn btn-outline-dark btn-sm' href="{{route('item-barcode.index', $row['item_id'])}}"><i class='fa fa-barcode'></i> Barcode</a></td> --}}
                         <td class="text-center">
-                            <a type="button" class="btn btn-outline-warning btn-sm" href="{{ url('/item/edit-tiket/'.$row['item_id']) }}">Edit</a>
+                            <a type="button" class="btn btn-outline-warning btn-sm" href="{{ url('/general-ticket/edit-tiket/'.$row['item_id']) }}">Edit</a>
                             <a type="button" class="btn btn-outline-danger btn-sm" onclick="deleteItem('{{$row['item_id']}}','{{$row['item_name']}}')">Hapus</a>
                         </td>
                     </tr>
