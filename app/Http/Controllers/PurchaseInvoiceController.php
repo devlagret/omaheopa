@@ -207,6 +207,7 @@ class PurchaseInvoiceController extends Controller
             $dataarray = array(
                 'purchase_invoice_id'   => $purchase_invoice_id['purchase_invoice_id'],
                 'merchant_id'           => $val['merchant_id'],
+                'warehouse_id'          => $val['warehouse_id'],
                 'item_category_id'      => $val['item_category_id'],
                 'item_unit_id'          => $val['item_unit_id'],
                 'item_id'               => $val['item_id'],
@@ -221,7 +222,7 @@ class PurchaseInvoiceController extends Controller
                 'updated_id'            => Auth::id()
             );
             PurchaseInvoiceItem::create($dataarray);
-            StockHelper::find($val['item_id'],$val['item_unit_id'])->add($val['quantity']);
+            StockHelper::find($val['item_id'],$val['item_unit_id'],$val['warehouse_id'])->add($val['quantity']);
         }
         if($request->purchase_payment_method){
             //* Hutang
