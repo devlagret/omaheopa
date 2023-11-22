@@ -241,7 +241,7 @@ class JournalVoucherController extends Controller
     {
         $data = PreferenceTransactionModule::where('transaction_module_code',$transaction_module_code)->first();
 
-        return $data['transaction_module_id'];
+        return $data['transaction_module_id'] ?? '';
     }
 
     public function reverseJournalVoucher($journal_voucher_id)
