@@ -1950,15 +1950,18 @@ class APIController extends Controller
             ],401);
         }
     }
+    //END API TIKET Penjualan Wahana
 
 
     //API TIKET Penjualan UMUM
-    public function getHistorySalesTiket()
-    {
+    public function getHistorySalesTiket(Request $request)
+    {   
+        
         $sales  = SalesInvoice::select('*')
         ->where('data_state', 0)
         ->where('company_id', Auth::user()->company_id)
         ->where('sales_status',0)
+        ->orderBy('item_name', 'ASC')
         ->get();
         
         if($sales){
@@ -1973,8 +1976,9 @@ class APIController extends Controller
         }
     }
 
-    public function getSalesTiket()
-    {
+    public function getSalesTiket(Request $request)
+    {   
+
         $items  = InvtItem::select('*')
         ->where('data_state', 0)
         ->where('company_id', Auth::user()->company_id)
