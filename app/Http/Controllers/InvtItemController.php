@@ -114,6 +114,7 @@ class InvtItemController extends Controller
             $warehouse = InvtWarehouse::where('data_state',0)
             ->where('company_id',Auth::user()->company_id)
             ->where('merchant_id',$request->merchant_id)
+            ->orWhereNull('merchant_id')
             ->get();
             DB::beginTransaction();
             try {
