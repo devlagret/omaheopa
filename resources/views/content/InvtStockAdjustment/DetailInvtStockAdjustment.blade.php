@@ -152,7 +152,6 @@
                             <tr>
                                 <th style='text-align:center'>Nama Barang</th>
                                 <th style='text-align:center'>Satuan Barang</th>
-                                <th style='text-align:center'>Gudang</th>
                                 <th style='text-align:center'>Stock Sistem</th>
                                 <th style='text-align:center'>Penyesuaian Sistem</th>
                                 <th style='text-align:center'>Selisih Stock</th>
@@ -160,12 +159,11 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($data_item as $row)
+                            @foreach ($data->items as $row)
                                 <tr>
-                                  <td> {{ $ISAC->getItemName($row['item_id']) }}</td>
-                                  <td>{{ $ISAC->getItemUnitName($row['item_unit_id']) }}</td>
-                                  <td>{{ $ISAC->getWarehouseName($row['warehouse_id']) }} </td>
-                                  <td>{{ $ISAC->getItemStock($row['item_id'],$row['item_unit_id'],$row['item_category_id'],$row['warehouse_id']) }}</td>
+                                  <td>{{ $row->item->item_name }}</td>
+                                  <td>{{ $row->unit->item_unit_name }}</td>
+                                  <td>{{ $ISAC->getItemStock($row->item->item_id,$row['item_unit_id'],$row['item_category_id'],$data['warehouse_id']) }}</td>
                                   <td>{{ $row['last_balance_adjustment'] }}</td>
                                   <td>{{ $row['last_balance_physical'] }}</td>
                                   <td>{{ $row['stock_adjustment_item_remark'] }}</td>

@@ -1,4 +1,3 @@
-@inject('ISAC','App\Http\Controllers\InvtStockAdjustmentController')
 @extends('adminlte::page')
 
 @section('title',  "MOZAIC Omah'e Opa")
@@ -127,9 +126,9 @@
                       <tr>
                         <td>{{ $no++ }}</td>
                         <td>{{ $row['stock_adjustment_date'] }}</td>
-                        <td>{{ $ISAC->getWarehouseName($row['warehouse_id']) }}</td>
-                        <td>{{ $ISAC->getItemName($row['item_id']) }}</td>
-                        <td>{{ $row['last_balance_adjustment'] }}</td>
+                        <td>{{ $row->warehouse->warehouse_name }}</td>
+                        <td>{{ $row->item->item->item_name }}</td>
+                        <td>{{ $row->item->last_balance_adjustment }}</td>
                         <td style="text-align: center">
                             <a type="button" class="btn btn-outline-warning btn-sm" href="{{ url('/stock-adjustment/detail/'.$row['stock_adjustment_id']) }}">Detail</a>
                         </td>

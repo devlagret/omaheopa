@@ -1,6 +1,5 @@
 @inject('ISAC','App\Http\Controllers\InvtStockAdjustmentController')
 @extends('adminlte::page')
-
 @section('title', "MOZAIC Omah'e Opa")
 @section('js')
 <script>
@@ -19,25 +18,12 @@
 			}
 		});
 	}
-
     function function_last_balance_physical(value){
         last_data =  document.getElementById("last_balance_data").value;
         last_adjustment =  document.getElementById("last_balance_adjustment").value || 0;
-        
         var last_physical = parseInt(last_adjustment) - parseInt(last_data);
         $('#last_balance_physical').val(last_physical);
     }
-    // nostr = $("#no").val();
-    // no = parseInt(nostr)+1;
-    // for(var i = 1; i < no; i++){
-    //     $('#'+i+"_last_balance_adjustment").change(function(){
-    //         var last_data = $('#'+i+"_last_balance_data").val();
-    //         var last_adjustment = $('#'+i+"_last_balance_adjustment").val();
-    //         var last_physical = last_data - last_adjustment;
-    
-    //         $('#'+i+"_last_balance_physical").val(last_physical);
-    //     });
-    // }
     function changeCategory() {
             var merchant_id = $("#merchant_id_view").val();
             if($('#merchant_id_view').val()!=''){
@@ -56,6 +42,7 @@
                     $('#item_category').html(return_data);
                     $('#loading').modal('hide');
                     changeItem($('#item_category').val());
+                    changeWarehouse('merchant_id_view');
                     function_elements_add('merchant_id', merchant_id);
                 },
                 error: function(data) {
@@ -95,15 +82,43 @@
 				success: function(msg){
                     location.reload();
 			}
-
 		});
 	}
-
-
+    function changeWarehouse(id) {
+        var merchant_id = $("#" + id).val();
+            loadingWidget();
+            $.ajax({
+                type: "POST",
+                url: "{{ route('pi.get-whs') }}",
+                dataType: "html",
+                data: {
+                    'merchant_id': merchant_id,
+                    '_token': '{{ csrf_token() }}',
+                },
+                success: function(return_data) {
+                    $('#warehouse_id').val(1);
+                    $('#warehouse_id').html(return_data);
+                },
+                complete: function() {
+                    loadingWidget(0);
+                    setTimeout(function() {
+                        loadingWidget(0);
+                    }, 200);
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            });
+    }
+    $(document).ready(function () {
+        if($('merchant_id_view').val()!=''){
+            $('#merchant_id').val($('#merchant_id_view').val());
+            changeCategory();
+        }
+    });
 </script>
 @stop
 @section('content_header')
-    
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ url('home') }}">Beranda</a></li>
@@ -111,11 +126,8 @@
         <li class="breadcrumb-item active" aria-current="page">Tambah Penyesuaian Stok</li>
     </ol>
   </nav>
-
 @stop
-
 @section('content')
-
 <h3 class="page-title">
     Form Tambah Penyesuaian Stok
 </h3>
@@ -125,7 +137,6 @@
     {{session('msg')}}
 </div>
 @endif
-
 @if(count($errors) > 0)
 <div class="alert alert-danger" role="alert">
     @foreach ($errors->all() as $error)
@@ -142,12 +153,6 @@
             <button onclick="location.href='{{ url('stock-adjustment') }}'" name="Find" class="btn btn-sm btn-info" title="Back"><i class="fa fa-angle-left"></i>  Kembali</button>
         </div>
     </div>
-
-    <?php 
-            // if (empty($coresection)){
-            //     $coresection['section_name'] = '';
-            // }
-        ?>
     <form method="post" action="{{ route('filter-add-stock-adjustment') }}" enctype="multipart/form-data">
         @csrf
         <div class="card-body">
@@ -213,7 +218,6 @@
         </div>       
     </form>    
 </div>
-
 <div class="card border border-dark">
     <div class="card-header border-dark bg-dark">
         <h5 class="mb-0 float-left">
@@ -255,7 +259,6 @@
                                             {{ $ISAC->getWarehouseName($row['warehouse_id']) }}
                                             <input type="text" name="warehouse_id" id="warehouse_id" value="{{ $row['warehouse_id'] }}" hidden>
                                             {{-- <input type="text" name="stock_adjustment_date" id="stock_adjustment_date" value="{{ $row['stock_adjustment_date'] }}"> --}}
-
                                         </td>
                                         <td style='text-align:right'>
                                             {{ $ISAC->getItemStock($row['item_id'],$row['item_unit_id'],$row['item_category_id'],$row['warehouse_id']) }}
@@ -284,15 +287,8 @@
         </div>
     </form>
 </div>
-
-
-
 @stop
-
 @section('footer')
-    
 @stop
-
 @section('css')
-    
 @stop

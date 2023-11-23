@@ -42,11 +42,10 @@ class InvtStockAdjustmentController extends Controller
         } else {
             $end_date = Session::get('end_date');
         }
-        $data  = InvtStockAdjustment::join('invt_stock_adjustment_item','invt_stock_adjustment.stock_adjustment_id','=','invt_stock_adjustment_item.stock_adjustment_id')
-        ->where('invt_stock_adjustment.stock_adjustment_date', '>=', $start_date)
-        ->where('invt_stock_adjustment.stock_adjustment_date', '<=', $end_date)
-        ->where('invt_stock_adjustment.company_id', Auth::user()->company_id)
-        ->where('invt_stock_adjustment.data_state',0)
+        $data  = InvtStockAdjustment::with('warehouse','item.item')
+        ->where('stock_adjustment_date', '>=', $start_date)
+        ->where('stock_adjustment_date', '<=', $end_date)
+        ->where('company_id', Auth::user()->company_id)
         ->get(); 
         return view('content.InvtStockAdjustment.ListInvtStockAdjustment',compact('data','start_date','end_date'));
     }
@@ -281,11 +280,7 @@ class InvtStockAdjustmentController extends Controller
         ->get()
         ->pluck('item_name','item_id');
 
-        $data = InvtStockAdjustment::select('invt_stock_adjustment_item.item_id', 'invt_stock_adjustment_item.item_category_id', 'invt_stock_adjustment_item.item_unit_id', 'invt_stock_adjustment_item.last_balance_adjustment', 'invt_stock_adjustment_item.last_balance_physical', 'invt_stock_adjustment_item.stock_adjustment_item_remark', 'invt_stock_adjustment.stock_adjustment_date', 'invt_stock_adjustment.stock_adjustment_date', 'invt_stock_adjustment_item.last_balance_data')
-        ->join('invt_stock_adjustment_item', 'invt_stock_adjustment_item.stock_adjustment_id', '=', 'invt_stock_adjustment.stock_adjustment_id')
-        ->where('invt_stock_adjustment.stock_adjustment_id', $stock_adjustment_id)
-        ->where('invt_stock_adjustment.data_state', 0)
-        ->first();
+        $data = InvtStockAdjustment::with('items.item','items.unit','warehouse')->find($stock_adjustment_id);
         return view('content.InvtStockAdjustment.DetailInvtStockAdjustment',compact('categorys','warehouse','units','items','data'));
     }
 }
