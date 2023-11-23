@@ -11,6 +11,7 @@ use App\Models\InvtItemCategory;
 
 class ItemHelper extends AppHelper
 {
+    protected static $general=0;
     /**
      * Get item category
      *
@@ -58,6 +59,11 @@ class ItemHelper extends AppHelper
         try {
             $item = InvtItem::select('item_id', 'item_name')
                 ->where('item_category_id', $request->item_category_id);
+            if(self::$general){
+                $item->where('item_status', 1);
+            }else{
+                $item->where('item_status', 0);
+            }
             if ($withMerchant) {
                 $item->where('merchant_id', $request->merchant_id);
             }
@@ -90,7 +96,7 @@ class ItemHelper extends AppHelper
             $unit = InvtItemUnit::get();
             $lastItemunit ?? $lastItemunit = 1;
             for ($a = 1; $a <= 4; $a++) {
-                if ($item['item_unit_id' . $a] != null) {
+                if ($item['item_unit_id' . $a] != null&&$item['item_default_quantity' . $a] != null) {
                     $data .= "<option value='" . $item['item_unit_id' . $a] . "' " . ($lastItemunit == $item['item_unit_id' . $a] ? 'selected' : '') . ">" . $unit->where('item_unit_id', $item['item_unit_id' . $a])->pluck('item_unit_name')[0] . "</option>\n";
                 }
             }
@@ -99,5 +105,16 @@ class ItemHelper extends AppHelper
             error_log(strval($e));
             return response($data);
         }
+    }
+
+    /**
+     * Set the return item to general item
+     *
+     * @return  self
+     */
+    public static function general($general=1)
+    {
+        self::$general = $general;
+        return new self;
     }
 }
