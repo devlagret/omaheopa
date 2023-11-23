@@ -160,7 +160,7 @@ class AcctAssetReportController extends Controller
     }
 
     public function getAssetDepreciationAmountTotal($asset_id, $year){
-        $data = AcctAssetReportitem::select(DB::raw("SUM(acct_asset_depreciation_item.asset_depreciation_item_amount) As asset_depreciation_item_amount_total"))
+        $data = AcctAssetReportItem::select(DB::raw("SUM(acct_asset_depreciation_item.asset_depreciation_item_amount) As asset_depreciation_item_amount_total"))
         ->join('acct_asset_depreciation', 'acct_asset_depreciation_item.asset_depreciation_id','acct_asset_depreciation.asset_depreciation_id')
         ->where('acct_asset_depreciation_item.asset_depreciation_item_journal_status', 1)
         ->where('acct_asset_depreciation.asset_id', $asset_id)
@@ -185,7 +185,7 @@ class AcctAssetReportController extends Controller
     }
 
     public function getAssetDepreciationBookValue($asset_id, $year){
-        $data = AcctAssetReportitem::join('acct_asset_depreciation', 'acct_asset_depreciation.asset_depreciation_id','acct_asset_depreciation_item.asset_depreciation_id')
+        $data = AcctAssetReportItem::join('acct_asset_depreciation', 'acct_asset_depreciation.asset_depreciation_id','acct_asset_depreciation_item.asset_depreciation_id')
         ->where('acct_asset_depreciation_item.asset_depreciation_item_journal_status', 1)
         ->where('acct_asset_depreciation.asset_id', $asset_id)
         ->where('acct_asset_depreciation_item.asset_depreciation_item_year', $year)
