@@ -1977,10 +1977,19 @@ class APIController extends Controller
 
     public function getSalesTiket(Request $request)
     {   
+        $fields = $request->validate([
+            'user_id'           => 'required',
+            'item_category_id'  => 'required',
+        ]);
+
+        $company_id = User::select('preference_company.company_id')
+        ->join('preference_company', 'preference_company.company_id', 'system_user.company_id')
+        ->where('system_user.user_id', $fields['user_id'])
+        ->first();
 
         $items  = InvtItem::select('*')
         ->where('data_state', 0)
-        ->where('company_id', Auth::user()->company_id)
+        ->where('item_category_id', $fields['item_category_id'])
         ->where('item_status',1)
         ->orderBy('item_id', 'ASC')
         ->get();
