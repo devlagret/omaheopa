@@ -15,8 +15,5 @@ class AcctAccountSetting extends Model
         'updated_at',
         'created_at'
     ];
-    protected static function booted()
-    {
-        static::addGlobalScope(new NotDeletedScope);
-    }
+
 }

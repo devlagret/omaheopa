@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\AcctAssetReport;
-use App\Models\AcctAssetReportitem;
+use App\Models\AcctAssetReportItem;
 use App\Models\AcctAsset;
 use App\Models\AcctAssetType;
 use Illuminate\Http\Request;
@@ -147,14 +147,14 @@ class AcctAssetReportController extends Controller
 
     public function getAssetDepreciationAccumulationAmountTotal($asset_id, $year){
 
-        $data = AcctAssetReportitem::select(DB::raw("SUM(acct_asset_depreciation_item.asset_depreciation_item_accumulation_amount) AS asset_depreciation_item_accumulation_amount"))
+        $data = AcctAssetReportItem::select(DB::raw("SUM(acct_asset_depreciation_item.asset_depreciation_item_accumulation_amount) AS asset_depreciation_item_accumulation_amount"))
         ->join('acct_asset_depreciation', 'acct_asset_depreciation.asset_depreciation_id','acct_asset_depreciation_item.asset_depreciation_id')
         ->where('acct_asset_depreciation_item.asset_depreciation_item_journal_status', 1)
         ->where('acct_asset_depreciation.asset_id', $asset_id)
         ->where('acct_asset_depreciation_item.asset_depreciation_item_year','<=', $year)
         ->whereNotNull('acct_asset_depreciation_item.asset_depreciation_item_accumulation_amount')
         ->get();
-      
+    
         return $data[0]['asset_depreciation_item_accumulation_amount'];
 
     }
