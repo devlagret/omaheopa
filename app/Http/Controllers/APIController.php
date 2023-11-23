@@ -1993,7 +1993,7 @@ class APIController extends Controller
         ->where('company_id', $company_id['company_id'])
         // ->where('item_name', $fields['item_name'])
         ->where('item_status',1)
-        ->orderBy('item_id', 'ASC')
+        // ->orderBy('item_id', 'ASC')
         ->get();
         
         if($items){
