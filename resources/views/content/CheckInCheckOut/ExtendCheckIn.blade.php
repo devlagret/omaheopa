@@ -84,6 +84,8 @@
             var subtotal_facility = $("#sbs-facility").val();
             var subtotal_menu = $("#sbs-menu").val();
             var discount_percentage = $("#discount_percentage_total").val();
+            var dicount_ori = $("#discount_percentage_ori").val();
+            var down_payment = $("#down_payment").val();
             if (discount_percentage > 100) {
                 discount_percentage = 100;
                 $("#discount_percentage_total").val(discount_percentage);
@@ -93,6 +95,9 @@
                 $("#discount_percentage_total").val(discount_percentage);
             }
             sbsAll = Number(subtotal_room) + Number(subtotal_facility) + Number(subtotal_menu);
+            dis_ori = (sbsAll * dicount_ori) / 100;
+            sbsAll -= dis_ori 
+            sbsAll -= down_payment
             $("#subtotal_all_view").val(toRp(sbsAll));
             $("#subtotal_all").val(sbsAll);
             diskon = (sbsAll * discount_percentage) / 100;
@@ -102,7 +107,7 @@
                 $("#discount_amount_view").val('');
                 $("#discount_amount").val('');
             }
-            $("#total_amount_view").val(toRp(sbsAll - diskon));
+            $("#total_amount_view").val(toRp(sbsAll  -diskon));
             $("#total_amount").val(sbsAll - diskon);
             $('#change_amount_view').attr('min', sbsAll - diskon);
             if ($("#payed_amount").val() != '') {
@@ -195,6 +200,7 @@
                                     </h5>
                                     <h5 class="col">
                                         Diskon : {{ $data->discount??0 }} %
+                                        <input type="hidden" id="discount_percentage_ori" value="{{ $data->discount??0 }}"/>
                                     </h5>
                                 </div>
                                 <div class="row">
@@ -211,6 +217,7 @@
                                     </h5>
                                     <h5 class="col">
                                         Uang Muka : Rp {{ number_format($data->down_payment,2) }}
+                                        <input type="hidden" id="down_payment" value="{{$data->down_payment}}">
                                     </h5>
                                 </div>
                                 <div class="row">
@@ -285,7 +292,7 @@
                                                         :
                                                     </div>
                                                     <div class="col-8">
-                                                        <input class="form-control input-bb" type="text" id="subtotal_all_view"
+                                                        <input class="form-control input-bb" type="text" readonly id="subtotal_all_view"
                                                             name="subtotal_all_view" autocomplete="off"  />
                                                         <input class="form-control input-bb" type="hidden" id="subtotal_all"
                                                             name="subtotal_all" autocomplete="off"  />

@@ -855,8 +855,8 @@ if (empty($paket)) {
                     }
                 })
             });
-            $(".room-id").each(function() {
-                id = $(this).val();
+            $(".booked-room").each(function() {
+                id = $(this).data('id');
                 getRoomPriceList(id);
             });
             $("#discount_amount_view").change(function() {
@@ -911,7 +911,7 @@ if (empty($paket)) {
                 $('#down-payment-el').hide();
                 $('#without-dp').show();
             }
-        });
+            });
             if(index >= 4){
                 $("#card-total-all").show();
             }
@@ -1125,11 +1125,10 @@ if (empty($paket)) {
                                                 @php $no = 1; @endphp
                                                 @foreach ($room as $val)
                                                     <tr class="booked-room room-{{ $val->room_id }}"
-                                                        id="booked-room-{{ $val->room_id }}">
-                                                        <td>{{ $no++ }}
-                                                            <input type='hidden' class="room-id" name="room_id[]"
-                                                                value="{{ $val->room_id }}" />
-                                                        </td>
+                                                        data-id="{{$val->room_id}}" id="booked-room-{{ $val->room_id }}">
+                                                        <input type='hidden' class="room-id" name="item[{{$no-1}}][room_id]"
+                                                        value="{{ $val->room_id}}" />
+                                                        <td>{{ $no++ }}</td>
                                                         <td>{{ $val->room_name }}</td>
                                                         <td>{{ $val->roomType->room_type_name }}</td>
                                                         <td>{{ $val->building->building_name }}</td>
@@ -1150,7 +1149,7 @@ if (empty($paket)) {
                                                         </td>
                                                         <td width="15%">
                                                             <select class="selection-search-clear room-price-select required select-form" required
-                                                             placeholder="Pilih Nama" name="room_price_id[]" id="room_price_id_{{$val->room_id}}"
+                                                             placeholder="Pilih Nama" name="item[{{$no-1}}][room_price_id]" id="room_price_id_{{$val->room_id}}"
                                                             onchange="changePrice({{$val->room_id}},this.value)"  data-id="{{$val->room_id}}" >
                                                             </select>
                                                         </td>

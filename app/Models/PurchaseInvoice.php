@@ -15,8 +15,17 @@ class PurchaseInvoice extends Model
         'created_at',
         'updated_at'
     ];
-    // protected static function booted()
-    // {
-    //     static::addGlobalScope(new NotDeletedScope);
-    // }
+    public function supplier() {
+        return $this->belongsTo(CoreSupplier::class,'supplier_id','supplier_id');
+    }
+    public function warehouse() {
+        return $this->belongsTo(InvtWarehouse::class,'warehouse_id','warehouse_id');
+    }
+    public function item() {
+        return $this->hasMany(PurchaseInvoiceItem::class,'purchase_invoice_id','purchase_invoice_id');
+    }
+    protected static function booted()
+    {
+        static::addGlobalScope(new NotDeletedScope);
+    }
 }

@@ -82,7 +82,7 @@
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane fade show active" id="room">
                         <div class="row form-group mt-5">
-                            <div class="col">
+                            <div class="col-12">
                                 <div class="form-group">
                                     <a class="text-dark">Nama Kamar<a class='red'> *</a></a>
                                     <input placeholder="Masukan nama kamar" required class="form-control input-bb required"
@@ -91,8 +91,6 @@
                                         value="{{ old('room_name', $sessiondata['room_name'] ?? '') }}" />
                                 </div>
                             </div>
-                        </div>
-                        <div class="row form-group mt-5">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <a class="text-dark">Tipe Kamar<a class='red'> *</a></a>
@@ -104,8 +102,6 @@
                                     ]) !!}
                                 </div>
                             </div>
-                        </div>
-                        <div class="row form-group mt-5">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <a class="text-dark">Bangunan<a class='red'> *</a></a>

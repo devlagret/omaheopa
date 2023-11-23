@@ -85,7 +85,7 @@ class DownPaymentController extends Controller
             return redirect()->route('booking.index')->with('msg','Tambah Booking Berhasil  -.');
         }
         // * buat journal dp
-            JournalHelper::make($token,'Down Payment',['down_payment_account','pre_operation_cost_account'],$order->down_payment);
+            JournalHelper::token($token)->make('Down Payment',['down_payment_account','pre_operation_cost_account'],$order->down_payment);
         $order->sales_order_status = 1;
         $order->save();
         DB::commit();

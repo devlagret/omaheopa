@@ -59,12 +59,12 @@ function check(name,uri){
                 </thead>
                 <tbody>
                     <?php $no = 1; ?>
-                    @foreach($sales as $row)
+                    @foreach($room as $row)
                     <tr>
                         <td style='text-align:center'>{{ $no++ }}</td>
                         <td>{{ $row->room_name }}</td>
-                        <td>{{ $row->roomType->room_type_name }}</td>
-                        <td>{{ $row->building->building_name }}</td>
+                        <td>{{ $row->roomType->room_type_name??'-' }}</td>
+                        <td>{{ $row->building->building_name??'-' }}</td>
                         <td>{{ $row->room_facility }}</td>
                         <td class="text-center">
                             <a type="button" class="btn btn-outline-warning btn-sm" href="{{ route('room.edit',$row->room_id) }}">Edit</a>

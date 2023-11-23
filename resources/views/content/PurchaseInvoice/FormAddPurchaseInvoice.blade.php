@@ -110,7 +110,7 @@
                 $('#item_unit_cost').val(return_data.cost);
                 function_elements_add('item_unit', item_unit);
                 setTimeout(function(){ loadingWidget(0); }, 200);
-                
+
             },
             error: function(data) {
                 $('#item_unit_cost_view').val('');
@@ -123,7 +123,7 @@
             }
         });
     }
-    function changeWarehouse(id) { 
+    function changeWarehouse(id) {
         var merchant_id = $("#" + id).val();
             loadingWidget();
             $.ajax({
@@ -303,7 +303,7 @@
             e.preventDefault();
             changeCategory(this.id,'item_category_id');
         });
-        $('#add_purchase_item').click(function (e) { 
+        $('#add_purchase_item').click(function (e) {
             e.preventDefault();
             processAddArrayPurchaseInvoice();
         });
@@ -693,17 +693,19 @@
             }, 100);
         }
         $('#purchase_invoice_due_day').val(diff);
+        @if(!empty($arraydatases))
         const datamdl = {
             @foreach ($arraydatases as $key => $val)
                 {{$key}}:{"Kategori": "{{$val['item_category_name']??'-'}}",
                     "Gudang": "{{$val['warehouse_name']??'-'}}",
                             "Merchant": "{{$val['merchant_name']??'-'}}"
-                            @if (!empty($val['discount_percentage'])||$val['discount_percentage']!=0)
+                            @if (!empty($val['discount_percentage'])&&$val['discount_percentage']!=0)
                             ,"Diskon":"{{$val['discount_amount']}} ({{$val['discount_percentage']}}%)"
                             @endif
                             }
             @endforeach
             };
+        @endif
         $('#detailModal').on('show.bs.modal', function (event) {
             var id = $(event.relatedTarget).data('id')
              $(this).find('.modal-title').text('Detail Item')
@@ -716,7 +718,7 @@
         })
 
     });
-    function check() { 
+    function check() {
         method = $('#purchase_payment_method').val()
         pay = parseInt($("#paid_amount").val())
         if(method == 0&&pay==0){
@@ -923,7 +925,7 @@
                             </select>
                         </div>
                     </div>
-                   
+
                     <div class="col-md-6">
                         <div class="form-group">
                             <a class="text-dark">Biaya Barang Satuan<a class='red'> *</a></a>
@@ -1023,7 +1025,7 @@
                                                         <a  name='Detail' class='btn btn-warning btn-sm' data-toggle="modal" data-target="#detailModal" data-id="{{$key}}"> Detail</a>
                                                     </td>
                                                 </tr>
-                            @php    
+                            @php
                             $quantity += $val['quantity'];
                             $subtotal_amount += $val['subtotal_amount_after_discount'];
                             $i++;
@@ -1129,7 +1131,6 @@
         </div>
         <div class="modal-body">
           <div class="row row-body">
-          
           </div>
         </div>
         <div class="modal-footer">
@@ -1138,7 +1139,6 @@
       </div>
     </div>
   </div>
-  
 @stop
 
 @section('footer')

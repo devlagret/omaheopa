@@ -51,7 +51,7 @@ class PurchaseInvoiceController extends Controller
         Session::forget('items');
         Session::forget('arraydatases');
         Session::forget('purchase-token');
-        $data = PurchaseInvoice::where('data_state', 0)
+        $data = PurchaseInvoice::with('supplier')->where('data_state', 0)
             ->where('company_id', Auth::user()->company_id)
             ->where('purchase_invoice_date', '>=', $start_date)
             ->where('purchase_invoice_date', '<=', $end_date)
@@ -98,9 +98,9 @@ class PurchaseInvoiceController extends Controller
             ->where('company_id', Auth::user()->company_id)
             ->get()
             ->pluck('warehouse_name', 'warehouse_id');
-        $purchaseinvoice = PurchaseInvoice::where('purchase_invoice_id', $purchase_invoice_id)->first();
-        $purchaseinvoiceitem = PurchaseInvoiceItem::where('purchase_invoice_id', $purchase_invoice_id)->get();
-        return view('content.PurchaseInvoice.DetailPurchaseInvoice', compact('purchaseinvoice', 'warehouses', 'purchaseinvoiceitem'));
+        $purchase_payment_method =array(0 => 'Tunai',1 => 'Hutang Supplier');
+        $purchaseinvoice = PurchaseInvoice::with('supplier','item.warehouse','item.merchant','item.item','item.unit','item.category')->find($purchase_invoice_id);
+        return view('content.PurchaseInvoice.DetailPurchaseInvoice', compact('purchaseinvoice', 'warehouses','purchase_payment_method'));
     }
 
     public function addElementsPurchaseInvoice(Request $request)
@@ -239,6 +239,7 @@ class PurchaseInvoiceController extends Controller
     } catch (\Exception $e) {
         DB::rollBack();
         report($e);
+        dd($e);
         Session::forget('purchase-token');
         return redirect()->route('pi.add')->with('msg','Tambah Pembelian Gagal');
         }
@@ -310,17 +311,17 @@ class PurchaseInvoiceController extends Controller
         if ($request->merchant_id == 0) {
             $g = 1;
         }
-        return response(ItemHelper::getCategory($items['item_category_id'] ?? null, $request, $g));
+        return ItemHelper::getCategory($items['item_category_id'] ?? null, $request, $g);
     }
     public function getUnit(Request $request)
     {
         $items = Session::get('datases');
-        return response(ItemHelper::getItemUnit($items['item_unit'] ?? null, $request));
+        return ItemHelper::getItemUnit($items['item_unit'] ?? null, $request);
     }
     public function getItem(Request $request)
     {
         $items = Session::get('datases');
-        return response(ItemHelper::getItem($items['item_id'] ?? null, $request));
+        return ItemHelper::getItem($items['item_id'] ?? null, $request);
     }
     public function getWarehouse(Request $request)
     {

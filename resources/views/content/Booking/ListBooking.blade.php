@@ -140,7 +140,7 @@
                         <td class="text-center">{{ $row->rooms->count() }}</td>
                         <td>{{ number_format($row->down_payment) }}</td>
                         <td>{{ number_format($row->sales_order_price) }}</td>
-                        <td>{{ is_null($row->invoice->extend_price)?'-':number_format($row->invoice->extend_price-$row->sales_order_price) }}</td>
+                        <td>{{ is_null($row->invoice)?'-':number_format($row->invoice->extend_price-$row->sales_order_price) }}</td>
                         <td>{{ number_format($row->invoice->extend_price??$row->sales_order_price) }}</td>
                         <td style="text-align: center">
                             @if (!$row->sales_order_status)

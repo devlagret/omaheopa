@@ -15,8 +15,5 @@ class CapitalMoney extends Model
         'created_at',
         'updated_at'
     ];
-    protected static function booted()
-    {
-        static::addGlobalScope(new NotDeletedScope);
-    }
+
 }

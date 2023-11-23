@@ -194,7 +194,7 @@ Route::prefix('purchase-invoice')->name('pi.')->group(function () {
     Route::post('process-add', [PurchaseInvoiceController::class, 'processAddPurchaseInvoice'])->name('process-add');
     Route::get('detail/{purchase_invoice_id}',[PurchaseInvoiceController::class, 'detailPurchaseInvoice'])->name('detail-');
     Route::post('filter', [PurchaseInvoiceController::class,'filterPurchaseInvoice'])->name('filter');
-    Route::get('filter-reset', [PurchaseInvoiceController::class,'filterResetPurchaseInvoice'])->name('filter-reset-');
+    Route::get('filter-reset', [PurchaseInvoiceController::class,'filterResetPurchaseInvoice'])->name('filter-reset');
     Route::post('process-change-cost', [PurchaseInvoiceController::class,'processChangeCostPurchaseInvoice'])->name('process-change-cost');
     Route::get('note/{purchase_invoice_id?}',[PurchaseInvoiceController::class, 'printNote'])->name('purchase-note');
     Route::get('print-proof-acceptance-item/{purchase_invoice_id?}',[PurchaseInvoiceController::class, 'printProofAcceptanceItem'])->name('print-proof-acceptance-item');
@@ -649,21 +649,6 @@ Route::get('/warehouse-transfer-received-note/process-delete/{id}', [InvWarehous
 Route::post('/warehouse-transfer-received-note/filter', [InvWarehouseTransferReceivedNoteController::class, 'filterInvWarehouseTransferReceivedNote'])->name('filter-warehouse-transfer-received-note');
 Route::get('/warehouse-transfer-received-note/filter-reset', [InvWarehouseTransferReceivedNoteController::class, 'resetFilterInvWarehouseTransferReceivedNote'])->name('filter-reset-transfer-received-note');
 
-
-//purchase - payment
-Route::get('/purchase-payment', [PurchasePaymentController::class, 'index'])->name('purchase-payment');
-Route::post('/purchase-payment/filter', [PurchasePaymentController::class, 'filterPurchasePayment'])->name('filter-purchase-payment');
-Route::get('/purchase-payment/search', [PurchasePaymentController::class, 'searchCoreSupplier'])->name('search-core-supplier-purchase-payment');
-Route::get('/purchase-payment/add/{supplier_id}', [PurchasePaymentController::class, 'addPurchasePayment'])->name('add-purchase-payment');
-Route::get('/purchase-payment/detail/{supplier_id}', [PurchasePaymentController::class, 'detailPurchasePayment'])->name('detail-purchase-payment');
-Route::get('/purchase-payment/delete/{supplier_id}', [PurchasePaymentController::class, 'deletePurchasePayment'])->name('delete-purchase-payment');
-Route::post('/purchase-payment/process-delete', [PurchasePaymentController::class, 'processVoidPurchasePayment'])->name('process-delete-purchase-payment');
-Route::post('/purchase-payment/process-add/', [PurchasePaymentController::class, 'processAddPurchasePayment'])->name('process-add-purchase-payment');
-Route::post('/purchase-payment/elements-add/', [PurchasePaymentController::class, 'elements_add'])->name('elements-add-purchase-payment');
-Route::post('/purchase-payment/add-bank/', [PurchasePaymentController::class, 'addCoreBank'])->name('add-bank-purchase-payment');
-Route::post('/purchase-payment/add-transfer-array/', [PurchasePaymentController::class, 'processAddTransferArray'])->name('add-transfer-array-purchase-payment');
-Route::get('/purchase-payment/delete-transfer-array/{record_id}/{supplier_id}', [PurchasePaymentController::class, 'deleteTransferArray'])->name('delete-transfer-array-purchase-payment');
-
 //neraca
 Route::get('balance-sheet-report',[AcctBalanceSheetReportController::class, 'index'])->name('balance-sheet-report');
 Route::post('balance-sheet-report/filter',[AcctBalanceSheetReportController::class, 'filterAcctBalanceSheetReport'])->name('filter-balance-sheet-report');
@@ -701,3 +686,20 @@ Route::post('/item-stock/filter', [InvItemStockController::class, 'filterInvItem
 Route::post('/item-stock/type', [InvItemStockController::class, 'getInvItemType'])->name('item-stock-type');
 Route::post('/item-stock/grade', [InvItemStockController::class, 'getGrade'])->name('item-stock-grade');
 Route::get('/item-stock/export', [InvItemStockController::class, 'export'])->name('item-stock-export');
+//purchase payment
+Route::prefix('purchase-payment')->name('purchase-payment.')->group(function () {
+    Route::get('/',[PurchasePaymentController::class, 'index'])->name('index');
+    Route::post('filter',[PurchasePaymentController::class, 'filterPurchasePayment'])->name('filter');
+    Route::get('reset-filter',[PurchasePaymentController::class, 'resetFilterPurchasePayment'])->name('reset-filter');
+    Route::get('search', [PurchasePaymentController::class, 'searchPurchasePayment'])->name('search');
+    Route::get('add/{supplier_id}', [PurchasePaymentController::class, 'addPurchasePayment'])->name('select-supplier');
+    Route::post('elements-add', [PurchasePaymentController::class, 'elements_add'])->name('elements-add');
+    Route::post('process-add', [PurchasePaymentController::class, 'processAddPurchasePayment'])->name('process-add');
+    Route::get('delete/{supplier_id}', [PurchasePaymentController::class, 'deletePurchasePayment'])->name('delete');
+    Route::get('detail/{supplier_id}', [PurchasePaymentController::class, 'detailPurchasePayment'])->name('detail');
+    Route::get('print-recipt-cesh-payment/{payment_id?}', [PurchasePaymentController::class, 'printReciptCeshPayment'])->name('print-recipt-cesh-payment');
+    Route::get('print-recipt-non-cesh-payment/{payment_id?}', [PurchasePaymentController::class, 'printReciptNonCeshPayment'])->name('print-recipt-non-cesh-payment');
+    Route::post('add-transfer-array/', [PurchasePaymentController::class, 'processAddTransferArray'])->name('add-transfer-array');
+    Route::get('delete-transfer-array/{record_id}/{supplier_id}', [PurchasePaymentController::class, 'deleteTransferArray'])->name('delete-transfer-array');
+    Route::post('add-bank/', [PurchasePaymentController::class, 'addCoreBank'])->name('add-bank');
+});

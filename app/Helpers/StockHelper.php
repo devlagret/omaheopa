@@ -2,13 +2,16 @@
 namespace App\Helpers;
 
 use App\Models\InvtItem;
-use App\Models\InvtItemStock;
 use App\Models\InvtItemUnit;
+use App\Models\InvtItemStock;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class StockHelper{
     public $qty;
     protected static $data;
+    protected static $warehouse;
+    protected static $makeStock;
     protected static $item;
     public function get(){
         return self::$data;
@@ -22,10 +25,12 @@ class StockHelper{
      */
     public function add(int $quantity = 1,$unit=null){
         $data = self::$data;
-        $data->update([
-            'last_balance' => ($data->last_balance + (abs($quantity)* (is_null($unit)?$unit = self::$item['item_default_quantity1']:$unit = $this->getDefaultQty($unit)))),
+        if(count($data->get())==0&&self::$makeStock){
+           return self::make(self::$item->item_id,self::$warehouse,(0+abs($quantity)));
+        }
+        return $data->update([
+            'last_balance' => DB::raw('last_balance +'.(abs($quantity)* (is_null($unit)?$unit = self::$item['item_default_quantity1']:$unit = $this->getDefaultQty($unit)))),
             'updated_id'       => Auth::id()]);
-        return $data->save();
     }
     /**
      * Substract stock
@@ -36,10 +41,12 @@ class StockHelper{
      */
     public function sub(int $quantity = 1,$unit=null){
         $data = self::$data;
-        $data->update([
+        if(count($data->get())==0&&self::$makeStock){
+            return self::make(self::$item->item_id,self::$warehouse,(0-abs($quantity)));
+        }
+        return $data->update([
             'last_balance' => ($data->last_balance - (abs($quantity) * (is_null($unit)?$unit = self::$item['item_default_quantity1']:$unit = $this->getDefaultQty($unit)))),
             'updated_id'       => Auth::id()]);
-        return $data->save();
     }
     /**
      * Update stock
@@ -50,10 +57,12 @@ class StockHelper{
      */
     public function update(int $quantity = 1,$unit=null){
         $data = self::$data;
-        $data->update([
-            'last_balance' => ($data->last_balance - ($quantity * (is_null($unit)?$unit = self::$item['item_default_quantity1']:$unit = $this->getDefaultQty($unit)))),
+        if(count($data->get())==0&&self::$makeStock){
+            return self::make(self::$item->item_id,self::$warehouse,(0+$quantity));
+        }
+        return $data->update([
+            'last_balance' => DB::raw('last_balance +'.($quantity * (is_null($unit)?$unit = self::$item['item_default_quantity1']:$unit = $this->getDefaultQty($unit)))),
             'updated_id'       => Auth::id()]);
-        return $data->save();
     }
     /**
      * Find item stock by item code and warehouse
@@ -65,6 +74,8 @@ class StockHelper{
      * @return StockHelper
      */
     public static function find(int $item_id, $unit=null,int $warehouse_id=null,$makeStock=1){
+        self::$makeStock=$makeStock;
+        self::$warehouse=$warehouse_id;
         $item = InvtItem::find($item_id);
         self::$item = $item;
         $stock = InvtItemStock::where('company_id',Auth::user()->company_id)
@@ -72,10 +83,8 @@ class StockHelper{
         if(!empty($warehouse_id)){
             $stock->where('warehouse_id',$warehouse_id);
         }
-        if(empty($stock)&&$makeStock){
-            self::make($item_id,$warehouse_id);
-        }
-        $stock = $stock->get();
+        
+        // dump($stock);
         self::$data=$stock;
         $sh = new StockHelper();
         $sh->setdata($unit);
@@ -86,9 +95,9 @@ class StockHelper{
      *
      * @param integer $item_id
      * @param integer $warehouse_id
-     * @return void
+     * @return void|bool
      */
-    public static function make(int $item_id,int $warehouse_id) {
+    public static function make(int $item_id,int $warehouse_id,int $intialqty=0) {
         $item = self::$item;
         if(empty($item)){
         $item = InvtItem::find($item_id);
@@ -99,7 +108,7 @@ class StockHelper{
             'item_id'           => $item_id,
             'item_unit_id'      => $item['item_unit_id1'],
             'item_category_id'  => $item['item_category_id'],
-            'last_balance'      => 0,
+            'last_balance'      => $intialqty,
             'updated_id'        => Auth::id(),
             'created_id'        => Auth::id(),
         ]);
@@ -121,6 +130,5 @@ class StockHelper{
     }
     private function setdata($unit = null){
         is_null($unit)?$unit = self::$item['item_default_quantity1']:$unit = $this->getDefaultQty($unit);
-        $this->qty = (self::$data->last_balance/$unit);
     }
 }

@@ -45,6 +45,12 @@ class RestoreDataController extends Controller
             'core_city',
             'core_province',
             'preference_transaction_module',
+            'failed_jobs',
+            'migrations',
+            'password_resets',
+            'personal_access_tokens',
+            'sessions',
+            'users',
             ])
         ->pluck('Tables_in_'.$dbName)->flatten();
         foreach($tables as $val){
