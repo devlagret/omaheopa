@@ -1988,9 +1988,9 @@ class APIController extends Controller
         ->where('system_user.user_id', $fields['user_id'])
         ->first();
 
-        $items  = InvtItem::select('*')
+        $items  = InvtItem::select('item_id','item_name','item_unit_price1')
         ->where('data_state', 0)
-        // ->where('item_unit_price1', $fields['item_id'])
+        // ->where('item_id', $fields['item_id'])
         // ->where('item_name', $fields['item_name'])
         ->where('item_status',1)
         // ->orderBy('item_id', 'ASC')
