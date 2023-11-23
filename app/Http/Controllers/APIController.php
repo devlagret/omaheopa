@@ -1911,7 +1911,6 @@ class APIController extends Controller
         return response([
             'message' => 'Data Berhasil Disimpan'
         ],201);
-
     }
 
     //API TIKET Penjualan Wahana
