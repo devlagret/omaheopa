@@ -152,7 +152,7 @@ class AcctProfitLossReportController extends Controller
         ->get();
 
         $expenditure = AcctProfitLossReport::select('report_tab','report_bold','report_type','account_name','account_id','account_code','report_no','report_formula','report_operator')
-        ->where('data_state',0)
+        ->whereIn('data_state',['0','1'])
         ->where('account_type_id',3)
         ->where('company_id', Auth::user()->company_id)
         ->get();
@@ -393,6 +393,15 @@ class AcctProfitLossReportController extends Controller
 									} else {
 										$tblitem_bottom3 = "";
 									}
+
+                                    if($valBottom['report_type']	== 4){
+                                    
+                                        $expenditure_subtotal 	= $this->getAmountAccount($valBottom['account_id']);
+    
+    
+                                        $account_amount[$valBottom['report_no']] = $expenditure_subtotal;
+                                    }
+    
 									
 
 									if($valBottom['report_type'] == 5){
@@ -427,8 +436,13 @@ class AcctProfitLossReportController extends Controller
 									} else {
 										$tblitem_bottom5 = "";
 									}
-
-									$tblitem_bottom .= $tblitem_bottom1.$tblitem_bottom2.$tblitem_bottom3.$tblitem_bottom5;
+                                    if($valBottom['report_type']	== 5){
+                                    
+                                        $expenditure_subtotal 	= $total_account_amount2;
+    
+    
+                                        $account_amount[$valBottom['report_no']] = $expenditure_subtotal;
+                                    }
 
 
 									if($valBottom['report_type'] == 6){
@@ -452,12 +466,28 @@ class AcctProfitLossReportController extends Controller
 													}
 												}
 											}
+                                            $tblitem_bottom6 = "
+												<tr>
+													<td><div style=\"font-weight:".$report_bold."\">".$report_tab."".$valBottom['account_name']."</div></td>
+													<td style=\"text-align:righr;\"><div style=\"font-weight:".$report_bold."\">".number_format($grand_total_account_amount2, 2)."</div></td>
+												</tr>";
 										} else {
-											
+											$tblitem_bottom6 = "";
 										}
 									} else {
-										
+                                        $tblitem_bottom6 = "";
 									}
+
+                                    if($valBottom['report_type']	== 6){
+                                    
+                                        $expenditure_subtotal 	= $grand_total_account_amount2;
+    
+    
+                                        $account_amount[$valBottom['report_no']] = $expenditure_subtotal;
+                                    }
+
+									$tblitem_bottom .= $tblitem_bottom1.$tblitem_bottom2.$tblitem_bottom3.$tblitem_bottom5.$tblitem_bottom6;
+                                   
 
 								}
 								// exit;
@@ -469,22 +499,11 @@ class AcctProfitLossReportController extends Controller
 		        </tr>";
 
 
-			        $shu = $grand_total_account_amount1 - $grand_total_account_amount2;
+			        // $shu = $grand_total_account_amount1 - $grand_total_account_amount2;
 
 			$tblFooter = "
 			   
-			    <tr>
-			    	<td width=\"5%\"></td>
-			    	<td style=\"border:1px black solid;\">
-			    		<table id=\"items\" width=\"100%\" cellspacing=\"1\" cellpadding=\"2\" border=\"0\">
-							<tr>
-								<td style=\"width: 75%\"><div style=\"font-weight:bold;font-size:14px\">RUGI / LABA</div></td>
-								<td style=\"width: 23%; text-align:right;\"><div style=\"font-weight:bold; font-size:14px\">".number_format($shu, 2)."</div></td>
-							</tr>
-			    		</table>
-			    	</td>
-			    	<td width=\"10%\"></td>
-			    </tr>
+			   
 			</table>
             <table cellspacing=\"0\" cellpadding=\"2\" border=\"0\">
                 <tr>
@@ -692,6 +711,7 @@ class AcctProfitLossReportController extends Controller
                 $account_amount1[$val['report_no']] = $account_subtotal;
             }
         }
+        
         }
         
             foreach($expenditure as $keyBottom => $valBottom){
