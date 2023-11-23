@@ -241,21 +241,14 @@ class GeneralTiketController extends Controller
     }
     public function processEditTiket(Request $request)
     {
-        dump($request->all());
+        // dump($request->all());
         $itm="Barang";
-        $warehouse = InvtWarehouse::where('data_state',0)
-            ->where('company_id',Auth::user()->company_id)
-            ->where('merchant_id',$request->merchant_id)
-            ->get();
-        if(!$warehouse->count()){
-            return redirect('/item/add-item')->with('msg','Merchant Tidak Memiliki Warehouse, Harap Tambah Warehouse.');
-        }
         $fields = $request->validate([
-            'item_category_id'  => 'required|integer',
+            // 'item_category_id'  => 'required|integer',
             'item_code'         => 'required',
             'item_name'         => 'required',
             'item_id'         => 'required',
-        ],['item_category_id.integer'=>'Wahana / Merchant Tidak Memiliki Kategori']);
+        ]);
         $paket= InvtItemPackage::where('item_id',$fields['item_id']);
         try{
         DB::beginTransaction();
@@ -282,10 +275,8 @@ class GeneralTiketController extends Controller
                 'item_unit_id'=>$table['item_unit_id1']
             ],['item_unit_id'=>$request->item_unit_id1]);
         }
-        $table->item_category_id        = $fields['item_category_id'];
         $table->item_code               = $fields['item_code'];
         $table->item_name               = $fields['item_name'];
-        $table->merchant_id             = $request->merchant_id;
         $table->item_remark             = $request->item_remark;
         // * Kemasan
         $table->item_unit_id1           = $request->item_unit_id1;

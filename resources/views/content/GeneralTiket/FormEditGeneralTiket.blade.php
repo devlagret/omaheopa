@@ -1,7 +1,6 @@
 @extends('adminlte::page')
 <?php
 if (empty($items)) {
-    $item['merchant_id'] = '';
     $items['kemasan'] = 1;
     $items['max_kemasan'] = 4;
 }
@@ -68,13 +67,11 @@ if (empty($pktitem)) {
                 url: "{{ route('get-item-category') }}",
                 dataType: "html",
                 data: {
-                    'merchant_id': merchant_id,
                     'from_paket': from_paket,
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function(return_data) {
                     if (from_paket) {
-                        function_elements_add('package_merchant_id', merchant_id);
                         $('#' + el).html(return_data);
                         changeItem($('#' + el).val());
                         return 0;
@@ -84,7 +81,6 @@ if (empty($pktitem)) {
                             loading(0);
                         }, 2000);
                         $('#' + el).html(return_data);
-                        function_elements_add('merchant_id', merchant_id);
                     }
                 },
                 error: function(data) {
@@ -94,7 +90,6 @@ if (empty($pktitem)) {
         }
         function changeItem(category) {
             loading();
-            var id = $("#package_merchant_id").val();
             var no = $('.pkg-itm').length;
             $.ajax({
                 type: "POST",
@@ -102,16 +97,12 @@ if (empty($pktitem)) {
                 dataType: "html",
                 data: {
                     'no': no,
-                    'merchant_id': id,
-                    'item_category_id': category,
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function(return_data) {
                     $('#package_item_id').val(1);
                     $('#package_item_id').html(return_data);
                     changeSatuan();
-                    function_elements_add('package_merchant_id', id);
-                    function_elements_add('package_item_category', category);
                 }
             });
         }
@@ -176,7 +167,6 @@ if (empty($pktitem)) {
             $('#form-barang').submit();
         }
         $(document).ready(function() {
-            changeCategory('merchant_id', 'item_category_id');
             changeCategory('package_merchant_id', 'package_item_category', 1);
             checkKemasan();
             if ($('#package_price_view').val() != '') {
@@ -265,36 +255,7 @@ if (empty($pktitem)) {
                     <div role="tabpanel" class="tab-pane fade in {{ $counts->count() == 0 ? 'show active' : '' }}"
                         id="barang">
                         <div class="row form-group mt-5">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
-                                    {!! Form::select(
-                                        'merchant_id',
-                                        $merchant,
-                                        isset($items['merchant_id']) ? $items['merchant_id'] : $data['merchant_id'],
-                                        [
-                                            'class' => 'selection-search-clear required select-form '.($merchant->count()==1||!empty($pkg)?"disabled":""),
-                                            'name' => 'merchant_id_view',
-                                            'id' => 'merchant_id_view',
-                                            'onchange' => 'changeCategory(this.id,"item_category_id")',
-                                            'form' => 'form-barang',
-                                            'required',
-                                            $merchant->count()==1||!empty($pkg)?"disabled":''
-                                        ],
-                                    ) !!}
-                                     <input type="hidden" form="form-barang" name="merchant_id" id="merchant_id">
-                                     <input type="hidden" form="form-barang" name="create_warehouse" value="0" id="create_warehouse">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <a class="text-dark">Nama Kategori Barang<a class='red'> *</a></a>
-                                    <select class=" required selection-search-clear select-form" required form="form-barang"
-                                        placeholder="Masukan Kategori" name="item_category_id" id="item_category_id"
-                                        onchange="function_elements_add(this.name, this.value)">
-                                    </select>
-                                </div>
-                            </div>
+                            
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <a class="text-dark">Kode Barang<a class='red'> *</a></a>
