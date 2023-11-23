@@ -1979,7 +1979,7 @@ class APIController extends Controller
     {   
         $fields = $request->validate([
             'user_id'           => 'required',
-            'item_id'           => 'required',
+            // 'item_id'           => 'required',
 
         ]);
 
@@ -1990,7 +1990,7 @@ class APIController extends Controller
 
         $items  = InvtItem::select('*')
         ->where('data_state', 0)
-        ->where('item_unit_price1', $fields['item_id'])
+        // ->where('item_unit_price1', $fields['item_id'])
         // ->where('item_name', $fields['item_name'])
         ->where('item_status',1)
         // ->orderBy('item_id', 'ASC')
