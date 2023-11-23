@@ -1979,7 +1979,6 @@ class APIController extends Controller
     {   
         $fields = $request->validate([
             'user_id'           => 'required',
-            'item_category_id'  => 'required',
         ]);
 
         $company_id = User::select('preference_company.company_id')
