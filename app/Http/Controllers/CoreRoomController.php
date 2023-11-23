@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\CoreBuilding;
 use App\Models\CoreRoom;
+use Illuminate\Support\Str;
+use App\Models\CoreBuilding;
 use App\Models\CoreRoomType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
@@ -20,11 +22,15 @@ class CoreRoomController extends Controller
         if(Auth::user()->merchant_id !=1&&Auth::id()!=1){
             return redirect()->back();
            }
-        Session::forget('room-data');
+           Session::forget('room-token');
+           Session::forget('room-data');
         $room = CoreRoom::with(['roomType','building'])->get();
         return view('content.CoreRoom.ListRoom')->with(['room'=>$room]);
     }
     public function add() {
+        if(empty(Session::get('room-token'))){
+            Session::put('room-token',Str::uuid());
+         }
         $sessiondata = Session::get('room-data');
         $roomtype = CoreRoomType::get()->pluck('room_type_name','room_type_id');
         $building = CoreBuilding::get()->pluck('building_name','building_id');
@@ -42,17 +48,38 @@ class CoreRoomController extends Controller
         Session::put('room-data', $sessiondata);
     }
     public function processAdd(Request $request) {
-        if(CoreRoom::create([
+        $token = Session::get('room-token');
+        if(empty($token)){
+           return redirect()->route('room.index')->with(['type'=>'success','msg'=>'Tambah Kamar Berhasil*']);
+        }
+        $request->validate([
+            'room_name'=>'required',
+            'room_type_id'=>'required',
+            'building_id'=>'required'
+        ],[
+            'room_name.required'=>'Nama Kamar Harus Diisi',
+            'room_type_id.required'=>'Tipe Kamar Harus Diisi',
+            'building_id.required'=>'Bangunan Harus Diisi'
+        ]);
+        try {
+        DB::beginTransaction();
+        CoreRoom::create([
             'room_name'=>$request->room_name,
             'room_type_id'=>$request->room_type_id,
             'building_id'=>$request->building_id,
             'room_facility'=>$request->room_facility,
+            'room_token'=>$token,
             'created_id'=>Auth::id(),
-            ])){
-           return redirect()->route('room.index')->with(['type'=>'success','msg'=>'Tambah Kamar Berhasil']);
-        }
+        ]);
+        DB::commit();
+        Session::forget('room-token');
+        return redirect()->route('room.index')->with(['type'=>'success','msg'=>'Tambah Kamar Berhasil']);
+        } catch (\Exception $e) {
+        DB::rollBack();
+        report($e);
+        Session::forget('room-token');
         return redirect()->route('room.index')->with(['type'=>'danger','msg'=>'Tambah Kamar Gagal']);
-
+        }
     }
     public function edit($room_id) {
         $sessiondata = Session::get('room-data');
