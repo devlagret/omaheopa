@@ -114,11 +114,11 @@
                 </thead>
                 <tbody>
                   <?php $no = 1 ?>
-                  @foreach ($data as $val)
-                    <tr>
+                  {{-- @foreach ($data as $val) --}}
+                    {{-- <tr>
                         <td>{{ $no++ }}</td>
                         <td>{{ $val->item->merchant->merchant_name }}</td>
-                        <td>{{ $val->category->item_category_name}}</td>
+                        <td>{{ empty($val->category)?'-':$val->category->item_category_name}}</td>
                         <td>{{ $val->item->item_name }}</td>
                         <td>{{ $val->unit->item_unit_name }}</td>
                         <td>{{ $no++ }}</td>
@@ -126,8 +126,8 @@
                         <td>{{ $no++ }}</td>
                         <td>{{ $no++ }}</td>
                         <td><a type='button' href="{{route('sc.print',$val->item_stock_id)}}" class='btn btn-secondary btn-sm'><i class='fa fa-file-pdf'></i> Kartu Stok</a></td>
-                    </tr>
-                  @endforeach
+                    </tr> --}}
+                  {{-- @endforeach --}}
                 </tbody>
             </table>
         </div>

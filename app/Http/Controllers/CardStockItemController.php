@@ -107,7 +107,7 @@ class CardStockItemController extends Controller
             $row= collect();
             $row->push("<div class='text-center'>".$no++.".</div>");
             $row->push($val->item->merchant->merchant_name);
-            $row->push($val->category->item_category_name);
+            $row->push((empty($val->category)?'-':$val->category->item_category_name));
             $row->push($val->item->item_name);
             $row->push($val->unit->item_unit_name);
             $row->push($val->opening_balance??0);

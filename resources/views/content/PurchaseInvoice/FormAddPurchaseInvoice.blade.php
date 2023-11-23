@@ -148,7 +148,7 @@
                     console.log(data);
                 }
             });
-     }
+    }
     $(document).ready(function(){
         $("#quantity").change(function(){
             var quantity = $("#quantity").val();

@@ -1,7 +1,4 @@
-@inject('InvItemStock', 'App\Http\Controllers\InvItemStockController')
 @inject('Grading', 'App\Http\Controllers\GradingController')
-@inject('ISARC','App\Http\Controllers\InvtStockAdjustmentReportController' )
-
 @extends('adminlte::page')
 
 @section('title',  "MOZAIC Omah'e Opa")
@@ -178,7 +175,7 @@
                     <tr>
                         <td style='text-align:center'>{{$no}}</td>
                         <td>{{$stock->item->merchant->merchant_name}}</td>
-                        <td>{{$stock->category->item_category_name}}</td>
+                        <td>{{empty($stock->category)?'-':$stock->category->item_category_name}}</td>
                         <td>{{$stock->item->item_name}}</td>
                         {{-- <?php if($stock['item_id']==0) {?>
                             <td>No Grade</td>
