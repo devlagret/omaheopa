@@ -181,6 +181,10 @@ class PurchasePaymentController extends Controller
         $datapurchasepaymenttransfer = Session::get('datapurchasepaymenttransfer');
         $fields = $request->validate([
             'payment_date'                      => 'required',
+            'payment_allocated_move_view'                      => 'required',
+        ],[
+            'payment_date.required'=>'Kolom Tanggal Pembayaran Harus Diisi',
+            'payment_allocated_move_view.required'=>'Harap Isi Alokasi',
         ]);
         if (is_array($datapurchasepaymenttransfer) && !empty($datapurchasepaymenttransfer)) {
             foreach ($datapurchasepaymenttransfer as $keyTransfer => $valTransfer) {

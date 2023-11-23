@@ -194,7 +194,7 @@ Route::prefix('purchase-invoice')->name('pi.')->group(function () {
     Route::post('process-add', [PurchaseInvoiceController::class, 'processAddPurchaseInvoice'])->name('process-add');
     Route::get('detail/{purchase_invoice_id}',[PurchaseInvoiceController::class, 'detailPurchaseInvoice'])->name('detail-');
     Route::post('filter', [PurchaseInvoiceController::class,'filterPurchaseInvoice'])->name('filter');
-    Route::get('filter-reset', [PurchaseInvoiceController::class,'filterResetPurchaseInvoice'])->name('filter-reset-');
+    Route::get('filter-reset', [PurchaseInvoiceController::class,'filterResetPurchaseInvoice'])->name('filter-reset');
     Route::post('process-change-cost', [PurchaseInvoiceController::class,'processChangeCostPurchaseInvoice'])->name('process-change-cost');
     Route::get('note/{purchase_invoice_id?}',[PurchaseInvoiceController::class, 'printNote'])->name('purchase-note');
     Route::get('print-proof-acceptance-item/{purchase_invoice_id?}',[PurchaseInvoiceController::class, 'printProofAcceptanceItem'])->name('print-proof-acceptance-item');

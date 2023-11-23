@@ -194,8 +194,7 @@
                         <input type ="date" class="form-control form-control-inline input-medium date-picker input-date"
                             data-date-format="dd-mm-yyyy" type="text" name="payment_date" id="payment_date"
                             onChange="elements_add(this.name, this.value);"
-                            value="{{ $purchasepaymentelements == null ? '' : $purchasepaymentelements['payment_date'] }}"
-                            style="width: 15rem;" />
+                            value="{{ empty($purchasepaymentelements['payment_date']) ? date('Y-m-d') : $purchasepaymentelements['payment_date'] }}" />
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">

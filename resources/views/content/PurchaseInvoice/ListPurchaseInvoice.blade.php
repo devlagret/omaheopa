@@ -1,4 +1,3 @@
-@inject('PurchaseInvoice','App\Http\Controllers\PurchaseInvoiceController')
 @extends('adminlte::page')
 
 @section('title', "MOZAIC Point of Sales")
@@ -7,7 +6,7 @@
     function reset_add(){
 		$.ajax({
 				type: "GET",
-				url : "{{route('filter-reset-purchase-invoice')}}",
+				url : "{{route('pi.filter-reset')}}",
 				success: function(msg){
                     location.reload();
 			}
@@ -34,7 +33,7 @@
 </h3>
 <br/>
 <div id="accordion">
-    <form  method="post" action="{{ route('filter-purchase-invoice') }}" enctype="multipart/form-data">
+    <form  method="post" action="{{ route('pi.filter') }}" enctype="multipart/form-data">
     @csrf
         <div class="card border border-dark">
         <div class="card-header bg-dark" id="headingOne" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
@@ -129,7 +128,6 @@
                         <th style="text-align: center">No Pembelian</th>
                         <th style="text-align: center">Tanggal Pembelian</th>
                         <th style="text-align: center">Nama Supplier</th>
-                        <th style="text-align: center">Nama Gudang</th>
                         <th style="text-align: center">Jumlah Pembelian</th>	
                         <th style="text-align: center">Dibayar</th>
                         <th style="text-align: center">Hutang</th>		
@@ -144,8 +142,7 @@
                     <td class="text-center">{{ $no++ }}.</td>
                     <td>{{ $row['purchase_invoice_no'] }}</td>
                     <td>{{ date('d-m-Y', strtotime($row['purchase_invoice_date'])) }}</td>
-                    <td>{{ $PurchaseInvoice->getSupplierName($row['supplier_id']) }}</td>
-                    <td>{{ $PurchaseInvoice->getWarehouseName($row['warehouse_id']) }}</td>
+                    <td>{{ $row->supplier->supplier_name }}</td>
                     <td style="text-align: right">{{ number_format($row['total_amount'],2,',','.') }}</td>
                     <td style="text-align: right">{{ number_format($row['paid_amount'],2,',','.') }}</td>
                     <td style="text-align: right">{{ number_format($row['owing_amount'],2,',','.') }}</td>
