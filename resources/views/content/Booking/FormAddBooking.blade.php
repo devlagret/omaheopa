@@ -727,9 +727,9 @@ if (empty($paket)) {
             $("#end_date").attr('min',start_date.add(1,'d').format('Y-MM-DD'));
             if(days <= 0){
                 // alert("Tanggal Check-Out Tidak Boleh Sebelum Tanggal Check-In");
-                // $("#end_date").val(start_date.format('Y-MM-DD'));
-                // end_date = moment($("#end_date").val());
-                // days = 1;
+                $("#end_date").val(start_date.format('Y-MM-DD'));
+                end_date = moment($("#end_date").val());
+                days = 1;
             }
             $("#days_booked").val(days);
             $(".room-id").each(function() {
