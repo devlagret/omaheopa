@@ -40,7 +40,7 @@ function check(name,uri){
         Daftar Supplier
     </h5>
     <div class="form-actions float-right">
-        <button onclick="location.href='{{ route('aset-type.add') }}'" name="add" class="btn btn-sm btn-info" title="Add Data"><i class="fa fa-plus"></i> Tambah Supplier </button>
+        <button onclick="location.href='{{ route('supplier.add') }}'" name="add" class="btn btn-sm btn-info" title="Add Data"><i class="fa fa-plus"></i> Tambah Supplier </button>
     </div>
   </div>
 
