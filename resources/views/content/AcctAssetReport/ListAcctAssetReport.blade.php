@@ -84,7 +84,7 @@ function check(name,uri){
                         <th width="5%">No</th>
                         <th width="10%">Nama Tipe Aset</th>
                         <th width="10%">Nama Aset</th>
-                        <th width="6%">Satuan</th>
+                        <th width="6%">Jumlah Aset</th>
                         <th width="15%">Deskripsi Aset</th>
                         <th width="10%">Tahun Perolehan</th>
                         <th width="6%">Jml Tahun</th>
