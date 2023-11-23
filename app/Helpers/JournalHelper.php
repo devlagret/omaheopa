@@ -7,13 +7,16 @@ use App\Models\JournalVoucher;
 use App\Models\JournalVoucherItem;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-
 class JournalHelper extends AppHelper
 {
     protected static $token;
     protected static $journal_voucher_date;
-    protected static $appentTitle;
+    protected static $appendTitle;
     protected static $prependTitle;
+    protected static $appendDescription;
+    protected static $prependDescription;
+    protected static $title;
+    protected static $defaultTitle='';
     protected static $account_id;
     /**
      * Make journal voucher and journal voucher item
@@ -41,12 +44,17 @@ class JournalHelper extends AppHelper
             $jvd=Carbon::parse($date)->format('Y-m-d');
             $jvp=Carbon::parse($date)->format('Ym');
         }
+        $title=(parent::getTransactionModule($transaction_module_code)->name??self::$defaultTitle);
+        if(empty(self::$title)){
+            $title = self::$title;
+        }
+        $transactionModuleId=(parent::getTransactionModule($transaction_module_code)->id??'');
         JournalVoucher::create([
             'company_id'                    => Auth::user()->company_id,
             'journal_voucher_status'        => 1,
-            'journal_voucher_description'   => $journal_voucher_description,
-            'journal_voucher_title'         => parent::getTransactionModule($transaction_module_code)->name??'',
-            'transaction_module_id'         => parent::getTransactionModule($transaction_module_code)->id??'',
+            'journal_voucher_description'   => self::$prependDescription.$journal_voucher_description.self::$appendDescription,
+            'journal_voucher_title'         => self::$prependTitle.$title.self::$appendTitle,
+            'transaction_module_id'         => $transactionModuleId,
             'transaction_module_code'       => $transaction_module_code,
             'journal_voucher_date'          => $jvd,
             'journal_voucher_period'        => $jvp,
@@ -138,7 +146,6 @@ class JournalHelper extends AppHelper
         }
         $journal->items()->update(['acct_journal_voucher_item.reverse_state' => 1]);
     }
-
     /**
      * Set the value of token
      *
@@ -149,7 +156,6 @@ class JournalHelper extends AppHelper
         self::$token = $token;
         return new self;
     }
-
     /**
      * Set Journal date
      *
@@ -184,7 +190,6 @@ class JournalHelper extends AppHelper
     public static function getAccountStatus(string $account_id){
         return AcctAccount::select(['account_default_status as status'])->find($account_id);
     }
-    
     public function item(int $total_amount,int $account_id,int $account_setting_status,int $merchant_id=null) {
         if(empty(self::$token)){
             throw new \Exception("unspecified journal token. use this funtion after call make() or token()");
@@ -211,6 +216,44 @@ class JournalHelper extends AppHelper
             'updated_id'                    => Auth::id(),
             'created_id'                    => Auth::id()
         ]);
+        return new self;
+    }
+    /**
+     * Set Journal defaul title
+     *
+     * @return  self
+     */ 
+    public static function setDefaultTitle($defaultTitle='')
+    {
+        self::$defaultTitle = $defaultTitle;
+        return new self;
+    }
+    /**
+     * Prepend Journal Title (and description), space provided
+     *
+     * @param string $prepend
+     * @return  self
+     */ 
+    public static function prependTitle($prepend,int $withDesc =0)
+    {
+        self::$prependTitle = " {$prepend}";
+        if ($withDesc) {
+            self::$prependDescription = " {$prepend}";
+        }
+        return new self;
+    }
+    /**
+     * Append Journal Title (and description), space provided
+     *
+     * @param string $append
+     * @return  self
+     */ 
+    public static function appendTitle($append,int $withDesc =0)
+    {
+        self::$appendTitle = "{$append} ";
+        if ($withDesc) {
+            self::$prependDescription = "{$append} ";
+        }
         return new self;
     }
 }
