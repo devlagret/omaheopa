@@ -305,6 +305,24 @@
 
             });
         }
+
+        // Mendapatkan elemen input tanggal
+        var inputTanggal = document.getElementById('sales_invoice_date');
+        
+        // Mendapatkan tanggal hari ini
+        var today = new Date();
+        
+        // Mendapatkan bulan dari tanggal hari ini
+        var currentMonth = today.getMonth() + 1;
+        
+        // Mendapatkan tahun dari tanggal hari ini
+        var currentYear = today.getFullYear();
+        
+        // Mendapatkan nilai minimum yang dapat dipilih (tahun-bulan-tanggal)
+        var minimumDate = currentYear + '-' + (currentMonth < 10 ? '0' : '') + currentMonth + '-01';
+        
+        // Menetapkan nilai minimum pada input tanggal
+        inputTanggal.min = minimumDate;
     </script>
 @stop
 @section('content_header')
@@ -362,7 +380,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <a class="text-dark">Tanggal Invoice Penjualan<a class='red'> *</a></a>
-                            <input style="width: 40%" class="form-control input-bb" name="sales_invoice_date"
+                            <input style="width: 40%" class="form-control input-bb" name="sales_invoice_date" 
                                 id="sales_invoice_date" type="date" autocomplete="off" value="{{ $date }}" />
                         </div>
                     </div>
