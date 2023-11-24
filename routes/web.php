@@ -740,14 +740,14 @@ Route::prefix('purchase-payment')->name('purchase-payment.')->group(function () 
     Route::post('add-bank/', [PurchasePaymentController::class, 'addCoreBank'])->name('add-bank');
 });
 
-Route::get('/purchase-payment',[PaymentReservationController::class, 'index'])->name('purchase-payment');
-Route::post('/purchase-payment/filter',[PaymentReservationController::class, 'filterPurchasePayment'])->name('filter-purchase-payment');
-Route::get('/purchase-payment/reset-filter',[PaymentReservationController::class, 'resetFilterPurchasePayment'])->name('reset-filter-purchase-payment');
-Route::get('/purchase-payment/search', [PaymentReservationController::class, 'searchPurchasePayment'])->name('search-purchase-payment');
-Route::get('/purchase-payment/select-supplier/{sales_invoice_reservation_id}', [PaymentReservationController::class, 'selectSupplierPurchasePayment'])->name('select-supplier-purchase-payment');
-Route::post('/purchase-payment/elements-add/', [PaymentReservationController::class, 'elements_add'])->name('elements-add-purchase-payment');
-Route::post('/purchase-payment/process-add/', [PaymentReservationController::class, 'processAddPurchasePayment'])->name('process-add-purchase-payment');
-Route::get('/purchase-payment/delete/{supplier_id}', [PaymentReservationController::class, 'deletePurchasePayment'])->name('delete-purchase-payment');
-Route::get('/purchase-payment/detail/{supplier_id}', [PaymentReservationController::class, 'detailPurchasePayment'])->name('detail-purchase-payment');
-Route::get('/purchase-payment/print-recipt-cesh-payment', [PaymentReservationController::class, 'printReciptCeshPayment'])->name('purchase-payment-print-recipt-cesh-payment');
-Route::get('/purchase-payment/print-recipt-non-cesh-payment', [PaymentReservationController::class, 'printReciptNonCeshPayment'])->name('purchase-payment-print-recipt-non-cesh-payment');
+Route::get('/reservation-payment',[PaymentReservationController::class, 'index'])->name('reservation-payment');
+Route::post('/reservation-payment/filter',[PaymentReservationController::class, 'filterreservationPayment'])->name('filter-reservation-payment');
+Route::get('/reservation-payment/reset-filter',[PaymentReservationController::class, 'resetFilterreservationPayment'])->name('reset-filter-reservation-payment');
+Route::get('/reservation-payment/search', [PaymentReservationController::class, 'searchreservationPayment'])->name('search-reservation-payment');
+Route::get('/reservation-payment/select-supplier/{sales_invoice_reservation_id}', [PaymentReservationController::class, 'selectSupplieReservationPayment'])->name('select-supplier-reservation-payment');
+Route::post('/reservation-payment/elements-add/', [PaymentReservationController::class, 'elements_add'])->name('elements-add-reservation-payment');
+Route::post('/reservation-payment/process-add/', [PaymentReservationController::class, 'processAddreservationPayment'])->name('process-add-reservation-payment');
+Route::get('/reservation-payment/delete/{supplier_id}', [PaymentReservationController::class, 'deletereservationPayment'])->name('delete-reservation-payment');
+Route::get('/reservation-payment/detail/{supplier_id}', [PaymentReservationController::class, 'detailreservationPayment'])->name('detail-reservation-payment');
+Route::get('/reservation-payment/print-recipt-cesh-payment', [PaymentReservationController::class, 'printReciptCeshPayment'])->name('reservation-payment-print-recipt-cesh-payment');
+Route::get('/reservation-payment/print-recipt-non-cesh-payment', [PaymentReservationController::class, 'printReciptNonCeshPayment'])->name('reservation-payment-print-recipt-non-cesh-payment');

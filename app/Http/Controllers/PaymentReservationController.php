@@ -102,7 +102,7 @@ class PaymentReservationController extends Controller
         return view('content.PurchasePayment.SearchPurchasePayment', compact('coresupplier'));
     }
 
-    public function selectSupplierPurchasePayment($sales_invoice_reservation_id)
+    public function selectSupplierReservationPayment($sales_invoice_reservation_id)
     {
         $purchaseinvoice = PaymentReservation::where('sales_invoice_reservation_id', $sales_invoice_reservation_id)
         ->where('company_id', Auth::user()->company_id)
