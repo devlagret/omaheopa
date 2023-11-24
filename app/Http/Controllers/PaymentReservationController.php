@@ -126,7 +126,7 @@ class PaymentReservationController extends Controller
         ->get()
         ->pluck('full_account','account_id');
 
-        return view('content.PurchasePayment.AddPurchasePayment', compact('purchaseinvoice','purchasepaymentelements','payment_method_list','supplier', 'account'));
+        return view('content.PaymentReservation.AddPaymentReservation', compact('purchaseinvoice','purchasepaymentelements','payment_method_list','supplier', 'account'));
     }
 
     public function elements_add(Request $request){
