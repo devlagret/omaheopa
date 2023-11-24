@@ -133,6 +133,7 @@
                         <td>{{ $row['customer_name'] ?? ''  }}</td>
                         <td style="text-align: right">{{ $row['total_amount'] ?? '' }}</td>
                         <td class="text-center">
+                            <a type="button" class="btn btn-outline-primary btn-sm" href="{{ url('/sales-reservation/detail/'.$row['sales_invoice_id'] ?? '') }}">Bayar</a>
                             <a type="button" class="btn btn-outline-warning btn-sm" href="{{ url('/sales-reservation/detail/'.$row['sales_invoice_id'] ?? '') }}">Detail</a>
                             <a type="button" class="btn btn-outline-danger btn-sm" href="{{ url('/sales-reservation/delete/'.$row['sales_invoice_id'] ?? '' ) }}">Hapus</a>
                         </td>
