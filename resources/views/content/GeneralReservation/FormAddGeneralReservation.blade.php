@@ -84,7 +84,7 @@
                     title="Back"><i class="fa fa-angle-left"></i> Kembali</button>
             </div>
         </div>
-        <form method="post" action="" enctype="multipart/form-data">
+        <form method="post" action="{{ route('process-add-reservation') }}" enctype="multipart/form-data">
             @csrf
             <div class="card-body">
                 <div class="row form-group">
