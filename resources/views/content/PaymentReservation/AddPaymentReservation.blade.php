@@ -205,6 +205,8 @@
                                 <td class="text-center">
                                     <input class="checkbox-lg text-center" type="checkbox" id="sales_invoice_reservation_id_{{ $no }}" name="sales_invoice_reservation_id_{{ $no }}" purchaseinvoiceue="{{ $purchaseinvoice['sales_invoice_reservation_id'] }}" onchange="count_amount('sales_invoice_reservation_id',{{ (int)$purchaseinvoice['owing_amount'] }},{{ $no }})">
                                 </td>
+                                <input class="text-center" type="text" id="sales_invoice_reservation_id" name="sales_invoice_reservation_id" value="{{ $purchaseinvoice['sales_invoice_reservation_id'] }}" >
+                                
                             </tr>
                             {{-- @php
                                 $total_retur += (int)$purchaseinvoice['return_amount'];

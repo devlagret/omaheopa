@@ -188,7 +188,7 @@ class PaymentReservationController extends Controller
             'updated_id'        => Auth::id(),
         );
         // echo json_encode($dataPayment);exit;
-        dd($dataPayment);
+        // dd($dataPayment);
         PaymentReservation::create($dataPayment);
         
         $purchasepayment = PaymentReservation::where('company_id', Auth::user()->company_id)
@@ -197,15 +197,16 @@ class PaymentReservationController extends Controller
 
         for ($i=1; $i <= $request->total_invoice ; $i++) {
             if ($request['sales_invoice_reservation_id_'.$i] != null) {
-                $purchase_invoice = SalesInvoiceReservation::where('sales_invoice_reservation_id', $request['sales_invoice_reservation_id_'.$i])
+
+                $purchase_invoice = SalesInvoiceReservation::where('sales_invoice_reservation_id', $request['sales_invoice_reservation_id'])
                 ->first();
 
-                $table                  = SalesInvoiceReservation::findOrFail($request['sales_invoice_reservation_id_'.$i]);
-                $table->paid_amount     = $purchase_invoice->owing_amount;
+                $table                  = SalesInvoiceReservation::findOrFail($request['sales_invoice_reservation_id']);
+                $table->owing_amount     = $request['rounding_amount'];
                 // $table->owing_amount    = 0;
                 $table->updated_id      = Auth::id();
-                $table->save();
-
+                $table->save(); 
+                
                 $dataPaymentItem = array(
                     'company_id'            => Auth::user()->company_id,
                     'payment_id'            => $purchasepayment['payment_id'],
@@ -222,7 +223,6 @@ class PaymentReservationController extends Controller
                 PaymentReservationItem::create($dataPaymentItem);
             }
         }
-
         // $journal = array(
         //     'company_id'                    => Auth::user()->company_id,
         //     'transaction_module_id'         => $transaction_module_id,
@@ -238,226 +238,226 @@ class PaymentReservationController extends Controller
         // );
         // if (JournalVoucher::create($journal)) {
 
-            // if ($request->payment_method == 1) {
-            //     $account_setting_name = 'purchase_cash_payment_account';
-            //     $account_id = $this->getAccountId($account_setting_name);
-            //     $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
-            //     $account_default_status = $this->getAccountDefaultStatus($account_id);
-            //     $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
-            //     if ($account_setting_status == 0){
-            //         $debit_amount = $purchasepayment['payment_amount'] - $request->subtraction_amount;
-            //         $credit_amount = 0;
-            //     } else {
-            //         $debit_amount = 0;
-            //         $credit_amount = $purchasepayment['payment_amount'] - $request->subtraction_amount;
-            //     }
-            //     $journal_debit = array(
-            //         'company_id'                    => Auth::user()->company_id,
-            //         'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
-            //         'account_id'                    => $account_id,
-            //         'journal_voucher_amount'        => $purchasepayment['payment_amount'] - $request->subtraction_amount,
-            //         'account_id_default_status'     => $account_default_status,
-            //         'account_id_status'             => $account_setting_status,
-            //         'journal_voucher_debit_amount'  => $debit_amount,
-            //         'journal_voucher_credit_amount' => $credit_amount,
-            //         'created_id'                    => Auth::id(),
-            //         'updated_id'                    => Auth::id()
-            //     );
-            //     JournalVoucherItem::create($journal_debit);
+        //     if ($request->payment_method == 1) {
+        //         $account_setting_name = 'purchase_cash_payment_account';
+        //         $account_id = $this->getAccountId($account_setting_name);
+        //         $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
+        //         $account_default_status = $this->getAccountDefaultStatus($account_id);
+        //         $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
+        //         if ($account_setting_status == 0){
+        //             $debit_amount = $purchasepayment['payment_amount'] - $request->subtraction_amount;
+        //             $credit_amount = 0;
+        //         } else {
+        //             $debit_amount = 0;
+        //             $credit_amount = $purchasepayment['payment_amount'] - $request->subtraction_amount;
+        //         }
+        //         $journal_debit = array(
+        //             'company_id'                    => Auth::user()->company_id,
+        //             'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
+        //             'account_id'                    => $account_id,
+        //             'journal_voucher_amount'        => $purchasepayment['payment_amount'] - $request->subtraction_amount,
+        //             'account_id_default_status'     => $account_default_status,
+        //             'account_id_status'             => $account_setting_status,
+        //             'journal_voucher_debit_amount'  => $debit_amount,
+        //             'journal_voucher_credit_amount' => $credit_amount,
+        //             'created_id'                    => Auth::id(),
+        //             'updated_id'                    => Auth::id()
+        //         );
+        //         JournalVoucherItem::create($journal_debit);
                 
-            //     $account_setting_name = 'purchase_payment_account';
-            //     $account_id = $this->getAccountId($account_setting_name);
-            //     $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
-            //     $account_default_status = $this->getAccountDefaultStatus($account_id);
-            //     $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
-            //     if ($account_setting_status == 0){
-            //         $debit_amount = $purchasepayment['payment_amount'] - $request->subtraction_amount;
-            //         $credit_amount = 0;
-            //     } else {
-            //         $debit_amount = 0;
-            //         $credit_amount = $purchasepayment['payment_amount'] - $request->subtraction_amount;
-            //     }
-            //     $journal_credit = array(
-            //         'company_id'                    => Auth::user()->company_id,
-            //         'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
-            //         'account_id'                    => $account_id,
-            //         'journal_voucher_amount'        => $purchasepayment['payment_amount'] - $request->subtraction_amount,
-            //         'account_id_default_status'     => $account_default_status,
-            //         'account_id_status'             => $account_setting_status,
-            //         'journal_voucher_debit_amount'  => $debit_amount,
-            //         'journal_voucher_credit_amount' => $credit_amount,
-            //         'created_id'                    => Auth::id(),
-            //         'updated_id'                    => Auth::id()
-            //     );
-            //     JournalVoucherItem::create($journal_credit);
-            // } else {
-            //     $account_setting_name = 'purchase_non_cash_cash_payment_account';
-            //     $account_id = $this->getAccountId($account_setting_name);
-            //     $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
-            //     $account_default_status = $this->getAccountDefaultStatus($account_id);
-            //     $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
-            //     if ($account_setting_status == 0){
-            //         $debit_amount = $purchasepayment['payment_amount'] - $request->subtraction_amount;
-            //         $credit_amount = 0;
-            //     } else {
-            //         $debit_amount = 0;
-            //         $credit_amount = $purchasepayment['payment_amount'] - $request->subtraction_amount;
-            //     }
-            //     $journal_debit = array(
-            //         'company_id'                    => Auth::user()->company_id,
-            //         'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
-            //         'account_id'                    => $account_id,
-            //         'journal_voucher_amount'        => $purchasepayment['payment_amount'] - $request->subtraction_amount,
-            //         'account_id_default_status'     => $account_default_status,
-            //         'account_id_status'             => $account_setting_status,
-            //         'journal_voucher_debit_amount'  => $debit_amount,
-            //         'journal_voucher_credit_amount' => $credit_amount,
-            //         'created_id'                    => Auth::id(),
-            //         'updated_id'                    => Auth::id()
-            //     );
-            //     JournalVoucherItem::create($journal_debit);
+        //         $account_setting_name = 'purchase_payment_account';
+        //         $account_id = $this->getAccountId($account_setting_name);
+        //         $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
+        //         $account_default_status = $this->getAccountDefaultStatus($account_id);
+        //         $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
+        //         if ($account_setting_status == 0){
+        //             $debit_amount = $purchasepayment['payment_amount'] - $request->subtraction_amount;
+        //             $credit_amount = 0;
+        //         } else {
+        //             $debit_amount = 0;
+        //             $credit_amount = $purchasepayment['payment_amount'] - $request->subtraction_amount;
+        //         }
+        //         $journal_credit = array(
+        //             'company_id'                    => Auth::user()->company_id,
+        //             'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
+        //             'account_id'                    => $account_id,
+        //             'journal_voucher_amount'        => $purchasepayment['payment_amount'] - $request->subtraction_amount,
+        //             'account_id_default_status'     => $account_default_status,
+        //             'account_id_status'             => $account_setting_status,
+        //             'journal_voucher_debit_amount'  => $debit_amount,
+        //             'journal_voucher_credit_amount' => $credit_amount,
+        //             'created_id'                    => Auth::id(),
+        //             'updated_id'                    => Auth::id()
+        //         );
+        //         JournalVoucherItem::create($journal_credit);
+        //     } else {
+        //         $account_setting_name = 'purchase_non_cash_cash_payment_account';
+        //         $account_id = $this->getAccountId($account_setting_name);
+        //         $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
+        //         $account_default_status = $this->getAccountDefaultStatus($account_id);
+        //         $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
+        //         if ($account_setting_status == 0){
+        //             $debit_amount = $purchasepayment['payment_amount'] - $request->subtraction_amount;
+        //             $credit_amount = 0;
+        //         } else {
+        //             $debit_amount = 0;
+        //             $credit_amount = $purchasepayment['payment_amount'] - $request->subtraction_amount;
+        //         }
+        //         $journal_debit = array(
+        //             'company_id'                    => Auth::user()->company_id,
+        //             'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
+        //             'account_id'                    => $account_id,
+        //             'journal_voucher_amount'        => $purchasepayment['payment_amount'] - $request->subtraction_amount,
+        //             'account_id_default_status'     => $account_default_status,
+        //             'account_id_status'             => $account_setting_status,
+        //             'journal_voucher_debit_amount'  => $debit_amount,
+        //             'journal_voucher_credit_amount' => $credit_amount,
+        //             'created_id'                    => Auth::id(),
+        //             'updated_id'                    => Auth::id()
+        //         );
+        //         JournalVoucherItem::create($journal_debit);
                 
-            //     $account_setting_name = 'purchase_non_cash_payment_account';
-            //     $account_id = $this->getAccountId($account_setting_name);
-            //     $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
-            //     $account_default_status = $this->getAccountDefaultStatus($account_id);
-            //     $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
-            //     if ($account_setting_status == 0){
-            //         $debit_amount = $purchasepayment['payment_amount'] - $request->subtraction_amount;
-            //         $credit_amount = 0;
-            //     } else {
-            //         $debit_amount = 0;
-            //         $credit_amount = $purchasepayment['payment_amount'] - $request->subtraction_amount;
-            //     }
-            //     $journal_credit = array(
-            //         'company_id'                    => Auth::user()->company_id,
-            //         'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
-            //         'account_id'                    => $account_id,
-            //         'journal_voucher_amount'        => $purchasepayment['payment_amount'] - $request->subtraction_amount,
-            //         'account_id_default_status'     => $account_default_status,
-            //         'account_id_status'             => $account_setting_status,
-            //         'journal_voucher_debit_amount'  => $debit_amount,
-            //         'journal_voucher_credit_amount' => $credit_amount,
-            //         'created_id'                    => Auth::id(),
-            //         'updated_id'                    => Auth::id()
-            //     );
-            //     JournalVoucherItem::create($journal_credit);
-            // }
+        //         $account_setting_name = 'purchase_non_cash_payment_account';
+        //         $account_id = $this->getAccountId($account_setting_name);
+        //         $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
+        //         $account_default_status = $this->getAccountDefaultStatus($account_id);
+        //         $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
+        //         if ($account_setting_status == 0){
+        //             $debit_amount = $purchasepayment['payment_amount'] - $request->subtraction_amount;
+        //             $credit_amount = 0;
+        //         } else {
+        //             $debit_amount = 0;
+        //             $credit_amount = $purchasepayment['payment_amount'] - $request->subtraction_amount;
+        //         }
+        //         $journal_credit = array(
+        //             'company_id'                    => Auth::user()->company_id,
+        //             'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
+        //             'account_id'                    => $account_id,
+        //             'journal_voucher_amount'        => $purchasepayment['payment_amount'] - $request->subtraction_amount,
+        //             'account_id_default_status'     => $account_default_status,
+        //             'account_id_status'             => $account_setting_status,
+        //             'journal_voucher_debit_amount'  => $debit_amount,
+        //             'journal_voucher_credit_amount' => $credit_amount,
+        //             'created_id'                    => Auth::id(),
+        //             'updated_id'                    => Auth::id()
+        //         );
+        //         JournalVoucherItem::create($journal_credit);
+        //     }
 
-            // if ($request->account_id != null && $request->subtraction_amount != 0) {
-            //     if ($request->payment_method == 1) {
-            //         $account_setting_name = 'purchase_cash_payment_account';
-            //         $account_id = $request->account_id;
-            //         $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
-            //         $account_default_status = $this->getAccountDefaultStatus($account_id);
-            //         $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
-            //         if ($account_setting_status == 0){
-            //             $debit_amount = $request->subtraction_amount;
-            //             $credit_amount = 0;
-            //         } else {
-            //             $debit_amount = 0;
-            //             $credit_amount = $request->subtraction_amount;
-            //         }
-            //         $journal_debit = array(
-            //             'company_id'                    => Auth::user()->company_id,
-            //             'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
-            //             'account_id'                    => $account_id,
-            //             'journal_voucher_amount'        => $request->subtraction_amount,
-            //             'account_id_default_status'     => $account_default_status,
-            //             'account_id_status'             => $account_setting_status,
-            //             'journal_voucher_debit_amount'  => $debit_amount,
-            //             'journal_voucher_credit_amount' => $credit_amount,
-            //             'created_id'                    => Auth::id(),
-            //             'updated_id'                    => Auth::id()
-            //         );
-            //         JournalVoucherItem::create($journal_debit);
+        //     if ($request->account_id != null && $request->subtraction_amount != 0) {
+        //         if ($request->payment_method == 1) {
+        //             $account_setting_name = 'purchase_cash_payment_account';
+        //             $account_id = $request->account_id;
+        //             $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
+        //             $account_default_status = $this->getAccountDefaultStatus($account_id);
+        //             $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
+        //             if ($account_setting_status == 0){
+        //                 $debit_amount = $request->subtraction_amount;
+        //                 $credit_amount = 0;
+        //             } else {
+        //                 $debit_amount = 0;
+        //                 $credit_amount = $request->subtraction_amount;
+        //             }
+        //             $journal_debit = array(
+        //                 'company_id'                    => Auth::user()->company_id,
+        //                 'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
+        //                 'account_id'                    => $account_id,
+        //                 'journal_voucher_amount'        => $request->subtraction_amount,
+        //                 'account_id_default_status'     => $account_default_status,
+        //                 'account_id_status'             => $account_setting_status,
+        //                 'journal_voucher_debit_amount'  => $debit_amount,
+        //                 'journal_voucher_credit_amount' => $credit_amount,
+        //                 'created_id'                    => Auth::id(),
+        //                 'updated_id'                    => Auth::id()
+        //             );
+        //             JournalVoucherItem::create($journal_debit);
                     
-            //         $account_setting_name = 'purchase_payment_account';
-            //         $account_id = $this->getAccountId($account_setting_name);
-            //         $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
-            //         $account_default_status = $this->getAccountDefaultStatus($account_id);
-            //         $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
-            //         if ($account_setting_status == 0){
-            //             $debit_amount = $request->subtraction_amount;
-            //             $credit_amount = 0;
-            //         } else {
-            //             $debit_amount = 0;
-            //             $credit_amount = $request->subtraction_amount;
-            //         }
-            //         $journal_credit = array(
-            //             'company_id'                    => Auth::user()->company_id,
-            //             'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
-            //             'account_id'                    => $account_id,
-            //             'journal_voucher_amount'        => $request->subtraction_amount,
-            //             'account_id_default_status'     => $account_default_status,
-            //             'account_id_status'             => $account_setting_status,
-            //             'journal_voucher_debit_amount'  => $debit_amount,
-            //             'journal_voucher_credit_amount' => $credit_amount,
-            //             'created_id'                    => Auth::id(),
-            //             'updated_id'                    => Auth::id()
-            //         );
-            //         JournalVoucherItem::create($journal_credit);
-            //     } else {
-            //         $account_setting_name = 'purchase_non_cash_cash_payment_account';
-            //         $account_id = $request->account_id;
-            //         $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
-            //         $account_default_status = $this->getAccountDefaultStatus($account_id);
-            //         $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
-            //         if ($account_setting_status == 0){
-            //             $debit_amount = $request->subtraction_amount;
-            //             $credit_amount = 0;
-            //         } else {
-            //             $debit_amount = 0;
-            //             $credit_amount = $request->subtraction_amount;
-            //         }
-            //         $journal_debit = array(
-            //             'company_id'                    => Auth::user()->company_id,
-            //             'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
-            //             'account_id'                    => $account_id,
-            //             'journal_voucher_amount'        => $request->subtraction_amount,
-            //             'account_id_default_status'     => $account_default_status,
-            //             'account_id_status'             => $account_setting_status,
-            //             'journal_voucher_debit_amount'  => $debit_amount,
-            //             'journal_voucher_credit_amount' => $credit_amount,
-            //             'created_id'                    => Auth::id(),
-            //             'updated_id'                    => Auth::id()
-            //         );
-            //         JournalVoucherItem::create($journal_debit);
+        //             $account_setting_name = 'purchase_payment_account';
+        //             $account_id = $this->getAccountId($account_setting_name);
+        //             $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
+        //             $account_default_status = $this->getAccountDefaultStatus($account_id);
+        //             $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
+        //             if ($account_setting_status == 0){
+        //                 $debit_amount = $request->subtraction_amount;
+        //                 $credit_amount = 0;
+        //             } else {
+        //                 $debit_amount = 0;
+        //                 $credit_amount = $request->subtraction_amount;
+        //             }
+        //             $journal_credit = array(
+        //                 'company_id'                    => Auth::user()->company_id,
+        //                 'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
+        //                 'account_id'                    => $account_id,
+        //                 'journal_voucher_amount'        => $request->subtraction_amount,
+        //                 'account_id_default_status'     => $account_default_status,
+        //                 'account_id_status'             => $account_setting_status,
+        //                 'journal_voucher_debit_amount'  => $debit_amount,
+        //                 'journal_voucher_credit_amount' => $credit_amount,
+        //                 'created_id'                    => Auth::id(),
+        //                 'updated_id'                    => Auth::id()
+        //             );
+        //             JournalVoucherItem::create($journal_credit);
+        //         } else {
+        //             $account_setting_name = 'purchase_non_cash_cash_payment_account';
+        //             $account_id = $request->account_id;
+        //             $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
+        //             $account_default_status = $this->getAccountDefaultStatus($account_id);
+        //             $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
+        //             if ($account_setting_status == 0){
+        //                 $debit_amount = $request->subtraction_amount;
+        //                 $credit_amount = 0;
+        //             } else {
+        //                 $debit_amount = 0;
+        //                 $credit_amount = $request->subtraction_amount;
+        //             }
+        //             $journal_debit = array(
+        //                 'company_id'                    => Auth::user()->company_id,
+        //                 'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
+        //                 'account_id'                    => $account_id,
+        //                 'journal_voucher_amount'        => $request->subtraction_amount,
+        //                 'account_id_default_status'     => $account_default_status,
+        //                 'account_id_status'             => $account_setting_status,
+        //                 'journal_voucher_debit_amount'  => $debit_amount,
+        //                 'journal_voucher_credit_amount' => $credit_amount,
+        //                 'created_id'                    => Auth::id(),
+        //                 'updated_id'                    => Auth::id()
+        //             );
+        //             JournalVoucherItem::create($journal_debit);
                     
-            //         $account_setting_name = 'purchase_non_cash_payment_account';
-            //         $account_id = $this->getAccountId($account_setting_name);
-            //         $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
-            //         $account_default_status = $this->getAccountDefaultStatus($account_id);
-            //         $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
-            //         if ($account_setting_status == 0){
-            //             $debit_amount = $request->subtraction_amount;
-            //             $credit_amount = 0;
-            //         } else {
-            //             $debit_amount = 0;
-            //             $credit_amount = $request->subtraction_amount;
-            //         }
-            //         $journal_credit = array(
-            //             'company_id'                    => Auth::user()->company_id,
-            //             'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
-            //             'account_id'                    => $account_id,
-            //             'journal_voucher_amount'        => $request->subtraction_amount,
-            //             'account_id_default_status'     => $account_default_status,
-            //             'account_id_status'             => $account_setting_status,
-            //             'journal_voucher_debit_amount'  => $debit_amount,
-            //             'journal_voucher_credit_amount' => $credit_amount,
-            //             'created_id'                    => Auth::id(),
-            //             'updated_id'                    => Auth::id()
-            //         );
-            //         JournalVoucherItem::create($journal_credit);
-            //     }
-            // }
+        //             $account_setting_name = 'purchase_non_cash_payment_account';
+        //             $account_id = $this->getAccountId($account_setting_name);
+        //             $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
+        //             $account_default_status = $this->getAccountDefaultStatus($account_id);
+        //             $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
+        //             if ($account_setting_status == 0){
+        //                 $debit_amount = $request->subtraction_amount;
+        //                 $credit_amount = 0;
+        //             } else {
+        //                 $debit_amount = 0;
+        //                 $credit_amount = $request->subtraction_amount;
+        //             }
+        //             $journal_credit = array(
+        //                 'company_id'                    => Auth::user()->company_id,
+        //                 'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
+        //                 'account_id'                    => $account_id,
+        //                 'journal_voucher_amount'        => $request->subtraction_amount,
+        //                 'account_id_default_status'     => $account_default_status,
+        //                 'account_id_status'             => $account_setting_status,
+        //                 'journal_voucher_debit_amount'  => $debit_amount,
+        //                 'journal_voucher_credit_amount' => $credit_amount,
+        //                 'created_id'                    => Auth::id(),
+        //                 'updated_id'                    => Auth::id()
+        //             );
+        //             JournalVoucherItem::create($journal_credit);
+        //         }
+        //     }
 
             // Session::flash('payment_method', $request->payment_method);
             $msg = "Tambah Pelunasan Hutang Berhasil";
-            return redirect('/reservation-payment')->with('msg',$msg);
+            return redirect('/sales-reservation')->with('msg',$msg);
         // } else {
         //     $msg = "Tambah Pelunasan Hutang Gagal";
-        //     return redirect('/reservation-payment')->with('msg',$msg);
+        //     return redirect('/sales-reservation')->with('msg',$msg);
         // }
     }
 
