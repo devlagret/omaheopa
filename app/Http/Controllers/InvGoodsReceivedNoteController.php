@@ -105,6 +105,7 @@ class InvGoodsReceivedNoteController extends Controller
         if($merchant == null){
 
         $purchaseorder = PurchaseInvoice::select('purchase_invoice.*','purchase_invoice_item.*')
+        ->withoutGlobalScopes()
         ->where('purchase_invoice.data_state','=',0)
         ->where('purchase_invoice.invt_goods_received_status','=',0)
         ->join('purchase_invoice_item','purchase_invoice.purchase_invoice_id','purchase_invoice_item.purchase_invoice_id')
@@ -112,6 +113,7 @@ class InvGoodsReceivedNoteController extends Controller
         ->get();
         }else{
             $purchaseorder = PurchaseInvoice::select('purchase_invoice.*','purchase_invoice_item.*')
+            ->withoutGlobalScopes()
             ->where('purchase_invoice.data_state','=',0)
             ->where('purchase_invoice.invt_goods_received_status','=',0)
             ->join('purchase_invoice_item','purchase_invoice.purchase_invoice_id','purchase_invoice_item.purchase_invoice_id')
@@ -136,12 +138,14 @@ class InvGoodsReceivedNoteController extends Controller
             $merchant_id = Auth::user()->merchant_id;
         }
         $purchaseInvoice = PurchaseInvoice::where('purchase_invoice.data_state', 0)
+        ->withoutGlobalScopes()
         ->join('purchase_invoice_item','purchase_invoice.purchase_invoice_id','purchase_invoice_item.purchase_invoice_id')
         ->where('purchase_invoice.purchase_invoice_id', $purchase_invoice_id)
         ->where('purchase_invoice_item.quantity', '>', 0)
         ->first();
         
         $purchaseInvoiceitem = PurchaseInvoice::select('*')
+        ->withoutGlobalScopes()
         ->join('purchase_invoice_item','purchase_invoice.purchase_invoice_id','purchase_invoice_item.purchase_invoice_id')
         ->where('purchase_invoice.data_state', 0)
         ->where('purchase_invoice.purchase_invoice_id', $purchase_invoice_id)
@@ -161,6 +165,7 @@ class InvGoodsReceivedNoteController extends Controller
         // dd($merge_data);
         
         $add_type_purchaseInvoiceitem = PurchaseInvoiceItem::select('*')
+        ->withoutGlobalScopes()
         ->join('invt_item', 'invt_item.item_id', '=', 'purchase_invoice_item.item_id')
         ->join('invt_item_unit', 'invt_item_unit.item_unit_id', '=', 'purchase_invoice_item.item_unit_id')
         ->where('purchase_invoice_item.data_state', 0)
@@ -168,7 +173,8 @@ class InvGoodsReceivedNoteController extends Controller
         
         ->pluck('invt_item.item_name', 'purchase_invoice_item.item_id');
 
-        $add_unit_purchaseInvoiceitem = PurchaseInvoiceItem::where('purchase_invoice_item.data_state', 0)
+        $add_unit_purchaseInvoiceitem = PurchaseInvoiceItem::withoutGlobalScopes()
+        ->where('purchase_invoice_item.data_state', 0)
         ->join('invt_item_unit', 'invt_item_unit.item_unit_id', '=', 'purchase_invoice_item.item_unit_id')
         ->where('purchase_invoice_item.purchase_invoice_id', $purchase_invoice_id)
         ->pluck('item_unit_name', 'purchase_invoice_item.item_unit_id');

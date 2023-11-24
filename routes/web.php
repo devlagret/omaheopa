@@ -24,6 +24,7 @@ use App\Http\Controllers\CoreRoomTypeController;
 use App\Http\Controllers\CoreSupplierController;
 use App\Http\Controllers\DownPaymentController;
 use App\Http\Controllers\GeneralLedgerController;
+use App\Http\Controllers\GeneralReservationController;
 use App\Http\Controllers\PreferenceCompanyController;
 use App\Http\Controllers\RestoreDataController;
 use App\Http\Controllers\SalesMerchantController;
@@ -61,6 +62,7 @@ use App\Http\Controllers\SalesInvoiceByYearReportController;
 use App\Http\Controllers\SalesInvoiceController;
 use App\Http\Controllers\SalesTiketController;
 use App\Http\Controllers\SalesInvoiceReportController;
+use App\Http\Controllers\SalesReservationController;
 use App\Http\Controllers\SalesRoomFacilityController;
 use App\Http\Controllers\PaymentReservationController;
 use App\Http\Controllers\SalesRoomPriceController;
@@ -184,6 +186,39 @@ Route::post('/sales-tiket/select-data-unit', [SalesTiketController::class, 'getS
 Route::post('/sales-tiket/filter',[SalesTiketController::class, 'filterSalesTiket'])->name('filter-sales-tiket');
 Route::post('/sales-tiket/select-data-unit-price', [SalesTiketController::class, 'getUnitPrice'])->name('select-data-unit-price');
 Route::post('/sales-tiket/item', [SalesTiketController::class, 'getCoreItem'])->name('select-item-category-sales-tiket');
+
+Route::get('/sales-reservation',[SalesReservationController::class, 'index'])->name('sales-reservation');
+Route::get('/sales-reservation/add', [SalesReservationController::class,'addSalesReservation'])->name('add-sales-reservation');
+Route::post('/sales-reservation/add-elements', [SalesReservationController::class,'addElementsSalesReservation'])->name('add-elements-sales-reservation');
+Route::post('/sales-reservation/process-add', [SalesReservationController::class, 'processAddSalesReservation'])->name('process-add-sales-reservation');
+Route::get('/sales-reservation/reset-add',[SalesReservationController::class, 'resetSalesInvoice'])->name('add-reset-sales-reservation');
+Route::post('/sales-reservation/add-array',[SalesReservationController::class,'addArraySalesReservation'])->name('add-array-sales-reservation');
+Route::get('/sales-reservation/delete-array/{record_id}',[SalesReservationController::class,'deleteArraySalesReservation'])->name('delete-array-sales-reservation');
+Route::get('/sales-reservation/detail/{sales_invoice_id}',[SalesReservationController::class, 'detailSalesReservation'])->name('detail-sales-reservation');
+Route::get('/sales-reservation/delete/{sales_invoice_id}',[SalesReservationController::class, 'deleteSalesReservation'])->name('delete-sales-reservation');
+Route::get('/sales-reservation/filter-reset',[SalesReservationController::class, 'filterResetSalesReservation'])->name('filter-reset-sales-reservation');
+Route::post('/sales-reservation/filter',[SalesReservationController::class, 'filterSalesReservation'])->name('filter-sales-reservation');
+Route::post('/sales-reservation/select-data-unit', [SalesReservationController::class, 'getSelectDataUnit'])->name('select-data-unit-sales-reservation');
+Route::post('/sales-reservation/filter',[SalesReservationController::class, 'filterSalesReservation'])->name('filter-sales-reservation');
+Route::post('/sales-reservation/select-data-unit-price', [SalesReservationController::class, 'getUnitPrice'])->name('select-data-unit-price');
+Route::post('/sales-reservation/item', [SalesReservationController::class, 'getCoreItem'])->name('select-item-category-sales-reservation');
+
+Route::get('/general-reservation',[GeneralReservationController::class, 'index'])->name('general-reservation');
+Route::post('/general-reservation/unit',[GeneralReservationController::class, 'getItemUnit'])->name('get-tiket-unit');
+Route::post('/general-reservation/cost',[GeneralReservationController::class, 'getReservationCost'])->name('get-reservation-cost');
+Route::post('/general-reservation/cost/process-edit',[GeneralReservationController::class, 'processEditCost'])->name('process-edit-cost-tiket');
+Route::post('/general-reservation/category',[GeneralReservationController::class, 'getCategory'])->name('get-tiket-category');
+Route::post('/merchant/general-reservation/',[GeneralReservationController::class, 'getTiketItem'])->name('get-tiket-item');
+Route::get('/general-reservation/add-kemasan',[GeneralReservationController::class, 'addKemasan'])->name('add-kemasan');
+Route::get('/general-reservation/remove-kemasan',[GeneralReservationController::class, 'removeKemasan'])->name('remove-kemasan');
+Route::get('/general-reservation/add-reservation', [GeneralReservationController::class, 'addReservation'])->name('add-reservation');
+Route::get('/general-reservation/add-reset-tiket', [GeneralReservationController::class, 'addResetItem'])->name('add-reset-tiket');
+Route::post('/general-reservation/add-tiket-elements', [GeneralReservationController::class, 'addItemElements'])->name('add-tiket-elements');
+Route::post('/general-reservation/process-add-tiket', [GeneralReservationController::class,'processAddTiket'])->name('process-add-tiket');
+Route::get('/general-reservation/edit-tiket/{item_id}', [GeneralReservationController::class, 'editTiket'])->name('edit-tiket');
+Route::post('/general-reservation/process-edit-tiket', [GeneralReservationController::class, 'processEditTiket'])->name('process-edit-tiket');
+Route::get('/general-reservation/delete-tiket/{item_id}', [GeneralReservationController::class, 'deleteTiket'])->name('delete-tiket');
+Route::get('/general-reservation/check-delete-tiket/{item_id}', [GeneralReservationController::class, 'checkDeleteItem'])->name('check-delete-tiket');
 
 Route::prefix('purchase-invoice')->name('pi.')->group(function () {
     Route::get('/', [PurchaseInvoiceController::class, 'index'])->name('index');
