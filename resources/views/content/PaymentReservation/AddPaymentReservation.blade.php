@@ -9,7 +9,7 @@
     function elements_add(name, value){
         $.ajax({
             type: "POST",
-            url : "{{route('elements-add-purchase-payment')}}",
+            url : "{{route('elements-add-reservation-payment')}}",
             dataType: "html",
             data: {
                 'name'      : name,
@@ -22,8 +22,8 @@
     }
 
     function count_amount(name, value, no) {
-        if (name == 'purchase_invoice_id') {
-            if ($('#purchase_invoice_id_'+no).is(':checked') == true) {
+        if (name == 'sales_invoice_reservation_id') {
+            if ($('#sales_invoice_reservation_id_'+no).is(':checked') == true) {
                 var subtotal_payable = parseInt($('#subtotal_payable').val() || 0);
                 var total_payment = parseInt($('#total_payment').val()) || 0;
                 var subtraction_amount = parseInt($('#subtraction_amount').val()) || 0;
@@ -43,7 +43,7 @@
                 var subtraction_amount = parseInt($('#subtraction_amount').val() || 0);
                 var total_payable = subtotal_payable - parseInt(value || 0);
                 var final_total_payable = total_payable + subtraction_amount;
-                var rounding_amount = total_payment - final_total_payable;
+                var rounding_amount = total_payment + final_total_payable;
 
                 $('#subtotal_payable').val(total_payable);
                 $('#total_payable').val(final_total_payable);
@@ -54,7 +54,7 @@
             }
         } else if (name == 'total_payment_view') {
             var total_payable = parseInt($('#total_payable').val() || 0);
-            var rounding_amount = parseInt(value || 0) - total_payable;
+            var rounding_amount = parseInt(value || 0) + total_payable;
 
             $('#total_payment_view').val(toRp(value || 0));
             $('#total_payment').val(value || 0);
@@ -64,7 +64,7 @@
             var subtotal_payable = parseInt($('#subtotal_payable').val() || 0);
             var total_payment = parseInt($('#total_payment').val() || 0);
             var total_payable = subtotal_payable + parseInt(value || 0);
-            var rounding_amount = total_payment - total_payable;
+            var rounding_amount = total_payment + total_payable;
 
             $('#subtraction_amount_view').val(toRp(value || 0));
             $('#subtraction_amount').val(value || 0);
@@ -129,7 +129,7 @@
             <button onclick="location.href='{{ url('purchase-payment') }}'" name="Find" class="btn btn-sm btn-info" title="Back"><i class="fa fa-angle-left"></i>  Kembali</button>
         </div>
     </div>
-    <form id="form-payment" method="post" action="{{ route('process-add-purchase-payment') }}" enctype="multipart/form-data">
+    <form id="form-payment" method="post" action="{{ route('process-add-reservation-payment') }}" enctype="multipart/form-data">
     @csrf
     <div class="card-body">
         <div class="row form-group">
@@ -146,11 +146,10 @@
             <div class="col-md-4">
                 <div class="form-group">
                     <a class="text-dark">Nama Supplier</a>
-                    <input class="form-control input-bb" type="text" name="supplier_name" id="supplier_name" value="{{ $supplier['supplier_name'] }}" readonly/>
-                    <input class="form-control input-bb" type="hidden" name="supplier_id" id="supplier_id" value="{{ $supplier['supplier_id'] }}" readonly/>
+                    <input class="form-control input-bb" type="text" name="supplier_name" id="supplier_name" value="{{ $purchaseinvoice['customer_name'] ?? '' }}" readonly/>
                 </div>
             </div>
-            <div class="col-md-4">
+            {{-- <div class="col-md-4">
                 <div class="form-group">
                     <section class="control-label">Metode Pembayaran
                         <span class="required text-danger">
@@ -159,7 +158,7 @@
                         {!! Form::select('',  $payment_method_list, $purchasepaymentelements['payment_method']?? '', ['class' => 'form-control selection-search-clear select-form','name' => 'payment_method', 'id' => 'payment_method', 'onchange' => 'elements_add(this.name, this.value);']) !!}
                     </section>
                 </div>
-            </div>
+            </div> --}}
             <div class="col-md-8 ">
                 <div class="form-group">
                     <a class="text-dark">Keterangan</a>
@@ -184,11 +183,11 @@
                         <tr>
                             <th style='text-align:center'>No</th>
                             <th style='text-align:center'>Tanggal Pembelian</th>
-                            <th style='text-align:center'>Tanggal Jatuh Tempo</th>
+                            {{-- <th style='text-align:center'>Tanggal Jatuh Tempo</th> --}}
                             <th style='text-align:center'>No. Pembelian</th>
-                            <th style='text-align:center'>Jumlah Retur</th>
+                            {{-- <th style='text-align:center'>Jumlah Retur</th> --}}
                             <th style='text-align:center'>Jumlah Hutang</th>
-                            <th style='text-align:center'>Aksi</th>
+                            {{-- <th style='text-align:center'>Aksi</th> --}}
                         </tr>
                     </thead>
                     @php
@@ -196,23 +195,21 @@
                         $total_retur = 0;
                         $total_payable = 0;
                     @endphp
-                        @foreach ($purchaseinvoice as $key => $val)
                             <tr>
                                 <td class="text-center">{{ $no++ }}.</td>
-                                <td>{{ date('d-m-Y', strtotime($val['purchase_invoice_date'])) }}</td>
-                                <td>{{ date('d-m-Y', strtotime($val['purchase_invoice_due_date'])) }}</td>
-                                <td>{{ $val['purchase_invoice_no'] }}</td>
-                                <td class="text-right">{{ number_format((int)$val['return_amount'],2,'.',',') }}</td>
-                                <td class="text-right">{{ number_format((int)$val['total_amount'] - (int)$val['return_amount'],2,'.',',') }}</td>
+                                <td>{{ date('d-m-Y', strtotime($purchaseinvoice['sales_invoice_reservation_date'])) }}</td>
+                                {{-- <td>{{ date('d-m-Y', strtotime($purchaseinvoice['purchase_invoice_due_date'])) }}</td> --}}
+                                <td>{{ $purchaseinvoice['purchase_invoice_no'] }}</td>
+                                {{-- <td class="text-right">{{ number_format((int)$purchaseinvoice['return_amount'],2,'.',',') }}</td> --}}
+                                <td class="text-right">{{ number_format((int)$purchaseinvoice['owing_amount'],2,'.',',') }}</td>
                                 <td class="text-center">
-                                    <input class="checkbox-lg text-center" type="checkbox" id="purchase_invoice_id_{{ $no }}" name="purchase_invoice_id_{{ $no }}" value="{{ $val['purchase_invoice_id'] }}" onchange="count_amount('purchase_invoice_id',{{ (int)$val['total_amount'] - (int)$val['return_amount'] }},{{ $no }})">
+                                    <input class="checkbox-lg text-center" type="checkbox" id="sales_invoice_reservation_id_{{ $no }}" name="sales_invoice_reservation_id_{{ $no }}" purchaseinvoiceue="{{ $purchaseinvoice['sales_invoice_reservation_id'] }}" onchange="count_amount('sales_invoice_reservation_id',{{ (int)$purchaseinvoice['owing_amount'] }},{{ $no }})">
                                 </td>
                             </tr>
-                            @php
-                                $total_retur += (int)$val['return_amount'];
-                                $total_payable += (int)$val['total_amount'] - (int)$val['return_amount'];
-                                @endphp
-                        @endforeach
+                            {{-- @php
+                                $total_retur += (int)$purchaseinvoice['return_amount'];
+                                $total_payable += (int)$purchaseinvoice['total_amount'] - (int)$purchaseinvoice['return_amount'];
+                                @endphp --}}
                         {{-- <tr>
                             <th colspan="3" class="text-left">Pengurangan</th>
                             <td colspan="2">{!! Form::select('account_id',  $account, 0, ['class' => 'form-control selection-search-clear select-form', 'id' => 'account_id', 'name' => 'account_id']) !!}</td>
@@ -223,25 +220,22 @@
                             <td></td>
                         </tr> --}}
                         <tr>
-                            <th colspan="5" class="text-left">Total</th>
+                            <th colspan="3" class="text-left">Total</th>
                             <th class="text-right" id="total_payable_view">{{ number_format(0,2,'.',',') }}</th>
-                            <td>
                                 <input class="text-center" type="text" id="total_payable" name="total_payable" value="0" hidden>
                                 <input class="text-center" type="text" id="subtotal_payable" name="subtotal_payable" value="0" hidden>
-                            </td>
                         </tr>
                         <tr>
-                            <th colspan="5" class="text-left" id="payment_method_view">Tunai</th>
+                            <th colspan="3" class="text-left" id="payment_method_view">Tunai</th>
                             <th class="text-right">
                                 <input class="form-control input-bb text-right" type="text" id="total_payment_view" name="total_payment_view" onchange="count_amount(this.name, this.value)" autocomplete="off">
                                 <input class="form-control input-bb text-right" type="text" id="total_payment" name="total_payment" value="0" hidden>
                             </th>
-                            <td></td>
                         </tr>
                         <tr>
-                            <th colspan="5" class="text-left">Pembulatan</th>
+                            <th colspan="3" class="text-left">Pembulatan</th>
                             <th class="text-right" id="rounding_amount_view">{{ number_format(0,2,'.',',') }}</th>
-                            <td><input class="form-control input-bb text-right" type="text" id="rounding_amount" name="rounding_amount" value="0" hidden></td>
+                            <input class="form-control input-bb text-right" type="text" id="rounding_amount" name="rounding_amount" value="0" hidden>
                         </tr>
                     </tbody>
                     <input type="text" id="total_invoice" name="total_invoice" value="{{ $no }}" hidden>
