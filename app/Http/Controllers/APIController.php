@@ -1955,7 +1955,6 @@ class APIController extends Controller
     //API TIKET Penjualan UMUM
     public function getHistorySalesTiket(Request $request)
     {   
-        
         $sales  = SalesInvoice::select('*')
         ->where('data_state', 0)
         ->where('company_id', Auth::user()->company_id)
