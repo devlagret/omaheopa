@@ -22,12 +22,12 @@ class JournalHelper extends AppHelper
      * Make journal voucher and journal voucher item
      *
      * @param string $journal_voucher_description
-     * @param array $account_setting_name
+        // @param array $account_setting_name
      * @param integer $total_amount
      * @param string|null $transaction_module_code
      * @return void|self
      */
-    public static function make(string $journal_voucher_description, array $account_setting_name=[],int $total_amount,string $transaction_module_code = null){
+    public static function make(string $journal_voucher_description, int $total_amount,string $transaction_module_code = null){
         if(is_null($transaction_module_code)){
             $transaction_module_code = preg_replace('/[^A-Z]/', '',$journal_voucher_description);
         }
