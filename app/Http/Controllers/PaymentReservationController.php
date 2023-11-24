@@ -25,7 +25,7 @@ use App\Models\PurchaseInvoice;
 use App\Models\PurchasePayment;
 use App\Models\PaymentReservation;
 use App\Models\PaymentReservationItem;
-
+use App\Models\CoreReservation;
 use App\Models\PurchasePaymentGiro;
 use App\Models\PurchasePaymentItem;
 use App\Models\PurchasePaymentTransfer;
@@ -102,22 +102,23 @@ class PaymentReservationController extends Controller
         return view('content.PurchasePayment.SearchPurchasePayment', compact('coresupplier'));
     }
 
-    public function selectSupplierPurchasePayment($supplier_id)
+    public function selectSupplierPurchasePayment($sales_invoice_reservation_id)
     {
-        $purchaseinvoice = PurchaseInvoice::where('supplier_id', $supplier_id)
+        $purchaseinvoice = PaymentReservation::where('sales_invoice_reservation_id', $sales_invoice_reservation_id)
         ->where('company_id', Auth::user()->company_id)
-        ->where('purchase_method', 2)
+        // ->where('purchase_method', 2)
         ->where('owing_amount', '!=',0)
         ->where('data_state', 0)
         ->get();
 
-        $supplier = CoreSupplier::where('supplier_id',$supplier_id)
+        $supplier = CoreReservation::where('reservation_id',$sales_invoice_reservation_id)
         ->first();
 
         $payment_method_list = array(
             1 => 'Tunai',
             2 => 'Non Tunai',
         );
+
         $purchasepaymentelements = Session::get('purchasepaymentelements');
         $account = AcctAccount::select(DB::raw("CONCAT(account_code,' - ',account_name) AS full_account"),'account_id')
         ->where('data_state',0)
