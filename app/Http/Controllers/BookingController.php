@@ -585,7 +585,7 @@ class BookingController extends Controller
                     'merchant_id' => empty(Auth::user()->merchant_id)?1:Auth::user()->merchant_id,
                 ]);
                 // * buat jurnal
-                JournalHelper::token($token)->make('Booking Full Book',['hotel_account','hotel_cash_account'],$request->total_amount);
+                JournalHelper::token($token)->make('Booking Full Book',$request->total_amount,['hotel_account','hotel_cash_account']);
                 $si = SalesInvoice::where('sales_invoice_token',$token)->first();
                 $sales_invoice_id = $si->sales_invoice_id;
             }
@@ -899,7 +899,7 @@ class BookingController extends Controller
                     'merchant_id' => empty(Auth::user()->merchant_id)?1:Auth::user()->merchant_id,
                 ]);
                 // * buat jurnal
-                JournalHelper::token($token)->make('Booking Full Book',['hotel_account','hotel_cash_account'],$request->total_amount);
+                JournalHelper::token($token)->make('Booking Full Book',$request->total_amount,['hotel_account','hotel_cash_account']);
                 //
                 $si = SalesInvoice::where('sales_invoice_token',$token)->first();
                 $sales_invoice_id = $si->sales_invoice_id;
