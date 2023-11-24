@@ -116,25 +116,13 @@ class CheckInCheckOutController extends Controller
     }
     public function processExtend(Request $request){
         $data = SalesOrder::with('rooms')->find($request->sales_order_id);
-        $dataroom = SalesOrderRoom::where('sales_order_id',$request->sales_order_id)
-        ->get()->pluck('room_id');
-        dump($request->all());
         if(Session::get('extend-token')){
-            report('['.Carbon::now().'] : Doubleclik at checkin extend');
             return redirect()->route('cc.index')->with('msg','Perpanjangan Berhasil');
         }
+        if($request->checkout_date_old==$request->checkout_date){
+            return redirect()->back()->with(['msg'=>'Tanggal Tidak Diubah','type'=>'warning']);
+        }
         $invoice = SalesInvoice::find($data->sales_invoice_id);
-        // $so = SalesOrder::with('rooms')->where('sales_order_id','!=',$request->sales_order_id)->where('checkin_date','<',$request->checkout_date)
-        // ->where('checkin_date','>',$request->checkin_date)
-        // // ->where('checkout_date','>',$request->checkout_date)
-        // ->get();
-        // dump($dataroom);
-        // foreach($so as $val){
-        //     foreach($val->rooms->whereIn('room_id',$dataroom) as $row){
-        //         dump($row);
-        //     }
-        // }
-        // return response('',202);
         try{
             DB::beginTransaction();
             $invoice->extend_discount = $request->discount_percentage_total;
@@ -145,6 +133,9 @@ class CheckInCheckOutController extends Controller
                     'checkout_date'=>$request->checkout_date_old,
                     'checkout_date_new'=>$request->checkout_date,
                     'sales_order_id'=>$request->sales_order_id,
+                    'discount_percentage'=>$request->discount_percentage_total,
+                    'discount_amount'=>$request->discount_amount,
+                    'total_amount'=>$request->total_amount,
                     'created_id'=>Auth::id(),
                 ]);
                 $data->checkout_date=$request->checkout_date;
@@ -199,12 +190,12 @@ class CheckInCheckOutController extends Controller
                 $total_amount = $request->total_w_pinalty;
             }
             if($order->sales_order_type==4&&$request->use_penalty){
-                JournalHelper::make($token,'Penalty Overtime',['hotel_account','hotel_cash_account'],($request->pinalty),'PyO');
+                JournalHelper::token($token)->make('Penalty Overtime',['hotel_account','hotel_cash_account'],($request->pinalty),'PyO');
             }
             // buat journal kalau tidak full book
             if($order->sales_order_type!=4){
             // * buat jurnal
-                JournalHelper::make($token,'Check-Out',['hotel_account','hotel_cash_account'],$total_amount,'SO');
+                JournalHelper::token($token)->make('Check-Out',['hotel_account','hotel_cash_account'],$total_amount,'SO');
             //
             }
             $invoice->paid_amount = $field['paid_amount'];
