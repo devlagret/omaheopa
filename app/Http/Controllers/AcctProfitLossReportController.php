@@ -98,23 +98,54 @@ class AcctProfitLossReportController extends Controller
         } else {
             $end_date = Session::get('end_date');
         }
+        if(!$journal_voucher_id = Session::get('journal_voucher_id')){
+            $journal_voucher_id = null;
+        } else {
+            $journal_voucher_id = Session::get('journal_voucher_id');
+        }
         
 
-    $data = JournalVoucher::join('acct_journal_voucher_item','acct_journal_voucher_item.journal_voucher_id','acct_journal_voucher.journal_voucher_id')
-        ->select('acct_journal_voucher_item.journal_voucher_amount','acct_journal_voucher_item.account_id_status')
-        ->where('acct_journal_voucher.journal_voucher_date', '>=', $start_date)
-        ->where('acct_journal_voucher.journal_voucher_date', '<=', $end_date)
-        ->where('acct_journal_voucher.data_state',0)
-        ->where('acct_journal_voucher_item.account_id', $account_id)
-        ->get();
-
-    $data_first = JournalVoucher::join('acct_journal_voucher_item','acct_journal_voucher_item.journal_voucher_id','acct_journal_voucher.journal_voucher_id')
-        ->select('acct_journal_voucher_item.account_id_status','acct_journal_voucher_item.account_id_default_status')
-        ->where('acct_journal_voucher.journal_voucher_date', '>=', $start_date)
-        ->where('acct_journal_voucher.journal_voucher_date', '<=', $end_date)
-        ->where('acct_journal_voucher.data_state',0)
-        ->where('acct_journal_voucher_item.account_id', $account_id)
-        ->first();
+        if($journal_voucher_id == ''){
+            $data = JournalVoucher::join('acct_journal_voucher_item','acct_journal_voucher_item.journal_voucher_id','acct_journal_voucher.journal_voucher_id','acct_journal_voucher.merchant_id')
+            ->select('acct_journal_voucher_item.journal_voucher_amount','acct_journal_voucher_item.account_id_status','acct_journal_voucher.merchant_id')
+            ->where('acct_journal_voucher.journal_voucher_date', '>=', $start_date)
+            ->where('acct_journal_voucher.journal_voucher_date', '<=', $end_date)
+            ->where('acct_journal_voucher.data_state',0)
+            ->where('acct_journal_voucher_item.account_id', $account_id)
+            ->where('acct_journal_voucher.company_id', Auth::user()->company_id)
+            ->get();
+            }else{
+                $data = JournalVoucher::join('acct_journal_voucher_item','acct_journal_voucher_item.journal_voucher_id','acct_journal_voucher.journal_voucher_id','acct_journal_voucher.merchant_id')
+            ->select('acct_journal_voucher_item.journal_voucher_amount','acct_journal_voucher_item.account_id_status','acct_journal_voucher.merchant_id')
+            ->where('acct_journal_voucher.journal_voucher_date', '>=', $start_date)
+            ->where('acct_journal_voucher.journal_voucher_date', '<=', $end_date)
+            ->where('acct_journal_voucher.merchant_id',$journal_voucher_id)
+            ->where('acct_journal_voucher.data_state',0)
+            ->where('acct_journal_voucher_item.account_id', $account_id)
+            ->where('acct_journal_voucher.company_id', Auth::user()->company_id)
+            ->get();
+        }
+    
+        if($journal_voucher_id == ''){
+        $data_first = JournalVoucher::join('acct_journal_voucher_item','acct_journal_voucher_item.journal_voucher_id','acct_journal_voucher.journal_voucher_id','acct_journal_voucher.merchant_id')
+            ->select('acct_journal_voucher_item.account_id_status','acct_journal_voucher_item.account_id_default_status')
+            ->where('acct_journal_voucher.journal_voucher_date', '>=', $start_date)
+            ->where('acct_journal_voucher.journal_voucher_date', '<=', $end_date)
+            ->where('acct_journal_voucher.data_state',0)
+            ->where('acct_journal_voucher.company_id', Auth::user()->company_id)
+            ->where('acct_journal_voucher_item.account_id', $account_id)
+            ->first();
+        }else{
+            $data_first = JournalVoucher::join('acct_journal_voucher_item','acct_journal_voucher_item.journal_voucher_id','acct_journal_voucher.journal_voucher_id','acct_journal_voucher.merchant_id')
+            ->select('acct_journal_voucher_item.account_id_status','acct_journal_voucher.merchant_id','acct_journal_voucher_item.account_id_default_status')
+            ->where('acct_journal_voucher.journal_voucher_date', '>=', $start_date)
+            ->where('acct_journal_voucher.journal_voucher_date', '<=', $end_date)
+            ->where('acct_journal_voucher.merchant_id',$journal_voucher_id)
+            ->where('acct_journal_voucher.data_state',0)
+            ->where('acct_journal_voucher.company_id', Auth::user()->company_id)
+            ->where('acct_journal_voucher_item.account_id', $account_id)
+            ->first();
+        }
     
         
         $amount     = 0;
