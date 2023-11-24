@@ -140,6 +140,7 @@ class SalesReservationController extends Controller
         $transaction_module_id  = $this->getTransactionModuleID($transaction_module_code);
         $fields = $request->validate([
             'sales_invoice_reservation_date'        => 'required',
+            'sales_invoice_reservation_due_date'    => 'required',
             'subtotal_item'                         => 'required',
             'subtotal_amount1'                      => 'required',
             'total_amount'                          => 'required',
@@ -158,6 +159,7 @@ class SalesReservationController extends Controller
             'sales_name'                => $request->sales_name,
             // 'merchant_id'               => $request->merchant_id,
             'sales_invoice_reservation_date'        => $fields['sales_invoice_reservation_date'],
+            'sales_invoice_reservation_due_date'        => $fields['sales_invoice_reservation_due_date'],
             'subtotal_item'             => $fields['subtotal_item'],
             'subtotal_amount'           => $fields['subtotal_amount1'],
             'discount_percentage_total' => $discount_percentage_total,

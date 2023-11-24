@@ -359,11 +359,18 @@
             @csrf
             <div class="card-body">
                 <div class="row form-group">
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <div class="form-group">
                             <a class="text-dark">Tanggal Reservasi<a class='red'> *</a></a>
                             <input style="width: 40%" class="form-control input-bb" name="sales_invoice_reservation_date"
                                 id="sales_invoice_reservation_date" type="date" autocomplete="off" value="{{ $date }}" />
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <a class="text-dark">Tanggal Jatuh tempo<a class='red'> *</a></a>
+                            <input style="width: 40%" class="form-control input-bb" name="sales_invoice_reservation_due_date"
+                                id="sales_invoice_reservation_due_date" type="date" autocomplete="off" value="{{ $date }}" />
                         </div>
                     </div>
                     <div class="col-md-6">

@@ -43,168 +43,37 @@ class GeneralReservationController extends Controller
         return view('content.GeneralReservation.FormAddGeneralReservation');
     }
 
-    public function addItemElements(Request $request)
+    public function processAddReservation(Request $request)
     {
-        $items = Session::get('items');
-        if (!$items || $items == '') {
-            $items['item_code']  = '';
-            $items['item_name']  = '';
-            $items['item_barcode']  = '';
-            $items['item_remark']  = '';
-            $items['item_quantity']  = '';
-            $items['item_price']  = '';
-            $items['package_item_id']  = 1;
-            $items['item_cost']  = '';
-            $items['item_category_id']  = '';
-            $items['kemasan']  = 1;
-            $items['merchant_id']  = '';
-            $items['max_kemasan']  = 4;
-        }
-        $items[$request->name] = $request->value;
-        Session::put('items', $items);
-    }
-
-    public function processAddTiket(Request $request)
-    {
-        if(empty(Session::get('token'))){return redirect('/general-ticket')->with('msg', "Tambah Barang Berhasil");}
         // dump($request->all());
-        // dump(Session::get('paket'));exit;
             $fields = $request->validate([
-                'item_code'         => 'required',
-                'item_name'         => 'required',
-                // 'item_unit_id1'     => 'required',
+                'reservation_name'    => 'required',
+                'reservation_price'         => 'required',
             ]);
-            // $warehouse = InvtWarehouse::where('data_state',0)
-            // ->where('company_id',Auth::user()->company_id)
-            // ->where('merchant_id',$request->merchant_id)
-            // ->get();
-            // if(!$warehouse->count()){
-            //     return redirect('/item/add-item')->with('msg','Merchant Tidak Memiliki Warehouse, Harap Tambah Warehouse.');
-            // }
-            
-        
             DB::beginTransaction();
             try {
-                $data = InvtItem::create([
-                    'item_code'             => $fields['item_code'],
-                    'item_name'             => $fields['item_name'],
-                    'item_remark'           => $request->item_remark,
+                $data = CoreReservation::create([
+                    'reservation_name'      => $fields['reservation_name'],
+                    'reservation_price'     => $fields['reservation_price'],
                     'item_status'           => 1,
-                    // * Kemasan
-                    'item_unit_id1'         => 1,
-                    'item_default_quantity1'=> $request->item_default_quantity1,
-                    'item_unit_price1'      => $request->item_unit_price1,
-                    'item_unit_cost1'       => $request->item_unit_cost1,
-                    'item_unit_id2'         => 1,
-                    'item_default_quantity2'=> $request->item_default_quantity2,
-                    'item_unit_price2'      => $request->item_unit_price2,
-                    'item_unit_cost2'       => $request->item_unit_cost2,
-                    'item_unit_id3'         => 1,
-                    'item_default_quantity3'=> $request->item_default_quantity3,
-                    'item_unit_price3'      => $request->item_unit_price3,
-                    'item_unit_cost3'       => $request->item_unit_cost3,
-                    'item_unit_id4'         => 1,
-                    'item_default_quantity4'=> $request->item_default_quantity4,
-                    'item_unit_price4'      => $request->item_unit_price4,
-                    'item_unit_cost4'       => $request->item_unit_cost4,
-                    // *
                     'company_id'            => Auth::user()->company_id,
                     'created_id'            => Auth::id(),
                 ]);
-                // echo json_encode($data);exit;
-                $item = InvtItem::orderBy('created_at', 'DESC')->where('item_status',1)->where('company_id',Auth::user()->company_id)->first();
-                // echo json_encode($item);exit;
-
-                InvtItemStock::create([
-                    'company_id'        => $item['company_id'],
-                    'warehouse_id'      => 1,
-                    'item_id'           => $item['item_id'],
-                    'item_unit_id'      => 1,
-                    'item_category_id'  => null,
-                    'last_balance'      => 0,
-                    'updated_id'        => Auth::id(),
-                    'created_id'        => Auth::id(),
-                ]);
-            $itm = "";
-            if(!empty(Session::get('paket'))){
-                $itm = "Paket";
-                $paket = collect(Session::get('paket'));
-                foreach($paket as $val){
-                    InvtItemPackage::create([
-                        'item_id' => $item['item_id'],
-                        'package_item_id' => array_keys($val)[0],
-                        'item_quantity' => $val[array_keys($val)[0]][0],
-                        'item_unit_id' => $val[array_keys($val)[0]][1],
-                    ]);
-                }
-            }
                 DB::commit();
-                Session::forget('token');
-                $msg    = "Tambah ".$itm." Berhasil";
-                return redirect('/general-ticket')->with('msg', $msg);
+                $msg    = "Tambah Master Reservasi Berhasil";
+                return redirect('/general-reservation')->with('msg', $msg);
             } catch (\Exception $e) {
                 report($e);
-                // dd($e);
-                Session::forget('token');
-                $msg  = "Tambah  Gagal";
-                return redirect('/general-ticket')->with('msg', $msg);
+                $msg  = "Tambah  Master Reservasi Gagal";
+                return redirect('/general-reservation')->with('msg', $msg);
             }
 
     }
 
-    public function editTiket($item_id)
+    public function editReservation($reservation_id)
     {
-        $paket='';
-        $pktitem='';
-        $counts = collect();
-        $items = Session::get('items');
-        $msg = '';
-        $invtpaket = InvtItemPackage::where('item_id',$item_id)->get();
-        $pkg = InvtItemPackage::where('package_item_id',$item_id)->get()->count();
-        if($pkg){
-            $msg ='Ada paket yang menggunakan item ini';
-        }
-        if($invtpaket->count()){
-            //* mengecek apakah (session) paket kosong
-            if(empty(Session::get('paket'))){
-            //* mengisi data paket dari db jika session kosong
-            foreach ($invtpaket as $itm){
-            $arr=[$itm->package_item_id=>[$itm->item_quantity,$itm->item_unit_id]];
-            Session::push('paket',$arr);
-            }}
-            //* set package item data for view
-            $pktitem = collect(Session::get('paket'));
-            //* set unit item data for view
-            $unit = InvtItemUnit::get(['item_unit_id','item_unit_name']);
-            //* get all package item id (using sesion so that the last input saved)
-            foreach($pktitem as $key => $val){
-                if(! $counts->contains(collect($val)->keys()[0])){
-                    $counts->push(collect($val)->keys()[0]);
-                }
-              }
-              $paket = InvtItem::with('category','merchant')->wherein('item_id',$counts)->get();
-        }
-              $unit = InvtItemUnit::get(['item_unit_id','item_unit_name']);
-
-        $itemunits    = InvtItemUnit::where('data_state', '=', 0)
-            ->where('company_id', Auth::user()->company_id)
-            ->get()
-            ->pluck('item_unit_name', 'item_unit_id');
-        $category    = InvtItemCategory::where('data_state', '=', 0)
-            ->where('company_id', Auth::user()->company_id)
-            ->get()
-            ->pluck('item_category_name', 'item_category_id');
-        $merchant   = SalesMerchant::where('data_state', 0);
-        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
-            $merchant->where('merchant_id',Auth::user()->merchant_id);
-        }
-        $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
-        $data  = InvtItem::where('item_id', $item_id)->first();
-        $base_kemasan=0;
-        for($n=1;$n<=4;$n++){
-            $data['item_unit_id'.$n] != null ? $base_kemasan++ : '';
-        }
-        return view('content.GeneralTiket.FormEditGeneralTiket', compact('data','unit', 'itemunits', 'paket','pktitem','category', 'items', 'merchant', 'base_kemasan','counts','msg','pkg'));
+    
+        return view('content.GeneralTiket.FormEditGeneralTiket');
     }
     public function processEditTiket(Request $request)
     {
