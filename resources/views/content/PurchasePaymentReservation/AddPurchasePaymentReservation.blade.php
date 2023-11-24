@@ -1,4 +1,4 @@
-@inject('PurchasePayment', 'App\Http\Controllers\PurchasePaymentController  ')
+@inject('PurchasePayment', 'App\Http\Controllers\PurchasePaymentController')
 @extends('adminlte::page')
 
 @section('title', 'MOZAIC Minimarket')

@@ -64,6 +64,7 @@ use App\Http\Controllers\SalesTiketController;
 use App\Http\Controllers\SalesInvoiceReportController;
 use App\Http\Controllers\SalesReservationController;
 use App\Http\Controllers\SalesRoomFacilityController;
+use App\Http\Controllers\PaymentReservationController;
 use App\Http\Controllers\SalesRoomPriceController;
 use App\Http\Controllers\SystemLogsController;
 use Illuminate\Support\Facades\Auth;
@@ -738,3 +739,15 @@ Route::prefix('purchase-payment')->name('purchase-payment.')->group(function () 
     Route::get('delete-transfer-array/{record_id}/{supplier_id}', [PurchasePaymentController::class, 'deleteTransferArray'])->name('delete-transfer-array');
     Route::post('add-bank/', [PurchasePaymentController::class, 'addCoreBank'])->name('add-bank');
 });
+
+Route::get('/purchase-payment',[PaymentReservationController::class, 'index'])->name('purchase-payment');
+Route::post('/purchase-payment/filter',[PaymentReservationController::class, 'filterPurchasePayment'])->name('filter-purchase-payment');
+Route::get('/purchase-payment/reset-filter',[PaymentReservationController::class, 'resetFilterPurchasePayment'])->name('reset-filter-purchase-payment');
+Route::get('/purchase-payment/search', [PaymentReservationController::class, 'searchPurchasePayment'])->name('search-purchase-payment');
+Route::get('/purchase-payment/select-supplier/{sales_invoice_reservation_id}', [PaymentReservationController::class, 'selectSupplierPurchasePayment'])->name('select-supplier-purchase-payment');
+Route::post('/purchase-payment/elements-add/', [PaymentReservationController::class, 'elements_add'])->name('elements-add-purchase-payment');
+Route::post('/purchase-payment/process-add/', [PaymentReservationController::class, 'processAddPurchasePayment'])->name('process-add-purchase-payment');
+Route::get('/purchase-payment/delete/{supplier_id}', [PaymentReservationController::class, 'deletePurchasePayment'])->name('delete-purchase-payment');
+Route::get('/purchase-payment/detail/{supplier_id}', [PaymentReservationController::class, 'detailPurchasePayment'])->name('detail-purchase-payment');
+Route::get('/purchase-payment/print-recipt-cesh-payment', [PaymentReservationController::class, 'printReciptCeshPayment'])->name('purchase-payment-print-recipt-cesh-payment');
+Route::get('/purchase-payment/print-recipt-non-cesh-payment', [PaymentReservationController::class, 'printReciptNonCeshPayment'])->name('purchase-payment-print-recipt-non-cesh-payment');
