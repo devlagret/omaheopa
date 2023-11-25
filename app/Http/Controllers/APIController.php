@@ -2265,7 +2265,7 @@ class APIController extends Controller
                 );
             if(SalesInvoiceItem::create($dataarray)){
 
-                StockHelper::find($dataarray['item_id'])->sub((int)$dataarray['quantity'],$dataarray['item_unit_id']);
+                // StockHelper::find($dataarray['item_id'])->sub((int)$dataarray['quantity'],$dataarray['item_unit_id']);
             }else{
                 return response([
                     'message' => 'Data Tidak Berhasil Disimpan'
