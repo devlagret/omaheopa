@@ -220,20 +220,20 @@ class SalesTiketController extends Controller
                 // dump(StockHelper::find(3)->sub(5,$val['item_unit_id']));
                 // dump(StockHelper::find($val['item_id']));
                 // dd($dataarray); 
-                StockHelper::find($val['item_id'])->sub((int)$val['quantity'],$val['item_unit_id']);
+                // StockHelper::find($val['item_id'])->sub((int)$val['quantity'],$val['item_unit_id']);
                 SalesInvoiceItem::create($dataarray);
-                // $stock_item = InvtItemStock::where('item_id',$dataarray['item_id'])
-                // ->where('item_category_id',$dataarray['item_category_id'])
-                // ->where('item_unit_id', $dataarray['item_unit_id'])
-                // ->where('company_id', Auth::user()->company_id)
-                // ->first();
-                // if(isset($stock_item)){
-                //     $table = InvtItemStock::findOrFail($stock_item['item_stock_id']);
-                //     $table->last_balance = $stock_item['last_balance'] - $dataarray['quantity'];
-                //     $table->updated_id = Auth::id();
-                //     $table->save();
+                $stock_item = InvtItemStock::where('item_id',$dataarray['item_id'])
+                ->where('item_category_id',$dataarray['item_category_id'])
+                ->where('item_unit_id', $dataarray['item_unit_id'])
+                ->where('company_id', Auth::user()->company_id)
+                ->first();
+                if(isset($stock_item)){
+                    $table = InvtItemStock::findOrFail($stock_item['item_stock_id']);
+                    $table->last_balance = $stock_item['last_balance'] - $dataarray['quantity'];
+                    $table->updated_id = Auth::id();
+                    $table->save();
 
-                // }
+                }
                 //stock update
             }
 

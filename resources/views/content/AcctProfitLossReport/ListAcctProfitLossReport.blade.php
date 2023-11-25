@@ -74,6 +74,12 @@
                                 <input style="width: 50%" class="form-control input-bb" name="end_date" id="end_date" type="date" data-date-format="dd-mm-yyyy" autocomplete="off" value="{{ $end_date }}"/>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <a class="text-dark">Merchant</a>
+                                {!! Form::select('journal_voucher_id',  $unit_status, $journal_voucher_id, ['class' => 'form-control selection-search-clear select-form', 'id' => 'journal_voucher_id', 'name' => 'journal_voucher_id']) !!}
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="card-footer text-muted">

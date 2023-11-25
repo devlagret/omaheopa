@@ -25,7 +25,7 @@ class JournalHelper extends AppHelper
      * Make journal voucher and journal voucher item
      * leave account_setting_name empty to return self
      * @param string $journal_voucher_description
-     * @param array $account_setting_name
+        // @param array $account_setting_name
      * @param integer $total_amount
      * @param string|null $transaction_module_code
      * @return void|self

@@ -1,4 +1,5 @@
 @inject('SalesInvoice', 'App\Http\Controllers\SalesInvoiceController')
+@inject('SalesReservation', 'App\Http\Controllers\SalesReservationController')
 @extends('adminlte::page')
 
 @section('title', "MOZAIC Omah'e Opa")
@@ -9,7 +10,7 @@
             // console.log("value " + value);
             $.ajax({
                 type: "POST",
-                url: "{{ route('add-elements-sales-invoice') }}",
+                url: "{{ route('add-elements-sales-tiket') }}",
                 data: {
                     'name': name,
                     'value': value,
@@ -19,112 +20,154 @@
             });
         }
 
-        function changeCategory(id, el) {
+        // function changeCategory(id, el) {
+        //     loadingWidget();
+        //     var item_id = $("#" + id).val();
+        //     $('#item_id').val(item_id);
+        //     console.log(id);
+        //     $.ajax({
+        //         type: "POST",
+        //         url: "{{ route('get-tiket-item') }}",
+        //         dataType: "html",
+        //         data: {
+        //             'item_id': item_id,
+        //             '_token': '{{ csrf_token() }}',
+        //         },
+        //         success: function(return_data) {
+        //             function_elements_add(id, item_id);
+        //             $('#' + el).html(return_data);
+        //             changeItem($('#' + el).val());
+        //         },
+        //         error: function(data) {
+        //             console.log(data);
+        //         }
+        //     });
+        // }
+
+        // function changeItem() {
+        //     loadingWidget();
+        //     var item_id = $("#item_id_view").val();
+        //     $('#item_id').val(item_id);
+        //     console.log(item_id)
+        //     $.ajax({
+        //         type: "POST",
+        //         url: "{{ route('get-tiket-unit') }}",
+        //         dataType: "html",
+        //         data: {
+        //             'item_id': item_id,
+        //             // 'item_category_id': category,
+        //             '_token': '{{ csrf_token() }}',
+        //         },
+        //         success: function(return_data) {
+        //             console.log(return_data)
+        //             $('#item_unit').val(1);
+        //             $('#item_unit').html(return_data);
+        //             console.log('ci c')
+        //             changeSatuan();
+        //             // function_elements_add('item_category_id', category);
+        //         }
+        //     });
+        // }
+
+        function changeSatuan() {
+            var item_id = $("#item_id_view").val();
             loadingWidget();
-            var merchant_id = $("#" + id).val();
-            $('#merchant_id').val(merchant_id);
-            console.log(id);
             $.ajax({
                 type: "POST",
-                url: "{{ route('get-item-category') }}",
+                url: "{{ route('get-tiket-unit') }}",
                 dataType: "html",
                 data: {
-                    'merchant_id': merchant_id,
+                    'item_id': item_id,
                     '_token': '{{ csrf_token() }}',
                 },
                 success: function(return_data) {
-                    function_elements_add(id, merchant_id);
-                    $('#' + el).html(return_data);
-                    changeItem($('#' + el).val());
+                    $('#item_unit').val(1);
+                    $('#item_unit').html(return_data);
+                    changeCost();
+                    function_elements_add('item_id', item_id);
+                },
+                complete: function() {
+                    loadingWidget(0);
+                    setTimeout(function() {
+                        loadingWidget(0);
+                    }, 200);
                 },
                 error: function(data) {
                     console.log(data);
-                }
-            });
-        }
-
-        function changeItem(category) {
-            loadingWidget();
-            var id = $("#merchant_id").val();
-            var no = $('.pkg-itm').length;
-            $.ajax({
-                type: "POST",
-                url: "{{ route('get-merchant-item') }}",
-                dataType: "html",
-                data: {
-                    'no': no,
-                    'merchant_id': id,
-                    'item_category_id': category,
-                    '_token': '{{ csrf_token() }}',
-                },
-                success: function(return_data) {
-                    $('#item_id').val(1);
-                    $('#item_id').html(return_data);
-                    console.log('ci c')
-                    changeSatuan();
-                    function_elements_add('item_category_id', category);
                 }
             });
         }
 
         function changeCost() {
-            loadingWidget();
-            var item_unit = $("#item_unit").val();
-            var item_id = $("#item_id").val();
-            $.ajax({
-                type: "POST",
-                url: "{{ route('get-item-cost') }}",
-                dataType: "json",
-                data: {
-                    'item_id': item_id,
-                    'item_unit': item_unit,
-                    '_token': '{{ csrf_token() }}',
-                },
-                success: function(return_data) {
-                    console.log(return_data);
-                    loadingWidget(0);
-                    $('#item_unit_price_view').val(return_data == '' ? '' : toRp(return_data.price));
-                    $('#item_unit_price').val(return_data.price);
-                    setTimeout(function(){ loadingWidget(0); }, 200);
+            var reservation_id = $("#reservation_id_view").val();
 
-                },
-                error: function(data) {
-                    console.log(data);
-                    loadingWidget(0);
-                    setTimeout(function(){ loadingWidget(0); }, 200);
+            if(reservation_id == 0 ){
+                $('#reservation_price_view').val(0);
+                $('#reservation_price').val(0);
+            }else{
+                    loadingWidget();
+                    $.ajax({
+                    type: "POST",
+                    url: "{{ route('get-reservation-cost') }}",
+                    dataType: "json",
+                    data: {
+                        'reservation_id': reservation_id,
+                        '_token': '{{ csrf_token() }}',
+                    },
+                    success: function(return_data) {
+                        console.log(return_data);
+                        loadingWidget(0);
+                        $('#reservation_price_view').val(return_data == 0 ? 0 : return_data);
+                        $('#reservation_price').val(return_data);
+                        setTimeout(function(){ loadingWidget(0); }, 200);
+                    },
+                    error: function(data) {
+                        console.log(data);
+                        loadingWidget(0);
+                        setTimeout(function(){ loadingWidget(0); }, 200);
 
 
-                }
-            });
+                    }
+                });
+            }
         }
 
         function getItmPrice() {
             item_id = $('#item_id').val();
         }
-        $(document).ready(function() {
-            changeCategory('merchant_id_view', 'item_category_id')
-            $("#item_unit_price").change(function() {
-                var unit_price = $("#item_unit_price").val();
+        $(document).ready(function() { 
+            
+            $("#reservation_id").change(function() {
+                var reservation_price = $("#reservation_price").val();
                 var quantity = $('#quantity').val();
-                var subtotal_amount = unit_price * quantity;
+                var subtotal_amount = reservation_price * quantity;
+
+                $("#subtotal_amount").val(subtotal_amount);
+                $("#subtotal_amount_view").val(toRp(subtotal_amount));
+            });
+            
+            $("#reservation_price").change(function() {
+                var reservation_price = $("#reservation_price").val();
+                var quantity = $('#quantity').val();
+                var subtotal_amount = reservation_price * quantity;
 
                 $("#subtotal_amount").val(subtotal_amount);
                 $("#subtotal_amount_view").val(toRp(subtotal_amount));
             });
 
             $("#quantity").change(function() {
-                var unit_price = $("#item_unit_price").val();
+                var reservation_price = $("#reservation_price").val();
                 var quantity = $('#quantity').val();
-                var subtotal_amount = unit_price * quantity;
+                var subtotal_amount = reservation_price * quantity;
 
                 $("#subtotal_amount").val(subtotal_amount);
                 $("#subtotal_amount_view").val(toRp(subtotal_amount));
             });
 
             $("#quantity").change(function() {
-                var unit_price = $("#item_unit_price").val();
+                var reservation_price = $("#reservation_price").val();
                 var quantity = $('#quantity').val();
-                var subtotal_amount = unit_price * quantity;
+                var subtotal_amount = reservation_price * quantity;
 
                 $("#subtotal_amount_after_discount").val(subtotal_amount);
                 $("#subtotal_amount_after_discount_view").val(toRp(subtotal_amount));
@@ -165,20 +208,20 @@
 
 
 
-            $("#item_category_id").change(function() {
-                var item_category_id = $("#item_category_id").val();
+            $("#item_id").change(function() {
+                var item_id = $("#item_id").val();
 
                 $.ajax({
                     type: "POST",
-                    url: "{{ route('select-item-category-sales') }}",
+                    url: "{{ route('select-item-category-sales-tiket') }}",
                     dataType: "html",
                     data: {
-                        'item_category_id': item_category_id,
+                        'item_id': item_id,
                         '_token': '{{ csrf_token() }}',
                     },
                     success: function(return_data) {
                         // console.log(item_category_id);
-                        $('#item_id').html(return_data);
+                        $('#item_category_id').html(return_data);
                         $('#item_unit').html('');
                         $('#item_unit_price').val('');
                         $('#quantity').val('');
@@ -192,8 +235,8 @@
                     }
                 });
             });
-            if ($('#merchant_id_view').val() != '') {
-                $('#merchant_id').val($('#merchant_id_view').val());
+            if ($('#item_id_view').val() != '') {
+                $('#item_id').val($('#item_id_view').val());
             }
 
 
@@ -222,52 +265,10 @@
             });
         });
 
-
-        function changeSatuan() {
-            var item_id = $("#item_id").val();
-            loadingWidget();
-            $.ajax({
-                type: "POST",
-                url: "{{ route('get-item-unit') }}",
-                dataType: "html",
-                data: {
-                    'item_id': item_id,
-                    '_token': '{{ csrf_token() }}',
-                },
-                success: function(return_data) {
-                    $('#item_unit').val(1);
-                    $('#item_unit').html(return_data);
-                    changeCost();
-                    function_elements_add('item_id', item_id);
-                },
-                complete: function() {
-                    loadingWidget(0);
-                    setTimeout(function() {
-                        loadingWidget(0);
-                    }, 200);
-                },
-                error: function(data) {
-                    console.log(data);
-                }
-            });
-        }
-
-
-
-
-
-
-
-
-
-
-
-
         function processAddArraySalesInvoice() {
-            var item_category_id = document.getElementById("item_category_id").value;
-            var item_id = document.getElementById("item_id").value;
-            var item_unit_id = document.getElementById("item_unit").value;
-            var item_unit_price = document.getElementById("item_unit_price").value;
+            // var item_category_id = document.getElementById("item_category_id").value;
+            var reservation_id = document.getElementById("reservation_id_view").value;
+            var reservation_price = document.getElementById("reservation_price").value;
             var quantity = document.getElementById("quantity").value;
             var subtotal_amount = document.getElementById("subtotal_amount").value;
             var discount_percentage = document.getElementById("discount_percentage").value;
@@ -276,12 +277,11 @@
 
             $.ajax({
                 type: "POST",
-                url: "{{ route('add-array-sales-invoice') }}",
+                url: "{{ route('add-array-sales-reservation') }}",
                 data: {
-                    'item_category_id': item_category_id,
-                    'item_id': item_id,
-                    'item_unit_id': item_unit_id,
-                    'item_unit_price': item_unit_price,
+                    // 'item_category_id': item_category_id,
+                    'reservation_id': reservation_id,
+                    'reservation_price': reservation_price,
                     'quantity': quantity,
                     'subtotal_amount': subtotal_amount,
                     'discount_percentage': discount_percentage,
@@ -305,24 +305,6 @@
 
             });
         }
-
-        // Mendapatkan elemen input tanggal
-        var inputTanggal = document.getElementById('sales_invoice_date');
-        
-        // Mendapatkan tanggal hari ini
-        var today = new Date();
-        
-        // Mendapatkan bulan dari tanggal hari ini
-        var currentMonth = today.getMonth() + 1;
-        
-        // Mendapatkan tahun dari tanggal hari ini
-        var currentYear = today.getFullYear();
-        
-        // Mendapatkan nilai minimum yang dapat dipilih (tahun-bulan-tanggal)
-        var minimumDate = currentYear + '-' + (currentMonth < 10 ? '0' : '') + currentMonth + '-01';
-        
-        // Menetapkan nilai minimum pada input tanggal
-        inputTanggal.min = minimumDate;
     </script>
 @stop
 @section('content_header')
@@ -330,8 +312,8 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ url('home') }}">Beranda</a></li>
-            <li class="breadcrumb-item"><a href="{{ url('sales-invoice') }}">Daftar Penjualan</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Tambah Penjualan</li>
+            <li class="breadcrumb-item"><a href="{{ url('sales-reservation') }}">Daftar Reservasi</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Tambah Reservasi</li>
         </ol>
     </nav>
 
@@ -340,7 +322,7 @@
 @section('content')
 
     <h3 class="page-title">
-        Form Tambah Penjualan
+        Form Tambah Reservasi
     </h3>
     <br />
     @if (session('msg'))
@@ -362,7 +344,7 @@
                 Form Tambah
             </h5>
             <div class="float-right">
-                <button onclick="location.href='{{ url('sales-invoice') }}'" name="Find" class="btn btn-sm btn-info"
+                <button onclick="location.href='{{ url('sales-reservation') }}'" name="Find" class="btn btn-sm btn-info"
                     title="Back"><i class="fa fa-angle-left"></i> Kembali</button>
             </div>
         </div>
@@ -373,84 +355,83 @@
         // }
         ?>
 
-        <form method="post" action="{{ route('process-add-sales-invoice') }}" enctype="multipart/form-data">
+        <form method="post" action="{{ route('process-add-sales-reservation') }}" enctype="multipart/form-data">
             @csrf
             <div class="card-body">
                 <div class="row form-group">
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <div class="form-group">
-                            <a class="text-dark">Tanggal Invoice Penjualan<a class='red'> *</a></a>
-                            <input style="width: 40%" class="form-control input-bb" name="sales_invoice_date" 
-                                id="sales_invoice_date" type="date" autocomplete="off" value="{{ $date }}" />
+                            <a class="text-dark">Tanggal Reservasi<a class='red'> *</a></a>
+                            <input style="width: 40%" class="form-control input-bb" name="sales_invoice_reservation_date"
+                                id="sales_invoice_reservation_date" type="date" autocomplete="off" value="{{ $date }}" />
                         </div>
                     </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <a class="text-dark">Tanggal Jatuh tempo<a class='red'> *</a></a>
+                            <input style="width: 40%" class="form-control input-bb" name="sales_invoice_reservation_due_date"
+                                id="sales_invoice_reservation_due_date" type="date" autocomplete="off" value="{{ $date }}" />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <a class="text-dark">Marketing</a>
+                            <input class="form-control input-bb" name="sales_name" id="sales_name" type="text"
+                                autocomplete="off" value=""
+                                onChange="function_elements_add(this.name, this.value);" />
+                        </div>
+                    </div>
+
+                    <h6 class="col-md-8 mt-2 mb-2"><b>Data Reservasi</b></h6>
                     <div class="col-md-6">
                         <div class="form-group">
                             <a class="text-dark">Pelanggan</a>
                             <input class="form-control input-bb" name="customer_name" id="customer_name" type="text"
                                 autocomplete="off" value=""
                                 onChange="function_elements_add(this.name, this.value);" />
-                            {{-- <input class="form-control input-bb"  name="merchant_id" id="merchant_id" type="text" value="{{ Auth::user()->merchant_id }}" /> --}}
                         </div>
                     </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <a class="text-dark">Nama Item<a class='red'> *</a></a>
+                               
+                            
+                                <select class="selection-search-clear required select-form" name="reservation_id_view" id="reservation_id_view" onchange="changeCost()" autofocus>
+                                    <option value="0">pilih Paket</option>
+                                    @foreach ($reservations as $item)
+                                    <option value="{{ $item->reservation_id }}">{{ $item->reservation_name }}</option>
+                                    @endforeach
+                                </select>
+                            <input type="text" name="reservation_id" id="reservation_id" hidden/>
+                            </div>
+                        </div>
+                      
 
-                    <h6 class="col-md-8 mt-2 mb-2"><b>Data Penjualan Barang</b></h6>
-                    <div class="col-md-6">
+                    {{-- <div class="col-md-6">
                         <div class="form-group">
-                            <a class="text-dark">Wahana / Merchant<a class='red'> *</a></a>
-                            {!! Form::select('merchant_id', $merchant, $sessiondata['merchant_id'] ?? '', [
-                                'class' => 'selection-search-clear select-form',
-                                'name' => 'merchant_id_view',
-                                'id' => 'merchant_id_view',
-                                'onchange' => 'changeCategory(this.id,`item_category_id`)',
-                                'autofocus' => 'autofocus',
-                                $merchant->count()==1?"disabled":''
-                            ]) !!}
-                            <input type="hidden" name="merchant_id" id="merchant_id" />
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <a class="text-dark">Kategori Barang / Paket<a class='red'> *</a></a>
-                            <select class="selection-search-clear required select-form"
-                                placeholder="Masukan Kategori Barang" name="item_category_id" id="item_category_id"
-                                onchange="changeItem(this.value)">
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <a class="text-dark">Nama Barang<a class='red'> *</a></a>
-                            <select class="selection-search-clear required select-form" placeholder="Masukan Nama Barang"
-                                name="item_id" id="item_id" onchange="changeSatuan()">
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <a class="text-dark">Satuan Barang<a class='red'> *</a></a>
-                            <select class="selection-search-clear required select-form"
+                            <a class="text-dark" hidden>Satuan Tiket<a class='red'hidden> *</a></a>
+                            <input class="form-control input-bb"
                                 placeholder="Masukan Kategori Barang" name="item_unit" id="item_unit"
-                                onchange="changeCost()">
-                            </select>
+                                onchange="changeCost()" hidden>
                         </div>
-                    </div>
+                    </div> --}}
                     <div class="col-md-6">
                         <div class="form-group">
-                            <a class="text-dark">Harga Per Barang<a class='red'> *</a></a>
-                            <input class="form-control input-bb" name="item_unit_price_view" id="item_unit_price_view" type="text"
-                                autocomplete="off" readonly />
-                                <input class="form-control input-bb" name="item_unit_price" id="item_unit_price" type="text"
-                                autocomplete="off" hidden />
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <a class="text-dark">Quantity<a class='red'> *</a></a>
+                            <a class="text-dark">Jumlah Orang<a class='red'> *</a></a>
                             <input class="form-control input-bb" name="quantity" id="quantity" type="text"
                                 autocomplete="off" value="" />
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <a class="text-dark">Harga Per orang<a class='red'> *</a></a>
+                            <input class="form-control input-bb" name="reservation_price_view" id="reservation_price_view" type="text"
+                                autocomplete="off" readonly />
+                                <input class="form-control input-bb" name="reservation_price" id="reservation_price" type="text"
+                                autocomplete="off" hidden/>
+                        </div>
+                    </div>
+                   
                     <div class="col-md-6">
                         <div class="form-group">
                             <a class="text-dark">Total<a class='red'> *</a></a>
@@ -523,7 +504,7 @@
                     <table class="table table-bordered table-advance table-hover">
                         <thead class="thead-light">
                             <tr>
-                                <th style='text-align:center'>Barang</th>
+                                <th style='text-align:center'>Item </th>
                                 <th style='text-align:center'>Quantity</th>
                                 <th style='text-align:center'>Harga</th>
                                 <th style='text-align:center'>Subtotal</th>
@@ -545,16 +526,16 @@
                                     foreach ($arraydatases as $key => $val) {
                                         echo "
                                         <tr>
-                                            <td style='text-align  : left !important;'>". $SalesInvoice->getItemName($val['item_id'])."</td>
+                                            <td style='text-align  : left !important;'>". $SalesReservation->getItemName($val['reservation_id'])."</td>
                                             <td style='text-align  : right !important;'>".$val['quantity']."</td>
-                                            <td style='text-align  : right !important;'>".number_format($val['item_unit_price'],2,'.',',')."</td>
+                                            <td style='text-align  : right !important;'>".number_format($val['reservation_price'],2,'.',',')."</td>
                                             <td style='text-align  : right !important;'>".number_format($val['subtotal_amount'],2,'.',',')."</td>
                                             <td style='text-align  : right !important;'>".$val['discount_percentage']."</td>
                                             <td style='text-align  : right !important;'>".number_format($val['subtotal_amount_after_discount'],2,'.',',')."</td>
                                         ";
                                         ?>
                             <td style='text-align  : center'>
-                                <a href="{{ route('delete-array-sales-invoice', ['record_id' => $key]) }}" name='Reset'
+                                <a href="{{ route('delete-array-sales-reservation', ['record_id' => $key]) }}" name='Reset'
                                     class='btn btn-danger btn-sm'
                                     onclick="return confirm('Apakah Anda Yakin Ingin Menghapus Data Ini ?')"></i> Hapus</a>
                             </td>
@@ -617,7 +598,7 @@
                                 <td></td>
                             </tr>
                             <tr>
-                                <th colspan="4">Bayar</th>
+                                <th colspan="4">DP</th>
                                 <td style='text-align  : right !important;'>
                                     <input type="text" style="text-align  : right !important;"
                                         class="form-control input-bb" name="paid_amount" id="paid_amount"
@@ -627,7 +608,7 @@
                                 <td></td>
                             </tr>
                             <tr>
-                                <th colspan="4">Kembalian</th>
+                                <th colspan="4">Sisa Bayar</th>
                                 <td style='text-align  : right !important;'>
                                     <input type="text" style="text-align  : right !important;"
                                         class="form-control input-bb" name="change_amount_view" id="change_amount_view"
