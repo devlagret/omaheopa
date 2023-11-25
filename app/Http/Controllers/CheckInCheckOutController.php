@@ -145,6 +145,7 @@ class CheckInCheckOutController extends Controller
             return redirect()->route('cc.index')->with('msg','Data Berhasil Diinput');
         }catch(\Exception $e){
             DB::rollBack();
+            dd($e);
             report($e);
             return redirect()->route('cc.index')->with('msg','Data Gagal Diinput');
         }
@@ -190,12 +191,12 @@ class CheckInCheckOutController extends Controller
                 $total_amount = $request->total_w_pinalty;
             }
             if($order->sales_order_type==4&&$request->use_penalty){
-                JournalHelper::token($token)->make('Penalty Overtime',['hotel_account','hotel_cash_account'],($request->pinalty),'PyO');
+                JournalHelper::token($token)->make('Penalty Overtime',($request->pinalty),['hotel_account','hotel_cash_account'],'PyO');
             }
             // buat journal kalau tidak full book
             if($order->sales_order_type!=4){
             // * buat jurnal
-                JournalHelper::token($token)->make('Check-Out',['hotel_account','hotel_cash_account'],$total_amount,'SO');
+                JournalHelper::token($token)->make('Check-Out',$total_amount,['hotel_account','hotel_cash_account'],'SO');
             //
             }
             $invoice->paid_amount = $field['paid_amount'];
@@ -358,7 +359,7 @@ class CheckInCheckOutController extends Controller
         }
 
         // * buat jurnal
-        JournalHelper::make($token,'Check-in Non Booking',['hotel_account','hotel_cash_account'],$request->total_amount);
+        JournalHelper::make('Check-in Non Booking',$request->total_amount,['hotel_account','hotel_cash_account']);
         //
 
             DB::commit();

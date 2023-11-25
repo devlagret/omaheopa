@@ -140,8 +140,8 @@
 
                                 <input type="text" style="text-align:right" name="journal_voucher_credit_amount_view" id="journal_voucher_credit_amount_view" value="{{ number_format($acctassetItem['asset_depreciation_item_amount'], 2) }} " class="form-control">
                             </td>
-                            <input type="text" style="text-align:right" name="asset_depreciation_item_id" id="asset_depreciation_item_id" value="{{ $acctassetItem['asset_depreciation_item_id']; }} " class="form-control" hidden>
-                            <input type="text" style="text-align:right" name="asset_depreciation_id" id="asset_depreciation_id" value="{{ $acctassetItem['asset_depreciation_id']; }} " class="form-control" hidden>
+                            <input type="text" style="text-align:right" name="asset_depreciation_item_id" id="asset_depreciation_item_id" value="{{ $acctassetItem['asset_depreciation_item_id'] }} " class="form-control" hidden>
+                            <input type="text" style="text-align:right" name="asset_depreciation_id" id="asset_depreciation_id" value="{{ $acctassetItem['asset_depreciation_id'] }} " class="form-control" hidden>
 
                         </tr>
                     </tbody>

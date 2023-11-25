@@ -1,5 +1,3 @@
-@inject('PIRC','App\Http\Controllers\PurchaseInvoiceReportController' )
-
 @extends('adminlte::page')
 
 @section('title',  "MOZAIC Omah'e Opa")
@@ -99,7 +97,6 @@
         Daftar
     </h5>
   </div>
-
     <div class="card-body">
         <div class="table-responsive">
             <table id="example" style="width:100%" class="table table-striped table-bordered table-hover table-full-width">
@@ -118,18 +115,20 @@
                 </thead>
                 <tbody>
                     <?php $no =1; ?>
-                    @foreach ($data as $row)
+                    @foreach ($data as $dt)
+                    @foreach ($dt->item as $row)
                         <tr>
                             <td>{{ $no++ }}</td>
-                            <td>{{ $row['purchase_invoice_supplier'] }}</td>
-                            <td>{{ $PIRC->getWarehouseName($row['warehouse_id']) }}</td>
-                            <td>{{ $PIRC->getItemName($row['item_id']) }}</td>
-                            <td>{{ $row['purchase_invoice_date'] }}</td>
+                            <td>{{ $dt->supplier->supplier_name }}</td>
+                            <td>{{ $row->warehouse->warehouse_name}}</td>
+                            <td>{{ $row->item->item_name}}</td>
+                            <td>{{ $dt['purchase_invoice_date'] }}</td>
                             <td>{{ $row['quantity'] }}</td>
-                            <td>{{ $PIRC->getUnitName($row['item_unit_id']) }}</td>
+                            <td>{{ $row->unit->item_unit_name}}</td>
                             <td style="text-align: right">{{ number_format($row['item_unit_cost'],2,'.',',') }}</td>
                             <td style="text-align: right">{{ number_format($row['subtotal_amount'],2,'.',',') }}</td>
                         </tr>
+                    @endforeach
                     @endforeach
                 </tbody>
             </table>

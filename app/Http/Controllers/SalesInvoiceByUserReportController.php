@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Models\InvtItem;
-use App\Models\InvtItemCategory;
 use App\Models\InvtItemUnit;
 use App\Models\SalesInvoice;
-use App\Models\User;
-use Elibyy\TCPDF\Facades\TCPDF;
 use Illuminate\Http\Request;
+use Elibyy\TCPDF\Facades\TCPDF;
+use App\Models\InvtItemCategory;
+use App\Models\SalesInvoiceItem;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -39,17 +40,21 @@ class SalesInvoiceByUserReportController extends Controller
         } else {
             $user_id = Session::get('user_id');
         }
-        $user = User::where('data_state',0)
+        $user = User::where('data_state','0')
         ->where('company_id', Auth::user()->company_id)
+        ->where('user_id','!=',1)
         ->get()
         ->pluck('name','user_id');
-        $data = SalesInvoice::join('sales_invoice_item','sales_invoice.sales_invoice_id','=','sales_invoice_item.sales_invoice_id')
-        ->where('sales_invoice.sales_invoice_date','>=',$start_date)
-        ->where('sales_invoice.sales_invoice_date','<=',$end_date)
-        ->where('sales_invoice.created_id', $user_id)
-        ->where('sales_invoice.company_id', Auth::user()->company_id)
-        ->where('sales_invoice.data_state',0)
-        ->get();
+        // dd(SalesInvoiceItem::get());
+        $data = SalesInvoice::with('items.unit','items.item','user')
+        ->where('sales_invoice_date','>=',$start_date)
+        ->where('sales_invoice_date','<=',$end_date)
+        ->where('company_id', Auth::user()->company_id)
+        ->where('data_state',0);
+        if(!empty(Session::get('user_id'))){
+            $data->where('created_id', $user_id);
+        }
+        $data=$data->get();
         return view('content.SalesInvoiceByUserReport.ListSalesInvoiceByUserReport', compact('user','data','start_date','end_date'));
     }
 

@@ -20,7 +20,11 @@ class ItemUsageController extends Controller
     }
     public function index() {
         Session::forget('h-item-data');
-        $usage = InvtItemUsage::with('item','unit')->get();
+        $filter = Session::get('lst-usage-filter');
+        $usage = InvtItemUsage::with('item','unit')
+        ->where('date','>=',$filter['start_date']??date('Y-m-d'))
+        ->where('date','<=',$filter['end_date']??date('Y-m-d'))
+        ->get();
         return view('content.ItemUsage.ListUsage')->with(['usage'=>$usage]);
     }
     public function add() {
@@ -31,6 +35,13 @@ class ItemUsageController extends Controller
         }
         $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
         return view('content.ItemUsage.FormAddUsage',compact('sessiondata','merchant'));
+    }
+    public function filter(Request $request) {
+        $data = collect(Session::get('lst-usage-filter'));
+        $data->put('start_date',$request->start_date);
+        $data->put('end_date',$request->end_date);
+        Session::put('lst-usage-filter',$data->toArray());
+        return redirect()->route('hi.index');
     }
     public function elementsAdd(Request $request){
         $sessiondata = Session::get('h-item-data');
@@ -56,6 +67,7 @@ class ItemUsageController extends Controller
            return redirect()->route('hi.index')->with(['type'=>'success','msg'=>'Tambah Penggunaan Barang Berhasil']);
         }catch(\Exception $e){
             DB::rollBack();
+            dd($e);
             report($e);
             return redirect()->route('hi.index')->with(['type'=>'danger','msg'=>'Tambah Penggunaan Barang Gagal']);
         }

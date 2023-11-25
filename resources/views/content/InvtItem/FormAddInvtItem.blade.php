@@ -387,8 +387,8 @@ if (empty($paket)) {
                 Form Tambah
             </h5>
             <div class="float-right">
-                <button onclick="location.href='{{ url('item') }}'" name="Find" class="btn btn-sm btn-info"
-                    title="Back"><i class="fa fa-angle-left"></i> Kembali</button>
+                <a href="{{url()->previous()}}" name="back" class="btn btn-sm btn-info"
+                    title="Back"><i class="fa fa-angle-left"></i> Kembali</a>
             </div>
         </div>
 

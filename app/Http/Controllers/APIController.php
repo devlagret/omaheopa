@@ -2114,7 +2114,7 @@ class APIController extends Controller
         $sales  = SalesInvoice::select('*')
         ->where('data_state', 0)
         ->where('company_id', Auth::user()->company_id)
-        ->where('sales_status',0)
+        ->where('sales_status', 1)
         ->get();
         
         if($sales){
@@ -2200,13 +2200,9 @@ class APIController extends Controller
         $transaction_module_code = 'SI';
         $transaction_module_id  = $this->getTransactionModuleID($transaction_module_code);
         $fields = $request->validate([
-            'sales_invoice_date'        => 'required',
-            'subtotal_item'             => '',
-            'subtotal_amount1'          => '',
             'total_amount'              => 'required',
             'paid_amount'               => 'required',
             'item_id'                   => 'required',
-            'change_amount'             => ''
         ]);
         if (empty($request->discount_percentage_total)){
             $discount_percentage_total = 0;
@@ -2218,14 +2214,14 @@ class APIController extends Controller
         $data = array(
             'customer_name'             => $request->customer_name,
             // 'merchant_id'               => $request->merchant_id,
-            'sales_invoice_date'        => $fields['sales_invoice_date'],
-            'subtotal_item'             => $fields['subtotal_item'],
-            'subtotal_amount'           => $fields['subtotal_amount1'],
+            'sales_invoice_date'        =>   date('Y-m-d'),
+            'subtotal_item'             => $request->subtotal_item,
+            'subtotal_amount'           => $request->subtotal_amount1,
             'discount_percentage_total' => $discount_percentage_total,
             'discount_amount_total'     => $discount_amount_total,
             'total_amount'              => $fields['total_amount'],
             'paid_amount'               => $fields['paid_amount'],
-            'change_amount'             => $fields['change_amount'],
+            'change_amount'             => $request->change_amount,
             'sales_status'              => 1,
             'company_id'                => Auth::user()->company_id,
             'created_id'                => Auth::id(),
@@ -2254,7 +2250,7 @@ class APIController extends Controller
 
                 $dataarray = array(
                     'sales_invoice_id'                  => $sales_invoice_id['sales_invoice_id'],
-                    'item_category_id'                  => null, 
+                    'item_category_id'                  => null,
                     'item_unit_id'                      => $item['item_unit_id'],
                     'item_id'                           => $fields['item_id'],
                     'quantity'                          => $item['quantity'],
@@ -2269,7 +2265,18 @@ class APIController extends Controller
                 );
             if(SalesInvoiceItem::create($dataarray)){
 
-                StockHelper::find($dataarray['item_id'])->sub((int)$dataarray['quantity'],$dataarray['item_unit_id']);
+                // StockHelper::find($dataarray['item_id'])->sub((int)$dataarray['quantity'],$dataarray['item_unit_id']);
+                $stock_item = InvtItemStock::where('item_id',$dataarray['item_id'])
+                // ->where('item_category_id',$dataarray['item_category_id'])
+                ->where('item_unit_id', $dataarray['item_unit_id'])
+                ->where('company_id', Auth::user()->company_id)
+                ->first();
+                if(isset($stock_item)){
+                    $table = InvtItemStock::findOrFail($stock_item['item_stock_id']);
+                    $table->last_balance = $stock_item['last_balance'] - $dataarray['quantity'];
+                    $table->updated_id = Auth::id();
+                    $table->save();
+                }
             }else{
                 return response([
                     'message' => 'Data Tidak Berhasil Disimpan'

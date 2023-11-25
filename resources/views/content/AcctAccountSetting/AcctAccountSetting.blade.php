@@ -115,7 +115,7 @@
                             {!! Form::select(0, $status, $data->where('account_setting_name','purchase_payment_account')->pluck('account_setting_status')??'',['class' => 'selection-search-clear select-form','name'=>'purchase_payment_account_status','id'=>'purchase_payment_account_status']) !!}
                         </td>
                     </tr>
-                    <tr>
+                    {{-- <tr>
                         <th style="text-align: left !important; width: 40% !important">Kas</th>
                         <td style="text-align: left !important; width: 30% !important">
                             {!! Form::select(0, $accountlist, $data->where('account_setting_name','purchase_cash_payment_account')->pluck('account_id')??'',['class' => 'selection-search-clear select-form','name'=>'purchase_cash_payment_account_id','id'=>'purchase_cash_payment_account_id']) !!}
@@ -123,7 +123,7 @@
                         <td style="text-align: left !important; width: 30% !important">
                             {!! Form::select(0, $status, $data->where('account_setting_name','purchase_cash_payment_account')->pluck('account_setting_status')??'',['class' => 'selection-search-clear select-form','name'=>'purchase_cash_payment_account_status','id'=>'purchase_cash_payment_account_status']) !!}
                         </td>
-                    </tr>
+                    </tr> --}}
 
                     <tr>
                         <th colspan="3" style="text-align: center !important ;width: 100% !important">Pembayaran Hutang Non Tunai</th>
@@ -137,7 +137,7 @@
                             {!! Form::select(0, $status, $data->where('account_setting_name','purchase_non_cash_payment_account')->pluck('account_setting_status')??'',['class' => 'selection-search-clear select-form','name'=>'purchase_non_cash_payment_account_status','id'=>'purchase_non_cash_payment_account_status']) !!}
                         </td>
                     </tr>
-                    <tr>
+                    {{-- <tr>
                         <th style="text-align: left !important; width: 40% !important">Kas</th>
                         <td style="text-align: left !important; width: 30% !important">
                             {!! Form::select(0, $accountlist, $data->where('account_setting_name','purchase_non_cash_cash_payment_account')->pluck('account_id')??'',['class' => 'selection-search-clear select-form','name'=>'purchase_non_cash_cash_payment_account_id','id'=>'purchase_non_cash_cash_payment_account_id']) !!}
@@ -145,7 +145,7 @@
                         <td style="text-align: left !important; width: 30% !important">
                             {!! Form::select(0, $status, $data->where('account_setting_name','purchase_non_cash_cash_payment_account')->pluck('account_setting_status')??'',['class' => 'selection-search-clear select-form','name'=>'purchase_non_cash_cash_payment_account_status','id'=>'purchase_non_cash_cash_payment_account_status']) !!}
                         </td>
-                    </tr>
+                    </tr> --}}
 
                     <tr>
                         <th colspan="3" style="text-align: center !important ;width: 100% !important">Retur Pembelian</th>

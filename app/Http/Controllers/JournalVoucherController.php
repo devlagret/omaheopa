@@ -7,6 +7,8 @@ use App\Models\AcctAccount;
 use App\Models\JournalVoucher;
 use App\Models\JournalVoucherItem;
 use App\Models\PreferenceTransactionModule;
+use App\Models\SalesMerchant;
+
 use DateTime;
 use Elibyy\TCPDF\Facades\TCPDF;
 use Illuminate\Http\Request;
@@ -57,12 +59,14 @@ class JournalVoucherController extends Controller
             '0' => 'Debit',
             '1' => 'Kredit'
         );
+        $unit_status = SalesMerchant::where('data_state', 0)->pluck('merchant_name','merchant_id');
+
         $account = AcctAccount::select(DB::raw("CONCAT(account_code,' - ',account_name) AS full_account"),'account_id')
         ->where('data_state',0)
         ->where('company_id',Auth::user()->company_id)
         ->get()
         ->pluck('full_account','account_id');
-        return view('content.JournalVoucher.FormAddJournalVoucher',compact('status','account','journal','arraydata'));
+        return view('content.JournalVoucher.FormAddJournalVoucher',compact('status','account','journal','arraydata','unit_status'));
     }
 
     public function addElementsJournalVoucher(Request $request)
@@ -83,6 +87,8 @@ class JournalVoucherController extends Controller
             'account_id'                => 'required',
             'account_status'            => 'required',
             'journal_voucher_amount'    => 'required',
+            'merchant_id'    => 'required',
+
             
         ]);
 
@@ -90,6 +96,8 @@ class JournalVoucherController extends Controller
             'account_id'                => $request->account_id,
             'account_status'            => $request->account_status,
             'journal_voucher_amount'    => $request->journal_voucher_amount,
+            'merchant_id'               => $request->merchant_id,
+
             
         );
 
@@ -137,6 +145,7 @@ class JournalVoucherController extends Controller
             'journal_voucher_date'          => $fields['journal_voucher_date'],
             'journal_voucher_description'   => $fields['journal_voucher_description'],
             'journal_voucher_title'         => $fields['journal_voucher_description'],
+            'merchant_id'                   => $request->merchant_id,
             'journal_voucher_period'        => date('Ym'),
             'transaction_module_code'       => $transaction_module_code,
             'transaction_module_id'         => $transaction_module_id,

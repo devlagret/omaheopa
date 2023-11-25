@@ -226,10 +226,10 @@ class PurchaseInvoiceController extends Controller
         }
         if($request->purchase_payment_method){
             //* Hutang
-            JournalHelper::token($token)->make('Purchase Invoice',['purchase_cash_payable_account','purchase_payable_account'],$fields['total_amount']);
+            JournalHelper::token($token)->make('Purchase Invoice',$fields['total_amount'],['purchase_cash_payable_account','purchase_payable_account']);
         }else{
             //* Tunai
-            JournalHelper::token($token)->make('Purchase Invoice',['purchase_cash_account','purchase_account'],$fields['total_amount']);
+            JournalHelper::token($token)->make('Purchase Invoice',$fields['total_amount'],['purchase_cash_account','purchase_account']);
          }
         DB::commit();
         Session::forget('purchase-token');

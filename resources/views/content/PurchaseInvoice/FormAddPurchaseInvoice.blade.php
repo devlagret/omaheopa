@@ -291,9 +291,10 @@
             }
             var total_amount = parseInt($("#total_amount").val());
             var owing_amount = paid_amount - total_amount;
-            // if(paid_amount>total_amount){
-            //     owing_amount = 0;
-            // }
+            $('#hutang-label').html('Hutang');
+            if(paid_amount>total_amount){
+              $('#hutang-label').html('Kembalian');
+            }
             $('#paid_amount_view').val(toRp(paid_amount));
             $('#paid_amount').val(paid_amount);
             $("#owing_amount").val(Math.abs(owing_amount));
@@ -976,7 +977,7 @@
             </div>
             <div class="card-footer text-muted">
                 <div class="form-actions float-right">
-                            <a class="btn btn-secondary">Tambah Barang Baru</a>
+                    <a class="btn btn-secondary" href="{{route('add-item')}}">Tambah Barang Baru</a>
                     <button type="button" id="add_purchase_item" class="btn btn-success" title="Add"> Tambah</button>
                 </div>
             </div>
@@ -1097,7 +1098,7 @@
                                     <td></td>
                                 </tr>
                                 <tr id="hutang-view">
-                                    <td colspan="3">Hutang</td>
+                                    <td colspan="3" id="hutang-label">Hutang</td>
                                     <td style='text-align  : right !important;'>
                                         <input type="text" style="text-align  : right !important;" class="form-control input-bb" name="owing_amount_view" id="owing_amount_view" value="" readonly/>
                                         <input type="text" style="text-align  : right !important;" class="form-control input-bb" name="owing_amount" id="owing_amount" value="" hidden/>

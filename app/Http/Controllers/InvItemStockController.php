@@ -386,7 +386,7 @@ class InvItemStockController extends Controller
 
         }
         
-            ob_clean();
+            // ob_clean();
             $filename='Stock Barang '.date('d M Y').'.xls';
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             header('Content-Disposition: attachment;filename="'.$filename.'"');

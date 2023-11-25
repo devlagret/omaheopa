@@ -14,7 +14,9 @@
                     '_token'    : '{{csrf_token()}}'
                 },
 				success: function(msg){
-                    console.log(msg);
+                    setTimeout(function() {
+                        loading(0);
+                    }, 500);
 			}
 		});
 	}
@@ -58,7 +60,7 @@
                     loading(0);
                     setTimeout(function() {
                         loading(0);
-                    }, 100);
+                    }, 300);
                 },
                 complete: function() {
                     loading(0);

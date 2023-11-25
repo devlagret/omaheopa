@@ -24,7 +24,9 @@
         var account_id                  = document.getElementById("account_id").value;
         var account_status              = document.getElementById("account_status").value;
         var journal_voucher_amount      = document.getElementById("journal_voucher_amount").value;
-       
+        var merchant_id      = document.getElementById("merchant_id").value;
+
+    
         $.ajax({
             type: "POST",
             url : "{{route('add-array-journal-voucher')}}",
@@ -32,6 +34,8 @@
                 'account_id'                : account_id,
                 'account_status'            : account_status,
                 'journal_voucher_amount'    : journal_voucher_amount,
+                'merchant_id'               : merchant_id,
+
                 '_token'                    : '{{csrf_token()}}'
             },
             success: function(msg){
@@ -98,10 +102,16 @@
         @csrf
         <div class="card-body">
             <div class="row form-group">
-                <div class="col-md-9">
+                <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">Tanggal<a class='red'> *</a></a>
                         <input style="width: 30%" class="form-control input-bb" name="journal_voucher_date" id="journal_voucher_date" type="date" data-date-format="dd-mm-yyyy" autocomplete="off" onchange="function_elements_add(this.name, this.value)" value="{{ $journal['journal_voucher_date'] ?? ''}}"/>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <a class="text-dark">Merchant</a>
+                        {!! Form::select('merchant_id',  $unit_status, 0,['class' => 'selection-search-clear select-form', 'id' => 'merchant_id', 'name' => 'merchant_id']) !!}
                     </div>
                 </div>
                 <div class="col-md-9 mb-5">
@@ -110,6 +120,7 @@
                         <textarea rows="2" cols="2" style="width: 60%" class="form-control input-bb" name="journal_voucher_description" id="journal_voucher_description" autocomplete="off" onchange="function_elements_add(this.name, this.value)">{{ $journal['journal_voucher_description'] ?? ''}}</textarea>
                     </div>
                 </div>
+                
                 <div class="col-md-6">
                     <div class="form-group">
                         <a class="text-dark">No. Perkiraan<a class='red'> *</a></a>
@@ -128,6 +139,7 @@
                         <input class="form-control input-bb" id="journal_voucher_amount" autocomplete="off" value=""/>
                     </div>
                 </div>
+                
             </div>
         </div> 
         <div class="card-footer text-muted">
@@ -177,6 +189,8 @@
                                                     <td style='text-align  : right !important;'>".number_format($val['journal_voucher_amount'],2,'.',',')."</td>";
                                         }?>
                                         <input type="text" name="account_id" value="{{ $val['account_id'] }}" hidden>
+                                        <input type="text" name="merchant_id" value="{{ $val['merchant_id'] }}" hidden>
+
                                         <input type="text" name="account_default_status" value="{{ $JournalVoucher->getAccountDefaultStatus($val['account_id']) }}" hidden>
                                         <input type="text" name="account_status" value="{{ $val['account_status'] }}" hidden>
                                         <input type="text" name="journal_voucher_amount" value="{{ $val['journal_voucher_amount'] }}" hidden>

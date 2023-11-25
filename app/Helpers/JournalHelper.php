@@ -11,6 +11,7 @@ class JournalHelper extends AppHelper
 {
     protected static $token;
     protected static $journal_voucher_date;
+    protected static $journal_voucher_id;
     protected static $appendTitle;
     protected static $prependTitle;
     protected static $appendDescription;
@@ -18,16 +19,19 @@ class JournalHelper extends AppHelper
     protected static $title;
     protected static $defaultTitle='';
     protected static $account_id;
+    protected static $total_amount;
+    protected static $merchant_id;
     /**
      * Make journal voucher and journal voucher item
-     *
+     * leave account_setting_name empty to return self
      * @param string $journal_voucher_description
-        // @param array $account_setting_name
+     * @param array $account_setting_name
      * @param integer $total_amount
      * @param string|null $transaction_module_code
      * @return void|self
      */
-    public static function make(string $journal_voucher_description, int $total_amount,string $transaction_module_code = null){
+    public static function make(string $journal_voucher_description, int $total_amount,array $account_setting_name=[],string $transaction_module_code = null){
+        self::$total_amount=$total_amount;
         if(is_null($transaction_module_code)){
             $transaction_module_code = preg_replace('/[^A-Z]/', '',$journal_voucher_description);
         }
@@ -62,11 +66,14 @@ class JournalHelper extends AppHelper
             'journal_voucher_token'         => $token,
         ]);
         $jv = JournalVoucher::where('journal_voucher_token',$token)->first();
+        self::$journal_voucher_id=$jv->journal_voucher_id;
         $account=$account_setting_name;
         if(!empty(self::$account_id)){
             $account=self::$account_id;
         }
         if(!empty($account)){
+            $mid=self::$merchant_id;
+            if(empty($mid)){$mid=Auth::user()->merchant_id;}
             foreach ($account as $name){
                 if(empty(self::$account_id)){
                 $account_id = parent::getAccountSetting($name)->account_id;
@@ -84,9 +91,9 @@ class JournalHelper extends AppHelper
                 }
                 //* buat journal item
                 JournalVoucherItem::create([
-                    'merchat_id' => Auth::user()->merchant_id??1,
-                    'company_id'        => Auth::user()->company_id,
-                    'journal_voucher_id'=>$jv->journal_voucher_id,
+                    'merchat_id'                    => $mid,
+                    'company_id'                    => Auth::user()->company_id,
+                    'journal_voucher_id'            => $jv->journal_voucher_id,
                     'account_id'                    => $account_id,
                     'journal_voucher_amount'        => $total_amount,
                     'account_id_default_status'     => self::getAccountDefaultStatus($account_id),
@@ -190,9 +197,36 @@ class JournalHelper extends AppHelper
     public static function getAccountStatus(string $account_id){
         return AcctAccount::select(['account_default_status as status'])->find($account_id);
     }
-    public function item(int $total_amount,int $account_id,int $account_setting_status,int $merchant_id=null) {
-        if(empty(self::$token)){
-            throw new \Exception("unspecified journal token. use this funtion after call make() or token()");
+  /**
+   * Make Journal Item, call this function after calling make() or token() or journalVoucherId()
+   * All parameter that has ben passed here is became priority after any set parameter before it
+   * @param string|int $account_id_or_setting account id or account setting name
+   * @param integer|null $total_amount if null get from make()
+   * @param integer|null $account_setting_status use account default status(if using account id) if null. (0=D,1=K)
+   * @param integer $merchant_id
+   * @return void|self
+   */
+    public function item($account_id_or_setting,int $account_setting_status=null,int $total_amount=null,int $merchant_id=null ) {
+        $journal_voucher_id = self::$journal_voucher_id;
+        if(empty($journal_voucher_id)){
+            if(empty(self::$token)){
+                throw new \Exception("unspecified journal token. use this funtion after call make() or token()");
+            }
+            $jv = JournalVoucher::where('journal_voucher_token',self::$token)->first();
+            $journal_voucher_id = $jv->journal_voucher_id;
+        }
+        if(is_int($account_id_or_setting)){
+            $account_id = $account_id_or_setting;
+            $asts = self::getAccountStatus($account_id_or_setting)->status;
+        }else{
+            $account_id = parent::getAccountSetting($account_id_or_setting)->account_id;
+            $asts = parent::getAccountSetting($account_id_or_setting)->status;
+        }
+        if(empty($account_setting_status)){
+            $account_setting_status =  $asts;
+        }
+        if(empty($total_amount)){
+            $total_amount = self::$total_amount;
         }
         if ($account_setting_status == 0){
             $debit_amount = $total_amount;
@@ -201,12 +235,15 @@ class JournalHelper extends AppHelper
             $debit_amount = 0;
             $credit_amount = $total_amount;
         }
-        $jv = JournalVoucher::where('journal_voucher_token',self::$token)->first();
+        $mid=$merchant_id;
+        if(empty($mid)){
+            $mid=self::$merchant_id;
+        }
         //* buat journal item
         JournalVoucherItem::create([
-            'merchat_id'        => $merchant_id,
-            'company_id'        => Auth::user()->company_id,
-            'journal_voucher_id'            =>$jv->journal_voucher_id,
+            'merchat_id'                    => $mid,
+            'company_id'                    => Auth::user()->company_id,
+            'journal_voucher_id'            => $journal_voucher_id,
             'account_id'                    => $account_id,
             'journal_voucher_amount'        => $total_amount,
             'account_id_default_status'     => self::getAccountDefaultStatus($account_id),
@@ -254,6 +291,29 @@ class JournalHelper extends AppHelper
         if ($withDesc) {
             self::$prependDescription = "{$append} ";
         }
+        return new self;
+    }
+
+
+    /**
+     * Set Journal item merchant id
+     *
+     * @return  self
+     */ 
+    public static function merchantId($merchant_id)
+    {
+        self::$merchant_id = $merchant_id;
+        return new self;
+    }
+
+    /**
+     * Set journal voucher id
+     *
+     * @return  self
+     */ 
+    public static function journalVoucherId($journal_voucher_id)
+    {
+        self::$journal_voucher_id = $journal_voucher_id;
         return new self;
     }
 }

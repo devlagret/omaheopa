@@ -18,5 +18,6 @@ class NotDeletedScope implements Scope
     public function apply(Builder $builder, Model $model)
     {
         $builder->where('data_state',0);
+        $builder->orWhereNull('data_state');
     }
 }
