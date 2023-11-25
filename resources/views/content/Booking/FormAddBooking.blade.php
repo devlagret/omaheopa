@@ -338,7 +338,10 @@ if (empty($paket)) {
                     loading(0);
                     setTimeout(function() {
                         loading(0);
-                    }, 100);
+                    }, 200);
+                    setTimeout(function() {
+                        loading(0);
+                    }, 400);
                 },
                 complete: function() {
                     subtotalFasilitas();
@@ -645,7 +648,7 @@ if (empty($paket)) {
                     loading(0);
                     setTimeout(function() {
                         loading(0);
-                    }, 200);
+                    }, 300);
                 },
                 error: function(data) {
                     console.log(data);
