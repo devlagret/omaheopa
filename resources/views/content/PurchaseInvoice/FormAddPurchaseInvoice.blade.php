@@ -976,7 +976,7 @@
             </div>
             <div class="card-footer text-muted">
                 <div class="form-actions float-right">
-                            <a class="btn btn-secondary">Tambah Barang Baru</a>
+                    <a class="btn btn-secondary" href="{{route('add-item')}}">Tambah Barang Baru</a>
                     <button type="button" id="add_purchase_item" class="btn btn-success" title="Add"> Tambah</button>
                 </div>
             </div>
