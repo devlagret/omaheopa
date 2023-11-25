@@ -128,6 +128,12 @@
                         <input class="form-control input-bb" id="journal_voucher_amount" autocomplete="off" value=""/>
                     </div>
                 </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <a class="text-dark">Merchant</a>
+                        {!! Form::select('merchant_id',  $unit_status, ['class' => 'selection-search-clear select-form', 'id' => 'merchant_id', 'name' => 'merchant_id']) !!}
+                    </div>
+                </div>
             </div>
         </div> 
         <div class="card-footer text-muted">

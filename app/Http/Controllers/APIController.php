@@ -2200,12 +2200,9 @@ class APIController extends Controller
         $transaction_module_code = 'SI';
         $transaction_module_id  = $this->getTransactionModuleID($transaction_module_code);
         $fields = $request->validate([
-            'subtotal_item'             => '',
-            'subtotal_amount1'          => '',
             'total_amount'              => 'required',
             'paid_amount'               => 'required',
             'item_id'                   => 'required',
-            'change_amount'             => ''
         ]);
         if (empty($request->discount_percentage_total)){
             $discount_percentage_total = 0;
