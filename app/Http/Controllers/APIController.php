@@ -2202,6 +2202,7 @@ class APIController extends Controller
         $fields = $request->validate([
             'total_amount'              => 'required',
             'paid_amount'               => 'required',
+            'item_id'                   => 'required',
         ]);
         if (empty($request->discount_percentage_total)){
             $discount_percentage_total = 0;
