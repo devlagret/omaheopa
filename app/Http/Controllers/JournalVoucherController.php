@@ -87,6 +87,8 @@ class JournalVoucherController extends Controller
             'account_id'                => 'required',
             'account_status'            => 'required',
             'journal_voucher_amount'    => 'required',
+            'merchant_id'    => 'required',
+
             
         ]);
 
@@ -94,6 +96,8 @@ class JournalVoucherController extends Controller
             'account_id'                => $request->account_id,
             'account_status'            => $request->account_status,
             'journal_voucher_amount'    => $request->journal_voucher_amount,
+            'merchant_id'               => $request->merchant_id,
+
             
         );
 
@@ -141,6 +145,7 @@ class JournalVoucherController extends Controller
             'journal_voucher_date'          => $fields['journal_voucher_date'],
             'journal_voucher_description'   => $fields['journal_voucher_description'],
             'journal_voucher_title'         => $fields['journal_voucher_description'],
+            'merchant_id'                   => $request->merchant_id,
             'journal_voucher_period'        => date('Ym'),
             'transaction_module_code'       => $transaction_module_code,
             'transaction_module_id'         => $transaction_module_id,
