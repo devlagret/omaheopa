@@ -175,7 +175,7 @@
                     $('.modal-backdrop .fade').hide();
                     setTimeout(() => {
                         $('.modal-backdrop .fade').hide();
-                    }, 1000);
+                    }, 5000);
                 }
             }
             /**
