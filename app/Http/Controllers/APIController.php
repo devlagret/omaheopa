@@ -2214,7 +2214,7 @@ class APIController extends Controller
         $data = array(
             'customer_name'             => $request->customer_name,
             // 'merchant_id'               => $request->merchant_id,
-            'sales_invoice_date'        => ,
+            'sales_invoice_date'        =>   date('Y-m-d'),
             'subtotal_item'             => $request->subtotal_item,
             'subtotal_amount'           => $request->subtotal_amount1,
             'discount_percentage_total' => $discount_percentage_total,
