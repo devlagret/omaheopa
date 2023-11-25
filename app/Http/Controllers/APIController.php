@@ -2276,6 +2276,7 @@ class APIController extends Controller
                     $table->last_balance = $stock_item['last_balance'] - $dataarray['quantity'];
                     $table->updated_id = Auth::id();
                     $table->save();
+                }
             }else{
                 return response([
                     'message' => 'Data Tidak Berhasil Disimpan'
