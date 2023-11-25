@@ -358,7 +358,7 @@ class CheckInCheckOutController extends Controller
         }
 
         // * buat jurnal
-        JournalHelper::make($token,'Check-in Non Booking',['hotel_account','hotel_cash_account'],$request->total_amount);
+        JournalHelper::make('Check-in Non Booking',$request->total_amount,['hotel_account','hotel_cash_account']);
         //
 
             DB::commit();
