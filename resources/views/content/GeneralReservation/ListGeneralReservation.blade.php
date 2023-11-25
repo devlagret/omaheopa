@@ -73,8 +73,8 @@ function check(name,uri){
                     <tr>
                         <th width="2%" style='text-align:center'>No</th>
                         <th width="15%" style='text-align:center'>Nama Paket</th>
-                        <th width="20%" style='text-align:center'>Harga</th>
-                        {{-- <th width="12%" style='text-align:center'>Barcode Tiket</th> --}}
+                        <th width="12%" style='text-align:center'>Harga</th>
+                        <th width="20%" style='text-align:center'>Keterangan</th>
                         <th width="15%" style='text-align:center'>Aksi</th>
                     </tr>
                 </thead>
@@ -85,10 +85,13 @@ function check(name,uri){
                         <td style='text-align:center'>{{ $no++ }}</td>
                         <td>{{ $row['reservation_name'] }}</td>
                         <td>{{ $row['reservation_price'] }}</td>
+                        <td>{{ $row['reservation_remark'] }}</td>
                         {{-- <td class='text-center'><a type='button' class='btn btn-outline-dark btn-sm' href="{{route('item-barcode.index', $row['item_id'])}}"><i class='fa fa-barcode'></i> Barcode</a></td> --}}
                         <td class="text-center">
-                            <a type="button" class="btn btn-outline-warning btn-sm" href="{{ url('/general-ticket/edit-tiket/'.$row['item_id']) }}">Edit</a>
-                            <a type="button" class="btn btn-outline-danger btn-sm" onclick="deleteItem('{{$row['item_id']}}','{{$row['item_name']}}')">Hapus</a>
+                            <a type="button" class="btn btn-outline-warning btn-sm" href="{{ url('/general-reservation/edit-reservation/'.$row['reservation_id']) }}">Edit</a>
+                            <a href="{{ route('delete-reservation', ['reservation_id' => $row['reservation_id']]) }}"
+                              name='Reset' class='btn btn-outline-danger btn-sm'
+                              onclick="return confirm('Apakah Anda Yakin Ingin Menghapus Data Ini ?')"></i> Hapus</a>
                         </td>
                     </tr>
                     @endforeach

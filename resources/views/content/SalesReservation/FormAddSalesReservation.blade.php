@@ -101,12 +101,12 @@
         function changeCost() {
             var reservation_id = $("#reservation_id_view").val();
 
-            if(reservation_id == 0 ){
+            if (reservation_id == 0) {
                 $('#reservation_price_view').val(0);
                 $('#reservation_price').val(0);
-            }else{
-                    loadingWidget();
-                    $.ajax({
+            } else {
+                loadingWidget();
+                $.ajax({
                     type: "POST",
                     url: "{{ route('get-reservation-cost') }}",
                     dataType: "json",
@@ -119,12 +119,16 @@
                         loadingWidget(0);
                         $('#reservation_price_view').val(return_data == 0 ? 0 : return_data);
                         $('#reservation_price').val(return_data);
-                        setTimeout(function(){ loadingWidget(0); }, 200);
+                        setTimeout(function() {
+                            loadingWidget(0);
+                        }, 200);
                     },
                     error: function(data) {
                         console.log(data);
                         loadingWidget(0);
-                        setTimeout(function(){ loadingWidget(0); }, 200);
+                        setTimeout(function() {
+                            loadingWidget(0);
+                        }, 200);
 
 
                     }
@@ -135,8 +139,8 @@
         function getItmPrice() {
             item_id = $('#item_id').val();
         }
-        $(document).ready(function() { 
-            
+        $(document).ready(function() {
+
             $("#reservation_id").change(function() {
                 var reservation_price = $("#reservation_price").val();
                 var quantity = $('#quantity').val();
@@ -145,7 +149,7 @@
                 $("#subtotal_amount").val(subtotal_amount);
                 $("#subtotal_amount_view").val(toRp(subtotal_amount));
             });
-            
+
             $("#reservation_price").change(function() {
                 var reservation_price = $("#reservation_price").val();
                 var quantity = $('#quantity').val();
@@ -200,7 +204,7 @@
             $("#paid_amount").change(function() {
                 var paid_amount = $("#paid_amount").val();
                 var total_amount = $("#total_amount").val();
-                var change_amount = paid_amount - total_amount;
+                var change_amount = total_amount - paid_amount;
 
                 $("#change_amount").val(change_amount);
                 $("#change_amount_view").val(toRp(change_amount));
@@ -305,6 +309,35 @@
 
             });
         }
+
+        function addReservasi(){
+        var reservation_name              = $("#reservation_name").val();
+        var reservation_price              = $("#reservation_price").val();
+        var reservation_remark              = $("#reservation_remark").val();
+        $.ajax({
+            type: "POST",
+            url : "{{route('process-add-reservation')}}",
+            dataType: "html",
+            data: {
+                'reservation_name'	            : reservation_name,
+                'reservation_price'	            : reservation_price,
+                'reservation_remark'	        : reservation_remark,
+                '_token'                        : '{{csrf_token()}}',
+            },
+            success: function(return_data){ 
+                location.reload();
+                $('#cancel-btn-unit').click();
+            },
+            error: function(data)
+            {
+                console.log(data);
+
+            }
+        });
+    }
+
+
+
     </script>
 @stop
 @section('content_header')
@@ -363,14 +396,16 @@
                         <div class="form-group">
                             <a class="text-dark">Tanggal Reservasi<a class='red'> *</a></a>
                             <input style="width: 40%" class="form-control input-bb" name="sales_invoice_reservation_date"
-                                id="sales_invoice_reservation_date" type="date" autocomplete="off" value="{{ $date }}" />
+                                id="sales_invoice_reservation_date" type="date" autocomplete="off"
+                                value="{{ $date }}" />
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
                             <a class="text-dark">Tanggal Jatuh tempo<a class='red'> *</a></a>
-                            <input style="width: 40%" class="form-control input-bb" name="sales_invoice_reservation_due_date"
-                                id="sales_invoice_reservation_due_date" type="date" autocomplete="off" value="{{ $date }}" />
+                            <input style="width: 40%" class="form-control input-bb"
+                                name="sales_invoice_reservation_due_date" id="sales_invoice_reservation_due_date"
+                                type="date" autocomplete="off" value="{{ $date }}" />
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -391,21 +426,43 @@
                                 onChange="function_elements_add(this.name, this.value);" />
                         </div>
                     </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <a class="text-dark">Nama Item<a class='red'> *</a></a>
-                               
-                            
-                                <select class="selection-search-clear required select-form" name="reservation_id_view" id="reservation_id_view" onchange="changeCost()" autofocus>
-                                    <option value="0">pilih Paket</option>
-                                    @foreach ($reservations as $item)
-                                    <option value="{{ $item->reservation_id }}">{{ $item->reservation_name }}</option>
-                                    @endforeach
-                                </select>
-                            <input type="text" name="reservation_id" id="reservation_id" hidden/>
-                            </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <a class="text-dark">No.Phone</a>
+                            <input class="form-control input-bb" name="customer_phone" id="customer_phone" type="text"
+                                autocomplete="off" value=""
+                                onChange="function_elements_add(this.name, this.value);" />
                         </div>
-                      
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <a class="text-dark">Alamat</a>
+                            <input class="form-control input-bb" name="customer_address" id="customer_address" type="text"
+                                autocomplete="off" value=""
+                                onChange="function_elements_add(this.name, this.value);" />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row form-group">
+                            <div class="col-md-8">
+                                <a class="text-dark">Nama Item<a class='red'> *</a></a>
+                            
+                            <select class="selection-search-clear required select-form" name="reservation_id_view"
+                                id="reservation_id_view" onchange="changeCost()" autofocus>
+                                <option value="0">-- Pilih --</option>
+                                @foreach ($reservations as $item)
+                                    <option value="{{ $item->reservation_id }}">{{ $item->reservation_name }}</option>
+                                @endforeach
+                            </select>
+                            </div>
+                            <div class="col-md-1" style="margin-top: 0.5%">
+                            <a href='#addreservation' data-toggle='modal' name="Find" class="btn btn-sm btn-success add-btn" title="Add Data">Tambah</a>
+                            </div>
+                            
+                            <input type="text" name="reservation_id" id="reservation_id" hidden />
+                        </div>
+                    </div>
+
 
                     {{-- <div class="col-md-6">
                         <div class="form-group">
@@ -425,13 +482,13 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <a class="text-dark">Harga Per orang<a class='red'> *</a></a>
-                            <input class="form-control input-bb" name="reservation_price_view" id="reservation_price_view" type="text"
-                                autocomplete="off" readonly />
-                                <input class="form-control input-bb" name="reservation_price" id="reservation_price" type="text"
-                                autocomplete="off" hidden/>
+                            <input class="form-control input-bb" name="reservation_price_view" id="reservation_price_view"
+                                type="text" autocomplete="off" readonly />
+                            <input class="form-control input-bb" name="reservation_price" id="reservation_price"
+                                type="text" autocomplete="off" hidden />
                         </div>
                     </div>
-                   
+
                     <div class="col-md-6">
                         <div class="form-group">
                             <a class="text-dark">Total<a class='red'> *</a></a>
@@ -535,8 +592,8 @@
                                         ";
                                         ?>
                             <td style='text-align  : center'>
-                                <a href="{{ route('delete-array-sales-reservation', ['record_id' => $key]) }}" name='Reset'
-                                    class='btn btn-danger btn-sm'
+                                <a href="{{ route('delete-array-sales-reservation', ['record_id' => $key]) }}"
+                                    name='Reset' class='btn btn-danger btn-sm'
                                     onclick="return confirm('Apakah Anda Yakin Ingin Menghapus Data Ini ?')"></i> Hapus</a>
                             </td>
                             <?php
@@ -636,10 +693,48 @@
     </div>
     </form>
 
+    <div class="modal fade bs-modal-lg" id="addreservation" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header"  style='text-align:left !important'>
+                    <h4>Form Tambah Paket Reservasi</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">	
+                            <div class="form-group">	
+                                <a class="text-dark">Nama Paket</a>
+                                <input class="form-control input-bb" type="text" name="reservation_name" id="reservation_name" value=""/>
+                            </div>
+                        </div>	
+                        <div class="col-md-6">	
+                            <div class="form-group">	
+                                <a class="text-dark">Harga</a>
+                                <input class="form-control input-bb" type="text" name="reservation_price" id="reservation_price" value=""/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">	
+                            <div class="form-group">	
+                                <a class="text-dark">Keterangan</a>
+                                <input class="form-control input-bb" type="text" name="reservation_remark" id="reservation_remark" value=""/>
+                            </div>
+                        </div>		
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal" id='cancel-btn-unit'>Batal</button>
+                    <a class="btn btn-primary btn-sm" onClick="addReservasi()">Simpan</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
 
 @stop
+
 
 @section('footer')
 

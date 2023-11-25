@@ -55,6 +55,7 @@ class GeneralReservationController extends Controller
                 $data = CoreReservation::create([
                     'reservation_name'      => $fields['reservation_name'],
                     'reservation_price'     => $fields['reservation_price'],
+                    'reservation_remark'     => $request->reservation_remark,
                     'item_status'           => 1,
                     'company_id'            => Auth::user()->company_id,
                     'created_id'            => Auth::id(),
@@ -72,111 +73,48 @@ class GeneralReservationController extends Controller
 
     public function editReservation($reservation_id)
     {
-    
-        return view('content.GeneralTiket.FormEditGeneralTiket');
+        $reservation= CoreReservation::where('reservation_id',$reservation_id)->first();
+        return view('content.GeneralReservation.FormEditGeneralReservation',compact('reservation'));
     }
-    public function processEditTiket(Request $request)
+    public function processEditReservation(Request $request)
     {
-        // dump($request->all());
-        $itm="Barang";
-        $fields = $request->validate([
-            // 'item_category_id'  => 'required|integer',
-            'item_code'         => 'required',
-            'item_name'         => 'required',
-            'item_id'         => 'required',
+         // dump($request->all());
+         $fields = $request->validate([
+            'reservation_name'    => 'required',
+            'reservation_price'         => 'required',
         ]);
-        $paket= InvtItemPackage::where('item_id',$fields['item_id']);
-        try{
         DB::beginTransaction();
-        $table       = InvtItem::findOrFail($fields['item_id']);
-        $packageitem = InvtItemPackage::with('unit')->where('package_item_id',$fields['item_id']);
-        for($l=1;$l<=4;$l++){
-            if($table['item_unit_id'.$l] != $request['item_unit_id'.$l]){
-                if($table['item_unit_id'.$l]!=null && $request['item_unit_id'.$l]==null){
-                    if($packageitem->where('item_unit_id',$table['item_unit_id'.$l])->get()->count()){
-                    return redirect()->back()->withErrors('Ada Paket yang Menggunankan Item "'.$table->item_name.'" Dengan Satuan "'.$packageitem->where('item_unit_id',$table['item_unit_id'.$l])->first()->unit->item_unit_name.'". Harap Tidak Menghapus Satuan Tersebut.' );
-                }
-                }
-                /*if($table['item_unit_id'.$l]!=null&&$request->used_in_package){
-                    $itmpackage = InvtItemPackage::where('item_id',$fields['item_id'])->where('item_unit_id',$table['item_unit_id'.$l]);
-                    $itmpackage->update(['item_unit_id'=> $request['item_unit_id'.$l]]);
-                }*/
-            }
-        }
-        foreach ($warehouse as $key => $val) {
-            InvtItemStock::updateOrCreate(['company_id'=>Auth::user()->company_id,
-                'item_id'=>$table['item_id'],
-                'item_category_id'=>$table['item_category_id'],
-                'warehouse_id'=>$val['warehouse_id'],
-                'item_unit_id'=>$table['item_unit_id1']
-            ],['item_unit_id'=>$request->item_unit_id1]);
-        }
-        $table->item_code               = $fields['item_code'];
-        $table->item_name               = $fields['item_name'];
-        $table->item_remark             = $request->item_remark;
-        // * Kemasan
-        $table->item_unit_id1           = $request->item_unit_id1;
-        $table->item_default_quantity1  = $request->item_default_quantity1;
-        $table->item_unit_price1        = $request->item_unit_price1;
-        $table->item_unit_cost1         = $request->item_unit_cost1;
-        $table->item_unit_id2           = $request->item_unit_id2;
-        $table->item_default_quantity2  = $request->item_default_quantity2;
-        $table->item_unit_price2        = $request->item_unit_price2;
-        $table->item_unit_cost2         = $request->item_unit_cost2;
-        $table->item_unit_id3           = $request->item_unit_id3;
-        $table->item_default_quantity3  = $request->item_default_quantity3;
-        $table->item_unit_price3        = $request->item_unit_price3;
-        $table->item_unit_cost3         = $request->item_unit_cost3;
-        $table->item_unit_id4           = $request->item_unit_id4;
-        $table->item_default_quantity4  = $request->item_default_quantity4;
-        $table->item_unit_price4        = $request->item_unit_price4;
-        $table->item_unit_cost4         = $request->item_unit_cost4;
-        $table->updated_id              = Auth::id();
-
-        $paketarr = collect(Session::get('paket'));
-        if($paket->count()&&empty(Session::get('paket'))){
-            $itm = "Paket";
-            $paket->delete();
-        }else{
-            $itm = "Paket";
-            $paket->delete();
-            foreach($paketarr as $vala){
-                InvtItemPackage::create([
-                    'item_id' => $fields['item_id'],
-                    'package_item_id' => array_keys($vala)[0],
-                    'item_quantity' => $vala[array_keys($vala)[0]][0],
-                    'item_unit_id' => $vala[array_keys($vala)[0]][1],
-                ]);
-            }
-        }
-
-        if ($table->save()) {
+        try 
+        {
+           CoreReservation::where('reservation_id', $request->reservation_id)
+                ->update([
+                'reservation_name' => $request->reservation_name,
+                'reservation_price' => $request->reservation_price,
+                'reservation_remark' => $request->reservation_remark,
+                ]
+              );      
             DB::commit();
-            $msg = "Ubah ".$itm." Berhasil";
-            return redirect('/general-ticket')->with('msg', $msg);
-        } else {
-            $msg = "Ubah ".$itm." Gagal.";
-            return redirect('/general-ticket')->with('msg', $msg);
-        }}catch(\Exception $e){
+            $msg    = "Edit Master Reservasi Berhasil";
+            return redirect('/general-reservation')->with('msg', $msg);
+        } catch (\Exception $e) {
             report($e);
-            DB::rollBack();
-            $msg = "Ubah ".$itm." Gagal";
-            return redirect('/general-ticket')->with('msg', $msg);
+            $msg  = "Edit  Master Reservasi Gagal";
+            return redirect('/general-reservation')->with('msg', $msg);
         }
     }
 
-    public function deleteTiket($item_id)
+    public function deleteReservation($reservation_id)
     {
-        $table             = InvtItem::findOrFail($item_id);
+        $table             = CoreReservation::findOrFail($reservation_id);
         $table->data_state = 1;
         $table->updated_id = Auth::id();
 
         if ($table->save()) {
-            $msg = "Hapus Tiket Berhasil";
-            return redirect('/general-ticket')->with('msg', $msg);
+            $msg = "Hapus master Reservasi Berhasil";
+            return redirect('/general-reservation')->with('msg', $msg);
         } else {
-            $msg = "Hapus Tiket Gagal";
-            return redirect('/general-ticket')->with('msg', $msg);
+            $msg = "Hapus master Reservasi Gagal";
+            return redirect('/general-reservation')->with('msg', $msg);
         }
     }
 
