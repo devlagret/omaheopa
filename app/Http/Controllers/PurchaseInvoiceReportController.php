@@ -40,12 +40,11 @@ class PurchaseInvoiceReportController extends Controller
             $warehouse_id = Session::get('warehouse_id');
         }
 
-        $data = PurchaseInvoice::join('purchase_invoice_item','purchase_invoice_item.purchase_invoice_id','=','purchase_invoice.purchase_invoice_id')
-        ->where('purchase_invoice.purchase_invoice_date','>=',$start_date)
-        ->where('purchase_invoice.purchase_invoice_date','<=',$end_date)
-        ->where('purchase_invoice.warehouse_id', $warehouse_id)
-        ->where('purchase_invoice.company_id', Auth::user()->company_id)
-        ->where('purchase_invoice.data_state',0)
+        $data = PurchaseInvoice::with('item.item','supplier','item.warehouse','item.unit')
+        ->where('purchase_invoice_date','>=',$start_date)
+        ->where('purchase_invoice_date','<=',$end_date)
+        ->where('warehouse_id', $warehouse_id)
+        ->where('company_id', Auth::user()->company_id)
         ->get();
        
         $warehouse = InvtWarehouse::where('data_state',0)
