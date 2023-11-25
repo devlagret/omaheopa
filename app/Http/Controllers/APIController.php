@@ -2202,7 +2202,6 @@ class APIController extends Controller
         $fields = $request->validate([
             'total_amount'              => 'required',
             'paid_amount'               => 'required',
-            'item_id'                   => 'required',
         ]);
         if (empty($request->discount_percentage_total)){
             $discount_percentage_total = 0;
@@ -2214,14 +2213,14 @@ class APIController extends Controller
         $data = array(
             'customer_name'             => $request->customer_name,
             // 'merchant_id'               => $request->merchant_id,
-            'sales_invoice_date'        => $fields['sales_invoice_date'],
-            'subtotal_item'             => $fields['subtotal_item'],
-            'subtotal_amount'           => $fields['subtotal_amount1'],
+            'sales_invoice_date'        => $request->sales_invoice_date,
+            'subtotal_item'             => $request->subtotal_item,
+            'subtotal_amount'           => $request->subtotal_amount1,
             'discount_percentage_total' => $discount_percentage_total,
             'discount_amount_total'     => $discount_amount_total,
             'total_amount'              => $fields['total_amount'],
             'paid_amount'               => $fields['paid_amount'],
-            'change_amount'             => $fields['change_amount'],
+            'change_amount'             => $request->change_amount,
             'sales_status'              => 1,
             'company_id'                => Auth::user()->company_id,
             'created_id'                => Auth::id(),
