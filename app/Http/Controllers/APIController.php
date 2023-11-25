@@ -2250,7 +2250,7 @@ class APIController extends Controller
 
                 $dataarray = array(
                     'sales_invoice_id'                  => $sales_invoice_id['sales_invoice_id'],
-                    'item_category_id'                  => 0, 
+                    'item_category_id'                  => null,
                     'item_unit_id'                      => $item['item_unit_id'],
                     'item_id'                           => $fields['item_id'],
                     'quantity'                          => $item['quantity'],
