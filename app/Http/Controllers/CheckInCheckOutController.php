@@ -145,6 +145,7 @@ class CheckInCheckOutController extends Controller
             return redirect()->route('cc.index')->with('msg','Data Berhasil Diinput');
         }catch(\Exception $e){
             DB::rollBack();
+            dd($e);
             report($e);
             return redirect()->route('cc.index')->with('msg','Data Gagal Diinput');
         }
