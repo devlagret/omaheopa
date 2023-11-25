@@ -573,7 +573,8 @@ class InvWarehouseTransferController extends Controller
     }
 
     public function getItemName($item_id){
-        $invitem = InvtItem::select('invt_item.item_id', DB::raw('CONCAT(invt_item_category.item_category_name, " - ", invt_item.item_name) AS item_name'))
+        $invitem = InvtItem::withoutGlobalScopes()
+        ->select('invt_item.item_id', DB::raw('CONCAT(invt_item_category.item_category_name, " - ", invt_item.item_name) AS item_name'))
         ->join('invt_item_category', 'invt_item_category.item_category_id', 'invt_item.item_category_id') 
         ->where('item_id', $item_id)
         ->where('invt_item.data_state','=',0)
