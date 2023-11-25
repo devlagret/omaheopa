@@ -2266,6 +2266,16 @@ class APIController extends Controller
             if(SalesInvoiceItem::create($dataarray)){
 
                 // StockHelper::find($dataarray['item_id'])->sub((int)$dataarray['quantity'],$dataarray['item_unit_id']);
+                $stock_item = InvtItemStock::where('item_id',$dataarray['item_id'])
+                // ->where('item_category_id',$dataarray['item_category_id'])
+                ->where('item_unit_id', $dataarray['item_unit_id'])
+                ->where('company_id', Auth::user()->company_id)
+                ->first();
+                if(isset($stock_item)){
+                    $table = InvtItemStock::findOrFail($stock_item['item_stock_id']);
+                    $table->last_balance = $stock_item['last_balance'] - $dataarray['quantity'];
+                    $table->updated_id = Auth::id();
+                    $table->save();
             }else{
                 return response([
                     'message' => 'Data Tidak Berhasil Disimpan'
