@@ -189,6 +189,8 @@
                                                     <td style='text-align  : right !important;'>".number_format($val['journal_voucher_amount'],2,'.',',')."</td>";
                                         }?>
                                         <input type="text" name="account_id" value="{{ $val['account_id'] }}" hidden>
+                                        <input type="text" name="merchant_id" value="{{ $val['merchant_id'] }}" hidden>
+
                                         <input type="text" name="account_default_status" value="{{ $JournalVoucher->getAccountDefaultStatus($val['account_id']) }}" hidden>
                                         <input type="text" name="account_status" value="{{ $val['account_status'] }}" hidden>
                                         <input type="text" name="journal_voucher_amount" value="{{ $val['journal_voucher_amount'] }}" hidden>
