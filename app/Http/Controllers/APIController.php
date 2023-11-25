@@ -2114,7 +2114,7 @@ class APIController extends Controller
         $sales  = SalesInvoice::select('*')
         ->where('data_state', 0)
         ->where('company_id', Auth::user()->company_id)
-        ->where('sales_status',0)
+        ->where('sales_status',1)
         ->get();
         
         if($sales){
@@ -2214,7 +2214,7 @@ class APIController extends Controller
         $data = array(
             'customer_name'             => $request->customer_name,
             // 'merchant_id'               => $request->merchant_id,
-            'sales_invoice_date'        => $request->sales_invoice_date,
+            'sales_invoice_date'        => ,
             'subtotal_item'             => $request->subtotal_item,
             'subtotal_amount'           => $request->subtotal_amount1,
             'discount_percentage_total' => $discount_percentage_total,
