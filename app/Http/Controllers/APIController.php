@@ -2049,8 +2049,8 @@ class APIController extends Controller
 
         if(SalesInvoice::create($data)){
             // if(SalesInvoice::create($data)){
-            $sales_invoice_id   = SalesInvoice::orderBy('created_at','DESC')->where('sales_status',1)->where('company_id', Auth::user()->company_id)->first();
-            $item = InvtItem::where('item_id', $fields['item_id'])->where('item_status',1)->first();
+            $sales_invoice_id   = SalesInvoice::orderBy('created_at','DESC')->where('sales_status',0)->where('company_id', Auth::user()->company_id)->first();
+            $item = InvtItem::where('item_id', $fields['item_id'])->where('item_status',0)->first();
 
                 $dataarray = array(
                     'sales_invoice_id'                  => $sales_invoice_id['sales_invoice_id'],
