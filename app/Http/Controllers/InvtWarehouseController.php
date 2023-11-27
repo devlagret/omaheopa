@@ -75,10 +75,10 @@ class InvtWarehouseController extends Controller
 
         if ($data->save()) {
             $msg = "Tambah Gudang Berhasil";
-            return redirect('/warehouse/')->with('msg', $msg);
+            return redirect()->route('warehouse')->with('msg', $msg);
         } else {
             $msg = "Tambah Gudang Gagal";
-            return redirect('/warehouse/')->with('msg', $msg);
+            return redirect()->route('warehouse')->with('msg', $msg);
         }
     }
 
@@ -113,10 +113,10 @@ class InvtWarehouseController extends Controller
 
         if ($table->save()) {
             $msg = "Ubah Gudang Berhasil";
-            return redirect('/warehouse')->with('msg', $msg);
+            return redirect()->route('warehouse')->with('msg', $msg);
         } else {
             $msg = "Ubah Gudang Gagal";
-            return redirect('/warehouse')->with('msg', $msg);
+            return redirect()->route('warehouse')->with('msg', $msg);
         }
     }
 
@@ -128,17 +128,17 @@ class InvtWarehouseController extends Controller
 
         if ($table->save()) {
             $msg = "Hapus Gudang Berhasil";
-            return redirect('/warehouse')->with('msg', $msg);
+            return redirect()->route('warehouse')->with('msg', $msg);
         } else {
             $msg = "Hapus Gudang Gagal";
-            return redirect('/warehouse')->with('msg', $msg);
+            return redirect()->route('warehouse')->with('msg', $msg);
         }
     }
 
     public function addResetWarehouse()
     {
         Session::forget('warehouses');
-        return redirect('/warehouse/add-warehouse');
+        return redirect()->route('warehouse');
     }
 
     //check warehouse
