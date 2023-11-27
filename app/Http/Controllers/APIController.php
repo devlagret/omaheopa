@@ -1933,7 +1933,7 @@ class APIController extends Controller
         $sales  = SalesInvoice::select('*')
         ->where('data_state', 0)
         ->where('company_id', Auth::user()->company_id)
-        ->where('sales_status',0)
+        ->where('sales_status',1)
         ->get();
         
         if($sales){
