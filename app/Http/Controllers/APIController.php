@@ -1966,10 +1966,10 @@ class APIController extends Controller
 
         if($item){
             return response([
-                'data' => $item,
-                'unit' => $units,
-                'merchant' => $merchant,
-                'category' => $category
+                'data' => $item, 
+                // 'unit' => $units,
+                // 'merchant' => $merchant,
+                // 'category' => $category
 
             ],201);
         }else{
