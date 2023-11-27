@@ -48,6 +48,9 @@ class PurchaseInvoicebyItemReportController extends Controller
         ->whereHas('invoice',function($query) use($start_date,$end_date,$warehouse_id){
             $query->where('purchase_invoice_date','>=',$start_date);
             $query->where('purchase_invoice_date','<=',$end_date);
+            if(!empty(Session::get('warehouse_id'))){
+                $query->where('warehouse_id', $warehouse_id);
+            }
             $query->where('warehouse_id', $warehouse_id);
             $query->where('company_id', Auth::user()->company_id);
         })
@@ -108,13 +111,17 @@ class PurchaseInvoicebyItemReportController extends Controller
         }else{
             $warehouse_id = Session::get('warehouse_id');
         }
-        $data = PurchaseInvoice::join('purchase_invoice_item','purchase_invoice_item.purchase_invoice_id','=','purchase_invoice.purchase_invoice_id')
-        ->where('purchase_invoice.purchase_invoice_date','>=',$start_date)
-        ->where('purchase_invoice.purchase_invoice_date','<=',$end_date)
-        ->where('purchase_invoice.warehouse_id', $warehouse_id)
-        ->where('purchase_invoice.company_id', Auth::user()->company_id)
-        ->where('purchase_invoice.data_state',0)
-        ->get();
+        $data = PurchaseInvoiceItem::with('invoice')
+        ->whereHas('invoice',function($query) use($start_date,$end_date,$warehouse_id){
+            $query->where('purchase_invoice_date','>=',$start_date);
+            $query->where('purchase_invoice_date','<=',$end_date);
+            if(!empty(Session::get('warehouse_id'))){
+                $query->where('warehouse_id', $warehouse_id);
+            }
+            $query->where('warehouse_id', $warehouse_id);
+            $query->where('company_id', Auth::user()->company_id);
+        })
+        ->groupBy('item_id')->get();
 
         $pdf = new TCPDF('P', PDF_UNIT, 'F4', true, 'UTF-8', false);
 
@@ -203,13 +210,17 @@ class PurchaseInvoicebyItemReportController extends Controller
         }else{
             $warehouse_id = Session::get('warehouse_id');
         }
-        $data = PurchaseInvoice::join('purchase_invoice_item','purchase_invoice_item.purchase_invoice_id','=','purchase_invoice.purchase_invoice_id')
-        ->where('purchase_invoice.purchase_invoice_date','>=',$start_date)
-        ->where('purchase_invoice.purchase_invoice_date','<=',$end_date)
-        ->where('purchase_invoice.warehouse_id', $warehouse_id)
-        ->where('purchase_invoice.company_id', Auth::user()->company_id)
-        ->where('purchase_invoice.data_state',0)
-        ->get();
+        $data = PurchaseInvoiceItem::with('invoice')
+        ->whereHas('invoice',function($query) use($start_date,$end_date,$warehouse_id){
+            $query->where('purchase_invoice_date','>=',$start_date);
+            $query->where('purchase_invoice_date','<=',$end_date);
+            if(!empty(Session::get('warehouse_id'))){
+                $query->where('warehouse_id', $warehouse_id);
+            }
+            $query->where('warehouse_id', $warehouse_id);
+            $query->where('company_id', Auth::user()->company_id);
+        })
+        ->groupBy('item_id')->get();
 
         $spreadsheet = new Spreadsheet();
 

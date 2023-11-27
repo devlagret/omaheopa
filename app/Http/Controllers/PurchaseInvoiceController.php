@@ -234,29 +234,6 @@ class PurchaseInvoiceController extends Controller
             Session::forget('purchase-token');
             return redirect()->route('pi.add')->with('msg', 'Tambah Pembelian Gagal');
         }
-<<<<<<< HEAD
-        if($request->purchase_payment_method){
-            //* Hutang
-            JournalHelper::token($token)->make('Purchase Invoice',$fields['total_amount'],['purchase_cash_payable_account','purchase_payable_account']);
-        }else{
-            //* Tunai
-            JournalHelper::token($token)->make('Purchase Invoice',$fields['total_amount'],['purchase_cash_account','purchase_account']);
-        }
-        DB::commit();
-        Session::forget('purchase-token');
-        Session::forget('datases');
-        Session::forget('purchase-item');
-        return redirect()->route('pi.add')->with('msg','Tambah Pembelian Berhasil');
-    } catch (\Exception $e) {
-        DB::rollBack();
-        report($e);
-        dd($e);
-        Session::forget('purchase-token');
-        return redirect()->route('pi.add')->with('msg','Tambah Pembelian Gagal');
-        }
-    
-=======
->>>>>>> 7b085fc43e419b9f68843966ad3cf0769e1f8d55
     }
     public function filterPurchaseInvoice(Request $request)
     {
