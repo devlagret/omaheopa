@@ -68,18 +68,19 @@ class InvItemStockController extends Controller
         
         $invitemstock       = InvtItemStock::with('item.merchant','unit','category','warehouse')
         // ->join('')
-        ->where('invt_item_stock.data_state','=',0);
+        ->where('data_state','=',0)
+      ;
         if($item_category_id||$item_category_id!=null||$item_category_id!=''){
-            $invitemstock   = $invitemstock->where('invt_item_stock.item_category_id', $item_category_id);
+            $invitemstock   = $invitemstock->where('item_category_id', $item_category_id);
         }
         if($item_id||$item_id!=null||$item_id!=''){
-            $invitemstock   = $invitemstock->where('invt_item_stock.item_id', $item_id);
+            $invitemstock   = $invitemstock->where('item_id', $item_id);
         }
         if($warehouse_id||$warehouse_id!=null||$warehouse_id!=''){
-            $invitemstock   = $invitemstock->where('invt_item_stock.warehouse_id', $warehouse_id);
+            $invitemstock   = $invitemstock->where('warehouse_id', $warehouse_id);
         }
         if($merchant_id||$warehouse_id!=null||$warehouse_id!=''){
-            $invitemstock   = $invitemstock->where('invt_item_stock.warehouse_id', $warehouse_id);
+            $invitemstock   = $invitemstock->where('warehouse_id', $warehouse_id);
         }
         $invitemstock       = $invitemstock->get();
        // dd($invitemstock);
