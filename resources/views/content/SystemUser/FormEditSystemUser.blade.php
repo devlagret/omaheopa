@@ -49,23 +49,23 @@ function openform(){
         </div>
     </div>
 
-    <form method="post" action="/system-user/process-edit-system-user" enctype="multipart/form-data">
+    <form method="post" action="{{route('process-edit-system-user')}}" enctype="multipart/form-data">
         @csrf
         <div class="card-body">
             <div class="row form-group">
                 <div class="col-md-4">
                     <div class="form-group">
-                        <a class="text-dark">Nama<a class='red'> *</a></a>
+                        <a class="text-dark">Username / Nama<a class='red'> *</a></a>
                         <input class="form-control input-bb" type="text" name="name" id="name" value="{{$systemuser['name']}}"/>
                         <input class="form-control input-bb" type="hidden" name="user_id" id="user_id" value="{{$user_id}}"/>
                     </div>
                 </div>
-                {{-- <div class="col-md-4">
+                <div class="col-md-4">
                     <div class="form-group">
-                        <a class="text-dark">Nama Panjang<a class='red'> *</a></a>
+                        <a class="text-dark">Nama Lengkap<a class='red'> *</a></a>
                         <input class="form-control input-bb" type="text" name="full_name" id="full_name" value="{{$systemuser['full_name']}}"/>
                     </div>
-                </div> --}}
+                </div>
                 @if(Auth::id() == 1)
                 <div class="col-md-1 mt-3">
                     <div class="form-group">
