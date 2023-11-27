@@ -7,6 +7,7 @@ use App\Models\InvtItem;
 use App\Models\InvtItemCategory;
 use App\Models\InvtWarehouse;
 use App\Models\PurchaseInvoice;
+use App\Models\PurchaseInvoiceItem;
 use Elibyy\TCPDF\Facades\TCPDF;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -43,13 +44,14 @@ class PurchaseInvoicebyItemReportController extends Controller
         ->where('company_id', Auth::user()->company_id)
         ->get()
         ->pluck('warehouse_name','warehouse_id');
-        $data = PurchaseInvoice::join('purchase_invoice_item','purchase_invoice_item.purchase_invoice_id','=','purchase_invoice.purchase_invoice_id')
-        ->where('purchase_invoice.purchase_invoice_date','>=',$start_date)
-        ->where('purchase_invoice.purchase_invoice_date','<=',$end_date)
-        ->where('purchase_invoice.warehouse_id', $warehouse_id)
-        ->where('purchase_invoice.company_id', Auth::user()->company_id)
-        ->where('purchase_invoice.data_state',0)
-        ->get();
+        $data = PurchaseInvoiceItem::with('invoice')
+        ->whereHas('invoice',function($query) use($start_date,$end_date,$warehouse_id){
+            $query->where('purchase_invoice_date','>=',$start_date);
+            $query->where('purchase_invoice_date','<=',$end_date);
+            $query->where('warehouse_id', $warehouse_id);
+            $query->where('company_id', Auth::user()->company_id);
+        })
+        ->groupBy('item_id')->get();
         return view('content.PurchaseInvoicebyItemReport.ListPurchaseInvoicebyItemReport',compact('warehouse', 'data','start_date','end_date'));
     }
 

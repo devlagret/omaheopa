@@ -18,18 +18,18 @@
                 success: function(msg) {}
             });
         }
-     
+
         $(document).ready(function() {
             // changeCategory('item_id_view')
-            
-    
+
+
 
 
         });
 
 
 
-    
+
 
         function reset_add() {
             $.ajax({
@@ -80,8 +80,8 @@
                 Form Tambah
             </h5>
             <div class="float-right">
-                <button onclick="location.href='{{ url('general-reservation') }}'" name="Find" class="btn btn-sm btn-info"
-                    title="Back"><i class="fa fa-angle-left"></i> Kembali</button>
+                <button onclick="location.href='{{ url('general-reservation') }}'" name="Find"
+                    class="btn btn-sm btn-info" title="Back"><i class="fa fa-angle-left"></i> Kembali</button>
             </div>
         </div>
         <form method="post" action="{{ route('process-add-reservation') }}" enctype="multipart/form-data">
@@ -91,20 +91,24 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <a class="text-dark">Nama Paket</a>
-                            <input class="form-control input-bb" name="reservation_name" id="reservation_name" type="text"
-                                autocomplete="off" value=""
+                            <input class="form-control input-bb" name="reservation_name" id="reservation_name"
+                                type="text" autocomplete="off" value=""
                                 onChange="function_elements_add(this.name, this.value);" />
-
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <a class="text-dark">Harga</a>
-                            <input class="form-control input-bb" name="reservation_price" id="reservation_price" type="text"
-                                autocomplete="off" value=""
+                            <input class="form-control input-bb" name="reservation_price" id="reservation_price"
+                                type="text" autocomplete="off" value=""
                                 onChange="function_elements_add(this.name, this.value);" />
                         </div>
                     </div>
+                </div>
+                <div class="form-group">
+                    <a class="text-dark">Keterangan</a>
+                    <input class="form-control input-bb" name="reservation_remark" id="reservation_remark" type="text"
+                        autocomplete="off" value="" onChange="function_elements_add(this.name, this.value);" />
                 </div>
                 <div class="card-footer text-muted">
 

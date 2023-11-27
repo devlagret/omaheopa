@@ -45,7 +45,7 @@ class StockHelper{
             return self::make(self::$item->item_id,self::$warehouse,(0-abs($quantity)));
         }
         return $data->update([
-            'last_balance' => ($data->last_balance - (abs($quantity) * (is_null($unit)?$unit = self::$item['item_default_quantity1']:$unit = $this->getDefaultQty($unit)))),
+            'last_balance' => DB::raw('last_balance -'.(abs($quantity) * (is_null($unit)?$unit = self::$item['item_default_quantity1']:$unit = $this->getDefaultQty($unit)))),
             'updated_id'       => Auth::id()]);
     }
     /**

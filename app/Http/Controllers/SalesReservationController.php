@@ -156,6 +156,8 @@ class SalesReservationController extends Controller
         }
         $data = array(
             'customer_name'             => $request->customer_name,
+            'customer_phone'            => $request->customer_phone,
+            'customer_address'          => $request->customer_address,
             'sales_name'                => $request->sales_name,
             // 'merchant_id'               => $request->merchant_id,
             'sales_invoice_reservation_date'        => $fields['sales_invoice_reservation_date'],
@@ -166,7 +168,7 @@ class SalesReservationController extends Controller
             'discount_amount_total'     => $discount_amount_total,
             'total_amount'              => $fields['total_amount'],
             'paid_amount'               => $fields['paid_amount'],
-            'owing_amount'             => $fields['change_amount'],
+            'owing_amount'              => $fields['change_amount'],
             'sales_status'              => 1,
             'company_id'                => Auth::user()->company_id,
             'created_id'                => Auth::id(),
@@ -373,116 +375,116 @@ class SalesReservationController extends Controller
 
         return $data['reservation_name']?? '';
     }
-    public function getCategoryName($item_category_id)
+    public function getReservationName($reservation_id)
     {
-        $data = InvtItemCategory::where('item_category_id', $item_category_id)->first();
-        return $data['item_category_name']?? '';
+        $data = CoreReservation::where('reservation_id', $reservation_id)->first();
+        return $data['reservation_name']?? '';
     }
-    public function getItemUnitName($item_unit_id)
+    public function getReservationPrice($reservation_id)
     {
-        $data = InvtItemUnit::where('item_unit_id', $item_unit_id)->first();
-        return $data['item_unit_name']?? '';
+        $data = CoreReservation::where('reservation_id', $reservation_id)->first();
+        return $data['reservation_price']?? '';
     }
-    public function detailSalesInvoice($sales_invoice_id)
+    public function detailSalesReservation($sales_invoice_reservation_id)
     {
-        $salesinvoice = SalesInvoice::where('sales_invoice_id', $sales_invoice_id)->first();
-        $salesinvoiceitem = SalesInvoiceItem::where('sales_invoice_id', $sales_invoice_id)->get();
-        return view('content.SalesInvoice.FormDetailSalesInvoice', compact('salesinvoice','salesinvoiceitem'));
+        $salesinvoicereservation = SalesInvoiceReservation::where('sales_invoice_reservation_id', $sales_invoice_reservation_id)->first();
+        $salesinvoicereservationitem = SalesInvoiceReservationItem::where('sales_invoice_reservation_id', $sales_invoice_reservation_id)->get();
+        return view('content.SalesReservation.FormDetailSalesReservation', compact('salesinvoicereservation','salesinvoicereservationitem'));
     }
-    public function deleteSalesInvoice($sales_invoice_id)
+    public function deleteSalesReservation($sales_invoice_reservation_id)
     {
         $transaction_module_code = 'HPSPJL';
         $transaction_module_id  = $this->getTransactionModuleID($transaction_module_code);
-        $sales_invoice = SalesInvoice::where('sales_invoice_id', $sales_invoice_id)->first();
-        $journal_voucher = JournalVoucherItem::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
-        // dd($sales_invoice);
-        // dd($journal_voucher['journal_voucher_amount']);
-        $journal = array(
-            'company_id'                    => Auth::user()->company_id,
-            'journal_voucher_status'        => 1,
-            'journal_voucher_description'   => $this->getTransactionModuleName($transaction_module_code),
-            'journal_voucher_title'         => $this->getTransactionModuleName($transaction_module_code),
-            'transaction_module_id'         => $transaction_module_id,
-            'transaction_module_code'       => $transaction_module_code,
-            'journal_voucher_date'          => date('Y-m-d'),
-            'journal_voucher_period'        => date('Ym'),
-            'updated_id'                    => Auth::id(),
-            'created_id'                    => Auth::id()
-        );
-        JournalVoucher::create($journal);
+        $sales_invoice_reservation = SalesInvoiceReservation::where('sales_invoice_reservation_id', $sales_invoice_reservation_id)->first();
+        // $journal_voucher = JournalVoucherItem::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
+        // // dd($sales_invoice);
+        // // dd($journal_voucher['journal_voucher_amount']);
+        // $journal = array(
+        //     'company_id'                    => Auth::user()->company_id,
+        //     'journal_voucher_status'        => 1,
+        //     'journal_voucher_description'   => $this->getTransactionModuleName($transaction_module_code),
+        //     'journal_voucher_title'         => $this->getTransactionModuleName($transaction_module_code),
+        //     'transaction_module_id'         => $transaction_module_id,
+        //     'transaction_module_code'       => $transaction_module_code,
+        //     'journal_voucher_date'          => date('Y-m-d'),
+        //     'journal_voucher_period'        => date('Ym'),
+        //     'updated_id'                    => Auth::id(),
+        //     'created_id'                    => Auth::id()
+        // );
+        // JournalVoucher::create($journal);
             
-        $account_setting_name = 'sales_cash_account';
-        $account_id = $this->getAccountId($account_setting_name);
-        $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
-        $account_default_status = $this->getAccountDefaultStatus($account_id);
-        $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
-        if($account_setting_status == 0){
-            $account_setting_status = 1;
-        } else {
-            $account_setting_status = 0;
-        }
-        if ($account_setting_status == 0){ 
-            $debit_amount = $journal_voucher['journal_voucher_amount'];
-            $credit_amount = 0;
-        } else {
-            $debit_amount = 0;
-            $credit_amount = $journal_voucher['journal_voucher_amount'];
-        }
-        $journal_debit = array(
-            'company_id'                    => Auth::user()->company_id,
-            'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
-            'account_id'                    => $account_id,
-            'journal_voucher_amount'        => $journal_voucher['journal_voucher_amount'],
-            'account_id_default_status'     => $account_default_status,
-            'account_id_status'             => $account_setting_status,
-            'journal_voucher_debit_amount'  => $debit_amount,
-            'journal_voucher_credit_amount' => $credit_amount,
-            'updated_id'                    => Auth::id(),
-            'created_id'                    => Auth::id()
-        );
-        JournalVoucherItem::create($journal_debit);
+        // $account_setting_name = 'sales_cash_account';
+        // $account_id = $this->getAccountId($account_setting_name);
+        // $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
+        // $account_default_status = $this->getAccountDefaultStatus($account_id);
+        // $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
+        // if($account_setting_status == 0){
+        //     $account_setting_status = 1;
+        // } else {
+        //     $account_setting_status = 0;
+        // }
+        // if ($account_setting_status == 0){ 
+        //     $debit_amount = $journal_voucher['journal_voucher_amount'];
+        //     $credit_amount = 0;
+        // } else {
+        //     $debit_amount = 0;
+        //     $credit_amount = $journal_voucher['journal_voucher_amount'];
+        // }
+        // $journal_debit = array(
+        //     'company_id'                    => Auth::user()->company_id,
+        //     'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
+        //     'account_id'                    => $account_id,
+        //     'journal_voucher_amount'        => $journal_voucher['journal_voucher_amount'],
+        //     'account_id_default_status'     => $account_default_status,
+        //     'account_id_status'             => $account_setting_status,
+        //     'journal_voucher_debit_amount'  => $debit_amount,
+        //     'journal_voucher_credit_amount' => $credit_amount,
+        //     'updated_id'                    => Auth::id(),
+        //     'created_id'                    => Auth::id()
+        // );
+        // JournalVoucherItem::create($journal_debit);
 
-        $account_setting_name = 'sales_account';
-        $account_id = $this->getAccountId($account_setting_name);
-        $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
-        $account_default_status = $this->getAccountDefaultStatus($account_id);
-        $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
-        if($account_setting_status == 1){
-            $account_setting_status = 0;
-        } else {
-            $account_setting_status = 1;
-        }
-        if ($account_setting_status == 0){
-            $debit_amount = $journal_voucher['journal_voucher_amount'];
-            $credit_amount = 0;
-        } else {
-            $debit_amount = 0;
-            $credit_amount = $journal_voucher['journal_voucher_amount'];
-        }
-        $journal_credit = array(
-            'company_id'                    => Auth::user()->company_id,
-            'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
-            'account_id'                    => $account_id,
-            'journal_voucher_amount'        => $journal_voucher['journal_voucher_amount'],
-            'account_id_default_status'     => $account_default_status,
-            'account_id_status'             => $account_setting_status,
-            'journal_voucher_debit_amount'  => $debit_amount,
-            'journal_voucher_credit_amount' => $credit_amount,
-            'updated_id'                    => Auth::id(),
-            'created_id'                    => Auth::id()
-        );
-        JournalVoucherItem::create($journal_credit);
+        // $account_setting_name = 'sales_account';
+        // $account_id = $this->getAccountId($account_setting_name);
+        // $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
+        // $account_default_status = $this->getAccountDefaultStatus($account_id);
+        // $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
+        // if($account_setting_status == 1){
+        //     $account_setting_status = 0;
+        // } else {
+        //     $account_setting_status = 1;
+        // }
+        // if ($account_setting_status == 0){
+        //     $debit_amount = $journal_voucher['journal_voucher_amount'];
+        //     $credit_amount = 0;
+        // } else {
+        //     $debit_amount = 0;
+        //     $credit_amount = $journal_voucher['journal_voucher_amount'];
+        // }
+        // $journal_credit = array(
+        //     'company_id'                    => Auth::user()->company_id,
+        //     'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
+        //     'account_id'                    => $account_id,
+        //     'journal_voucher_amount'        => $journal_voucher['journal_voucher_amount'],
+        //     'account_id_default_status'     => $account_default_status,
+        //     'account_id_status'             => $account_setting_status,
+        //     'journal_voucher_debit_amount'  => $debit_amount,
+        //     'journal_voucher_credit_amount' => $credit_amount,
+        //     'updated_id'                    => Auth::id(),
+        //     'created_id'                    => Auth::id()
+        // );
+        // JournalVoucherItem::create($journal_credit);
 
-        $table_sales_invoice = SalesInvoice::findOrFail($sales_invoice['sales_invoice_id']);
-        $table_sales_invoice->data_state = 1;
-        $table_sales_invoice->updated_id = Auth::id();
+        $table_sales_invoice_reservation = SalesInvoiceReservation::findOrFail($sales_invoice_reservation['sales_invoice_reservation_id']);
+        $table_sales_invoice_reservation->data_state = 1;
+        $table_sales_invoice_reservation->updated_id = Auth::id();
 
-        if($table_sales_invoice->save()){
-            $msg = "Hapus Penjualan Berhasil";
-            return redirect('/sales-invoice')->with('msg',$msg);
+        if($table_sales_invoice_reservation->save()){
+            $msg = "Hapus Reservasi Berhasil";
+            return redirect('/sales-reservation')->with('msg',$msg);
         } else {
-            $msg = "Hapus Penjualan Gagal";
-            return redirect('/sales-invoice')->with('msg',$msg);
+            $msg = "Hapus Reservasi Gagal";
+            return redirect('/sales-reservation')->with('msg',$msg);
         }
     }
     public function addElementsSalesTiket(Request $request)
@@ -494,7 +496,7 @@ class SalesReservationController extends Controller
         $salesinvoice[$request->name] = $request->value;
         Session::put('salesinvoice', $salesinvoice);
     }
-    public function filterSalesTiket(Request $request)
+    public function filterSalesReservation(Request $request)
     {
         $start_date = $request->start_date;
         $end_date = $request->end_date;
@@ -502,14 +504,14 @@ class SalesReservationController extends Controller
         Session::put('start_date',$start_date);
         Session::put('end_date',$end_date);
 
-        return redirect('/sales-tiket');
+        return redirect('/sales-reservation');
     }
-    public function filterResetSalesInvoice()
+    public function filterResetSalesReservation()
     {
         Session::forget('start_date');
         Session::forget('end_date');
 
-        return redirect('/sales-tiket');
+        return redirect('/sales-reservation');
     }
     public function getTransactionModuleID($transaction_module_code)
     {

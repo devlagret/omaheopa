@@ -1200,12 +1200,13 @@ class AcctBalanceSheetReportController extends Controller
                                 }
                             }
 
-                            $spreadsheet->getActiveSheet()->setCellValue('D'.$j, $report_tab2.$valRight['account_name2']);
-                            // $spreadsheet->getActiveSheet()->setCellValue('E'.$j, $report_tab2.$total_account_amount2+$total_account_amount210);
-                            $spreadsheet->getActiveSheet()->setCellValue('E'.$j, $report_tab2.$total_account_amount2);
+                           
 
                             
                             $grand_total_account_amount2 += $total_account_amount2;
+                            $spreadsheet->getActiveSheet()->setCellValue('D'.$j, $report_tab2.$valRight['account_name2']);
+                            // $spreadsheet->getActiveSheet()->setCellValue('E'.$j, $report_tab2.$total_account_amount2+$total_account_amount210);
+                            $spreadsheet->getActiveSheet()->setCellValue('E'.$j, $report_tab2.$grand_total_account_amount2);
 
                             
                         } else {

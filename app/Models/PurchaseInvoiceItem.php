@@ -30,6 +30,9 @@ class PurchaseInvoiceItem extends Model
     public function category() {
         return $this->belongsTo(InvtItemCategory::class,'item_category_id','item_category_id');
     }
+    public function invoice() {
+        return $this->belongsTo(PurchaseInvoice::class,'purchase_invoice_id','purchase_invoice_id');
+    }
     // protected static function booted()
     // {
     //     static::addGlobalScope(new NotDeletedScope);

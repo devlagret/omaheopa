@@ -1,5 +1,3 @@
-@inject('SIBURC','App\Http\Controllers\SalesInvoicebyUserReportController' )
-
 @extends('adminlte::page')
 
 @section('title',  "MOZAIC Omah'e Opa")
@@ -103,7 +101,6 @@
         Daftar
     </h5>
   </div>
-
     <div class="card-body">
         <div class="table-responsive">
             <table id="example" style="width:100%" class="table table-striped table-bordered table-hover table-full-width">
@@ -124,20 +121,22 @@
                 </thead>
                 <tbody>
                     <?php $no =1;?>
-                    @foreach ($data as $row)
+                    @foreach ($data as $dt)
+                    @foreach ($dt->items as $row)
                         <tr>
                             <td>{{ $no++ }}</td>
-                            <td>{{ $SIBURC->getUserName($row['created_id']) }}</td>
-                            <td>{{ $row['sales_invoice_no'] }}</td>
-                            <td>{{ $row['sales_invoice_date'] }}</td>
-                            <td>{{ $SIBURC->getItemName($row['item_id']) }}</td>
-                            <td>{{ $SIBURC->getItemUnitName($row['item_unit_id']) }}</td>
-                            <td>{{ $row['quantity'] }}</td>
+                            <td>{{ $dt->user->name }}</td>
+                            <td>{{ $dt->sales_invoice_no }}</td>
+                            <td>{{ $dt['sales_invoice_date'] }}</td>
+                            <td>{{ $row->item->item_name??'-' }}</td>
+                            <td>{{ $row->unit->item_unit_name??'-' }}</td>
+                            <td>{{ $row['quantity']??0 }}</td>
                             <td style="text-align: right">{{ number_format($row['item_unit_price'],2,'.',',') }}</td>
                             <td style="text-align: right">{{ number_format($row['subtotal_amount'],2,'.',',') }}</td>
                             <td style="text-align: right">{{ number_format($row['discount_amount'],2,'.',',') }}</td>
                             <td style="text-align: right">{{ number_format($row['subtotal_amount_after_discount'],2,'.',',') }}</td> 
                         </tr>
+                    @endforeach
                     @endforeach
                 </tbody>
             </table>

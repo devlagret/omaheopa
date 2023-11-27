@@ -117,8 +117,13 @@
                     <tr>
                         <th width="2%" style='text-align:center'>No</th>
                         <th width="15%" style='text-align:center'>Tanggal Reservasi</th>
+                        <th width="15%" style='text-align:center'>Jatuh Tempo</th>
                         <th width="15%" style='text-align:center'>Nomor Reservasi</th>
+                        <th width="15%" style='text-align:center'>Marketing</th>
+
                         <th width="15%" style='text-align:center'>Pelanggan</th>
+                        <th width="15%" style='text-align:center'>DP</th>
+                        <th width="15%" style='text-align:center'>Sisa</th>
                         <th width="15%" style='text-align:center'>Subtotal</th>
                         <th width="10%" style='text-align:center'>Aksi</th>
                     </tr>
@@ -129,13 +134,21 @@
                     <tr>
                         <td style='text-align:center'>{{ $no++ }}</td>
                         <td>{{ $row['sales_invoice_reservation_date'] ?? '' }}</td>
+                        <td>{{ $row['sales_invoice_reservation_due_date'] ?? '' }}</td>
                         <td>{{ $row['sales_invoice_reservation_no'] ?? '' }}</td>
+                        <td>{{ $row['sales_name'] ?? '' }}</td>
                         <td>{{ $row['customer_name'] ?? ''  }}</td>
+                        <td style="text-align: right">{{ $row['paid_amount'] ?? '' }}</td>
+                        <td style="text-align: right">{{ $row['owing_amount'] ?? '' }}</td>
                         <td style="text-align: right">{{ $row['total_amount'] ?? '' }}</td>
                         <td class="text-center">
-                            <a type="button" class="btn btn-outline-primary btn-sm" href="{{ url('/reservation-payment/select-supplier/'.$row['sales_invoice_reservation_id'] ?? '') }}">Bayar</a>
-                            <a type="button" class="btn btn-outline-warning btn-sm" href="{{ url('/sales-reservation/detail/'.$row['sales_invoice_id'] ?? '') }}">Detail</a>
-                            <a type="button" class="btn btn-outline-danger btn-sm" href="{{ url('/sales-reservation/delete/'.$row['sales_invoice_id'] ?? '' ) }}">Hapus</a>
+                            <?php if($row['owing_amount'] > 0){ ?>
+                            <a type="button" class="btn btn-outline-primary btn-sm" href="{{ url('/reservation-payment/select-customer/'.$row['sales_invoice_reservation_id'] ?? '') }}">Bayar</a>
+                            <?php } ?>
+                            <a type="button" class="btn btn-outline-warning btn-sm" href="{{ url('/sales-reservation/detail/'.$row['sales_invoice_reservation_id'] ?? '') }}">Detail</a>
+                            <a href="{{ route('delete-sales-reservation', ['sales_invoice_reservation_id' => $row['sales_invoice_reservation_id']]) }}"
+                                name='Reset' class='btn btn-outline-danger btn-sm'
+                                onclick="return confirm('Apakah Anda Yakin Ingin Menghapus Data Ini ?')"></i> Hapus</a>
                         </td>
                     </tr>
                     @endforeach

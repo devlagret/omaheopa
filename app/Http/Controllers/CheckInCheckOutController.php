@@ -145,6 +145,7 @@ class CheckInCheckOutController extends Controller
             return redirect()->route('cc.index')->with('msg','Data Berhasil Diinput');
         }catch(\Exception $e){
             DB::rollBack();
+            dd($e);
             report($e);
             return redirect()->route('cc.index')->with('msg','Data Gagal Diinput');
         }
@@ -358,7 +359,7 @@ class CheckInCheckOutController extends Controller
         }
 
         // * buat jurnal
-        JournalHelper::make($token,'Check-in Non Booking',['hotel_account','hotel_cash_account'],$request->total_amount);
+        JournalHelper::make('Check-in Non Booking',$request->total_amount,['hotel_account','hotel_cash_account']);
         //
 
             DB::commit();
