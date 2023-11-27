@@ -1,5 +1,7 @@
 <?php
 namespace App\Http\Controllers;
+
+use App\Helpers\JournalHelper;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
@@ -197,10 +199,15 @@ class PaymentReservationController extends Controller
         // echo json_encode($dataPayment);exit;
         // dd($dataPayment);
         PaymentReservation::create($dataPayment);
+
         
         $purchasepayment = PaymentReservation::where('company_id', Auth::user()->company_id)
         ->orderBy('payment_id','DESC')
         ->first();
+
+         //*jurnal
+         JournalHelper::trsJournalNo($this->getSalesReservationNo($purchasepayment->sales_invoice_reservation_id))->title('Pelunasan Reservasi',1)->appendTitle($this->getSalesReservationNo($purchasepayment->sales_invoice_reservation_id),1)->make('Sales Reservation', $request->total_payment, ['payment_reservation_cash_account','payment_reservation_account']);
+        
 
         for ($i=1; $i <= $request->total_invoice ; $i++) {
             if ($request['sales_invoice_reservation_id_'.$i] != null) {
@@ -845,6 +852,13 @@ class PaymentReservationController extends Controller
         $data = PreferenceTransactionModule::where('transaction_module_code',$transaction_module_code)->first();
 
         return $data['transaction_module_name'];
+    }
+
+    public function getSalesReservationNo($sales_invoice_reservation_id)
+    {
+        $data = SalesInvoiceReservation::where('sales_invoice_reservation_id',$sales_invoice_reservation_id)->first();
+
+        return $data['sales_invoice_reservation_no'];
     }
 
     // public function printReciptCeshPayment()

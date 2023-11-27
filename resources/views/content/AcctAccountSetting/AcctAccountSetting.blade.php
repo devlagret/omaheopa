@@ -55,6 +55,9 @@
                 <li class="nav-item">
                   <a class="nav-link" href="#hotel" role="tab" data-toggle="tab">Penginapan</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#reservasi" role="tab" data-toggle="tab">Reservasi</a>
+                  </li>
             </ul>
             <div class="tab-content">
                 <div role="tabpanel" class="tab-pane fade show active" id="pembelian">
@@ -376,7 +379,7 @@
                     <table class="table table-borderless">
 
                         <tr>
-                            <th colspan="3" style="text-align: center !important ;width: 100% !important">Pengeluaran</th>
+                            <th colspan="3" style="text-align: center !important ;width: 100% !important">Penginapan</th>
                         </tr>
                         <tr>
                             <th style="text-align: left !important; width: 40% !important">Kas</th>
@@ -398,6 +401,59 @@
                         </tr>
                     </table>
                 </div>
+
+                <div role="tabpanel" class="tab-pane fade" id="reservasi">
+                    <table class="table table-borderless">
+
+                        <tr>
+                            <th colspan="3" style="text-align: center !important ;width: 100% !important">Reservasi</th>
+                        </tr>
+                        <tr>
+                            <th style="text-align: left !important; width: 40% !important">Kas</th>
+                            <td style="text-align: left !important; width: 30% !important">
+                                {!! Form::select(0, $accountlist,$data->where('account_setting_name','sales_reservation_cash_account')->pluck('account_id')??'',['class' => 'selection-search-clear select-form','name'=>'sales_reservation_cash_account_id','id'=>'sales_reservation_cash_account_id']) !!}
+                            </td>
+                            <td style="text-align: left !important; width: 30% !important">
+                                {!! Form::select(0, $status,$data->where('account_setting_name','sales_reservation_cash_account')->pluck('account_setting_status')??'',['class' => 'selection-search-clear select-form','name'=>'sales_reservation_cash_reservation_account_status','id'=>'sales_reservation_cash_reservation_account_status']) !!}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th style="text-align: left !important; width: 40% !important">Penerimaan DP</th>
+                            <td style="text-align: left !important; width: 30% !important">
+                                {!! Form::select(0, $accountlist,$data->where('account_setting_name','sales_reservation_account')->pluck('account_id')??'',['class' => 'selection-search-clear select-form','name'=>'sales_reservation_account_id','id'=>'sales_reservation_account_id']) !!}
+                            </td>
+                            <td style="text-align: left !important; width: 30% !important">
+                                {!! Form::select(0, $status,$data->where('account_setting_name','sales_reservation_account')->pluck('account_setting_status')??'',['class' => 'selection-search-clear select-form','name'=>'sales_reservation_account_status','id'=>'sales_reservation_account_status']) !!}
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <th colspan="3" style="text-align: center !important ;width: 100% !important">Pelunasan Reservasi</th>
+                        </tr>
+                        <tr>
+                            <th style="text-align: left !important; width: 40% !important">Kas</th>
+                            <td style="text-align: left !important; width: 30% !important">
+                                {!! Form::select(0, $accountlist,$data->where('account_setting_name','payment_reservation_cash_account')->pluck('account_id')??'',['class' => 'selection-search-clear select-form','name'=>'payment_reservation_cash_account_id','id'=>'payment_reservation_cash_account_id']) !!}
+                            </td>
+                            <td style="text-align: left !important; width: 30% !important">
+                                {!! Form::select(0, $status,$data->where('account_setting_name','payment_reservation_cash_account')->pluck('account_setting_status')??'',['class' => 'selection-search-clear select-form','name'=>'payment_reservation_cash_account_status','id'=>'payment_reservation_cash_account_status']) !!}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th style="text-align: left !important; width: 40% !important">Pelunasan DP Reservasi</th>
+                            <td style="text-align: left !important; width: 30% !important">
+                                {!! Form::select(0, $accountlist,$data->where('account_setting_name','payment_reservation_account')->pluck('account_id')??'',['class' => 'selection-search-clear select-form','name'=>'payment_reservation_account_id','id'=>'payment_reservation_account_id']) !!}
+                            </td>
+                            <td style="text-align: left !important; width: 30% !important">
+                                {!! Form::select(0, $status,$data->where('account_setting_name','payment_reservation_account')->pluck('account_setting_status')??'',['class' => 'selection-search-clear select-form','name'=>'payment_reservation_account_status','id'=>'payment_reservation_account_status']) !!}
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+
+
             </div>
         </div>
         <div class="card-footer text-muted">
