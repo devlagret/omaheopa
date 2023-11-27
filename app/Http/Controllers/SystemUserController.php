@@ -82,7 +82,6 @@ class SystemUserController extends Controller
         return redirect()->route('system-user')->with('msg',"Tambah System User Berhasil");
         } catch (\Exception $e) {
         DB::rollBack();
-        dd($e);
         report($e);
         return redirect()->route('system-user')->with('msg',"Tambah System User Gagal");
         }
