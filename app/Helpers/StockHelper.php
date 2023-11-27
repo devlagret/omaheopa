@@ -84,7 +84,6 @@ class StockHelper{
             $stock->where('warehouse_id',$warehouse_id);
         }
         
-        // dump($stock);
         self::$data=$stock;
         $sh = new StockHelper();
         $sh->setdata($unit);

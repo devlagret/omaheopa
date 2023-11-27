@@ -127,8 +127,8 @@
     </div>
     <div class="card-footer text-muted">
         <div class="form-actions float-right">
-            <a class="btn btn-danger" href="/purchase-invoice-by-item-report/print"> Preview</a>
-            <a class="btn btn-primary" href="/purchase-invoice-by-item-report/export"><i class="fa fa-download"></i> Export Data</a>
+            <a class="btn btn-danger" href="{{route('print-purchase-invoice-by-item-report')}}"> Preview</a>
+            <a class="btn btn-primary" href="{{route('export-purchase-invoice-by-item-report')}}"><i class="fa fa-download"></i> Export Data</a>
         </div>
     </div>
   </div>

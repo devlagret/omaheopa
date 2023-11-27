@@ -144,8 +144,8 @@
         </div>
         <div class="text-muted mt-3">
             <div class="form-actions float-right">
-                <a class="btn btn-danger" href="/profit-loss-year-report/print"> Preview</a>
-                <a class="btn btn-primary" href="/profit-loss-year-report/export"><i class="fa fa-download"></i> Export Data</a>
+                <a class="btn btn-danger" href="{{route('print-profit-loss-year-report')}}"> Preview</a>
+                <a class="btn btn-primary" href="{{route('export-profit-loss-year-report')}}"><i class="fa fa-download"></i> Export Data</a>
             </div>
         </div>
   </div>
