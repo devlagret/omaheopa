@@ -267,14 +267,13 @@ class GeneralTiketController extends Controller
                 }*/
             }
         }
-        foreach ($warehouse as $key => $val) {
+        
             InvtItemStock::updateOrCreate(['company_id'=>Auth::user()->company_id,
                 'item_id'=>$table['item_id'],
                 'item_category_id'=>$table['item_category_id'],
-                'warehouse_id'=>$val['warehouse_id'],
+                // 'warehouse_id'=>$val['warehouse_id'],
                 'item_unit_id'=>$table['item_unit_id1']
             ],['item_unit_id'=>$request->item_unit_id1]);
-        }
         $table->item_code               = $fields['item_code'];
         $table->item_name               = $fields['item_name'];
         $table->item_remark             = $request->item_remark;
