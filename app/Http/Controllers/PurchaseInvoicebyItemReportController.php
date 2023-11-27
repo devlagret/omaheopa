@@ -51,7 +51,6 @@ class PurchaseInvoicebyItemReportController extends Controller
             if(!empty($warehouse_id)){
                 $query->where('warehouse_id', $warehouse_id);
             }
-            $query->where('warehouse_id', $warehouse_id);
             $query->where('company_id', Auth::user()->company_id);
         })
         ->groupBy('item_id')->get();
@@ -118,7 +117,6 @@ class PurchaseInvoicebyItemReportController extends Controller
             if(!empty($warehouse_id)){
                 $query->where('warehouse_id', $warehouse_id);
             }
-            $query->where('warehouse_id', $warehouse_id);
             $query->where('company_id', Auth::user()->company_id);
         })
         ->groupBy('item_id')->get();
@@ -217,7 +215,6 @@ class PurchaseInvoicebyItemReportController extends Controller
             if(!empty($warehouse_id)){
                 $query->where('warehouse_id', $warehouse_id);
             }
-            $query->where('warehouse_id', $warehouse_id);
             $query->where('company_id', Auth::user()->company_id);
         })
         ->groupBy('item_id')->get();
