@@ -535,7 +535,6 @@ class BookingController extends Controller
         if (empty(Session::get('booking-token'))) {
             return redirect()->route('booking.index')->with('msg', 'Tambah Booking Kamar Berhasil -');
         }
-        // dump($request->all());
         $field = $request->validate([
             'atas_nama' => 'required',
         ], ['atas_nama.required' => 'Nama Pemesan Diperlukan']);
@@ -578,9 +577,6 @@ class BookingController extends Controller
                 'company_id'    => Auth::user()->company_id,
             ]);
         }
-        // dump($check);
-        // dump($checkfac);
-        // dump($checkmenu);
         // // return 0;
         try {
             DB::beginTransaction();
@@ -686,7 +682,6 @@ class BookingController extends Controller
             Session::forget('booking-token');
             DB::rollBack();
             report($e);
-            dump($e);
             return redirect()->route('booking.index')->with(['msg' => 'Tambah Booking Kamar Gagal', 'type' => 'danger']);
         }
     }
@@ -745,13 +740,7 @@ class BookingController extends Controller
     }
     public function processRescedule(Request $request)
     {
-        dump($request->all());
         $so = SalesOrder::with('rooms')->find($request->sales_order_id);
-        dump($so);
-        foreach ($so->rooms as $val) {
-            dump($val);
-        }
-        // return 1;
         try {
             DB::beginTransaction();
             SalesOrderRescedule::create([
@@ -772,7 +761,7 @@ class BookingController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             report($e);
-            dump($e);
+            return redirect()->route('booking.index')->with('msg', 'Rescedule Booking Gagal');
         }
     }
     public function edit($sales_order_id)
@@ -863,7 +852,6 @@ class BookingController extends Controller
         if (!$roomData->count()) {
             return redirect()->back()->with(['msg' => 'Harap Tambahkan Kamar Yang Dibooking', 'type' => 'warning', 'tab-index' => 2]);
         }
-        dump($request->all());
         $field = $request->validate([
             'atas_nama' => 'required',
         ], ['atas_nama.required' => 'Nama Pemesan Diperlukan']);
@@ -1003,7 +991,6 @@ class BookingController extends Controller
             Session::forget('eb-token');
             DB::rollBack();
             report($e);
-            dump($e);
             return redirect()->route('booking.add')->with(['msg' => 'Edit Booking Kamar Gagal', 'type' => 'danger']);
         }
     }

@@ -147,7 +147,6 @@ class CheckInCheckOutController extends Controller
             return redirect()->route('cc.index')->with('msg', 'Data Berhasil Diinput');
         } catch (\Exception $e) {
             DB::rollBack();
-            dd($e);
             report($e);
             return redirect()->route('cc.index')->with('msg', 'Data Gagal Diinput');
         }
@@ -170,7 +169,6 @@ class CheckInCheckOutController extends Controller
             return redirect()->back()->with('msg', 'Check-In Berhasil');
         } catch (\Exception $e) {
             DB::rollBack();
-            // return dump($e);s
             report($e);
             return redirect()->back()->with('msg', 'Check-In Gagal');
         }
@@ -184,7 +182,6 @@ class CheckInCheckOutController extends Controller
         $field = $request->validate(['paid_amount' => 'required', 'sales_order_id' => 'required'], ['paid_amount.required' => 'Uang Yang dibayar Harus Dimasukan', 'sales_order_id.required' => 'Error']);
         $order = SalesOrder::find($request->sales_order_id);
         $invoice = SalesInvoice::find($order->sales_invoice_id);
-        // return dump($request->all());
         try {
             DB::beginTransaction();
             $order->sales_order_status = 3;
@@ -212,7 +209,6 @@ class CheckInCheckOutController extends Controller
             return redirect()->back()->with('msg', 'Check-Out Berhasil');
         } catch (\Exception $e) {
             DB::rollBack();
-            // return dump($e);s
             report($e);
             return redirect()->back()->with('msg', 'Check-Out Gagal');
         }
@@ -253,7 +249,6 @@ class CheckInCheckOutController extends Controller
         if (empty(Session::get('booking-token'))) {
             return redirect()->route('cc.index')->with('msg', 'Tambah Booking Kamar Berhasil -');
         }
-        dump($request->all());
         $field = $request->validate([
             'atas_nama' => 'required',
         ], ['atas_nama.required' => 'Nama Pemesan Diperlukan']);
@@ -296,10 +291,6 @@ class CheckInCheckOutController extends Controller
                 'company_id'    => Auth::user()->company_id,
             ]);
         }
-        dump($check);
-        dump($checkfac);
-        dump($checkmenu);
-        // return 0;
         try {
             DB::beginTransaction();
             SalesInvoice::create([
