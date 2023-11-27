@@ -310,32 +310,6 @@
             });
         }
 
-        function addReservasi(){
-        var reservation_name              = $("#reservation_name").val();
-        var reservation_price              = $("#reservation_price").val();
-        var reservation_remark              = $("#reservation_remark").val();
-        $.ajax({
-            type: "POST",
-            url : "{{route('process-add-reservation')}}",
-            dataType: "html",
-            data: {
-                'reservation_name'	            : reservation_name,
-                'reservation_price'	            : reservation_price,
-                'reservation_remark'	        : reservation_remark,
-                '_token'                        : '{{csrf_token()}}',
-            },
-            success: function(return_data){ 
-                location.reload();
-                $('#cancel-btn-unit').click();
-            },
-            error: function(data)
-            {
-                console.log(data);
-
-            }
-        });
-    }
-
 
 
     </script>
@@ -693,6 +667,9 @@
     </div>
     </form>
 
+
+    <form method="post" action="{{ route('save-new-reservation') }}" enctype="multipart/form-data">
+        @csrf
     <div class="modal fade bs-modal-lg" id="addreservation" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -725,11 +702,12 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal" id='cancel-btn-unit'>Batal</button>
-                    <a class="btn btn-primary btn-sm" onClick="addReservasi()">Simpan</a>
+                    <button type="submit" class="btn btn-primary btn-sm">Simpan</button>
                 </div>
             </div>
         </div>
     </div>
+    </form>
 
 
 

@@ -1934,23 +1934,42 @@ class APIController extends Controller
         }
     }
 
-    public function getSalesTiketMerchant()
+    public function getSalesTiketMerchant(Request $request)
     {
-        $merchant   = InvtItem::select('*')
-        ->where('data_state', 0);
+
+        $merchant   = SalesMerchant::where('data_state', 0);
         if(Auth::id()!=1||Auth::user()->merchant_id!=null){
             $merchant->where('merchant_id',Auth::user()->merchant_id);
         }
-        $merchant = $merchant->get();
+        $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
 
-        $units   = InvtItemUnit::where('data_state', 0)
+        $category = InvtItemCategory::select('item_category_id', 'item_category_name');
+        if (Auth::id()!=1||Auth::user()->merchant_id!=null) {
+            
+            $category->where('merchant_id', $request->merchant_id);
+        }
+        $category = $category->get();
+
+        $item   = InvtItem::select('*')
+        ->where('data_state', 0);
+        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
+            $item->where('merchant_id',Auth::user()->merchant_id);
+        }
+        $item = $item->get();
+
+        // $items = InvtItem::find($request->item_id);
+        $units          = InvtItemUnit::where('data_state', 0)
         ->where('company_id', Auth::user()->company_id)
-        ->get();
+        ->get()
+        ->pluck('item_unit_name','item_unit_name');
 
-        if($merchant){
+        if($item){
             return response([
-                'data' => $merchant,
-                'unit' => $units
+                'data' => $item,
+                'unit' => $units,
+                'merchant' => $merchant,
+                'category' => $category
+
             ],201);
         }else{
             return response([

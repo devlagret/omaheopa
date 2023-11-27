@@ -157,6 +157,48 @@
 </div>
 
 
+<div class="card border border-dark">
+    <div class="card-header border-dark bg-dark">
+        <h5 class="mb-0 float-left">
+            Detail Pembayaran
+        </h5>
+    </div>
+        <div class="card-body">
+            <div class="form-body form">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-advance table-hover">
+                        <thead class="thead-light">
+                            <tr>
+                                <th style='text-align:center'>No</th>
+                                <th style='text-align:center'>Tanggal bayar</th>
+                                <th style='text-align:center'>Jumlah bayar</th>
+                                <th style='text-align:center'>Sisa Hutang</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if($paymentreservation == null)
+                                    <tr><th colspan='4' style='text-align  : center !important;'>Data Kosong</th></tr>
+                            @else
+                            @php
+                            $no = 1;
+                            @endphp
+                                @foreach ($paymentreservation AS $key => $val)
+                                    <tr>
+                                        <td>{{ $no++ }}</td>
+                                        <td>{{ $val['payment_date'] }}</td>
+                                        <td style="text-align: right">{{ $val['payment_amount'] }}</td>
+                                        <td style="text-align: right">{{ $val['rounding_amount'] }}</td>
+                                    </tr>
+                                @endforeach
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+</div>
+
+
 
 @stop
 
