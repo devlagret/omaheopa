@@ -24,17 +24,15 @@ class SettingTiketController extends Controller
         ->where('data_state',0)
         ->where('company_id', Auth::user()->company_id)
         ->first();
-        // print_r($data); exit;
-        return view('content.PPN.ListPPN',compact('data'));
-    }
-    //  public function editCoreSupplier($supplier_id)
-    //  {
-    //      $data = CoreSupplier::select('supplier_name','supplier_phone','supplier_address','supplier_id')
-    //      ->where('supplier_id', $supplier_id)
-    //      ->first();
 
-    //      return view('content.CoreSupplier.EditCoreSupplier', compact('data'));
-    //  }
+        $tiket = array(
+            1 => 'Merchant',
+            2 => 'Global', 
+        );
+        return view('content.SettingTiket.ListSettingTiket',compact('data','tiket'));
+    }
+
+
 
     public function processEditTiket(Request $request)
     {
