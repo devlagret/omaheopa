@@ -66,6 +66,7 @@ use App\Http\Controllers\SalesReservationController;
 use App\Http\Controllers\SalesRoomFacilityController;
 use App\Http\Controllers\PaymentReservationController;
 use App\Http\Controllers\SalesRoomPriceController;
+use App\Http\Controllers\SettingTiketController;
 use App\Http\Controllers\SystemLogsController;
 use Illuminate\Support\Facades\Auth;
 
@@ -744,3 +745,6 @@ Route::get('/reservation-payment/delete/{supplier_id}', [PaymentReservationContr
 Route::get('/reservation-payment/detail/{supplier_id}', [PaymentReservationController::class, 'detailreservationPayment'])->name('detail-reservation-payment');
 Route::get('/reservation-payment/print-recipt-cesh-payment', [PaymentReservationController::class, 'printReciptCeshPayment'])->name('reservation-payment-print-recipt-cesh-payment');
 Route::get('/reservation-payment/print-recipt-non-cesh-payment', [PaymentReservationController::class, 'printReciptNonCeshPayment'])->name('reservation-payment-print-recipt-non-cesh-payment');
+
+Route::get('/setting-tiket', [SettingTiketController::class, 'index'])->name('setting-tiket');
+Route::post('/setting-tiket/process-edit', [SettingTiketController::class, 'processEditTiket'])->name('process-edit-tiket');
