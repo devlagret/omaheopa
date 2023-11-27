@@ -1914,6 +1914,19 @@ class APIController extends Controller
     }
 
     //API TIKET Penjualan Wahana
+
+    
+    public function getTransServiceDisposition(){
+        $units          = InvtItemUnit::where('data_state', 0)
+        ->where('company_id', Auth::user()->company_id)
+        ->get()
+        ->pluck('item_unit_name','item_unit_name');
+
+        return response([
+            'data' => $units
+        ],201);
+    }
+
     public function getHistorySalesTiketMerchant()
     {
         $sales  = SalesInvoice::select('*')
@@ -1957,12 +1970,17 @@ class APIController extends Controller
             $item->where('merchant_id',Auth::user()->merchant_id);
         }
         $item = $item->get();
-
+        foreach($item as $key => $val){
         // // $items = InvtItem::find($request->item_id);
-        // $units          = InvtItemUnit::where('data_state', 0)
-        // ->where('company_id', Auth::user()->company_id)
-        // ->get()
-        // ->pluck('item_unit_name','item_unit_name');
+        $units          = InvtItemUnit::select('*')
+        ->where('item_unit_id', $val['item_unit_id1'])
+        ->where('data_state', 0)
+        ->where('company_id', Auth::user()->company_id)
+        ->get()
+        ->pluck('item_unit_name','item_unit_id');
+        $val['item_unit_name'] = $units;
+
+        }
 
         if($item){
             return response([
