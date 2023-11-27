@@ -6,11 +6,11 @@
 @section('js')
     <script>
         function function_elements_add(name, value) {
-            // console.log("name " + name);
-            // console.log("value " + value);
+            console.log("name " + name);
+            console.log("value " + value);
             $.ajax({
                 type: "POST",
-                url: "{{ route('add-elements-sales-tiket') }}",
+                url: "{{ route('add-elements-sales-reservation') }}",
                 data: {
                     'name': name,
                     'value': value,
@@ -386,7 +386,7 @@
                         <div class="form-group">
                             <a class="text-dark">Marketing</a>
                             <input class="form-control input-bb" name="sales_name" id="sales_name" type="text"
-                                autocomplete="off" value=""
+                                autocomplete="off" value="{{$salesinvoicereservations == null ? '' : $salesinvoicereservations['sales_name']}}"
                                 onChange="function_elements_add(this.name, this.value);" />
                         </div>
                     </div>
@@ -396,7 +396,7 @@
                         <div class="form-group">
                             <a class="text-dark">Pelanggan</a>
                             <input class="form-control input-bb" name="customer_name" id="customer_name" type="text"
-                                autocomplete="off" value=""
+                                autocomplete="off" value="{{$salesinvoicereservations == null ? '' : $salesinvoicereservations['customer_name']}}"
                                 onChange="function_elements_add(this.name, this.value);" />
                         </div>
                     </div>
@@ -404,7 +404,7 @@
                         <div class="form-group">
                             <a class="text-dark">No.Phone</a>
                             <input class="form-control input-bb" name="customer_phone" id="customer_phone" type="text"
-                                autocomplete="off" value=""
+                                autocomplete="off" value="{{$salesinvoicereservations == null ? '' : $salesinvoicereservations['customer_phone']}}"
                                 onChange="function_elements_add(this.name, this.value);" />
                         </div>
                     </div>
@@ -412,7 +412,7 @@
                         <div class="form-group">
                             <a class="text-dark">Alamat</a>
                             <input class="form-control input-bb" name="customer_address" id="customer_address" type="text"
-                                autocomplete="off" value=""
+                                autocomplete="off" value="{{$salesinvoicereservations == null ? '' : $salesinvoicereservations['customer_address']}}"
                                 onChange="function_elements_add(this.name, this.value);" />
                         </div>
                     </div>

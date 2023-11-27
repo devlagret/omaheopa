@@ -45,6 +45,7 @@ class SalesReservationController extends Controller
             $end_date = Session::get('end_date');
         }
         Session::forget('arraydatases');
+        Session::forget('salesinvoicereservation');
         $data = SalesInvoiceReservation::where('data_state',0)
         ->where('sales_invoice_reservation_date','>=',$start_date)
         ->where('sales_invoice_reservation_date','<=',$end_date)
@@ -58,6 +59,7 @@ class SalesReservationController extends Controller
     public function addSalesReservation()
     {
         $arraydatases   = Session::get('arraydatases');
+        $salesinvoicereservations  = Session::get('salesinvoicereservation');
         $date           = date('Y-m-d');
         $reservations          = CoreReservation::where('data_state', 0)
         ->where('company_id', Auth::user()->company_id)
@@ -72,7 +74,7 @@ class SalesReservationController extends Controller
         ->where('company_id', Auth::user()->company_id)
         ->get()
         ->pluck('customer_name','customer_id');
-        return view('content.SalesReservation.FormAddSalesReservation',compact('date','units','arraydatases','customers','reservations'));
+        return view('content.SalesReservation.FormAddSalesReservation',compact('salesinvoicereservations','date','units','arraydatases','customers','reservations'));
     }
 
     public function addArraySalesReservation(Request $request)
@@ -525,14 +527,17 @@ class SalesReservationController extends Controller
 
 
 
-    public function addElementsSalesTiket(Request $request)
+    public function addElementsSalesReservation(Request $request)
     {
-        $salesinvoice  = Session::get('salesinvoice');
-        if(!$salesinvoice || $salesinvoice == ''){
-            $salesinvoice['customer_name'] = '';
+        $salesinvoicereservation  = Session::get('salesinvoicereservation');
+        if(!$salesinvoicereservation || $salesinvoicereservation == ''){
+            $salesinvoicereservation['customer_name'] = '';
+            $salesinvoicereservation['sales_name'] = '';
+            $salesinvoicereservation['customer_phone'] = '';
+            $salesinvoicereservation['customer_address'] = '';
         }
-        $salesinvoice[$request->name] = $request->value;
-        Session::put('salesinvoice', $salesinvoice);
+        $salesinvoicereservation[$request->name] = $request->value;
+        Session::put('salesinvoicereservation', $salesinvoicereservation);
     }
     public function filterSalesReservation(Request $request)
     {
