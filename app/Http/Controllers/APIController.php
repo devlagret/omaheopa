@@ -1997,7 +1997,7 @@ class APIController extends Controller
         }
     }
 
-    public function processAddSalesInvoice(Request $request)
+    public function postSalesTiketWahana(Request $request)
     {
         // dd($request->all());
         $transaction_module_code = 'SI';
