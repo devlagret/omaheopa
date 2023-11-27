@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\JournalHelper;
 use App\Helpers\StockHelper;
 use App\Models\AcctAccount;
 use App\Models\AcctAccountSetting;
@@ -137,8 +138,8 @@ class SalesReservationController extends Controller
     public function processAddSalesReservation(Request $request)
     {
         // dd($request->all());
-        $transaction_module_code = 'SI';
-        $transaction_module_id  = $this->getTransactionModuleID($transaction_module_code);
+        // $transaction_module_code = 'SI';
+        // $transaction_module_id  = $this->getTransactionModuleID($transaction_module_code);
         $fields = $request->validate([
             'sales_invoice_reservation_date'        => 'required',
             'sales_invoice_reservation_due_date'    => 'required',
@@ -188,12 +189,14 @@ class SalesReservationController extends Controller
         //     'created_id'                    => Auth::id()
         // );
         
-        //*jurnal
-        // JournalHelper::make(Str::uuid(),'Sales Invoice',['sales_cash_account','sales_account'],$fields['total_amount']);
+        
 
         if(SalesInvoiceReservation::create($data)){
             // if(SalesInvoice::create($data)){
             $sales_invoice_reservation_id   = SalesInvoiceReservation::orderBy('created_at','DESC')->where('company_id', Auth::user()->company_id)->first();
+        
+            //*jurnal
+        // JournalHelper::trsJournalNo($sales_invoice_reservation_id->sales_invoice_reservation_no)->make('Sales Reservation', $request->total_amount, ['hotel_account', 'hotel_cash_account']);
             $arraydatases       = Session::get('arraydatases');
             foreach ($arraydatases as $key => $val) {
                 $dataarray = array(
