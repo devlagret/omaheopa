@@ -119,12 +119,12 @@
                     @foreach ($dt->item as $row)
                         <tr>
                             <td>{{ $no++ }}</td>
-                            <td>{{ $dt->supplier->supplier_name }}</td>
-                            <td>{{ $row->warehouse->warehouse_name}}</td>
-                            <td>{{ $row->item->item_name}}</td>
+                            <td>{{ $dt->supplier->supplier_name??'-'}}</td>
+                            <td>{{ $row->warehouse->warehouse_name??'-'}}</td>
+                            <td>{{ $row->item->item_name??'-'}}</td>
                             <td>{{ $dt['purchase_invoice_date'] }}</td>
                             <td>{{ $row['quantity'] }}</td>
-                            <td>{{ $row->unit->item_unit_name}}</td>
+                            <td>{{ $row->unit->item_unit_name??'-'}}</td>
                             <td style="text-align: right">{{ number_format($row['item_unit_cost'],2,'.',',') }}</td>
                             <td style="text-align: right">{{ number_format($row['subtotal_amount'],2,'.',',') }}</td>
                         </tr>

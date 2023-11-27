@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use App\Models\InvtItem;
 use App\Models\InvtItemUnit;
+use Illuminate\Http\Request;
 use App\Models\InvtWarehouse;
 use App\Models\PurchaseInvoice;
-use App\Models\PurchaseInvoiceItem;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
 use Elibyy\TCPDF\Facades\TCPDF;
+use App\Models\PurchaseInvoiceItem;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 class PurchaseInvoiceReportController extends Controller
@@ -19,7 +20,7 @@ class PurchaseInvoiceReportController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        
+
     }
 
     public function index()
@@ -41,12 +42,14 @@ class PurchaseInvoiceReportController extends Controller
         }
 
         $data = PurchaseInvoice::with('item.item','supplier','item.warehouse','item.unit')
-        ->where('purchase_invoice_date','>=',$start_date)
-        ->where('purchase_invoice_date','<=',$end_date)
-        ->where('warehouse_id', $warehouse_id)
-        ->where('company_id', Auth::user()->company_id)
-        ->get();
-       
+        ->where('purchase_invoice_date','>=',Carbon::parse($start_date)->format('Y-m-d'))
+        ->where('purchase_invoice_date','<=',Carbon::parse($end_date)->format('Y-m-d'))
+        ->where('company_id', Auth::user()->company_id);
+        if(empty(Session::get('warehouse_id'))){
+            $data->where('warehouse_id', $warehouse_id);
+        }
+        $data = $data->get();
+
         $warehouse = InvtWarehouse::where('data_state',0)
         ->where('company_id', Auth::user()->company_id)
         ->get()
@@ -59,7 +62,7 @@ class PurchaseInvoiceReportController extends Controller
         $start_date = $request->start_date;
         $end_date   = $request->end_date;
         $warehouse_id = $request->warehouse_id;
-        
+
         Session::put('start_date', $start_date);
         Session::put('end_date', $end_date);
         Session::put('warehouse_id', $warehouse_id);
@@ -115,13 +118,14 @@ class PurchaseInvoiceReportController extends Controller
             $warehouse_id = Session::get('warehouse_id');
         }
 
-        $data = PurchaseInvoice::join('purchase_invoice_item','purchase_invoice_item.purchase_invoice_id','=','purchase_invoice.purchase_invoice_id')
-        ->where('purchase_invoice.purchase_invoice_date','>=',$start_date)
-        ->where('purchase_invoice.purchase_invoice_date','<=',$end_date)
-        ->where('purchase_invoice.warehouse_id', $warehouse_id)
-        ->where('purchase_invoice.company_id', Auth::user()->company_id)
-        ->where('purchase_invoice.data_state',0)
-        ->get();
+        $data = PurchaseInvoice::with('item.item','supplier','item.warehouse','item.unit')
+        ->where('purchase_invoice_date','>=',Carbon::parse($start_date)->format('Y-m-d'))
+        ->where('purchase_invoice_date','<=',Carbon::parse($end_date)->format('Y-m-d'))
+        ->where('company_id', Auth::user()->company_id);
+        if(empty(Session::get('warehouse_id'))){
+            $data->where('warehouse_id', $warehouse_id);
+        }
+        $data = $data->get();
 
         $pdf = new TCPDF('P', PDF_UNIT, 'F4', true, 'UTF-8', false);
 
@@ -154,7 +158,7 @@ class PurchaseInvoiceReportController extends Controller
         </table>
         ";
         $pdf::writeHTML($tbl, true, false, false, false, '');
-        
+
         $no = 1;
         $tblStock1 = "
         <table cellspacing=\"0\" cellpadding=\"1\" border=\"1\" width=\"100%\">
@@ -169,29 +173,31 @@ class PurchaseInvoiceReportController extends Controller
                 <td width=\"10%\" ><div style=\"text-align: center;\">Harga/Satuan</div></td>
                 <td width=\"15%\" ><div style=\"text-align: center;\">Jumlah Total</div></td>
             </tr>
-        
+
              ";
 
         $no = 1;
         $tblStock2 =" ";
-        foreach ($data as $key => $val) {
-            $tblStock2 .="
-                <tr>			
-                    <td style=\"text-align:left\">$no.</td>
-                    <td style=\"text-align:left\">".$val['purchase_invoice_supplier']."</td>
-                    <td style=\"text-align:left\">".$this->getWarehouseName($val['warehouse_id'])."</td>
-                    <td style=\"text-align:left\">".$this->getItemName($val['item_id'])."</td>
-                    <td style=\"text-align:left\">".$val['purchase_invoice_date']."</td>
-                    <td style=\"text-align:left\">".$val['quantity']."</td>
-                    <td style=\"text-align:left\">".$this->getUnitName($val['item_unit_id'])."</td>
-                    <td style=\"text-align:right\">".number_format($val['item_unit_cost'],2,'.',',')."</td>
-                    <td style=\"text-align:right\">".number_format($val['total_amount'],2,'.',',')."</td>
-                </tr>
-                
-            ";
-            $no++;
+        foreach ($data as $key => $row) {
+            foreach ($row->item as $key => $val) {
+                $tblStock2 .="
+                    <tr>
+                        <td style=\"text-align:left\">$no.</td>
+                        <td style=\"text-align:left\">".$row->supplier->supplier_name??'-'."</td>
+                        <td style=\"text-align:left\">".$val->warehouse->warehouse_name??'-'."</td>
+                        <td style=\"text-align:left\">".$val->item->item_name??'-'."</td>
+                        <td style=\"text-align:left\">{$row['purchase_invoice_date']}</td>
+                        <td style=\"text-align:left\">{$val['quantity']}</td>
+                        <td style=\"text-align:left\">".$val->unit->item_unit_id??'-'."</td>
+                        <td style=\"text-align:right\">".number_format($val['item_unit_cost'],2,'.',',')."</td>
+                        <td style=\"text-align:right\">".number_format($val['subtotal_amount'],2,'.',',')."</td>
+                    </tr>
+
+                ";
+                $no++;
+            }
         }
-        $tblStock3 = " 
+        $tblStock3 = "
 
         </table>";
 
@@ -222,14 +228,15 @@ class PurchaseInvoiceReportController extends Controller
             $warehouse_id = Session::get('warehouse_id');
         }
 
-        $data = PurchaseInvoice::join('purchase_invoice_item','purchase_invoice_item.purchase_invoice_id','=','purchase_invoice.purchase_invoice_id')
-        ->where('purchase_invoice.purchase_invoice_date','>=',$start_date)
-        ->where('purchase_invoice.purchase_invoice_date','<=',$end_date)
-        ->where('purchase_invoice.warehouse_id', $warehouse_id)
-        ->where('purchase_invoice.company_id', Auth::user()->company_id)
-        ->where('purchase_invoice.data_state',0)
-        ->get();
-        
+        $data = PurchaseInvoice::with('item.item','supplier','item.warehouse','item.unit')
+        ->where('purchase_invoice_date','>=',Carbon::parse($start_date)->format('Y-m-d'))
+        ->where('purchase_invoice_date','<=',Carbon::parse($end_date)->format('Y-m-d'))
+        ->where('company_id', Auth::user()->company_id);
+        if(empty(Session::get('warehouse_id'))){
+            $data->where('warehouse_id', $warehouse_id);
+        }
+        $data = $data->get();
+
         $spreadsheet = new Spreadsheet();
 
         if(count($data)>=0){
@@ -240,7 +247,7 @@ class PurchaseInvoiceReportController extends Controller
                                         ->setDescription("Purchase Invoice Report")
                                         ->setKeywords("Purchase, Invoice, Report")
                                         ->setCategory("Purchase Invoice Report");
-                                 
+
             $sheet = $spreadsheet->getActiveSheet(0);
             $spreadsheet->getActiveSheet()->getPageSetup()->setFitToWidth(1);
             $spreadsheet->getActiveSheet()->getPageSetup()->setFitToWidth(1);
@@ -253,7 +260,7 @@ class PurchaseInvoiceReportController extends Controller
             $spreadsheet->getActiveSheet()->getColumnDimension('H')->setWidth(20);
             $spreadsheet->getActiveSheet()->getColumnDimension('I')->setWidth(20);
             $spreadsheet->getActiveSheet()->getColumnDimension('J')->setWidth(20);
-    
+
             $spreadsheet->getActiveSheet()->mergeCells("B1:J1");
             $spreadsheet->getActiveSheet()->getStyle('B1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
             $spreadsheet->getActiveSheet()->getStyle('B1')->getFont()->setBold(true)->setSize(16);
@@ -261,7 +268,7 @@ class PurchaseInvoiceReportController extends Controller
             $spreadsheet->getActiveSheet()->getStyle('B3:J3')->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
             $spreadsheet->getActiveSheet()->getStyle('B3:J3')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
-            $sheet->setCellValue('B1',"Laporan Pembelian Dari Periode ".date('d M Y', strtotime($start_date))." s.d. ".date('d M Y', strtotime($end_date)));	
+            $sheet->setCellValue('B1',"Laporan Pembelian Dari Periode ".date('d M Y', strtotime($start_date))." s.d. ".date('d M Y', strtotime($end_date)));
             $sheet->setCellValue('B3',"No");
             $sheet->setCellValue('C3',"Nama Pemasok");
             $sheet->setCellValue('D3',"Nama Gudang");
@@ -270,21 +277,19 @@ class PurchaseInvoiceReportController extends Controller
             $sheet->setCellValue('G3',"Quantity");
             $sheet->setCellValue('H3',"Satuan");
             $sheet->setCellValue('I3',"Harga Per Satuan");
-            $sheet->setCellValue('J3',"Subtotal"); 
-            
+            $sheet->setCellValue('J3',"Subtotal");
+
             $j=4;
             $no=0;
-            
-            foreach($data as $key=>$val){
 
-                if(is_numeric($key)){
-                    
-                    $sheet = $spreadsheet->getActiveSheet(0);
+            foreach ($data as $key => $row) {
+                foreach ($row->item as $key => $val) {
+                    $sheet = $spreadsheet->getActiveSheet();
                     $spreadsheet->getActiveSheet()->setTitle("Jurnal Umum");
                     $spreadsheet->getActiveSheet()->getStyle('B'.$j.':J'.$j)->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
 
                     $spreadsheet->getActiveSheet()->getStyle('H'.$j.':J'.$j)->getNumberFormat()->setFormatCode('0.00');
-            
+
                     $spreadsheet->getActiveSheet()->getStyle('B'.$j)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                     $spreadsheet->getActiveSheet()->getStyle('C'.$j)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
                     $spreadsheet->getActiveSheet()->getStyle('D'.$j)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
@@ -299,20 +304,18 @@ class PurchaseInvoiceReportController extends Controller
 
                     $no++;
                     $sheet->setCellValue('B'.$j, $no);
-                    $sheet->setCellValue('C'.$j, $val['purchase_invoice_supplier']);
-                    $sheet->setCellValue('D'.$j, $this->getWarehouseName($val['warehouse_id']));
-                    $sheet->setCellValue('E'.$j, $this->getItemName($val['item_id']));
-                    $sheet->setCellValue('F'.$j, $val['purchase_invoice_date']);
+                    $sheet->setCellValue('C'.$j, $row->supplier->supplier_name??'-');
+                    $sheet->setCellValue('D'.$j, $val->warehouse->warehouse_name??'-');
+                    $sheet->setCellValue('E'.$j, $val->item->item_name??'-');
+                    $sheet->setCellValue('F'.$j, $row['purchase_invoice_date']);
                     $sheet->setCellValue('G'.$j, $val['quantity']);
-                    $sheet->setCellValue('H'.$j, $this->getUnitName($val['item_unit_id']));
+                    $sheet->setCellValue('H'.$j, $val->unit->item_unit_id??'-');
                     $sheet->setCellValue('I'.$j, number_format($val['item_unit_cost'],2,'.',','));
                     $sheet->setCellValue('J'.$j, number_format($val['subtotal_amount'],2,'.',','));
-                }
-                $j++;
-        
+                    $j++;
             }
-            
-            ob_clean();
+        }
+
             $filename='Laporan_Pembelian_'.$start_date.'_s.d._'.$end_date.'.xls';
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             header('Content-Disposition: attachment;filename="'.$filename.'"');
