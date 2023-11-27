@@ -1943,10 +1943,14 @@ class APIController extends Controller
         }
         $merchant = $merchant->get();
 
+        $units   = InvtItemUnit::where('data_state', 0)
+        ->where('company_id', Auth::user()->company_id)
+        ->get();
+
         if($merchant){
             return response([
                 'data' => $merchant,
-                // 'date' => $date
+                'unit' => $units
             ],201);
         }else{
             return response([
