@@ -9,6 +9,7 @@ use App\Models\InvWarehouse;
 use App\Models\CoreBank;
 use App\Models\CoreSupplier;
 use App\Models\AcctAccount;
+use App\Models\AcctAccountSetting;
 use App\Models\AcctJournalVoucher;
 use App\Models\AcctJournalVoucherItem;
 use App\Models\InvItemCategory;
@@ -30,6 +31,7 @@ use App\Models\SalesInvoiceReservation;
 use App\Models\PurchasePaymentItem;
 use App\Models\PurchasePaymentTransfer;
 use App\Models\User;
+use Elibyy\TCPDF\Facades\TCPDF;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
@@ -845,338 +847,338 @@ class PaymentReservationController extends Controller
         return $data['transaction_module_name'];
     }
 
-    public function printReciptCeshPayment()
-    {
-        $purchasepayment = PurchasePayment::where('data_state', 0)
-        ->where('company_id', Auth::user()->company_id)
-        ->orderBy('payment_id','DESC')
-        ->first();
+    // public function printReciptCeshPayment()
+    // {
+    //     $purchasepayment = PurchasePayment::where('data_state', 0)
+    //     ->where('company_id', Auth::user()->company_id)
+    //     ->orderBy('payment_id','DESC')
+    //     ->first();
 
-        $purchasepaymentitem = PurchasePaymentItem::where('payment_id', $purchasepayment['payment_id'])
-        ->where('data_state', 0)
-        ->where('company_id', Auth::user()->company_id)
-        ->get();
+    //     $purchasepaymentitem = PurchasePaymentItem::where('payment_id', $purchasepayment['payment_id'])
+    //     ->where('data_state', 0)
+    //     ->where('company_id', Auth::user()->company_id)
+    //     ->get();
 
-        $pdf = new TCPDF('P', PDF_UNIT, 'F4', true, 'UTF-8', false);
+    //     $pdf = new TCPDF('P', PDF_UNIT, 'F4', true, 'UTF-8', false);
 
-        $pdf::setHeaderCallback(function($pdf){
-            $path = public_path('resources/assets/img/logo_ruko.png');
-            $pdf->SetFont('helvetica', '', 8);
-            $header = "
-            <div></div>
-                <table cellspacing=\"0\" cellpadding=\"0\" border=\"0\">
-                    <tr>
-                        <td rowspan=\"3\" width=\"76%\"><img src=\"\" width=\"120\"></td>
-                        <td width=\"10%\"><div style=\"text-align: left;\">Halaman</div></td>
-                        <td width=\"2%\"><div style=\"text-align: center;\">:</div></td>
-                        <td width=\"12%\"><div style=\"text-align: left;\">".$pdf->getAliasNumPage()." / ".$pdf->getAliasNbPages()."</div></td>
-                    </tr>  
-                    <tr>
-                        <td width=\"10%\"><div style=\"text-align: left;\">Dicetak</div></td>
-                        <td width=\"2%\"><div style=\"text-align: center;\">:</div></td>
-                        <td width=\"12%\"><div style=\"text-align: left;\">".ucfirst(Auth::user()->name)."</div></td>
-                    </tr>
-                    <tr>
-                        <td width=\"10%\"><div style=\"text-align: left;\">Tgl. Cetak</div></td>
-                        <td width=\"2%\"><div style=\"text-align: center;\">:</div></td>
-                        <td width=\"12%\"><div style=\"text-align: left;\">".date('d-m-Y H:i')."</div></td>
-                    </tr>
-                </table>
-                <div style=\"margin-bottom: 150px; \">
-                    <hr>
-                </div>
-            ";
+    //     $pdf::setHeaderCallback(function($pdf){
+    //         $path = public_path('resources/assets/img/logo_ruko.png');
+    //         $pdf->SetFont('helvetica', '', 8);
+    //         $header = "
+    //         <div></div>
+    //             <table cellspacing=\"0\" cellpadding=\"0\" border=\"0\">
+    //                 <tr>
+    //                     <td rowspan=\"3\" width=\"76%\"><img src=\"\" width=\"120\"></td>
+    //                     <td width=\"10%\"><div style=\"text-align: left;\">Halaman</div></td>
+    //                     <td width=\"2%\"><div style=\"text-align: center;\">:</div></td>
+    //                     <td width=\"12%\"><div style=\"text-align: left;\">".$pdf->getAliasNumPage()." / ".$pdf->getAliasNbPages()."</div></td>
+    //                 </tr>  
+    //                 <tr>
+    //                     <td width=\"10%\"><div style=\"text-align: left;\">Dicetak</div></td>
+    //                     <td width=\"2%\"><div style=\"text-align: center;\">:</div></td>
+    //                     <td width=\"12%\"><div style=\"text-align: left;\">".ucfirst(Auth::user()->name)."</div></td>
+    //                 </tr>
+    //                 <tr>
+    //                     <td width=\"10%\"><div style=\"text-align: left;\">Tgl. Cetak</div></td>
+    //                     <td width=\"2%\"><div style=\"text-align: center;\">:</div></td>
+    //                     <td width=\"12%\"><div style=\"text-align: left;\">".date('d-m-Y H:i')."</div></td>
+    //                 </tr>
+    //             </table>
+    //             <div style=\"margin-bottom: 150px; \">
+    //                 <hr>
+    //             </div>
+    //         ";
 
-            $pdf->writeHTML($header, true, false, false, false, '');
-            $pdf->Image( $path, 12, 3, 35, 16, 'PNG', '', '', false, 100, '', false, false, false, false, false, false);
+    //         $pdf->writeHTML($header, true, false, false, false, '');
+    //         $pdf->Image( $path, 12, 3, 35, 16, 'PNG', '', '', false, 100, '', false, false, false, false, false, false);
 
-        });
+    //     });
         
-        $pdf::SetPrintFooter(false);
+    //     $pdf::SetPrintFooter(false);
 
-        $pdf::SetMargins(15, 25, 10, 10); // put space of 10 on top
+    //     $pdf::SetMargins(15, 25, 10, 10); // put space of 10 on top
 
-        $pdf::setImageScale(PDF_IMAGE_SCALE_RATIO);
+    //     $pdf::setImageScale(PDF_IMAGE_SCALE_RATIO);
 
-        if (@file_exists(dirname(__FILE__).'/lang/eng.php')) {
-            require_once(dirname(__FILE__).'/lang/eng.php');
-            $pdf::setLanguageArray($l);
-        }
+    //     if (@file_exists(dirname(__FILE__).'/lang/eng.php')) {
+    //         require_once(dirname(__FILE__).'/lang/eng.php');
+    //         $pdf::setLanguageArray($l);
+    //     }
 
-        $pdf::SetFont('helvetica', 'B', 20);
+    //     $pdf::SetFont('helvetica', 'B', 20);
 
-        $pdf::AddPage();
+    //     $pdf::AddPage();
 
-        $pdf::SetFont('helvetica', '', 8);
+    //     $pdf::SetFont('helvetica', '', 8);
 
-        $tbl = "
-        <table cellspacing=\"0\" cellpadding=\"2\" border=\"0\">
-            <tr>
-                <td><div style=\"text-align: center; font-size:14px; font-weight: bold\">BUKTI PENGELUARAN KAS</div></td>
-            </tr>
-        </table>
-        ";
-        $pdf::writeHTML($tbl, true, false, false, false, '');
+    //     $tbl = "
+    //     <table cellspacing=\"0\" cellpadding=\"2\" border=\"0\">
+    //         <tr>
+    //             <td><div style=\"text-align: center; font-size:14px; font-weight: bold\">BUKTI PENGELUARAN KAS</div></td>
+    //         </tr>
+    //     </table>
+    //     ";
+    //     $pdf::writeHTML($tbl, true, false, false, false, '');
         
-        $tbl1 = "
-        <table width=\"100%\" cellspacing=\"0\" cellpadding=\"2\" border=\"0\">
-            <tr>
-                <td width=\"16%\">Dibayarkan Kepada</td>
-                <td width=\"2%\">:</td>
-                <td width=\"82%\">".$this->getCoreSupplierName($purchasepayment['supplier_id'])."</td>
-            </tr>
-            <tr>
-                <td width=\"16%\">Sejumlah</td>
-                <td width=\"2%\">:</td>
-                <td width=\"82%\"><div style=\"font-weight: bold;\">Rp. ".number_format($purchasepayment['payment_amount'],2,'.',',')."</div></td>
-            </tr>
-            <tr>
-                <td width=\"18%\"></td>
-                <td width=\"82%\" style=\"font-style: italic; border: 0.1px solid black; line-height: 150%;\"><div style=\"font-style: italic;\"> # ".Configuration::numtotxt($purchasepayment['payment_amount'])." #</div></td>
-            </tr>
-            <tr>
-                <td width=\"16%\">Keterangan</td>
-                <td width=\"2%\">:</td>
-                <td width=\"82%\">Pembayaran  Hutang Untuk Nota - Nota Berikut :</td>
-            </tr>
-        ";
+    //     $tbl1 = "
+    //     <table width=\"100%\" cellspacing=\"0\" cellpadding=\"2\" border=\"0\">
+    //         <tr>
+    //             <td width=\"16%\">Dibayarkan Kepada</td>
+    //             <td width=\"2%\">:</td>
+    //             <td width=\"82%\">".$this->getCoreSupplierName($purchasepayment['supplier_id'])."</td>
+    //         </tr>
+    //         <tr>
+    //             <td width=\"16%\">Sejumlah</td>
+    //             <td width=\"2%\">:</td>
+    //             <td width=\"82%\"><div style=\"font-weight: bold;\">Rp. ".number_format($purchasepayment['payment_amount'],2,'.',',')."</div></td>
+    //         </tr>
+    //         <tr>
+    //             <td width=\"18%\"></td>
+    //             <td width=\"82%\" style=\"font-style: italic; border: 0.1px solid black; line-height: 150%;\"><div style=\"font-style: italic;\"> # ".Configuration::numtotxt($purchasepayment['payment_amount'])." #</div></td>
+    //         </tr>
+    //         <tr>
+    //             <td width=\"16%\">Keterangan</td>
+    //             <td width=\"2%\">:</td>
+    //             <td width=\"82%\">Pembayaran  Hutang Untuk Nota - Nota Berikut :</td>
+    //         </tr>
+    //     ";
 
-        $no = 1; 
-        foreach ($purchasepaymentitem as $key => $val) {
-            $tbl1 .= "
-                <tr>
-                    <td width=\"18%\"></td>
-                    <td width=\"4%\" style=\"text-align:center;\">".$no.")</td>
-                    <td width=\"16%\">".$val['purchase_invoice_no']."</td>
-                    <td width=\"5%\" style=\"text-align:center;\">Tgl.</td>
-                    <td width=\"10%\">".date('d-m-Y', strtotime($val['date_invoice']))."</td>
-                    <td width=\"5%\" style=\"text-align:center;\">Rp.</td>
-                    <td width=\"13%\"  style=\"text-align:right;\">".number_format($val['total_amount'],2,'.',',')."</td>
-                </tr>
-            ";
-            $no++;
-        }
+    //     $no = 1; 
+    //     foreach ($purchasepaymentitem as $key => $val) {
+    //         $tbl1 .= "
+    //             <tr>
+    //                 <td width=\"18%\"></td>
+    //                 <td width=\"4%\" style=\"text-align:center;\">".$no.")</td>
+    //                 <td width=\"16%\">".$val['purchase_invoice_no']."</td>
+    //                 <td width=\"5%\" style=\"text-align:center;\">Tgl.</td>
+    //                 <td width=\"10%\">".date('d-m-Y', strtotime($val['date_invoice']))."</td>
+    //                 <td width=\"5%\" style=\"text-align:center;\">Rp.</td>
+    //                 <td width=\"13%\"  style=\"text-align:right;\">".number_format($val['total_amount'],2,'.',',')."</td>
+    //             </tr>
+    //         ";
+    //         $no++;
+    //     }
 
-        if ($purchasepayment['subtraction_amount'] != 0) {
-            $tbl1 .= "
-                <tr>
-                    <td width=\"22%\"></td>
-                    <td width=\"31%\" style=\"\">Pengurangan</td>
-                    <td width=\"5%\" style=\"text-align:center;\">Rp.</td>
-                    <td width=\"13%\"  style=\"text-align:right;\">".number_format($purchasepayment['subtraction_amount'],2,'.',',')."</td>
-                </tr>
-            ";
-        }
+    //     if ($purchasepayment['subtraction_amount'] != 0) {
+    //         $tbl1 .= "
+    //             <tr>
+    //                 <td width=\"22%\"></td>
+    //                 <td width=\"31%\" style=\"\">Pengurangan</td>
+    //                 <td width=\"5%\" style=\"text-align:center;\">Rp.</td>
+    //                 <td width=\"13%\"  style=\"text-align:right;\">".number_format($purchasepayment['subtraction_amount'],2,'.',',')."</td>
+    //             </tr>
+    //         ";
+    //     }
 
-        if ($purchasepayment['rounding_amount'] != 0) {
-            $tbl1 .= "
-                <tr>
-                    <td width=\"22%\"></td>
-                    <td width=\"31%\" style=\"\">Pembulatan</td>
-                    <td width=\"5%\" style=\"text-align:center;\">Rp.</td>
-                    <td width=\"13%\"  style=\"text-align:right;\">".number_format($purchasepayment['rounding_amount'],2,'.',',')."</td>
-                </tr>
-            ";
-        }
+    //     if ($purchasepayment['rounding_amount'] != 0) {
+    //         $tbl1 .= "
+    //             <tr>
+    //                 <td width=\"22%\"></td>
+    //                 <td width=\"31%\" style=\"\">Pembulatan</td>
+    //                 <td width=\"5%\" style=\"text-align:center;\">Rp.</td>
+    //                 <td width=\"13%\"  style=\"text-align:right;\">".number_format($purchasepayment['rounding_amount'],2,'.',',')."</td>
+    //             </tr>
+    //         ";
+    //     }
 
-        $tbl1 .= "
-            <tr>
-                <td width=\"18%\"></td>
-                <td width=\"35%\" style=\"border-top:1px solid black;\"></td>
-                <td width=\"5%\" style=\"text-align:center; border-top:1px solid black;\">Rp.</td>
-                <td width=\"13%\"  style=\"text-align:right; border-top:1px solid black;\">".number_format($purchasepayment['payment_amount'],2,'.',',')."</td>
-            </tr>
-        ";
+    //     $tbl1 .= "
+    //         <tr>
+    //             <td width=\"18%\"></td>
+    //             <td width=\"35%\" style=\"border-top:1px solid black;\"></td>
+    //             <td width=\"5%\" style=\"text-align:center; border-top:1px solid black;\">Rp.</td>
+    //             <td width=\"13%\"  style=\"text-align:right; border-top:1px solid black;\">".number_format($purchasepayment['payment_amount'],2,'.',',')."</td>
+    //         </tr>
+    //     ";
         
-        $tbl2 = "
-        </table>
-        <div></div>
-        <table width=\"100%\" cellspacing=\"0\" cellpadding=\"2\" border=\"1\">
-            <tr nobr=\"true\">
-                <td width=\"25%\" style=\"height: 80px;\"><div style=\"text-align: left;\">Sekertaris I,</div></td>
-                <td width=\"25%\"><div style=\"text-align: left;\">Bendahara Toko,</div></td>
-                <td width=\"25%\"><div style=\"text-align: left;\">Petugas Toko, <br><br><br><br><br>".strtoupper(Auth::user()->name)."</div></td>
-                <td width=\"25%\"><div style=\"text-align: left;\">Penerima,</div></td>
-            </tr>
-        </table>    
-        ";
+    //     $tbl2 = "
+    //     </table>
+    //     <div></div>
+    //     <table width=\"100%\" cellspacing=\"0\" cellpadding=\"2\" border=\"1\">
+    //         <tr nobr=\"true\">
+    //             <td width=\"25%\" style=\"height: 80px;\"><div style=\"text-align: left;\">Sekertaris I,</div></td>
+    //             <td width=\"25%\"><div style=\"text-align: left;\">Bendahara Toko,</div></td>
+    //             <td width=\"25%\"><div style=\"text-align: left;\">Petugas Toko, <br><br><br><br><br>".strtoupper(Auth::user()->name)."</div></td>
+    //             <td width=\"25%\"><div style=\"text-align: left;\">Penerima,</div></td>
+    //         </tr>
+    //     </table>    
+    //     ";
         
-        $pdf::writeHTML($tbl1.$tbl2, true, false, false, false, '');
+    //     $pdf::writeHTML($tbl1.$tbl2, true, false, false, false, '');
 
 
-        $filename = 'Bukti Pembayaran Hutang.pdf';
-        $pdf::Output($filename, 'I');
-    }
+    //     $filename = 'Bukti Pembayaran Hutang.pdf';
+    //     $pdf::Output($filename, 'I');
+    // }
 
-    public function printReciptNonCeshPayment()
-    {
-        $purchasepayment = PurchasePayment::where('data_state', 0)
-        ->where('company_id', Auth::user()->company_id)
-        ->orderBy('payment_id','DESC')
-        ->first();
+    // public function printReciptNonCeshPayment()
+    // {
+    //     $purchasepayment = PurchasePayment::where('data_state', 0)
+    //     ->where('company_id', Auth::user()->company_id)
+    //     ->orderBy('payment_id','DESC')
+    //     ->first();
 
-        $purchasepaymentitem = PurchasePaymentItem::where('payment_id', $purchasepayment['payment_id'])
-        ->where('data_state', 0)
-        ->where('company_id', Auth::user()->company_id)
-        ->get();
+    //     $purchasepaymentitem = PurchasePaymentItem::where('payment_id', $purchasepayment['payment_id'])
+    //     ->where('data_state', 0)
+    //     ->where('company_id', Auth::user()->company_id)
+    //     ->get();
 
-        $coreBank = CoreBank::where('data_state',0)
-        ->where('company_id', Auth::user()->company_id)
-        ->first();
+    //     $coreBank = CoreBank::where('data_state',0)
+    //     ->where('company_id', Auth::user()->company_id)
+    //     ->first();
 
-        $pdf = new TCPDF('P', PDF_UNIT, 'F4', true, 'UTF-8', false);
+    //     $pdf = new TCPDF('P', PDF_UNIT, 'F4', true, 'UTF-8', false);
 
-        $pdf::setHeaderCallback(function($pdf){
-            $path = public_path('resources/assets/img/logo_ruko.png');
-            $pdf->SetFont('helvetica', '', 8);
-            $header = "
-            <div></div>
-                <table cellspacing=\"0\" cellpadding=\"0\" border=\"0\">
-                    <tr>
-                        <td rowspan=\"3\" width=\"76%\"><img src=\"\" width=\"120\"></td>
-                        <td width=\"10%\"><div style=\"text-align: left;\">Halaman</div></td>
-                        <td width=\"2%\"><div style=\"text-align: center;\">:</div></td>
-                        <td width=\"12%\"><div style=\"text-align: left;\">".$pdf->getAliasNumPage()." / ".$pdf->getAliasNbPages()."</div></td>
-                    </tr>  
-                    <tr>
-                        <td width=\"10%\"><div style=\"text-align: left;\">Dicetak</div></td>
-                        <td width=\"2%\"><div style=\"text-align: center;\">:</div></td>
-                        <td width=\"12%\"><div style=\"text-align: left;\">".ucfirst(Auth::user()->name)."</div></td>
-                    </tr>
-                    <tr>
-                        <td width=\"10%\"><div style=\"text-align: left;\">Tgl. Cetak</div></td>
-                        <td width=\"2%\"><div style=\"text-align: center;\">:</div></td>
-                        <td width=\"12%\"><div style=\"text-align: left;\">".date('d-m-Y H:i')."</div></td>
-                    </tr>
-                </table>
-                <div style=\"margin-bottom: 150px; \">
-                    <hr>
-                </div>
-            ";
+    //     $pdf::setHeaderCallback(function($pdf){
+    //         $path = public_path('resources/assets/img/logo_ruko.png');
+    //         $pdf->SetFont('helvetica', '', 8);
+    //         $header = "
+    //         <div></div>
+    //             <table cellspacing=\"0\" cellpadding=\"0\" border=\"0\">
+    //                 <tr>
+    //                     <td rowspan=\"3\" width=\"76%\"><img src=\"\" width=\"120\"></td>
+    //                     <td width=\"10%\"><div style=\"text-align: left;\">Halaman</div></td>
+    //                     <td width=\"2%\"><div style=\"text-align: center;\">:</div></td>
+    //                     <td width=\"12%\"><div style=\"text-align: left;\">".$pdf->getAliasNumPage()." / ".$pdf->getAliasNbPages()."</div></td>
+    //                 </tr>  
+    //                 <tr>
+    //                     <td width=\"10%\"><div style=\"text-align: left;\">Dicetak</div></td>
+    //                     <td width=\"2%\"><div style=\"text-align: center;\">:</div></td>
+    //                     <td width=\"12%\"><div style=\"text-align: left;\">".ucfirst(Auth::user()->name)."</div></td>
+    //                 </tr>
+    //                 <tr>
+    //                     <td width=\"10%\"><div style=\"text-align: left;\">Tgl. Cetak</div></td>
+    //                     <td width=\"2%\"><div style=\"text-align: center;\">:</div></td>
+    //                     <td width=\"12%\"><div style=\"text-align: left;\">".date('d-m-Y H:i')."</div></td>
+    //                 </tr>
+    //             </table>
+    //             <div style=\"margin-bottom: 150px; \">
+    //                 <hr>
+    //             </div>
+    //         ";
 
-            $pdf->writeHTML($header, true, false, false, false, '');
-            $pdf->Image( $path, 12, 3, 35, 16, 'PNG', '', '', false, 100, '', false, false, false, false, false, false);
+    //         $pdf->writeHTML($header, true, false, false, false, '');
+    //         $pdf->Image( $path, 12, 3, 35, 16, 'PNG', '', '', false, 100, '', false, false, false, false, false, false);
 
-        });
+    //     });
         
-        $pdf::SetPrintFooter(false);
+    //     $pdf::SetPrintFooter(false);
 
-        $pdf::SetMargins(15, 25, 10, 10); // put space of 10 on top
+    //     $pdf::SetMargins(15, 25, 10, 10); // put space of 10 on top
 
-        $pdf::setImageScale(PDF_IMAGE_SCALE_RATIO);
+    //     $pdf::setImageScale(PDF_IMAGE_SCALE_RATIO);
 
-        if (@file_exists(dirname(__FILE__).'/lang/eng.php')) {
-            require_once(dirname(__FILE__).'/lang/eng.php');
-            $pdf::setLanguageArray($l);
-        }
+    //     if (@file_exists(dirname(__FILE__).'/lang/eng.php')) {
+    //         require_once(dirname(__FILE__).'/lang/eng.php');
+    //         $pdf::setLanguageArray($l);
+    //     }
 
-        $pdf::SetFont('helvetica', 'B', 20);
+    //     $pdf::SetFont('helvetica', 'B', 20);
 
-        $pdf::AddPage();
+    //     $pdf::AddPage();
 
-        $pdf::SetFont('helvetica', '', 8);
+    //     $pdf::SetFont('helvetica', '', 8);
 
-        $tbl = "
-        <table cellspacing=\"0\" cellpadding=\"2\" border=\"0\">
-            <tr>
-                <td><div style=\"text-align: center; font-size:14px; font-weight: bold\">BUKTI PENGELUARAN BANK</div></td>
-            </tr>
-        </table>
-        ";
-        $pdf::writeHTML($tbl, true, false, false, false, '');
+    //     $tbl = "
+    //     <table cellspacing=\"0\" cellpadding=\"2\" border=\"0\">
+    //         <tr>
+    //             <td><div style=\"text-align: center; font-size:14px; font-weight: bold\">BUKTI PENGELUARAN BANK</div></td>
+    //         </tr>
+    //     </table>
+    //     ";
+    //     $pdf::writeHTML($tbl, true, false, false, false, '');
         
-        $tbl1 = "
-        <table width=\"100%\" cellspacing=\"0\" cellpadding=\"2\" border=\"0\">
-            <tr>
-                <td width=\"16%\">Dibayarkan Kepada</td>
-                <td width=\"2%\">:</td>
-                <td width=\"82%\">".$this->getCoreSupplierName($purchasepayment['supplier_id'])."</td>
-            </tr>
-            <tr>
-                <td width=\"16%\">Bank</td>
-                <td width=\"2%\">:</td>
-                <td width=\"82%\">".$coreBank['bank_name']."</td>
-            </tr>
-            <tr>
-                <td width=\"16%\">Sejumlah</td>
-                <td width=\"2%\">:</td>
-                <td width=\"82%\"><div style=\"font-weight: bold;\">Rp. ".number_format($purchasepayment['payment_amount'],2,'.',',')."</div></td>
-            </tr>
-            <tr>
-                <td width=\"18%\"></td>
-                <td width=\"82%\" style=\"font-style: italic; border: 0.1px solid black; line-height: 150%;\"><div style=\"font-style: italic;\"> # ".Configuration::numtotxt($purchasepayment['payment_amount'])." #</div></td>
-            </tr>
-            <tr>
-                <td width=\"16%\">Keterangan</td>
-                <td width=\"2%\">:</td>
-                <td width=\"82%\">Pembayaran  Hutang Untuk Nota - Nota Berikut :</td>
-            </tr>
-        ";
+    //     $tbl1 = "
+    //     <table width=\"100%\" cellspacing=\"0\" cellpadding=\"2\" border=\"0\">
+    //         <tr>
+    //             <td width=\"16%\">Dibayarkan Kepada</td>
+    //             <td width=\"2%\">:</td>
+    //             <td width=\"82%\">".$this->getCoreSupplierName($purchasepayment['supplier_id'])."</td>
+    //         </tr>
+    //         <tr>
+    //             <td width=\"16%\">Bank</td>
+    //             <td width=\"2%\">:</td>
+    //             <td width=\"82%\">".$coreBank['bank_name']."</td>
+    //         </tr>
+    //         <tr>
+    //             <td width=\"16%\">Sejumlah</td>
+    //             <td width=\"2%\">:</td>
+    //             <td width=\"82%\"><div style=\"font-weight: bold;\">Rp. ".number_format($purchasepayment['payment_amount'],2,'.',',')."</div></td>
+    //         </tr>
+    //         <tr>
+    //             <td width=\"18%\"></td>
+    //             <td width=\"82%\" style=\"font-style: italic; border: 0.1px solid black; line-height: 150%;\"><div style=\"font-style: italic;\"> # ".Configuration::numtotxt($purchasepayment['payment_amount'])." #</div></td>
+    //         </tr>
+    //         <tr>
+    //             <td width=\"16%\">Keterangan</td>
+    //             <td width=\"2%\">:</td>
+    //             <td width=\"82%\">Pembayaran  Hutang Untuk Nota - Nota Berikut :</td>
+    //         </tr>
+    //     ";
 
-        $no = 1; 
-        foreach ($purchasepaymentitem as $key => $val) {
-            $tbl1 .= "
-                <tr>
-                    <td width=\"18%\"></td>
-                    <td width=\"4%\" style=\"text-align:center;\">".$no.")</td>
-                    <td width=\"16%\">".$val['purchase_invoice_no']."</td>
-                    <td width=\"5%\" style=\"text-align:center;\">Tgl.</td>
-                    <td width=\"10%\">".date('d-m-Y', strtotime($val['date_invoice']))."</td>
-                    <td width=\"5%\" style=\"text-align:center;\">Rp.</td>
-                    <td width=\"13%\"  style=\"text-align:right;\">".number_format($val['total_amount'],2,'.',',')."</td>
-                </tr>
-            ";
-            $no++;
-        }
+    //     $no = 1; 
+    //     foreach ($purchasepaymentitem as $key => $val) {
+    //         $tbl1 .= "
+    //             <tr>
+    //                 <td width=\"18%\"></td>
+    //                 <td width=\"4%\" style=\"text-align:center;\">".$no.")</td>
+    //                 <td width=\"16%\">".$val['purchase_invoice_no']."</td>
+    //                 <td width=\"5%\" style=\"text-align:center;\">Tgl.</td>
+    //                 <td width=\"10%\">".date('d-m-Y', strtotime($val['date_invoice']))."</td>
+    //                 <td width=\"5%\" style=\"text-align:center;\">Rp.</td>
+    //                 <td width=\"13%\"  style=\"text-align:right;\">".number_format($val['total_amount'],2,'.',',')."</td>
+    //             </tr>
+    //         ";
+    //         $no++;
+    //     }
 
-        if ($purchasepayment['subtraction_amount'] != 0) {
-            $tbl1 .= "
-                <tr>
-                    <td width=\"22%\"></td>
-                    <td width=\"31%\" style=\"\">Pengurangan</td>
-                    <td width=\"5%\" style=\"text-align:center;\">Rp.</td>
-                    <td width=\"13%\"  style=\"text-align:right;\">".number_format($purchasepayment['subtraction_amount'],2,'.',',')."</td>
-                </tr>
-            ";
-        }
+    //     if ($purchasepayment['subtraction_amount'] != 0) {
+    //         $tbl1 .= "
+    //             <tr>
+    //                 <td width=\"22%\"></td>
+    //                 <td width=\"31%\" style=\"\">Pengurangan</td>
+    //                 <td width=\"5%\" style=\"text-align:center;\">Rp.</td>
+    //                 <td width=\"13%\"  style=\"text-align:right;\">".number_format($purchasepayment['subtraction_amount'],2,'.',',')."</td>
+    //             </tr>
+    //         ";
+    //     }
 
-        if ($purchasepayment['rounding_amount'] != 0) {
-            $tbl1 .= "
-                <tr>
-                    <td width=\"22%\"></td>
-                    <td width=\"31%\" style=\"\">Pembulatan</td>
-                    <td width=\"5%\" style=\"text-align:center;\">Rp.</td>
-                    <td width=\"13%\"  style=\"text-align:right;\">".number_format($purchasepayment['rounding_amount'],2,'.',',')."</td>
-                </tr>
-            ";
-        }
+    //     if ($purchasepayment['rounding_amount'] != 0) {
+    //         $tbl1 .= "
+    //             <tr>
+    //                 <td width=\"22%\"></td>
+    //                 <td width=\"31%\" style=\"\">Pembulatan</td>
+    //                 <td width=\"5%\" style=\"text-align:center;\">Rp.</td>
+    //                 <td width=\"13%\"  style=\"text-align:right;\">".number_format($purchasepayment['rounding_amount'],2,'.',',')."</td>
+    //             </tr>
+    //         ";
+    //     }
 
-        $tbl1 .= "
-            <tr>
-                <td width=\"18%\"></td>
-                <td width=\"35%\" style=\"border-top:1px solid black;\"></td>
-                <td width=\"5%\" style=\"text-align:center; border-top:1px solid black;\">Rp.</td>
-                <td width=\"13%\"  style=\"text-align:right; border-top:1px solid black;\">".number_format($purchasepayment['payment_amount'],2,'.',',')."</td>
-            </tr>
-        ";
+    //     $tbl1 .= "
+    //         <tr>
+    //             <td width=\"18%\"></td>
+    //             <td width=\"35%\" style=\"border-top:1px solid black;\"></td>
+    //             <td width=\"5%\" style=\"text-align:center; border-top:1px solid black;\">Rp.</td>
+    //             <td width=\"13%\"  style=\"text-align:right; border-top:1px solid black;\">".number_format($purchasepayment['payment_amount'],2,'.',',')."</td>
+    //         </tr>
+    //     ";
         
-        $tbl2 = "
-        </table>
-        <div></div>
-        <table width=\"100%\" cellspacing=\"0\" cellpadding=\"2\" border=\"1\">
-            <tr nobr=\"true\">
-                <td width=\"25%\" style=\"height: 80px;\"><div style=\"text-align: left;\">Sekertaris I,</div></td>
-                <td width=\"25%\"><div style=\"text-align: left;\">Bendahara Toko,</div></td>
-                <td width=\"25%\"><div style=\"text-align: left;\">Petugas Toko, <br><br><br><br><br>".strtoupper(Auth::user()->name)."</div></td>
-                <td width=\"25%\"><div style=\"text-align: left;\">Penerima,</div></td>
-            </tr>
-        </table>    
-        ";
+    //     $tbl2 = "
+    //     </table>
+    //     <div></div>
+    //     <table width=\"100%\" cellspacing=\"0\" cellpadding=\"2\" border=\"1\">
+    //         <tr nobr=\"true\">
+    //             <td width=\"25%\" style=\"height: 80px;\"><div style=\"text-align: left;\">Sekertaris I,</div></td>
+    //             <td width=\"25%\"><div style=\"text-align: left;\">Bendahara Toko,</div></td>
+    //             <td width=\"25%\"><div style=\"text-align: left;\">Petugas Toko, <br><br><br><br><br>".strtoupper(Auth::user()->name)."</div></td>
+    //             <td width=\"25%\"><div style=\"text-align: left;\">Penerima,</div></td>
+    //         </tr>
+    //     </table>    
+    //     ";
         
-        $pdf::writeHTML($tbl1.$tbl2, true, false, false, false, '');
+    //     $pdf::writeHTML($tbl1.$tbl2, true, false, false, false, '');
 
 
-        $filename = 'Bukti Pembayaran Hutang.pdf';
-        $pdf::Output($filename, 'I');
-    }
+    //     $filename = 'Bukti Pembayaran Hutang.pdf';
+    //     $pdf::Output($filename, 'I');
+    // }
 }

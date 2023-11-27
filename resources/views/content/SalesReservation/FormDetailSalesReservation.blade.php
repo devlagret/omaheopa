@@ -112,7 +112,7 @@
 
                                 @php
                                     $subtotal =  $salesinvoicereservationitem['quantity']  * $SalesInvoiceReservation->getReservationPrice($salesinvoicereservationitem['reservation_id']);
-                                    $subtotalafdiscount =  $salesinvoicereservationitem['quantity']  * $salesinvoicereservationitem['item_unit_price'] - $salesinvoicereservationitem['discount_percentage'] ;
+                                    $subtotalafdiscount =  $salesinvoicereservationitem['quantity']  * (int)$salesinvoicereservationitem['item_unit_price'] - (int)$salesinvoicereservationitem['discount_percentage'] ;
                                 @endphp
                                     <tr>
                                         <td>{{ $no++ }}</td>
