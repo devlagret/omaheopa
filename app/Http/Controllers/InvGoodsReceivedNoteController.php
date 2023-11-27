@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\StockHelper;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\PublicController;
@@ -375,19 +376,19 @@ class InvGoodsReceivedNoteController extends Controller
                 );
 
                 // dd($invitemstock);
-
-                $data_item_stock = InvtItemStock::where('item_id', $invitemstock['item_id'])
-                ->first();
-                // dd($item);
+                StockHelper::find($temprequest['item_id_'.$i], $temprequest['item_unit_id_'.$i], $fields['warehouse_id'])->add($temprequest['quantity_received_'.$i]);
+                // $data_item_stock = InvtItemStock::where('item_id', $invitemstock['item_id'])
+                // ->first();
+                // // dd($item);
                 
-                if($data_item_stock == null){
-                    InvtItemStock::create($invitemstock);
-                }else{
-                    $itemstockupdate = InvtItemStock::findOrFail($data_item_stock['item_stock_id']);
-                    $itemstockupdate->last_balance += $invitemstock['last_balance'];
-                    $itemstockupdate->goods_received_note_id = $goodsreceivednote['goods_received_note_id'];
-                    $itemstockupdate->save();
-                }
+                // if($data_item_stock == null){
+                //     InvtItemStock::create($invitemstock);
+                // }else{
+                //     $itemstockupdate = InvtItemStock::findOrFail($data_item_stock['item_stock_id']);
+                //     $itemstockupdate->last_balance += $invitemstock['last_balance'];
+                //     $itemstockupdate->goods_received_note_id = $goodsreceivednote['goods_received_note_id'];
+                //     $itemstockupdate->save();
+                // }
 
 //                 // dd($invitemstock);
 
