@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Helpers;
+
 use Carbon\Carbon;
 use App\Models\AcctAccount;
 use Illuminate\Support\Str;
@@ -7,6 +9,7 @@ use App\Models\JournalVoucher;
 use App\Models\JournalVoucherItem;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+
 class JournalHelper extends AppHelper
 {
     protected static $token;
@@ -17,6 +20,7 @@ class JournalHelper extends AppHelper
     protected static $appendDescription;
     protected static $prependDescription;
     protected static $title;
+    protected static $description;
     protected static $defaultTitle = '';
     protected static $account_id;
     protected static $total_amount;
@@ -50,23 +54,26 @@ class JournalHelper extends AppHelper
             $jvd = Carbon::parse($date)->format('Y-m-d');
             $jvp = Carbon::parse($date)->format('Ym');
         }
-        $title = (parent::getTransactionModule($transaction_module_code)->name ?? self::$defaultTitle);
-        if (empty(self::$title)) {
+        $title = parent::getTransactionModule($transaction_module_code)->name ?? self::$defaultTitle;
+        if (!empty(self::$title)) {
             $title = self::$title;
         }
-        $transactionModuleId = (parent::getTransactionModule($transaction_module_code)->id ?? '');
+        if (!empty(self::$description)) {
+            $journal_voucher_description = self::$description;
+        }
+        $transactionModuleId = parent::getTransactionModule($transaction_module_code)->id ?? '';
         JournalVoucher::create([
-            'company_id'                    => Auth::user()->company_id,
-            'journal_voucher_status'        => 1,
-            'transaction_journal_no'        => self::$transaction_journal_no,
-            'journal_voucher_description'   => self::$prependDescription . $journal_voucher_description . self::$appendDescription,
-            'journal_voucher_title'         => self::$prependTitle . $title . self::$appendTitle,
-            'transaction_module_id'         => $transactionModuleId,
-            'transaction_module_code'       => $transaction_module_code,
-            'journal_voucher_date'          => $jvd,
-            'journal_voucher_period'        => $jvp,
-            'created_id'                    => Auth::id(),
-            'journal_voucher_token'         => $token,
+            'company_id' => Auth::user()->company_id,
+            'journal_voucher_status' => 1,
+            'transaction_journal_no' => self::$transaction_journal_no,
+            'journal_voucher_description' => self::$prependDescription . $journal_voucher_description . self::$appendDescription,
+            'journal_voucher_title' => self::$prependTitle . $title . self::$appendTitle,
+            'transaction_module_id' => $transactionModuleId,
+            'transaction_module_code' => $transaction_module_code,
+            'journal_voucher_date' => $jvd,
+            'journal_voucher_period' => $jvp,
+            'created_id' => Auth::id(),
+            'journal_voucher_token' => $token,
         ]);
         $jv = JournalVoucher::where('journal_voucher_token', $token)->first();
         self::$journal_voucher_id = $jv->journal_voucher_id;
@@ -96,22 +103,22 @@ class JournalHelper extends AppHelper
                 }
                 //* buat journal item
                 JournalVoucherItem::create([
-                    'merchat_id'                    => $mid,
-                    'company_id'                    => Auth::user()->company_id,
-                    'journal_voucher_id'            => $jv->journal_voucher_id,
-                    'account_id'                    => $account_id,
-                    'journal_voucher_amount'        => $total_amount,
-                    'account_id_default_status'     => self::getAccountDefaultStatus($account_id),
-                    'account_id_status'             => $account_setting_status,
-                    'journal_voucher_debit_amount'  => $debit_amount,
+                    'merchat_id' => $mid,
+                    'company_id' => Auth::user()->company_id,
+                    'journal_voucher_id' => $jv->journal_voucher_id,
+                    'account_id' => $account_id,
+                    'journal_voucher_amount' => $total_amount,
+                    'account_id_default_status' => self::getAccountDefaultStatus($account_id),
+                    'account_id_status' => $account_setting_status,
+                    'journal_voucher_debit_amount' => $debit_amount,
                     'journal_voucher_credit_amount' => $credit_amount,
-                    'updated_id'                    => Auth::id(),
-                    'created_id'                    => Auth::id()
+                    'updated_id' => Auth::id(),
+                    'created_id' => Auth::id(),
                 ]);
             }
-            return new self;
+            return new self();
         } else {
-            return new self;
+            return new self();
         }
     }
     /**
@@ -128,16 +135,16 @@ class JournalHelper extends AppHelper
             'company_id' => $journal['company_id'],
             'transaction_module_id' => $journal['transaction_module_id'],
             'journal_voucher_status' => $journal['journal_voucher_status'],
-            'transaction_journal_no' =>  $journal['transaction_journal_no'],
+            'transaction_journal_no' => $journal['transaction_journal_no'],
             'transaction_module_code' => 'H' . $journal['transaction_module_code'],
             'journal_voucher_date' => date('Y-m-d'),
-            'journal_voucher_description' =>  'Hapus ' . $journal['journal_voucher_description'],
+            'journal_voucher_description' => 'Hapus ' . $journal['journal_voucher_description'],
             'journal_voucher_period' => $journal['journal_voucher_period'],
-            'journal_voucher_title' =>  'Hapus ' . $journal['journal_voucher_title'],
-            "data_state" => $journal['data_state'],
-            "journal_voucher_token" => $token,
-            "reverse_state" => 1,
-            'created_id' => Auth::id()
+            'journal_voucher_title' => 'Hapus ' . $journal['journal_voucher_title'],
+            'data_state' => $journal['data_state'],
+            'journal_voucher_token' => $token,
+            'reverse_state' => 1,
+            'created_id' => Auth::id(),
         ]);
         $journal->reverse_state = 1;
         $journal->save();
@@ -148,14 +155,14 @@ class JournalHelper extends AppHelper
                 'journal_voucher_id' => $jv['journal_voucher_id'],
                 'account_id' => $key['account_id'],
                 'journal_voucher_amount' => $key['journal_voucher_amount'],
-                'account_id_status' => (1 - $key['account_id_status']),
+                'account_id_status' => 1 - $key['account_id_status'],
                 'account_id_default_status' => $key['account_id_default_status'],
                 'journal_voucher_debit_amount' => $key['journal_voucher_credit_amount'],
                 'journal_voucher_credit_amount' => $key['journal_voucher_debit_amount'],
-                "data_state" => $key['data_state'],
-                "reverse_state" => 1,
+                'data_state' => $key['data_state'],
+                'reverse_state' => 1,
                 'updated_id' => Auth::id(),
-                'created_id' => Auth::id()
+                'created_id' => Auth::id(),
             ]);
         }
         $journal->items()->update(['acct_journal_voucher_item.reverse_state' => 1]);
@@ -168,7 +175,7 @@ class JournalHelper extends AppHelper
     public static function token($token)
     {
         self::$token = $token;
-        return new self;
+        return new self();
     }
     /**
      * Set Journal date
@@ -183,7 +190,7 @@ class JournalHelper extends AppHelper
             throw new \Exception("Can't Back Date");
         }
         self::$journal_voucher_date = $journal_voucher_date;
-        return new self;
+        return new self();
     }
     /**
      * Make journal with account id accoun seting name wont be used
@@ -194,7 +201,7 @@ class JournalHelper extends AppHelper
     public static function account(array $account_id)
     {
         self::$account_id = $account_id;
-        return new self;
+        return new self();
     }
     /**
      * Get Account Status by account id
@@ -220,7 +227,7 @@ class JournalHelper extends AppHelper
         $journal_voucher_id = self::$journal_voucher_id;
         if (empty($journal_voucher_id)) {
             if (empty(self::$token)) {
-                throw new \Exception("unspecified journal token. use this funtion after call make() or token()");
+                throw new \Exception('unspecified journal token. use this funtion after call make() or token()');
             }
             $jv = JournalVoucher::where('journal_voucher_token', self::$token)->first();
             $journal_voucher_id = $jv->journal_voucher_id;
@@ -233,7 +240,7 @@ class JournalHelper extends AppHelper
             $asts = parent::getAccountSetting($account_id_or_setting)->status;
         }
         if (empty($account_setting_status)) {
-            $account_setting_status =  $asts;
+            $account_setting_status = $asts;
         }
         if (empty($total_amount)) {
             $total_amount = self::$total_amount;
@@ -251,19 +258,19 @@ class JournalHelper extends AppHelper
         }
         //* buat journal item
         JournalVoucherItem::create([
-            'merchat_id'                    => $mid,
-            'company_id'                    => Auth::user()->company_id,
-            'journal_voucher_id'            => $journal_voucher_id,
-            'account_id'                    => $account_id,
-            'journal_voucher_amount'        => $total_amount,
-            'account_id_default_status'     => self::getAccountDefaultStatus($account_id),
-            'account_id_status'             => $account_setting_status,
-            'journal_voucher_debit_amount'  => $debit_amount,
+            'merchat_id' => $mid,
+            'company_id' => Auth::user()->company_id,
+            'journal_voucher_id' => $journal_voucher_id,
+            'account_id' => $account_id,
+            'journal_voucher_amount' => $total_amount,
+            'account_id_default_status' => self::getAccountDefaultStatus($account_id),
+            'account_id_status' => $account_setting_status,
+            'journal_voucher_debit_amount' => $debit_amount,
             'journal_voucher_credit_amount' => $credit_amount,
-            'updated_id'                    => Auth::id(),
-            'created_id'                    => Auth::id()
+            'updated_id' => Auth::id(),
+            'created_id' => Auth::id(),
         ]);
-        return new self;
+        return new self();
     }
     /**
      * Set Journal defaul title
@@ -273,7 +280,7 @@ class JournalHelper extends AppHelper
     public static function setDefaultTitle($defaultTitle = '')
     {
         self::$defaultTitle = $defaultTitle;
-        return new self;
+        return new self();
     }
     /**
      * Prepend Journal Title (and description), space provided
@@ -287,7 +294,7 @@ class JournalHelper extends AppHelper
         if ($withDesc) {
             self::$prependDescription = " {$prepend}";
         }
-        return new self;
+        return new self();
     }
     /**
      * Append Journal Title (and description), space provided
@@ -301,7 +308,7 @@ class JournalHelper extends AppHelper
         if ($withDesc) {
             self::$prependDescription = "{$append} ";
         }
-        return new self;
+        return new self();
     }
     /**
      * Set Journal item merchant id
@@ -312,7 +319,7 @@ class JournalHelper extends AppHelper
     public static function merchantId($merchant_id)
     {
         self::$merchant_id = $merchant_id;
-        return new self;
+        return new self();
     }
     /**
      * Set journal voucher id
@@ -323,7 +330,7 @@ class JournalHelper extends AppHelper
     public static function journalVoucherId($journal_voucher_id)
     {
         self::$journal_voucher_id = $journal_voucher_id;
-        return new self;
+        return new self();
     }
     /**
      * Set transaction journal no
@@ -334,7 +341,7 @@ class JournalHelper extends AppHelper
     public static function trsJournalNo($transaction_journal_no)
     {
         self::$transaction_journal_no = $transaction_journal_no;
-        return new self;
+        return new self();
     }
     /**
      * Update journal voucher (parent) that has been created
@@ -347,18 +354,50 @@ class JournalHelper extends AppHelper
         $journal_voucher_id = self::$journal_voucher_id;
         if (empty($journal_voucher_id)) {
             if (empty(self::$token)) {
-                throw new \Exception("unspecified journal token. use this funtion after call make() or token()");
+                throw new \Exception('unspecified journal token. use this funtion after call make() or token()');
             }
-            $jv = JournalVoucher::where('journal_voucher_token', self::$token)->latest()->first();
+            $jv = JournalVoucher::where('journal_voucher_token', self::$token)
+                ->latest()
+                ->first();
             $journal_voucher_id = $jv->journal_voucher_id;
         }
-        if(!empty($updates['journal_voucher_date'])){
+        if (!empty($updates['journal_voucher_date'])) {
             $date = Carbon::parse($updates['journal_voucher_date'])->format('Ym');
             $now = Carbon::now()->format('Ym');
             if ($date < $now) {
                 throw new \Exception("Can't Back Date");
             }
         }
-        return JournalVoucher::where('journal_voucher_id',$journal_voucher_id)->update($updates);
+        return JournalVoucher::where('journal_voucher_id', $journal_voucher_id)->update($updates);
+    }
+    /**
+     * Set Journal Title (and Description)
+     *
+     * @param string $title
+     * @param integer $withDesc
+     * @return self
+     */
+    public static function title(string $title, $withDesc = 0)
+    {
+        self::$title = $title;
+        if ($withDesc) {
+            self::$description = $title;
+        }
+        return new self;
+    }
+    /**
+     * Undocumented function
+     *
+     * @param string $description
+     * @param integer $withtitle
+     * @return self
+     */
+    public static function description(string $description, $withtitle = 0)
+    {
+        self::$description = $description;
+        if ($withtitle) {
+            self::$title = $description;
+        }
+        return new self;
     }
 }
