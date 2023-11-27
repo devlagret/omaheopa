@@ -125,10 +125,10 @@ class InvtStockAdjustmentController extends Controller
 
     public function filterAddStockAdjustment(Request $request)
     {
-        $request->validate(['item_unit'=>'required|integer','item_id'=>'required|integer'],[
-            'item_unit.required'=>'Harap Pilih item unit!',
+        $request->validate(['item_unit_id'=>'required|integer','item_id'=>'required|integer'],[
+            'item_unit_id.required'=>'Harap Pilih item unit!',
             'item_id.required'=>'Harap Pilih item!',
-            'item_unit.integer'=>'Item tidak memiliki unit',
+            'item_unit_id.integer'=>'Item tidak memiliki unit',
             'item_id.integer'=>'Wahana/Merchant tidak memiliki wahana',
         ]);
         $datas = [
