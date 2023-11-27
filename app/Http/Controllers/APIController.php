@@ -1941,7 +1941,7 @@ class APIController extends Controller
         if(Auth::id()!=1||Auth::user()->merchant_id!=null){
             $merchant->where('merchant_id',Auth::user()->merchant_id);
         }
-        // $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
+        $merchant = $merchant->get();
 
         if($merchant){
             return response([
