@@ -1937,19 +1937,19 @@ class APIController extends Controller
     public function getSalesTiketMerchant(Request $request)
     {
 
-        $item   = SalesMerchant::where('data_state', 0);
+        $merchant   = SalesMerchant::where('data_state', 0);
         if(Auth::id()!=1||Auth::user()->merchant_id!=null){
-            $item->where('merchant_id',Auth::user()->merchant_id);
+            $merchant->where('merchant_id',Auth::user()->merchant_id);
         }
 
-        $item = $item->get()->pluck('merchant_name', 'merchant_id');
+        $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
 
-        $item = InvtItemCategory::select('item_category_id', 'item_category_name');
+        $category = InvtItemCategory::select('item_category_id', 'item_category_name');
         if (Auth::id()!=1||Auth::user()->merchant_id!=null) {
             
-            $item->where('merchant_id', $request->merchant_id);
+            $category->where('merchant_id', $request->merchant_id);
         }
-        $item = $item->get()->pluck('item_category_name', 'item_category_id');
+        $category = $category->get()->pluck('item_category_name', 'item_category_id');
 
         $item   = InvtItem::select('*')
         ->where('data_state', 0);
@@ -1959,14 +1959,14 @@ class APIController extends Controller
         $item = $item->get();
 
         // $items = InvtItem::find($request->item_id);
-        $item          = InvtItemUnit::where('data_state', 0)
+        $units          = InvtItemUnit::where('data_state', 0)
         ->where('company_id', Auth::user()->company_id)
         ->get()
         ->pluck('item_unit_name','item_unit_name');
 
         if($item){
             return response([
-                'data' => $item,
+                'data' => $item,$units, 
                 // 'unit' => $units,
                 // 'merchant' => $merchant,
                 // 'category' => $category
