@@ -1957,10 +1957,10 @@ class APIController extends Controller
         }
         $item = $item->get();
 
-        $item = InvtItem::find($request->item_id);
+        $items = InvtItem::find($request->item_id);
         $units          = InvtItemUnit::where('data_state', 0)
         ->where('company_id', Auth::user()->company_id)
-        ->where('item_unit_id',$item['item_unit_id'])
+        ->where('item_unit_id',$items['item_unit_id'])
         ->get()
         ->pluck('item_unit_name','item_unit_id');
 
