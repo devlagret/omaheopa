@@ -32,6 +32,7 @@ class User extends Authenticatable
         'company_id',
         'merchant_id',
         'phone_number',
+        'full_name',
     ];
 
     /**
