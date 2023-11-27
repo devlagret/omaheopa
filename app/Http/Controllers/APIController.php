@@ -2038,7 +2038,7 @@ class APIController extends Controller
             'journal_voucher_title'         => $this->getTransactionModuleName($transaction_module_code),
             'transaction_module_id'         => $transaction_module_id,
             'transaction_module_code'       => $transaction_module_code,
-            'journal_voucher_date'          => $fields['sales_invoice_date'],
+            'journal_voucher_date'          => date('Y-m-d'),
             'journal_voucher_period'        => date('Ym'),
             'updated_id'                    => Auth::id(),
             'created_id'                    => Auth::id()
