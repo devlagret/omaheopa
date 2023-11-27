@@ -1934,14 +1934,42 @@ class APIController extends Controller
         }
     }
 
-    public function getSalesTiketMerchant()
+    public function getSalesTiketMerchant(Request $request)
     {
-        $merchant   =InvtItem::with('merchant','category')->where('item_status',0)->get();
 
-        if($merchant){
+        $merchant   = SalesMerchant::where('data_state', 0);
+        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
+            $merchant->where('merchant_id',Auth::user()->merchant_id);
+        }
+        $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
+
+        $category = InvtItemCategory::select('item_category_id', 'item_category_name');
+        if (Auth::id()!=1||Auth::user()->merchant_id!=null) {
+            
+            $category->where('merchant_id', $request->merchant_id);
+        }
+        $category = $category->get();
+
+        $item   = InvtItem::select('*')
+        ->where('data_state', 0);
+        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
+            $item->where('merchant_id',Auth::user()->merchant_id);
+        }
+        $item = $item->get();
+
+        // $items = InvtItem::find($request->item_id);
+        $units          = InvtItemUnit::where('data_state', 0)
+        ->where('company_id', Auth::user()->company_id)
+        ->get()
+        ->pluck('item_unit_name','item_unit_name');
+
+        if($item){
             return response([
-                'data' => $merchant,
-                // 'date' => $date
+                'data' => $item,
+                'unit' => $units,
+                'merchant' => $merchant,
+                'category' => $category
+
             ],201);
         }else{
             return response([
@@ -2227,18 +2255,18 @@ class APIController extends Controller
             'created_id'                => Auth::id(),
             'updated_id'                => Auth::id()
         );
-        // $journal = array(
-        //     'company_id'                    => Auth::user()->company_id,
-        //     'journal_voucher_status'        => 1,
-        //     'journal_voucher_description'   => $this->getTransactionModuleName($transaction_module_code),
-        //     'journal_voucher_title'         => $this->getTransactionModuleName($transaction_module_code),
-        //     'transaction_module_id'         => $transaction_module_id,
-        //     'transaction_module_code'       => $transaction_module_code,
-        //     'journal_voucher_date'          => $fields['sales_invoice_date'],
-        //     'journal_voucher_period'        => date('Ym'),
-        //     'updated_id'                    => Auth::id(),
-        //     'created_id'                    => Auth::id()
-        // );
+        $journal = array(
+            'company_id'                    => Auth::user()->company_id,
+            'journal_voucher_status'        => 1,
+            'journal_voucher_description'   => $this->getTransactionModuleName($transaction_module_code),
+            'journal_voucher_title'         => $this->getTransactionModuleName($transaction_module_code),
+            'transaction_module_id'         => $transaction_module_id,
+            'transaction_module_code'       => $transaction_module_code,
+            'journal_voucher_date'          => $fields['sales_invoice_date'],
+            'journal_voucher_period'        => date('Ym'),
+            'updated_id'                    => Auth::id(),
+            'created_id'                    => Auth::id()
+        );
         
         //*jurnal
         // JournalHelper::make(Str::uuid(),'Sales Invoice',['sales_cash_account','sales_account'],$fields['total_amount']);
@@ -2283,60 +2311,60 @@ class APIController extends Controller
                 ],401);  
             }
 
-            // $account_setting_name = 'sales_cash_account';
-            // $account_id = $this->getAccountId($account_setting_name);
-            // $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
-            // $account_default_status = $this->getAccountDefaultStatus($account_id);
-            // $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
-            // if ($account_setting_status == 0){
-            //     $debit_amount = $fields['total_amount'];
-            //     $credit_amount = 0;
-            // } else {
-            //     $debit_amount = 0;
-            //     $credit_amount = $fields['total_amount'];
-            // }
-            // $journal_debit = array(
-            //     'company_id'                    => Auth::user()->company_id,
-            //     'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
-            //     'account_id'                    => $account_id,
-            //     'journal_voucher_amount'        => $fields['total_amount'],
-            //     'account_id_default_status'     => $account_default_status,
-            //     'account_id_status'             => $account_setting_status,
-            //     'journal_voucher_debit_amount'  => $debit_amount,
-            //     'journal_voucher_credit_amount' => $credit_amount,
-            //     'updated_id'                    => Auth::id(),
-            //     'created_id'                    => Auth::id()
-            // );
-            // JournalVoucherItem::create($journal_debit);
+            $account_setting_name = 'sales_cash_account';
+            $account_id = $this->getAccountId($account_setting_name);
+            $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
+            $account_default_status = $this->getAccountDefaultStatus($account_id);
+            $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
+            if ($account_setting_status == 0){
+                $debit_amount = $fields['total_amount'];
+                $credit_amount = 0;
+            } else {
+                $debit_amount = 0;
+                $credit_amount = $fields['total_amount'];
+            }
+            $journal_debit = array(
+                'company_id'                    => Auth::user()->company_id,
+                'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
+                'account_id'                    => $account_id,
+                'journal_voucher_amount'        => $fields['total_amount'],
+                'account_id_default_status'     => $account_default_status,
+                'account_id_status'             => $account_setting_status,
+                'journal_voucher_debit_amount'  => $debit_amount,
+                'journal_voucher_credit_amount' => $credit_amount,
+                'updated_id'                    => Auth::id(),
+                'created_id'                    => Auth::id()
+            );
+            JournalVoucherItem::create($journal_debit);
 
-            // $account_setting_name = 'sales_account';
-            // $account_id = $this->getAccountId($account_setting_name);
-            // $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
-            // $account_default_status = $this->getAccountDefaultStatus($account_id);
-            // $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
-            // if ($account_setting_status == 0){
-            //     $debit_amount = $fields['total_amount'];
-            //     $credit_amount = 0;
-            // } else {
-            //     $debit_amount = 0;
-            //     $credit_amount = $fields['total_amount'];
-            // }
-            // $journal_credit = array(
-            //     'company_id'                    => Auth::user()->company_id,
-            //     'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
-            //     'account_id'                    => $account_id,
-            //     'journal_voucher_amount'        => $fields['total_amount'],
-            //     'account_id_default_status'     => $account_default_status,
-            //     'account_id_status'             => $account_setting_status,
-            //     'journal_voucher_debit_amount'  => $debit_amount,
-            //     'journal_voucher_credit_amount' => $credit_amount,
-            //     'updated_id'                    => Auth::id(),
-            //     'created_id'                    => Auth::id()
-            // );
-            // JournalVoucherItem::create($journal_credit);
+            $account_setting_name = 'sales_account';
+            $account_id = $this->getAccountId($account_setting_name);
+            $account_setting_status = $this->getAccountSettingStatus($account_setting_name);
+            $account_default_status = $this->getAccountDefaultStatus($account_id);
+            $journal_voucher_id = JournalVoucher::orderBy('created_at', 'DESC')->where('company_id', Auth::user()->company_id)->first();
+            if ($account_setting_status == 0){
+                $debit_amount = $fields['total_amount'];
+                $credit_amount = 0;
+            } else {
+                $debit_amount = 0;
+                $credit_amount = $fields['total_amount'];
+            }
+            $journal_credit = array(
+                'company_id'                    => Auth::user()->company_id,
+                'journal_voucher_id'            => $journal_voucher_id['journal_voucher_id'],
+                'account_id'                    => $account_id,
+                'journal_voucher_amount'        => $fields['total_amount'],
+                'account_id_default_status'     => $account_default_status,
+                'account_id_status'             => $account_setting_status,
+                'journal_voucher_debit_amount'  => $debit_amount,
+                'journal_voucher_credit_amount' => $credit_amount,
+                'updated_id'                    => Auth::id(),
+                'created_id'                    => Auth::id()
+            );
+            JournalVoucherItem::create($journal_credit);
 
-            // $msg = 'Tambah Tiket Penjualan Berhasil';
-            // return redirect('/sales-tiket/add')->with('msg',$msg);
+            $msg = 'Tambah Tiket Penjualan Berhasil';
+            return redirect('/sales-tiket/add')->with('msg',$msg);
         } else{
             return response([
                 'message' => 'Data Tidak Berhasil Disimpan'
