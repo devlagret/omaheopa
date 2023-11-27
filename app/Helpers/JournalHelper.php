@@ -26,6 +26,7 @@ class JournalHelper extends AppHelper
     protected static $total_amount;
     protected static $merchant_id;
     protected static $transaction_journal_no;
+    protected static $journal_voucher_status;
     /**
      * Make journal voucher and journal voucher item
      * leave account_setting_name empty to return self
@@ -62,9 +63,13 @@ class JournalHelper extends AppHelper
             $journal_voucher_description = self::$description;
         }
         $transactionModuleId = parent::getTransactionModule($transaction_module_code)->id ?? '';
+        $jvs=1;
+        if(!empty(self::$journal_voucher_status)){
+            $jvs=self::$journal_voucher_status;
+        }
         JournalVoucher::create([
             'company_id' => Auth::user()->company_id,
-            'journal_voucher_status' => 1,
+            'journal_voucher_status' => $jvs,
             'transaction_journal_no' => self::$transaction_journal_no,
             'journal_voucher_description' => self::$prependDescription . $journal_voucher_description . self::$appendDescription,
             'journal_voucher_title' => self::$prependTitle . $title . self::$appendTitle,
@@ -399,5 +404,14 @@ class JournalHelper extends AppHelper
             self::$title = $description;
         }
         return new self;
+    }
+    /**
+     * Buat Jurnal Sebagai Jurnal Umum
+     *
+     * @return self
+     */
+    public function general() {
+        self::$journal_voucher_status=0;
+         return new self;
     }
 }

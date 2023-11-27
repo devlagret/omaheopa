@@ -62,7 +62,7 @@ class AcctProfitLossYearReportController extends Controller
             $total_sales_amount += $row['total_amount'];
         }
 
-        $purchase_invoice = PurchaseInvoice::join('purchase_invoice_item','purchase_invoice_item.purchase_invoice_id','=','purchase_invoice.purchase_invoice_id')
+        $purchase_invoice = PurchaseInvoice::withoutGlobalScopes()->join('purchase_invoice_item','purchase_invoice_item.purchase_invoice_id','=','purchase_invoice.purchase_invoice_id')
         ->whereMonth('purchase_invoice.purchase_invoice_date','>=',01)
         ->whereMonth('purchase_invoice.purchase_invoice_date','<=',$month)
         ->whereYear('purchase_invoice.purchase_invoice_date',$year)
@@ -261,7 +261,7 @@ class AcctProfitLossYearReportController extends Controller
 
         $pdf::writeHTML($tblStock1, true, false, false, false, '');
 
-        
+        ob_clean();
 
         $filename = 'Laporan_Perhitungan_Laba_Rugi_1_'.$month.'_'.$year.'.pdf';
         $pdf::Output($filename, 'I');
@@ -413,7 +413,7 @@ class AcctProfitLossYearReportController extends Controller
                 $sheet->setCellValue('C13', number_format($subtotal_difference,2,'.',','));
 
             
-            
+            ob_clean();
             $filename='Laporan_Perhitungan_Laba_Rugi_01_'.$month.'_'.$year.'.xls';
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             header('Content-Disposition: attachment;filename="'.$filename.'"');
