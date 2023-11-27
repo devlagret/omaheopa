@@ -2001,8 +2001,8 @@ class APIController extends Controller
     {
        // Helper::sales(item_id,qty,unit,dis%)->withJournal();
         // dd($request->all());
-        $transaction_module_code = 'SI';
-        $transaction_module_id  = $this->getTransactionModuleID($transaction_module_code);
+        // $transaction_module_code = 'SI';
+        // $transaction_module_id  = $this->getTransactionModuleID($transaction_module_code);
         $fields = $request->validate([
             'total_amount'              => 'required',
             'paid_amount'               => 'required',
