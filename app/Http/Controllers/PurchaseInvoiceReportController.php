@@ -182,13 +182,13 @@ class PurchaseInvoiceReportController extends Controller
             foreach ($row->item as $key => $val) {
                 $tblStock2 .="
                     <tr>
-                        <td style=\"text-align:left\">$no.</td>
-                        <td style=\"text-align:left\">".$row->supplier->supplier_name??'-'."</td>
-                        <td style=\"text-align:left\">".$val->warehouse->warehouse_name??'-'."</td>
-                        <td style=\"text-align:left\">".$val->item->item_name??'-'."</td>
+                        <td style=\"text-align:left\">{$no}.</td>
+                        <td style=\"text-align:left\">".($row->supplier->supplier_name??'-')."</td>
+                        <td style=\"text-align:left\">".($val->warehouse->warehouse_name??'-')."</td>
+                        <td style=\"text-align:left\">".($val->item->item_name??'-')."</td>
                         <td style=\"text-align:left\">{$row['purchase_invoice_date']}</td>
                         <td style=\"text-align:left\">{$val['quantity']}</td>
-                        <td style=\"text-align:left\">".$val->unit->item_unit_id??'-'."</td>
+                        <td style=\"text-align:left\">".($val->unit->item_unit_id??'-')."</td>
                         <td style=\"text-align:right\">".number_format($val['item_unit_cost'],2,'.',',')."</td>
                         <td style=\"text-align:right\">".number_format($val['subtotal_amount'],2,'.',',')."</td>
                     </tr>
