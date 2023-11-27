@@ -87,7 +87,7 @@ class JournalVoucherController extends Controller
             'account_id'                => 'required',
             'account_status'            => 'required',
             'journal_voucher_amount'    => 'required',
-            'merchant_id'    => 'required',
+            'merchant_id'               => '',
 
             
         ]);
