@@ -176,7 +176,7 @@
                         <td style='text-align:center'>{{$no}}</td>
                         <td>{{$stock->item->merchant->merchant_name??'-'}}</td>
                         <td>{{empty($stock->category)?'-':$stock->category->item_category_name}}</td>
-                        <td>{{$stock->item->item_name}}</td>
+                        <td>{{$stock->item->item_name??'-'}}</td>
                         {{-- <?php if($stock['item_id']==0) {?>
                             <td>No Grade</td>
                         <?php } else {?>

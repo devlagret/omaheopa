@@ -377,7 +377,7 @@ class JournalVoucherController extends Controller
             </tr>
             <tr>
                 <td width=\"20%\"><div style=\"text-align: left;\">Uraian</div></td>
-                <td width=\"80%\"><div style=\"text-align: left;\">: ".$data['journal_voucher_description']."</div></td>
+                <td width=\"80%\"><div style=\"text-align: left;\">: ".$data['journal_voucher_title']."</div></td>
             </tr>		
         </table>";
 
