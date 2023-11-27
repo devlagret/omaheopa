@@ -290,9 +290,9 @@ class JournalHelper extends AppHelper
      */
     public static function prependTitle($prepend, int $withDesc = 0)
     {
-        self::$prependTitle = " {$prepend}";
+        self::$prependTitle = "{$prepend} ";
         if ($withDesc) {
-            self::$prependDescription = " {$prepend}";
+            self::$prependDescription = "{$prepend} ";
         }
         return new self();
     }
@@ -304,9 +304,9 @@ class JournalHelper extends AppHelper
      */
     public static function appendTitle($append, int $withDesc = 0)
     {
-        self::$appendTitle = "{$append} ";
+        self::$appendTitle = " {$append}";
         if ($withDesc) {
-            self::$prependDescription = "{$append} ";
+            self::$appendDescription = " {$append}";
         }
         return new self();
     }
