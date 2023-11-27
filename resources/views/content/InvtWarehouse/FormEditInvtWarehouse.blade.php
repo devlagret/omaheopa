@@ -101,7 +101,7 @@ $(document).ready(function() {
             // }
         ?>
 
-    <form method="post" action="/warehouse/process-edit-warehouse" enctype="multipart/form-data">
+    <form method="post" action="{{route('process-edit-warehouse')}}" enctype="multipart/form-data">
         @csrf
         <div class="card-body">
             <div class="row form-group">
