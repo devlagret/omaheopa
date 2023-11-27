@@ -747,4 +747,4 @@ Route::get('/reservation-payment/print-recipt-cesh-payment', [PaymentReservation
 Route::get('/reservation-payment/print-recipt-non-cesh-payment', [PaymentReservationController::class, 'printReciptNonCeshPayment'])->name('reservation-payment-print-recipt-non-cesh-payment');
 
 Route::get('/setting-tiket', [SettingTiketController::class, 'index'])->name('setting-tiket');
-Route::post('/setting-tiket/process-edit', [SettingTiketController::class, 'processEditTiket'])->name('process-edit-tiket');
+Route::post('/setting-tiket/process-edit', [SettingTiketController::class, 'processEditTiket'])->name('process-edit');
