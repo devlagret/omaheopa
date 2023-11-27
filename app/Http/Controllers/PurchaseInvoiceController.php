@@ -230,7 +230,7 @@ class PurchaseInvoiceController extends Controller
         }else{
             //* Tunai
             JournalHelper::token($token)->make('Purchase Invoice',$fields['total_amount'],['purchase_cash_account','purchase_account']);
-         }
+        }
         DB::commit();
         Session::forget('purchase-token');
         Session::forget('datases');
