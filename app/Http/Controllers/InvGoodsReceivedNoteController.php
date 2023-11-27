@@ -259,7 +259,7 @@ class InvGoodsReceivedNoteController extends Controller
         
             $transaction_module_code 	= "GRN";
     
-            $transactionmodule 		    = PreferenceTransactionModule::where('transaction_module_code', $transaction_module_code)
+            $transactionmodule 		    = PreferenceTransactionModule::withoutGlobalScopes()->where('transaction_module_code', $transaction_module_code)
             ->first();
     
             $transaction_module_id 		= $transactionmodule['transaction_module_id'];
