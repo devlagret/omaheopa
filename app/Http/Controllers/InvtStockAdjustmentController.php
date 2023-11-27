@@ -31,6 +31,7 @@ class InvtStockAdjustmentController extends Controller
         Session::forget('unit_id');
         Session::forget('warehouse_id');
         Session::forget('date');
+        Session::forget('data_item');
         Session::forget('datases');
         if(!$start_date = Session::get('start_date')){
             $start_date = date('Y-m-d');
@@ -124,6 +125,12 @@ class InvtStockAdjustmentController extends Controller
 
     public function filterAddStockAdjustment(Request $request)
     {
+        $request->validate(['item_unit'=>'required|integer','item_id'=>'required|integer'],[
+            'item_unit.required'=>'Harap Pilih item unit!',
+            'item_id.required'=>'Harap Pilih item!',
+            'item_unit.integer'=>'Item tidak memiliki unit',
+            'item_id.integer'=>'Wahana/Merchant tidak memiliki wahana',
+        ]);
         $datas = [
             "item_category"         =>$request->item_category,
             "item_id"               =>$request->item_id,
