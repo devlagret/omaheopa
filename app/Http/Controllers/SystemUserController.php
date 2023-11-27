@@ -58,14 +58,14 @@ class SystemUserController extends Controller
     {
         $fields = $request->validate([
             'name'                  => 'required',
-            // 'full_name'             => 'required',
+            'full_name'             => 'required',
             'password'              => 'required',
             'user_group_id'         => 'required',
             'merchant_id'            => 'required'
         ]);
         $user = User::create([
             'name'                  => $fields['name'],
-            // 'full_name'             => $fields['full_name'],
+            'full_name'             => $request->full_name,
             'password'              => Hash::make($fields['password']),
             // 'phone_number'          => $request->phone_number,
             'user_group_id'         => $fields['user_group_id'],
@@ -99,14 +99,14 @@ class SystemUserController extends Controller
         $fields = $request->validate([
             'user_id'                   => 'required',
             'name'                      => 'required',
-            // 'full_name'                 => 'required',
+            'full_name'                 => 'required',
             'user_group_id'             => 'required',
             'merchant_id'                => 'required'
         ]);
 
         $user                   = User::findOrFail($fields['user_id']);
         $user->name             = $fields['name'];
-        // $user->full_name        = $fields['full_name'];
+        $user->full_name        = $fields['full_name'];
         if($request->password){
             $user->password         = Hash::make($request->password);
         }

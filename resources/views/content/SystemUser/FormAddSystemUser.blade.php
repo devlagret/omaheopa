@@ -35,22 +35,22 @@
         </div>
     </div>
 
-    <form method="post" action="/system-user/process-add-system-user" enctype="multipart/form-data">
+    <form method="post" action="{{route('process-add-system-user')}}" enctype="multipart/form-data">
         @csrf
         <div class="card-body">
             <div class="row form-group">
                 <div class="col-md-3">
                     <div class="form-group">
-                        <a class="text-dark">Nama<a class='red'> *</a></a>
+                        <a class="text-dark">Username / nama<a class='red'> *</a></a>
                         <input class="form-control input-bb" type="text" name="name" id="name" value=""/>
                     </div>
                 </div>
-                {{-- <div class="col-md-3">
+                <div class="col-md-3">
                     <div class="form-group">
-                        <a class="text-dark">Nama Panjang<a class='red'> *</a></a>
+                        <a class="text-dark">Nama Lengkap<a class='red'> *</a></a>
                         <input class="form-control input-bb" type="text" name="full_name" id="full_name" value=""/>
                     </div>
-                </div> --}}
+                </div>
                 <div class="col-md-3">
                     <div class="form-group">
                         <a class="text-dark">Password<a class='red'> *</a></a>

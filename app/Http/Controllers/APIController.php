@@ -1977,7 +1977,7 @@ class APIController extends Controller
         ->where('data_state', 0)
         ->where('company_id', Auth::user()->company_id)
         ->get()
-        ->pluck('item_unit_name','item_unit_id');
+        ->pluck('item_unit_name','item_unit_name');
         $val['item_unit_name'] = $units;
 
         }
@@ -2003,12 +2003,9 @@ class APIController extends Controller
         $transaction_module_code = 'SI';
         $transaction_module_id  = $this->getTransactionModuleID($transaction_module_code);
         $fields = $request->validate([
-            // 'sales_invoice_date'        => 'required',
-            'subtotal_item'             => 'required',
-            'subtotal_amount1'          => 'required',
             'total_amount'              => 'required',
             'paid_amount'               => 'required',
-            'change_amount'             => 'required'
+            'item_id'                   => 'required',
         ]);
         if (empty($request->discount_percentage_total)){
             $discount_percentage_total = 0;
@@ -2020,7 +2017,7 @@ class APIController extends Controller
         $data = array(
             'customer_name'             => $request->customer_name,
             'merchant_id'               => Auth::user()->merchant_id,
-            'sales_invoice_date'        => $fields['sales_invoice_date'],
+            'sales_invoice_date'        =>   date('Y-m-d'),
             'subtotal_item'             => $fields['subtotal_item'],
             'subtotal_amount'           => $fields['subtotal_amount1'],
             'discount_percentage_total' => $discount_percentage_total,
@@ -2028,6 +2025,7 @@ class APIController extends Controller
             'total_amount'              => $fields['total_amount'],
             'paid_amount'               => $fields['paid_amount'],
             'change_amount'             => $fields['change_amount'],
+            'sales_status'              => 0,
             'company_id'                => Auth::user()->company_id,
             'created_id'                => Auth::id(),
             'updated_id'                => Auth::id()
