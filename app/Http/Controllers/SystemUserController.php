@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Providers\RouteServiceProvider;
 use App\Models\User;
-use App\Models\CoreDivision;
-use App\Models\SalesMerchant;
 use Illuminate\Support\Str;
+use App\Models\CoreDivision;
+use Illuminate\Http\Request;
+use App\Models\SalesMerchant;
 use App\Models\SystemUserGroup;
-use Illuminate\Foundation\Auth\RegistersUsers;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use App\Providers\RouteServiceProvider;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use JeroenNoten\LaravelAdminLte\Components\Widget\Alert;
 
 class SystemUserController extends Controller
@@ -63,20 +64,28 @@ class SystemUserController extends Controller
             'user_group_id'         => 'required',
             'merchant_id'            => 'required'
         ]);
-        $user = User::create([
+        try {
+        DB::beginTransaction();
+        User::create([
             'name'                  => $fields['name'],
             'full_name'             => $request->full_name,
             'password'              => Hash::make($fields['password']),
-            // 'phone_number'          => $request->phone_number,
             'user_group_id'         => $fields['user_group_id'],
             'merchant_id'            => $fields['merchant_id'],
             'user_token'            => Str::uuid(),
             'company_id'            => Auth::user()->company_id,
             'created_id'            => Auth::id(),
         ]);
+        // 'phone_number'          => $request->phone_number,
 
-        $msg = 'Tambah System User Berhasil';
-        return redirect('/system-user/')->with('msg',$msg);
+        DB::commit();
+        return redirect()->route('system-user')->with('msg',"Tambah System User Berhasil");
+        } catch (\Exception $e) {
+        DB::rollBack();
+        dd($e);
+        report($e);
+        return redirect()->route('system-user')->with('msg',"Tambah System User Gagal");
+        }
     }
 
     public function editSystemUser($user_id)
@@ -117,10 +126,10 @@ class SystemUserController extends Controller
 
         if($user->save()){
             $msg = 'Edit System User Berhasil';
-            return redirect('/system-user')->with('msg',$msg);
+            return redirect()->route('system-user')->with('msg',$msg);
         }else{
             $msg = 'Edit System User Gagal';
-            return redirect('/system-user')->with('msg',$msg);
+            return redirect()->route('system-user')->with('msg',$msg);
         }
     }
 
@@ -135,7 +144,7 @@ class SystemUserController extends Controller
             $msg = 'Hapus System User Gagal';
         }
 
-        return redirect('/system-user')->with('msg',$msg);
+        return redirect()->route('system-user')->with('msg',$msg);
     }
 
     public function getUserGroupName($user_group_id)
