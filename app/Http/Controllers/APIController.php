@@ -2395,4 +2395,7 @@ class APIController extends Controller
             'message' => 'Data Berhasil Disimpan'
         ],201);
     }
+    public function tes(){
+        return Auth::user();    
+    }
 }
