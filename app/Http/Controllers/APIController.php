@@ -2016,7 +2016,7 @@ class APIController extends Controller
         }
         $data = array(
             'customer_name'             => $request->customer_name,
-            'merchant_id'               => Auth::user()->merchant_id,
+            // 'merchant_id'               => Auth::user()->merchant_id,
             'sales_invoice_date'        =>   date('Y-m-d'),
             'subtotal_item'             => $fields['subtotal_item'],
             'subtotal_amount'           => $fields['subtotal_amount1'],
