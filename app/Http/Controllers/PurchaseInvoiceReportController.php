@@ -122,7 +122,7 @@ class PurchaseInvoiceReportController extends Controller
         ->where('purchase_invoice_date','>=',Carbon::parse($start_date)->format('Y-m-d'))
         ->where('purchase_invoice_date','<=',Carbon::parse($end_date)->format('Y-m-d'))
         ->where('company_id', Auth::user()->company_id);
-        if(empty(Session::get('warehouse_id'))){
+        if(!empty(Session::get('warehouse_id'))){
             $data->where('warehouse_id', $warehouse_id);
         }
         $data = $data->get();
