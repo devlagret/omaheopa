@@ -1989,7 +1989,7 @@ class APIController extends Controller
                 ->where('company_id', Auth::user()->company_id)
                 ->get()
                 ->pluck('item_unit_name','item_unit_id');
-                $val['item']['item_unit_name'] = $units;
+                $val['item_unit_name'] = $units;
             }
 
         // }
