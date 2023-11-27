@@ -33,6 +33,7 @@ class User extends Authenticatable
         'merchant_id',
         'phone_number',
         'full_name',
+        'data_state',
     ];
 
     /**

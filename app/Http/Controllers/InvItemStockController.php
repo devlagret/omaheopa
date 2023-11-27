@@ -105,10 +105,10 @@ class InvItemStockController extends Controller
         $item_id       = $request->item_id;
         $grade_id           = $request->grade_id;
         $warehouse_id       = $request->warehouse_id;
-        print_r('|||item_category_id'.$item_category_id);
-        print_r('|||item_id'.$item_id);
-        print_r('|||grade_id'.$grade_id);
-        print_r('|||warehouse_id'.$warehouse_id);
+        // print_r('|||item_category_id'.$item_category_id);
+        // print_r('|||item_id'.$item_id);
+        // print_r('|||grade_id'.$grade_id);
+        // print_r('|||warehouse_id'.$warehouse_id);
         // exit;
 
         Session::put('filtermerchantid', $item_category_id);
