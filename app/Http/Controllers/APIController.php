@@ -1936,7 +1936,11 @@ class APIController extends Controller
 
     public function getSalesTiketMerchant()
     {
-        $merchant   =InvtItem::with('merchant','category')->where('item_status',0)->get();
+        $merchant   = SalesMerchant::where('data_state', 0);
+        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
+            $merchant->where('merchant_id',Auth::user()->merchant_id);
+        }
+        $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
 
         if($merchant){
             return response([
