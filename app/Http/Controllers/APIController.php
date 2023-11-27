@@ -1981,16 +1981,16 @@ class APIController extends Controller
             // ->pluck('item_category_name','merchant_id');
             // $val['item_category_name'] = $category;
             
-            // foreach($item as $key => $val){
-            //     // // $items = InvtItem::find($request->item_id);
-            //     $units          = InvtItemUnit::select('*')
-            //     ->where('item_unit_id', $val['item_unit_id1'])
-            //     ->where('data_state', 0)
-            //     ->where('company_id', Auth::user()->company_id)
-            //     ->get()
-            //     ->pluck('item_unit_name','item_unit_id');
-            //     $val['item_unit_name'] = $units;
-            // }
+            foreach($item as $key => $val){
+                // // $items = InvtItem::find($request->item_id);
+                $units          = InvtItemUnit::select('*')
+                ->where('item_unit_id', $val['item_unit_id1'])
+                ->where('data_state', 0)
+                ->where('company_id', Auth::user()->company_id)
+                ->get()
+                ->pluck('item_unit_name','item_unit_id');
+                $val['item_unit_name'] = $units;
+            }
 
         // }
 
