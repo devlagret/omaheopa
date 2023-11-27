@@ -20,8 +20,7 @@ class SettingTiketController extends Controller
         Session::forget('datases');
         Session::forget('arraydatases');
 
-        $data = PreferenceCompany::select('tiket_status','company_id')
-        ->where('data_state',0)
+        $data = PreferenceCompany::where('data_state',0)
         ->where('company_id', Auth::user()->company_id)
         ->first();
 

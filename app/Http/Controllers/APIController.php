@@ -1937,39 +1937,39 @@ class APIController extends Controller
     public function getSalesTiketMerchant(Request $request)
     {
 
-        $merchant   = SalesMerchant::where('data_state', 0);
-        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
-            $merchant->where('merchant_id',Auth::user()->merchant_id);
-        }
+        // $merchant   = SalesMerchant::where('data_state', 0);
+        // if(Auth::id()!=1||Auth::user()->merchant_id!=null){
+        //     $merchant->where('merchant_id',Auth::user()->merchant_id);
+        // }
 
-        $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
+        // $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
 
-        $category = InvtItemCategory::select('item_category_id', 'item_category_name');
-        if (Auth::id()!=1||Auth::user()->merchant_id!=null) {
+        // $category = InvtItemCategory::select('item_category_id', 'item_category_name');
+        // if (Auth::id()!=1||Auth::user()->merchant_id!=null) {
             
-            $category->where('merchant_id', $request->merchant_id);
-        }
-        $category = $category->get()->pluck('item_category_name', 'item_category_id');
+        //     $category->where('merchant_id', $request->merchant_id);
+        // }
+        // $category = $category->get()->pluck('item_category_name', 'item_category_id');
 
-        $item   = InvtItem::select('*')
+        $item   = InvtItem::with('merchant','category')
         ->where('data_state', 0);
         if(Auth::id()!=1||Auth::user()->merchant_id!=null){
             $item->where('merchant_id',Auth::user()->merchant_id);
         }
         $item = $item->get();
 
-        // $items = InvtItem::find($request->item_id);
-        $units          = InvtItemUnit::where('data_state', 0)
-        ->where('company_id', Auth::user()->company_id)
-        ->get()
-        ->pluck('item_unit_name','item_unit_name');
+        // // $items = InvtItem::find($request->item_id);
+        // $units          = InvtItemUnit::where('data_state', 0)
+        // ->where('company_id', Auth::user()->company_id)
+        // ->get()
+        // ->pluck('item_unit_name','item_unit_name');
 
         if($item){
             return response([
-                'data' => $item,
-                'unit' => $units,
-                'merchant' => $merchant,
-                'category' => $category
+                'data' => $item, 
+                // 'unit' => $units,
+                // 'merchant' => $merchant,
+                // 'category' => $category
 
             ],201);
         }else{

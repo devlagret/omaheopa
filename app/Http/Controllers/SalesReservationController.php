@@ -189,14 +189,15 @@ class SalesReservationController extends Controller
         //     'created_id'                    => Auth::id()
         // );
         
-        
-
+        try {
+        DB::beginTransaction();
         if(SalesInvoiceReservation::create($data)){
             // if(SalesInvoice::create($data)){
             $sales_invoice_reservation_id   = SalesInvoiceReservation::orderBy('created_at','DESC')->where('company_id', Auth::user()->company_id)->first();
         
             //*jurnal
-        // JournalHelper::trsJournalNo($sales_invoice_reservation_id->sales_invoice_reservation_no)->make('Sales Reservation', $request->total_amount, ['hotel_account', 'hotel_cash_account']);
+            JournalHelper::trsJournalNo($sales_invoice_reservation_id->sales_invoice_reservation_no)->title('DP Reservasi',1)->appendTitle($sales_invoice_reservation_id->sales_invoice_reservation_no,1)->make('Sales Reservation', $request->total_amount, ['sales_reservation_cash_account','sales_reservation_account']);
+            
             $arraydatases       = Session::get('arraydatases');
             foreach ($arraydatases as $key => $val) {
                 $dataarray = array(
@@ -289,13 +290,20 @@ class SalesReservationController extends Controller
             //     'created_id'                    => Auth::id()
             // );
             // JournalVoucherItem::create($journal_credit);
-
+            }
+            // dd("1");
+            DB::commit();
             $msg = 'Tambah Reservasi Penjualan Berhasil';
             return redirect('/sales-reservation')->with('msg',$msg);
-        } else {
+        } catch (\Exception $e) {
+            DB::rollBack();
+            report($e);
+            dd($e);
+            Session::forget('purchase-token');
             $msg = 'Tambah Reservasi Penjualan Gagal';
             return redirect('/sales-reservation/add')->with('msg',$msg);
-        }
+            }
+
     }
     public function getCoreItem(Request $request){
         $item_category_id   = $request->item_category_id;
