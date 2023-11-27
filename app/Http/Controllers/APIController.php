@@ -1970,14 +1970,26 @@ class APIController extends Controller
             $item->where('merchant_id',Auth::user()->merchant_id);
         }
         $item = $item->get();
+
         foreach($item as $key => $val){
-        // // $items = InvtItem::find($request->item_id);
-        $units          = InvtItemUnit::select('*')
-        ->where('item_unit_id', $val['item_unit_id1'])
-        ->where('data_state', 0)
-        ->where('company_id', Auth::user()->company_id)
-        ->get()
-        ->pluck('item_unit_name','item_unit_id');
+            // // $items = InvtItem::find($request->item_id);
+            $category          = InvtItemCategory::select('*')
+            ->where('item_category_id', $val['item_category_id'])
+            ->where('data_state', 0)
+            ->where('company_id', Auth::user()->company_id)
+            ->get()
+            ->pluck('item_category_name','item_category_id');
+            $val['item_category_name'] = $category;
+            
+            foreach($item as $key => $val){
+                // // $items = InvtItem::find($request->item_id);
+                $units          = InvtItemUnit::select('*')
+                ->where('item_unit_id', $val['item_unit_id1'])
+                ->where('data_state', 0)
+                ->where('company_id', Auth::user()->company_id)
+                ->get()
+                ->pluck('item_unit_name','item_unit_id');
+            }
         $val['item_unit_name'] = $units;
 
         }
