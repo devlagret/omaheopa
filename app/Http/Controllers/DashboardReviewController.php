@@ -353,7 +353,7 @@ class DashboardReviewController extends PublicController
 
         $pdf::writeHTML($export.$export2.$export3.$export4, true, false, false, false, '');
 
-        ob_clean();
+        
         // -----------------------------------------------------------------------------
         
         //Close and output PDF document
@@ -544,7 +544,7 @@ class DashboardReviewController extends PublicController
             $sheet->setCellValue('H'.($k), "Total");
             $sheet->setCellValue('I'.($k), $total);
                
-            ob_clean();
+            
             $filename='Rekap_Layanan_'.$start_date.'_s.d._'.$end_date.'.xls';
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             header('Content-Disposition: attachment;filename="'.$filename.'"');

@@ -429,7 +429,7 @@ class JournalVoucherController extends Controller
         $pdf::writeHTML($tbl1.$tbl2.$tbl3.$tbl4, true, false, false, false, '');
 
 
-        ob_clean();
+        
 
         $filename = 'Jurnal_'.$data['journal_voucher_no'].'_'.$data['journal_voucher_date'].'.pdf';
         $pdf::Output($filename, 'I');
@@ -573,7 +573,7 @@ class JournalVoucherController extends Controller
         $pdf::writeHTML($tbl1.$tbl2.$tbl3.$tbl4, true, false, false, false, '');
 
 
-        // ob_clean();
+        // 
 
         $filename = 'Jurnal_'.$data['journal_voucher_no'].'_'.$data['journal_voucher_date'].'.pdf';
         $pdf::Output($filename, 'I');
@@ -720,7 +720,7 @@ class JournalVoucherController extends Controller
         $pdf::writeHTML($tbl1.$tbl2.$tbl3.$tbl4, true, false, false, false, '');
 
 
-        ob_clean();
+        
 
         $filename = 'Jurnal_'.$data['journal_voucher_no'].'_'.$data['journal_voucher_date'].'.pdf';
         $pdf::Output($filename, 'I');
@@ -865,7 +865,7 @@ class JournalVoucherController extends Controller
         $pdf::writeHTML($tbl1.$tbl2.$tbl3.$tbl4, true, false, false, false, '');
 
 
-        ob_clean();
+        
 
         $filename = 'Jurnal_'.$data['journal_voucher_no'].'_'.$data['journal_voucher_date'].'.pdf';
         $pdf::Output($filename, 'I');

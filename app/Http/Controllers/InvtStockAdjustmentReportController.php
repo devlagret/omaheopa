@@ -201,7 +201,7 @@ class InvtStockAdjustmentReportController extends Controller
 
         $pdf::writeHTML($tblStock1.$tblStock2.$tblStock3, true, false, false, false, '');
 
-        ob_clean();
+        
 
         $filename = 'Laporan_Stock.pdf';
         $pdf::Output($filename, 'I');
@@ -304,7 +304,7 @@ class InvtStockAdjustmentReportController extends Controller
         
             }
             
-            ob_clean();
+            
             $filename='Laporan_Stock.xls';
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             header('Content-Disposition: attachment;filename="'.$filename.'"');

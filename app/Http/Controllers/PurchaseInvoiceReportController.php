@@ -203,7 +203,7 @@ class PurchaseInvoiceReportController extends Controller
 
         $pdf::writeHTML($tblStock1.$tblStock2.$tblStock3, true, false, false, false, '');
 
-        ob_clean();
+        
 
         $filename = 'Laporan_Pembelian_'.$start_date.'s.d.'.$end_date.'.pdf';
         $pdf::Output($filename, 'I');
