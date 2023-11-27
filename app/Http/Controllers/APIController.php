@@ -1934,6 +1934,7 @@ class APIController extends Controller
         ->where('data_state', 0)
         ->where('company_id', Auth::user()->company_id)
         ->where('sales_status',1)
+        ->orderByDesc('created_at')
         ->get();
         
         if($sales){
