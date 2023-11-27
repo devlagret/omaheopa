@@ -1962,7 +1962,7 @@ class APIController extends Controller
         ->where('company_id', Auth::user()->company_id)
         ->where('item_unit_id',$items['item_unit_id'])
         ->get()
-        ->pluck('item_unit_name','item_unit_id');
+        ->pluck('item_unit_name');
 
         if($item){
             return response([
