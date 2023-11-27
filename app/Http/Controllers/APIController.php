@@ -1974,6 +1974,7 @@ class APIController extends Controller
         foreach($item as $key => $val){
             // // $items = InvtItem::find($request->item_id);
             $category          = InvtItemCategory::select('*')
+            ->where('merchant_id', $val['merchant_id'])
             ->where('data_state', 0)
             ->where('company_id', Auth::user()->company_id)
             ->get()
