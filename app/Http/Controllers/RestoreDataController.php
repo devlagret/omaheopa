@@ -51,6 +51,8 @@ class RestoreDataController extends Controller
             'personal_access_tokens',
             'sessions',
             'users',
+            'sales_payment_reservation',
+            'sales_payment_reservation_item',
             ])
         ->pluck('Tables_in_'.$dbName)->flatten();
         foreach($tables as $val){
