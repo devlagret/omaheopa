@@ -2001,8 +2001,8 @@ class APIController extends Controller
     {
        // Helper::sales(item_id,qty,unit,dis%)->withJournal();
         // dd($request->all());
-        $transaction_module_code = 'SI';
-        $transaction_module_id  = $this->getTransactionModuleID($transaction_module_code);
+        // $transaction_module_code = 'SI';
+        // $transaction_module_id  = $this->getTransactionModuleID($transaction_module_code);
         $fields = $request->validate([
             'total_amount'              => 'required',
             'paid_amount'               => 'required',
@@ -2018,7 +2018,7 @@ class APIController extends Controller
         $data = array(
             'customer_name'             => $request->customer_name,
             'merchant_id'               => $request->merchant_id,
-            'sales_invoice_date'        =>   date('Y-m-d'),
+            'sales_invoice_date'        =>  date('Y-m-d'),
             'subtotal_item'             => $request->subtotal_item,
             'subtotal_amount'           => $request->subtotal_amount1,
             'discount_percentage_total' => $discount_percentage_total,
@@ -2394,5 +2394,8 @@ class APIController extends Controller
         return response([
             'message' => 'Data Berhasil Disimpan'
         ],201);
+    }
+    public function tes(){
+        return Auth::user();    
     }
 }

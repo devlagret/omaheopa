@@ -48,10 +48,9 @@ class PurchaseInvoicebyItemReportController extends Controller
         ->whereHas('invoice',function($query) use($start_date,$end_date,$warehouse_id){
             $query->where('purchase_invoice_date','>=',$start_date);
             $query->where('purchase_invoice_date','<=',$end_date);
-            if(!empty(Session::get('warehouse_id'))){
+            if(!empty($warehouse_id)){
                 $query->where('warehouse_id', $warehouse_id);
             }
-            $query->where('warehouse_id', $warehouse_id);
             $query->where('company_id', Auth::user()->company_id);
         })
         ->groupBy('item_id')->get();
@@ -115,10 +114,9 @@ class PurchaseInvoicebyItemReportController extends Controller
         ->whereHas('invoice',function($query) use($start_date,$end_date,$warehouse_id){
             $query->where('purchase_invoice_date','>=',$start_date);
             $query->where('purchase_invoice_date','<=',$end_date);
-            if(!empty(Session::get('warehouse_id'))){
+            if(!empty($warehouse_id)){
                 $query->where('warehouse_id', $warehouse_id);
             }
-            $query->where('warehouse_id', $warehouse_id);
             $query->where('company_id', Auth::user()->company_id);
         })
         ->groupBy('item_id')->get();
@@ -214,10 +212,9 @@ class PurchaseInvoicebyItemReportController extends Controller
         ->whereHas('invoice',function($query) use($start_date,$end_date,$warehouse_id){
             $query->where('purchase_invoice_date','>=',$start_date);
             $query->where('purchase_invoice_date','<=',$end_date);
-            if(!empty(Session::get('warehouse_id'))){
+            if(!empty($warehouse_id)){
                 $query->where('warehouse_id', $warehouse_id);
             }
-            $query->where('warehouse_id', $warehouse_id);
             $query->where('company_id', Auth::user()->company_id);
         })
         ->groupBy('item_id')->get();
