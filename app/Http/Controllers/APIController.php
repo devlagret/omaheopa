@@ -2067,7 +2067,7 @@ class APIController extends Controller
                     'created_id'                        => Auth::id(),
                     'updated_id'                        => Auth::id()
                 );
-                SalesInvoiceItem::create($dataarray)
+                SalesInvoiceItem::create($dataarray);
             // if(SalesInvoiceItem::create($dataarray)){
 
             //     // StockHelper::find($dataarray['item_id'])->sub((int)$dataarray['quantity'],$dataarray['item_unit_id']);
