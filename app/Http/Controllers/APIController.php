@@ -1950,7 +1950,7 @@ class APIController extends Controller
         }
         $category = $category->get();
 
-        $item   = InvtItem::select('*')
+        $item   = InvtItem::select('*','item_unit_id1')
         ->where('data_state', 0);
         if(Auth::id()!=1||Auth::user()->merchant_id!=null){
             $item->where('merchant_id',Auth::user()->merchant_id);
@@ -1960,7 +1960,7 @@ class APIController extends Controller
         // $items = InvtItem::find($request->item_id);
         $units          = InvtItemUnit::where('data_state', 0)
         ->where('company_id', Auth::user()->company_id)
-        ->where('item_unit_id',$item['item_unit_id'])
+        ->where('item_unit_id',$item['item_unit_id1'])
         ->get()
         ->pluck('item_unit_name');
 
