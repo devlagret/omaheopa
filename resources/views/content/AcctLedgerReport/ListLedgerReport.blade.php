@@ -248,8 +248,8 @@
     </div>
     <div class="card-footer text-muted">
         <div class="form-actions float-right">
-            <a class="btn btn-danger" href="/ledger-report/print"> Preview</a>
-            <a class="btn btn-primary" href="/ledger-report/export"><i class="fa fa-download"></i> Export Data</a>
+            <a class="btn btn-danger" href="{{route('print-ledger-report')}}"> Preview</a>
+            <a class="btn btn-primary" href="{{route('export-ledger-report')}}"><i class="fa fa-download"></i> Export Data</a>
         </div>
     </div>
   </div>

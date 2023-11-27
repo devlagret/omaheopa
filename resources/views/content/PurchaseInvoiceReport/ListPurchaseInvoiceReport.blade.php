@@ -136,8 +136,8 @@
     </div>
     <div class="card-footer text-muted">
         <div class="form-actions float-right">
-            <a class="btn btn-danger" href="/purchase-invoice-report/print"> Preview</a>
-            <a class="btn btn-primary" href="/purchase-invoice-report/export"><i class="fa fa-download"></i> Export Data</a>
+            <a class="btn btn-danger" href="{{route('print-purchase-invoice-report')}}"> Preview</a>
+            <a class="btn btn-primary" href="{{route('export-purchase-invoice-report')}}"><i class="fa fa-download"></i> Export Data</a>
         </div>
     </div>
   </div>

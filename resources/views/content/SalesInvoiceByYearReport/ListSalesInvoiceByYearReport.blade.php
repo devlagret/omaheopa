@@ -67,8 +67,8 @@
     </div>
     <div class="card-footer text-muted">
         <div class="form-actions float-right">
-            <a class="btn btn-danger" href="/sales-invoice-by-year-report/print"> Preview</a>
-            <a class="btn btn-primary" href="/sales-invoice-by-year-report/export"><i class="fa fa-download"></i> Export Data</a>
+            <a class="btn btn-danger" href="{{report('print-sales-invoice-by-year-report')}}"> Preview</a>
+            <a class="btn btn-primary" href="{{report('export-sales-invoice-by-year-report')}}"><i class="fa fa-download"></i> Export Data</a>
         </div>
     </div>
   </div>
