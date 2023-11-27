@@ -159,7 +159,7 @@
                                             <td style='text-align: right'>".number_format($nominal,2,'.',',')."</td>
                                             <td>".$status."</td>
                                             <td style='text-align:center'>
-                                                <a href='/journal-voucher/print/".$val['journal_voucher_id']."' class='btn btn-primary btn-sm' >Cetak Bukti</a>
+                                                <a href=route('/journal-voucher/print/".$val['journal_voucher_id']."') class='btn btn-primary btn-sm' >Cetak Bukti</a>
                                             </td>
                                         </tr>
                                     ";
