@@ -210,7 +210,7 @@ class SalesInvoiceByUserReportController extends Controller
 
         $pdf::writeHTML($tblStock1.$tblStock2.$tblStock3, true, false, false, false, '');
 
-        ob_clean();
+        
 
         $filename = 'Laporan_Penjualan_By_User_'.$start_date.'s.d.'.$end_date.'.pdf';
         $pdf::Output($filename, 'I');
@@ -328,7 +328,7 @@ class SalesInvoiceByUserReportController extends Controller
         
             }
             
-            ob_clean();
+            
             $filename='Laporan_Penjualan_By_User_'.$start_date.'_s.d._'.$end_date.'.xls';
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             header('Content-Disposition: attachment;filename="'.$filename.'"');

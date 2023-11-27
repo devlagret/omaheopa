@@ -376,7 +376,7 @@ class AcctLedgerReportController extends Controller
 
         $pdf::writeHTML($tblStock1.$tblStock2.$tblStock4, true, false, false, false, '');
         
-        ob_clean();
+        
 
         $filename = 'Buku_Besar_.pdf';
         $pdf::Output($filename, 'I');
@@ -588,7 +588,7 @@ class AcctLedgerReportController extends Controller
         
             }
             
-            ob_clean();
+            
             $filename='Buku_Besar.xls';
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             header('Content-Disposition: attachment;filename="'.$filename.'"');

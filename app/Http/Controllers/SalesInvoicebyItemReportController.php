@@ -164,7 +164,7 @@ class SalesInvoicebyItemReportController extends Controller
 
         $pdf::writeHTML($tblStock1.$tblStock2.$tblStock3, true, false, false, false, '');
 
-        ob_clean();
+        
 
         $filename = 'Laporan_Penjualan_Barang_'.$start_date.'s.d.'.$end_date.'.pdf';
         $pdf::Output($filename, 'I');
@@ -261,7 +261,7 @@ class SalesInvoicebyItemReportController extends Controller
         
             }
             
-            ob_clean();
+            
             $filename='Laporan_Penjualan_Barang_'.$start_date.'_s.d._'.$end_date.'.xls';
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             header('Content-Disposition: attachment;filename="'.$filename.'"');
@@ -424,7 +424,7 @@ class SalesInvoicebyItemReportController extends Controller
 
         $pdf::writeHTML($tblStock1.$tblStock2.$tblStock3, true, false, false, false, '');
 
-        ob_clean();
+        
 
         $filename = 'Laporan_Penjualan_Barang_Yang_Tidak_Terjual_'.$start_date.'s.d.'.$end_date.'.pdf';
         $pdf::Output($filename, 'I');
@@ -531,7 +531,7 @@ class SalesInvoicebyItemReportController extends Controller
         
             }
             
-            ob_clean();
+            
             $filename='Laporan_Penjualan_Barang_Yang_Tidak_Terjual_'.$start_date.'_s.d._'.$end_date.'.xls';
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             header('Content-Disposition: attachment;filename="'.$filename.'"');

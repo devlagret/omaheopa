@@ -419,7 +419,7 @@ class PurchaseOrderReturnController extends Controller
 
 
 
-        // ob_clean();
+        // 
 
         $filename = 'PO_' . $purchaseorderreturn['purchase_order_return_no'] . '.pdf';
         $pdf::Output($filename, 'I');
@@ -672,7 +672,7 @@ class PurchaseOrderReturnController extends Controller
 
 
 
-        // ob_clean();
+        // 
 
         $filename = 'PO_' . $purchaseorderreturn['purchase_order_return_no'] . '.pdf';
         $pdf::Output($filename, 'I');
