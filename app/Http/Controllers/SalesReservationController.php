@@ -11,6 +11,7 @@ use App\Models\InvtItemCategory;
 use App\Models\InvtItemUnit;
 use App\Models\JournalVoucher;
 use App\Models\JournalVoucherItem;
+use App\Models\PaymentReservation;
 use App\Models\PreferenceTransactionModule;
 use App\Models\SalesCustomer;
 use App\Models\SalesInvoice;
@@ -388,8 +389,13 @@ class SalesReservationController extends Controller
     public function detailSalesReservation($sales_invoice_reservation_id)
     {
         $salesinvoicereservation = SalesInvoiceReservation::where('sales_invoice_reservation_id', $sales_invoice_reservation_id)->first();
+        
         $salesinvoicereservationitem = SalesInvoiceReservationItem::where('sales_invoice_reservation_id', $sales_invoice_reservation_id)->get();
-        return view('content.SalesReservation.FormDetailSalesReservation', compact('salesinvoicereservation','salesinvoicereservationitem'));
+        
+        $paymentreservation = PaymentReservation::where('sales_invoice_reservation_id', $sales_invoice_reservation_id)->get();
+        // dd($paymentreservation);
+        
+        return view('content.SalesReservation.FormDetailSalesReservation', compact('salesinvoicereservation','salesinvoicereservationitem','paymentreservation'));
     }
     public function deleteSalesReservation($sales_invoice_reservation_id)
     {
@@ -487,6 +493,27 @@ class SalesReservationController extends Controller
             return redirect('/sales-reservation')->with('msg',$msg);
         }
     }
+
+
+    
+    public function reject($sales_invoice_reservation_id)
+    {
+        $sales_invoice_reservation = SalesInvoiceReservation::where('sales_invoice_reservation_id', $sales_invoice_reservation_id)->first();
+        $table_sales_invoice_reservation = SalesInvoiceReservation::findOrFail($sales_invoice_reservation['sales_invoice_reservation_id']);
+        $table_sales_invoice_reservation->sales_invoice_reservation_status = 2;
+        $table_sales_invoice_reservation->updated_id = Auth::id();
+
+        if($table_sales_invoice_reservation->save()){
+            $msg = "Batal Reservasi Berhasil";
+            return redirect('/sales-reservation')->with('msg',$msg);
+        } else {
+            $msg = "Batal Reservasi Gagal";
+            return redirect('/sales-reservation')->with('msg',$msg);
+        }
+    }
+
+
+
     public function addElementsSalesTiket(Request $request)
     {
         $salesinvoice  = Session::get('salesinvoice');

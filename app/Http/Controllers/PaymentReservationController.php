@@ -162,7 +162,7 @@ class PaymentReservationController extends Controller
 
         // $transaction_module_code = 'PH';
         // $transaction_module_id = $this->getTransactionModuleID($transaction_module_code);
-
+        
         $payable_amount = 0;
         for ($i=1; $i <= $request->total_invoice ; $i++) {
             if ($request['sales_invoice_reservation_id_'.$i] != null) {
@@ -173,10 +173,15 @@ class PaymentReservationController extends Controller
             }
         }
 
+
+        $sales_invoice_reservation = SalesInvoiceReservation::where('sales_invoice_reservation_id', $request['sales_invoice_reservation_id'])
+                ->first();
+
         $dataPayment = array(
             'company_id'        => Auth::user()->company_id,
             'account_id'        => $request->account_id,
             'supplier_id'       => $request->supplier_id,
+            'sales_invoice_reservation_id'    => $sales_invoice_reservation->sales_invoice_reservation_id,
             'payment_method'    => $request->payment_method,
             'payment_date'      => $request->payment_date,
             'payment_remark'    => $request->payment_remark,

@@ -28,7 +28,7 @@
                     var subtraction_amount = parseInt($('#subtraction_amount').val()) || 0;
                     var total_payable = subtotal_payable + parseInt(value || 0);
                     var final_total_payable = total_payable + subtraction_amount;
-                    var rounding_amount = total_payment + final_total_payable;
+                    var rounding_amount = final_total_payable - total_payment;
 
                     $('#subtotal_payable').val(total_payable);
                     $('#total_payable').val(final_total_payable);
@@ -40,9 +40,9 @@
                     var subtotal_payable = parseInt($('#subtotal_payable').val() || 0);
                     var total_payment = parseInt($('#total_payment').val() || 0);
                     var subtraction_amount = parseInt($('#subtraction_amount').val() || 0);
-                    var total_payable = subtotal_payable - parseInt(value || 0);
+                    var total_payable = subtotal_payable + parseInt(value || 0);
                     var final_total_payable = total_payable + subtraction_amount;
-                    var rounding_amount = total_payment + final_total_payable;
+                    var rounding_amount = final_total_payable - total_payment;
 
                     $('#subtotal_payable').val(total_payable);
                     $('#total_payable').val(final_total_payable);
@@ -53,7 +53,7 @@
                 }
             } else if (name == 'total_payment_view') {
                 var total_payable = parseInt($('#total_payable').val() || 0);
-                var rounding_amount = parseInt(value || 0) + total_payable;
+                var rounding_amount = total_payable  -  parseInt(value || 0);
 
                 $('#total_payment_view').val(toRp(value || 0));
                 $('#total_payment').val(value || 0);

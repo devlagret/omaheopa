@@ -201,6 +201,8 @@ Route::post('/sales-reservation/filter',[SalesReservationController::class, 'fil
 Route::post('/sales-reservation/select-data-unit', [SalesReservationController::class, 'getSelectDataUnit'])->name('select-data-unit-sales-reservation');
 Route::post('/sales-reservation/select-data-unit-price', [SalesReservationController::class, 'getUnitPrice'])->name('select-data-unit-price');
 Route::post('/sales-reservation/item', [SalesReservationController::class, 'getCoreItem'])->name('select-item-category-sales-reservation');
+Route::get('/sales-reservation/reject/{sales_invoice_reservation_id}', [SalesReservationController::class, 'reject'])->name('reject-sales-reservation');
+
 
 Route::get('/general-reservation',[GeneralReservationController::class, 'index'])->name('general-reservation');
 Route::post('/general-reservation/cost',[GeneralReservationController::class, 'getReservationCost'])->name('get-reservation-cost');
@@ -209,6 +211,7 @@ Route::post('/general-reservation/process-add-reservation', [GeneralReservationC
 Route::get('/general-reservation/edit-reservation/{reservation_id}', [GeneralReservationController::class, 'editReservation'])->name('edit-reservation');
 Route::post('/general-reservation/process-edit-reservation', [GeneralReservationController::class, 'processEditReservation'])->name('process-edit-reservation');
 Route::get('/general-reservation/delete-reservation/{reservation_id}', [GeneralReservationController::class, 'deleteReservation'])->name('delete-reservation');
+Route::post('/general-reservation/save-new-reservation', [GeneralReservationController::class,'saveNewReservation'])->name('save-new-reservation');
 
 Route::prefix('purchase-invoice')->name('pi.')->group(function () {
     Route::get('/', [PurchaseInvoiceController::class, 'index'])->name('index');

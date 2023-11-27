@@ -55,7 +55,7 @@ class GeneralReservationController extends Controller
                 $data = CoreReservation::create([
                     'reservation_name'      => $fields['reservation_name'],
                     'reservation_price'     => $fields['reservation_price'],
-                    'reservation_remark'     => $request->reservation_remark,
+                    'reservation_remark'    => $request->reservation_remark,
                     'item_status'           => 1,
                     'company_id'            => Auth::user()->company_id,
                     'created_id'            => Auth::id(),
@@ -67,6 +67,34 @@ class GeneralReservationController extends Controller
                 report($e);
                 $msg  = "Tambah  Master Reservasi Gagal";
                 return redirect('/general-reservation')->with('msg', $msg);
+            }
+
+    }
+
+    public function saveNewReservation(Request $request)
+    {
+        // dump($request->all());
+            $fields = $request->validate([
+                'reservation_name'    => 'required',
+                'reservation_price'         => 'required',
+            ]);
+            DB::beginTransaction();
+            try {
+                $data = CoreReservation::create([
+                    'reservation_name'      => $fields['reservation_name'],
+                    'reservation_price'     => $fields['reservation_price'],
+                    'reservation_remark'    => $request->reservation_remark,
+                    'item_status'           => 1,
+                    'company_id'            => Auth::user()->company_id,
+                    'created_id'            => Auth::id(),
+                ]);
+                DB::commit();
+                $msg    = "Tambah Master Reservasi Berhasil";
+                return redirect('/sales-reservation/add')->with('msg', $msg);
+            } catch (\Exception $e) {
+                report($e);
+                $msg  = "Tambah  Master Reservasi Gagal";
+                return redirect('/sales-reservation/add')->with('msg', $msg);
             }
 
     }
