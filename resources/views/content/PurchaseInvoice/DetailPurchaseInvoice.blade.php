@@ -183,8 +183,13 @@
                             <td colspan = "2" style='text-align  : right !important;'>{{ number_format($purchaseinvoice['paid_amount'],2,',','.') }}</td>
                         </tr>
                         <tr>
-                            <td colspan = "4"><b>Sisa</b></td>
+                            @if($purchaseinvoice['purchase_payment_method'])
+                            <td colspan = "4"><b>Hutang</b></td>
                             <td colspan = "2" style='text-align  : right !important;'>{{ number_format($purchaseinvoice['owing_amount'],2,',','.') }}</td>
+                            @else
+                            <td colspan = "4"><b>Kembalian</b></td>
+                            <td colspan = "2" style='text-align  : right !important;'>{{ number_format(($purchaseinvoice->paid_amount-$purchaseinvoice->total_amount),2,',','.') }}</td>
+                            @endif
                         </tr>
                         </tbody>
                     </table>
