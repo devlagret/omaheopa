@@ -1936,21 +1936,33 @@ class APIController extends Controller
 
     public function getSalesTiketMerchant()
     {
-        $merchant   = InvtItem::select('*')
+        $item   = InvtItem::select('*')
         ->where('data_state', 0);
         if(Auth::id()!=1||Auth::user()->merchant_id!=null){
-            $merchant->where('merchant_id',Auth::user()->merchant_id);
+            $item->where('merchant_id',Auth::user()->merchant_id);
         }
-        $merchant = $merchant->get();
+        $item = $item->get();
 
         $units   = InvtItemUnit::where('data_state', 0)
         ->where('company_id', Auth::user()->company_id)
         ->get();
 
-        if($merchant){
+        $units   = InvtItemUnit::where('data_state', 0)
+        ->where('company_id', Auth::user()->company_id)
+        ->get();
+
+        $merchant   = SalesMerchant::where('data_state', 0);
+        if(Auth::id()!=1||Auth::user()->merchant_id!=null){
+            $merchant->where('merchant_id',Auth::user()->merchant_id);
+        }
+        $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
+
+        if($item){
             return response([
-                'data' => $merchant,
-                'unit' => $units
+                'data' => $item,
+                'unit' => $units,
+                'merchant' => $merchant
+
             ],201);
         }else{
             return response([
