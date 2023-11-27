@@ -1978,7 +1978,7 @@ class APIController extends Controller
             ->where('data_state', 0)
             ->where('company_id', Auth::user()->company_id)
             ->get()
-            ->pluck('item_category_name','item_category_id');
+            ->pluck('item_category_name','merchant_id');
             $val['item_category_name'] = $category;
             
             foreach($item as $key => $val){
