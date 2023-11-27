@@ -91,7 +91,7 @@ class APIController extends Controller
         $user_state->save();
 
         $user_state->tokens()->delete();
-        
+
         $login_log = array(
             'user_id'          => $user['user_id'],
             'company_id'       => $user['company_id'],
@@ -134,8 +134,8 @@ class APIController extends Controller
 
         // Check username
         $user = User::findOrFail($fields['user_id']);
-        
-        if(!Hash::check($fields['old_password'], $user->password)){ 
+
+        if(!Hash::check($fields['old_password'], $user->password)){
             return response([
                 'message' => 'Password Lama Tidak Sesuai'
             ],401);
@@ -221,7 +221,7 @@ class APIController extends Controller
 
         if($invtcategory){
             return response([
-                'data' => $invtcategory 
+                'data' => $invtcategory
             ],201);
         }else{
             return response([
@@ -344,7 +344,7 @@ class APIController extends Controller
         }else{
             return response([
                 'message' => 'Data Tidak Berhasil Disimpan'
-            ],401);            
+            ],401);
         }
 
 
@@ -376,7 +376,7 @@ class APIController extends Controller
         }else{
             return response([
                 'message' => 'Data Tidak Berhasil Disimpan'
-            ],401);            
+            ],401);
         }
 
 
@@ -441,7 +441,7 @@ class APIController extends Controller
         }else{
             return response([
                 'message' => 'Data Tidak Berhasil Disimpan'
-            ],401);            
+            ],401);
         }
     }
 
@@ -481,7 +481,7 @@ class APIController extends Controller
         }else{
             return response([
                 'message' => 'Data Tidak Berhasil Disimpan'
-            ],401);            
+            ],401);
         }
     }
 
@@ -554,7 +554,7 @@ class APIController extends Controller
                     'created_id'                        => $fields['user_id'],
                     'company_id'                        => $company_id['company_id']
                 );
-                
+
                 if(SalesInvoiceItem::create($data_item)){
                     $itemstock = InvtItemStock::where('item_id', $data_item['item_id'])->first();
                     if($itemstock){
@@ -564,7 +564,7 @@ class APIController extends Controller
                 }else{
                     return response([
                         'message' => 'Data Tidak Berhasil Disimpan'
-                    ],401);            
+                    ],401);
                 }
             }
 
@@ -576,10 +576,10 @@ class APIController extends Controller
                 $item->item_remark = $val['description'];
                 $item->save();
             }
-            
+
             $transaction_module_code = 'PJL';
             $transaction_module_id  = $this->getTransactionModuleID($transaction_module_code);
-            
+
             $journal = array(
                 'company_id'                    => $company_id['company_id'],
                 'journal_voucher_status'        => 1,
@@ -648,13 +648,13 @@ class APIController extends Controller
                 );
                 JournalVoucherItem::create($journal_credit);
             }
-            
+
         }else{
             return response([
                 'message' => 'Data Tidak Berhasil Disimpan'
-            ],401);            
+            ],401);
         }
-        
+
 
         return response([
             'message' => 'Data Berhasil Disimpan'
@@ -757,7 +757,7 @@ class APIController extends Controller
                     'created_id'                        => $fields['user_id'],
                     'company_id'                        => $company_id['company_id']
                 );
-                
+
                 if(SalesInvoiceItem::create($data_item)){
                     $itemstock = InvtItemStock::where('item_id', $data_item['item_id'])->first();
                     if($itemstock){
@@ -767,10 +767,10 @@ class APIController extends Controller
                 }else{
                     return response([
                         'message' => 'Data Tidak Berhasil Disimpan'
-                    ],401);            
+                    ],401);
                 }
             }
-            
+
             foreach($request->descriptions as $key => $val){
                 $item = SalesInvoiceItem::where('item_id', $val['item_id'])
                 ->where('sales_invoice_id', $salesinvoicelast['sales_invoice_id'])
@@ -782,9 +782,9 @@ class APIController extends Controller
         }else{
             return response([
                 'message' => 'Data Tidak Berhasil Disimpan'
-            ],401);            
+            ],401);
         }
-        
+
 
         return response([
             'message' => 'Data Berhasil Disimpan'
@@ -806,7 +806,7 @@ class APIController extends Controller
         ->join('preference_company', 'preference_company.company_id', 'system_user.company_id')
         ->where('system_user.user_id', $fields['user_id'])
         ->first();
-        
+
         if($fields['index_button'] <= 8){
             $payment_method = 0;
         }else if($fields['index_button'] == 9){
@@ -826,11 +826,11 @@ class APIController extends Controller
         $salesinvoice->paid_amount = $fields['paid_amount'];
         $salesinvoice->change_amount = $fields['paid_amount'] - ($salesinvoice->subtotal_amount - $fields['discount_amount_total']);
         $salesinvoice->payment_method = $payment_method;
-        if($salesinvoice->save()){  
-            
+        if($salesinvoice->save()){
+
             $transaction_module_code = 'PJL';
             $transaction_module_id  = $this->getTransactionModuleID($transaction_module_code);
-            
+
             $journal = array(
                 'company_id'                    => $company_id['company_id'],
                 'journal_voucher_status'        => 1,
@@ -902,11 +902,11 @@ class APIController extends Controller
 
             return response([
                 'message' => 'Data Berhasil Disimpan'
-            ],201);         
+            ],201);
         }else{
             return response([
                 'message' => 'Data Tidak Berhasil Disimpan'
-            ],401); 
+            ],401);
         }
     }
 
@@ -935,7 +935,7 @@ class APIController extends Controller
             ->join('invt_item', 'sales_invoice_item.item_id', 'invt_item.item_id')
             ->where('sales_invoice_item.sales_invoice_id', $val['sales_invoice_id'])
             ->get();
-            
+
             $no = 0;
             foreach($salesinvoiceitem as $keyy => $vall){
                 if($no == 0){
@@ -988,7 +988,7 @@ class APIController extends Controller
             ->join('invt_item', 'sales_invoice_item.item_id', 'invt_item.item_id')
             ->where('sales_invoice_item.sales_invoice_id', $val['sales_invoice_id'])
             ->get();
-            
+
             $no = 0;
             foreach($salesinvoiceitem as $keyy => $vall){
                 if($no == 0){
@@ -1076,7 +1076,7 @@ class APIController extends Controller
             ],401);
         }
     }
-    
+
 
     public function insertCapitalMoney(Request $request){
         $fields = $request->validate([
@@ -1094,7 +1094,7 @@ class APIController extends Controller
         ->where('capital_money_date', substr($fields['capital_money_date'],0,10))
         ->where('company_id', $company_id['company_id'])
         ->first();
-        
+
         if($capitalmoney){
             $capitalmoney->capital_money_amount = $fields['capital_money_amount'];
             if($capitalmoney->save()){
@@ -1104,7 +1104,7 @@ class APIController extends Controller
             }else{
                 return response([
                     'message' => 'Data Tidak Berhasil Disimpan'
-                ],401);            
+                ],401);
             }
         }else{
             $data = array(
@@ -1113,7 +1113,7 @@ class APIController extends Controller
                 'capital_money_date'        => $fields['capital_money_date'],
                 'created_id'                => $fields['user_id'],
             );
-    
+
             if(CapitalMoney::create($data)){
                 return response([
                     'message' => 'Data Berhasil Disimpan',
@@ -1121,12 +1121,12 @@ class APIController extends Controller
             }else{
                 return response([
                     'message' => 'Data Tidak Berhasil Disimpan'
-                ],401);            
+                ],401);
             }
         }
 
     }
-    
+
 
     public function insertExpenditure(Request $request){
         $fields = $request->validate([
@@ -1153,7 +1153,7 @@ class APIController extends Controller
         if(Expenditure::create($data)){
             $transaction_module_code = 'PGL';
             $transaction_module_id  = $this->getTransactionModuleID($transaction_module_code);
-            
+
             $journal = array(
                 'company_id'                    => $company_id['company_id'],
                 'journal_voucher_status'        => 1,
@@ -1230,10 +1230,10 @@ class APIController extends Controller
         }else{
             return response([
                 'message' => 'Pengeluaran Tidak Berhasil Disimpan'
-            ],401);            
+            ],401);
         }
     }
-    
+
 
     public function getExpenditure(Request $request){
         $fields = $request->validate([
@@ -1330,7 +1330,7 @@ class APIController extends Controller
         ->where('data_state', 0)
         ->where('payment_method', 4)
         ->get();
-        
+
         $salesinvoiceitem = SalesInvoiceItem::select('invt_item.item_name', DB::raw('SUM(sales_invoice_item.quantity) as `quantity`'), DB::raw('SUM(sales_invoice_item.subtotal_amount) as `subtotal_amount`'))
         ->join('invt_item', 'invt_item.item_id', 'sales_invoice_item.item_id')
         ->join('sales_invoice', 'sales_invoice.sales_invoice_id', 'sales_invoice_item.sales_invoice_id')
@@ -1341,7 +1341,7 @@ class APIController extends Controller
         ->where('sales_invoice.data_state', 0)
         ->groupBy('sales_invoice_item.quantity', 'sales_invoice_item.subtotal_amount', 'invt_item.item_name')
         ->get();
-        
+
         $expenditure = Expenditure::select('*')
         ->where('expenditure_date', '>=', substr($fields['dashboard_start_date'],0,10))
         ->where('expenditure_date', '<=', substr($fields['dashboard_end_date'],0,10))
@@ -1410,7 +1410,7 @@ class APIController extends Controller
         if($capitalmoneytoday){
             $capital_money_today = $capitalmoneytoday['capital_money_amount'];
         }
-        
+
         return response([
             'sales_cash_subtotal'       => $sales_cash_subtotal,
             'sales_gopay_subtotal'      => $sales_gopay_subtotal,
@@ -1446,7 +1446,7 @@ class APIController extends Controller
         ->join('system_user', 'system_user.user_id', 'sales_invoice.created_id')
         ->where('sales_invoice.sales_invoice_id', $fields['sales_invoice_id'])
         ->first();
-        
+
         $salesinvoiceitem = SalesInvoiceItem::select('sales_invoice_item.*', 'invt_item.item_name')
         ->join('invt_item','invt_item.item_id', 'sales_invoice_item.item_id')
         ->where('sales_invoice_item.sales_invoice_id', $fields['sales_invoice_id'])
@@ -1456,7 +1456,7 @@ class APIController extends Controller
         ->join('preference_company', 'preference_company.company_id', 'system_user.company_id')
         ->where('system_user.user_id', $fields['user_id'])
         ->first();
-        
+
         return response([
             'salesinvoice'          => $salesinvoice,
             'salesinvoiceitem'      => $salesinvoiceitem,
@@ -1479,13 +1479,13 @@ class APIController extends Controller
         ->join('preference_company', 'preference_company.company_id', 'system_user.company_id')
         ->where('system_user.user_id', $fields['user_id'])
         ->first();
-        
+
         return response([
             'expenditure'           => $expenditure,
             'preferencecompany'     => $preferencecompany
         ],201);
     }
-    
+
     public function getDashboardPrintData(Request $request){
         $fields = $request->validate([
             'user_id'                 => 'required',
@@ -1549,7 +1549,7 @@ class APIController extends Controller
         ->where('data_state', 0)
         ->where('payment_method', 4)
         ->get();
-        
+
         $salesinvoiceitem = SalesInvoiceItem::select('invt_item.item_name', DB::raw('SUM(sales_invoice_item.quantity) as `quantity`'), DB::raw('SUM(sales_invoice_item.subtotal_amount) as `subtotal_amount`'))
         ->join('invt_item', 'invt_item.item_id', 'sales_invoice_item.item_id')
         ->join('sales_invoice', 'sales_invoice.sales_invoice_id', 'sales_invoice_item.sales_invoice_id')
@@ -1560,7 +1560,7 @@ class APIController extends Controller
         ->where('sales_invoice.data_state', 0)
         ->groupBy('sales_invoice_item.quantity', 'sales_invoice_item.subtotal_amount', 'invt_item.item_name')
         ->get();
-        
+
         $expenditure = Expenditure::select('*')
         ->where('expenditure_date', '>=', substr($fields['dashboard_start_date'],0,10))
         ->where('expenditure_date', '<=', substr($fields['dashboard_end_date'],0,10))
@@ -1630,7 +1630,7 @@ class APIController extends Controller
         if($capitalmoneytoday){
             $capital_money_today = $capitalmoneytoday['capital_money_amount'];
         }
-        
+
         return response([
             'sales_cash_subtotal'   => $sales_cash_subtotal,
             'sales_gopay_subtotal'  => $sales_gopay_subtotal,
@@ -1694,7 +1694,7 @@ class APIController extends Controller
         ];
 
         return response($response, 201);
-    } 
+    }
 
     //!KASIH IBU
 
@@ -1711,7 +1711,7 @@ class APIController extends Controller
             'index_button'          => 'required',
             'item_cost'             => 'required',
         ]);
-        
+
         $company_id = User::select('preference_company.company_id')
         ->join('preference_company', 'preference_company.company_id', 'system_user.company_id')
         ->where('system_user.user_id', $fields['user_id'])
@@ -1767,7 +1767,7 @@ class APIController extends Controller
                 'created_id'                        => $fields['user_id'],
                 'company_id'                        => $company_id['company_id']
             );
-            
+
             if(SalesInvoiceItem::create($data_item)){
                 $itemstock = InvtItemStock::where('item_id', $data_item['item_id'])->first();
                 if($itemstock){
@@ -1777,12 +1777,12 @@ class APIController extends Controller
             }else{
                 return response([
                     'message' => 'Data Tidak Berhasil Disimpan'
-                ],401);            
+                ],401);
             }
-            
+
             $transaction_module_code = 'PJL';
             $transaction_module_id  = $this->getTransactionModuleID($transaction_module_code);
-            
+
             $journal = array(
                 'company_id'                    => $company_id['company_id'],
                 'journal_voucher_status'        => 1,
@@ -1901,13 +1901,13 @@ class APIController extends Controller
                 );
                 JournalVoucherItem::create($journal_credit);
             }
-            
+
         }else{
             return response([
                 'message' => 'Data Tidak Berhasil Disimpan'
-            ],401);            
+            ],401);
         }
-        
+
 
         return response([
             'message' => 'Data Berhasil Disimpan'
@@ -1916,7 +1916,7 @@ class APIController extends Controller
 
     //API TIKET Penjualan Wahana
 
-    
+
     public function getTransServiceDisposition(){
         $units          = InvtItemUnit::where('data_state', 0)
         ->where('company_id', Auth::user()->company_id)
@@ -1933,10 +1933,10 @@ class APIController extends Controller
         $sales  = SalesInvoice::select('*')
         ->where('data_state', 0)
         ->where('company_id', Auth::user()->company_id)
-        ->where('sales_status',1)
+        ->where('sales_status',0)
         ->orderByDesc('created_at')
         ->get();
-        
+
         if($sales){
             return response([
                 'data' => $sales,
@@ -1961,7 +1961,7 @@ class APIController extends Controller
 
         // $category = InvtItemCategory::select('item_category_id', 'item_category_name');
         // if (Auth::id()!=1||Auth::user()->merchant_id!=null) {
-            
+
         //     $category->where('merchant_id', $request->merchant_id);
         // }
         // $category = $category->get()->pluck('item_category_name', 'item_category_id');
@@ -1986,7 +1986,7 @@ class APIController extends Controller
 
         if($item){
             return response([
-                'data' => $item, 
+                'data' => $item,
                 // 'unit' => $units,
                 // 'merchant' => $merchant,
                 // 'category' => $category
@@ -2087,7 +2087,7 @@ class APIController extends Controller
             // }else{
             //     return response([
             //         'message' => 'Data Tidak Berhasil Disimpan'
-            //     ],401);  
+            //     ],401);
             // }
 
             // $account_setting_name = 'sales_cash_account';
@@ -2149,7 +2149,7 @@ class APIController extends Controller
         } else{
             return response([
                 'message' => 'Data Tidak Berhasil Disimpan'
-            ],401);            
+            ],401);
         }
     }
     //END API TIKET Penjualan Wahana
@@ -2157,13 +2157,14 @@ class APIController extends Controller
 
     //API TIKET Penjualan UMUM
     public function getHistorySalesTiket(Request $request)
-    {   
+    {
         $sales  = SalesInvoice::select('*')
         ->where('data_state', 0)
         ->where('company_id', Auth::user()->company_id)
         ->where('sales_status', 1)
+        ->orderByDesc('created_at')
         ->get();
-        
+
         if($sales){
             return response([
                 'data' => $sales,
@@ -2177,7 +2178,7 @@ class APIController extends Controller
     }
 
     public function getSalesTiketItem(Request $request)
-    {   
+    {
         $fields = $request->validate([
             'user_id'           => 'required',
             'item_id'           => 'required',
@@ -2196,7 +2197,7 @@ class APIController extends Controller
         ->where('item_status',1)
         // ->orderBy('item_id', 'ASC')
         ->get();
-        
+
         if($items){
             return response([
                 'data' => $items,
@@ -2210,7 +2211,7 @@ class APIController extends Controller
     }
 
     public function getSalesTiket(Request $request)
-    {   
+    {
         $fields = $request->validate([
             'user_id'           => 'required',
 
@@ -2227,7 +2228,7 @@ class APIController extends Controller
         ->where('item_status',1)
         // ->orderBy('item_id', 'ASC')
         ->get();
-        
+
         if($items){
             return response([
                 'data' => $items,
@@ -2326,7 +2327,7 @@ class APIController extends Controller
             }else{
                 return response([
                     'message' => 'Data Tidak Berhasil Disimpan'
-                ],401);  
+                ],401);
             }
 
             // $account_setting_name = 'sales_cash_account';
@@ -2387,13 +2388,13 @@ class APIController extends Controller
         } else{
             return response([
                 'message' => 'Data Tidak Berhasil Disimpan'
-            ],401);            
+            ],401);
         }
-        
 
-    
+
+
     }
     public function tes(){
-        return Auth::user();    
+        return Auth::user();
     }
 }
