@@ -1964,35 +1964,36 @@ class APIController extends Controller
         // }
         // $category = $category->get()->pluck('item_category_name', 'item_category_id');
 
-        $item   = InvtItemCategory::with('merchant','item')
+        $item   = InvtItem::with('merchant','category')
         ->where('data_state', 0);
         if(Auth::id()!=1||Auth::user()->merchant_id!=null){
             $item->where('merchant_id',Auth::user()->merchant_id);
         }
         $item = $item->get();
 
-        // foreach($item as $key => $val){
+        foreach($item as $key => $val){
             // // $items = InvtItem::find($request->item_id);
-            // $category          = InvtItem::select('*')
-            // ->where('merchant_id', $val['merchant_id'])
-            // ->where('data_state', 0)
-            // ->where('company_id', Auth::user()->company_id)
-            // ->get()
-            // ->pluck('item_category_name','merchant_id');
-            // $val['item_category_name'] = $category;
+            $category          = InvtItemCategory::select('*')
+            ->where('item_category_id', $val['item_category_id'])
+            ->where('data_state', 0)
+            ->where('company_id', Auth::user()->company_id)
+            ->get()
+            ->pluck('item_category_name','item_category_id');
+            $val['item_category_name'] = $category;
+    
             
             foreach($item as $key => $val){
                 // // $items = InvtItem::find($request->item_id);
-                $units  = InvtItemUnit::select('*')
-                ->where('item_unit_id', $val['item']['item_unit_id1'])
+                $units          = InvtItemUnit::select('*')
+                ->where('item_unit_id', $val['item_unit_id1'])
                 ->where('data_state', 0)
                 ->where('company_id', Auth::user()->company_id)
                 ->get()
                 ->pluck('item_unit_name','item_unit_id');
-                $val['item_unit_name'] = $units;
             }
+        $val['item_unit_name'] = $units;
 
-        // }
+        }
 
         if($item){
             return response([
