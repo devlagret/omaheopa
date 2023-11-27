@@ -47,7 +47,7 @@
             <div class="form-group">
                 <input class="form-control input-bb" name="company_id" id="company_id" type="text" autocomplete="off" value="{{ $data['company_id'] }}" hidden/>
                   <a class="text-dark">Merchant</a>
-                  {!! Form::select('tiket_status',  $tiket, 0,['class' => 'selection-search-clear select-form', 'id' => 'tiket_status', 'name' => 'tiket_status']) !!}
+                  {!! Form::select(0,  $tiket, $data->pluck('tiket_status','company_id'),['class' => 'selection-search-clear select-form', 'id' => 'tiket_status', 'name' => 'tiket_status']) !!}
               </div>
           </div>
         </div>
