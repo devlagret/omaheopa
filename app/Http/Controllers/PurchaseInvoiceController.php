@@ -49,7 +49,7 @@ class PurchaseInvoiceController extends Controller
         }
         Session::forget('datases');
         Session::forget('items');
-        Session::forget('arraydatases');
+        Session::forget('purchase-item');
         Session::forget('purchase-token');
         $data = PurchaseInvoice::with('supplier')->where('data_state', 0)
             ->where('company_id', Auth::user()->company_id)
