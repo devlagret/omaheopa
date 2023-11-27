@@ -1941,7 +1941,7 @@ class APIController extends Controller
         if(Auth::id()!=1||Auth::user()->merchant_id!=null){
             $merchant->where('merchant_id',Auth::user()->merchant_id);
         }
-        
+
         $merchant = $merchant->get()->pluck('merchant_name', 'merchant_id');
 
         $category = InvtItemCategory::select('item_category_id', 'item_category_name');
@@ -1949,7 +1949,7 @@ class APIController extends Controller
             
             $category->where('merchant_id', $request->merchant_id);
         }
-        $category = $category->get();
+        $category = $category->get()->pluck('item_category_name', 'item_category_id');
 
         $item   = InvtItem::select('*')
         ->where('data_state', 0);
