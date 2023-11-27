@@ -146,7 +146,7 @@
 						<th width="15%" style="vertical-align : middle;text-align:center;">Kredit</th>
                     </tr>
                 </thead>
-                {{-- <tbody>
+                <tbody>
                     <tr>
                         <th style="text-align: center" colspan="5">Saldo Awal</th>
                         <td></td>
@@ -242,7 +242,7 @@
                         <td style="text-align: right">{{ number_format($last_balance_debit,2,'.',',') }}</td>
                         <td style="text-align: right">{{ number_format($last_balance_credit,2,'.',',') }}</td>
                     </tr>
-                </tbody> --}}
+                </tbody>
             </table>
         </div>
     </div>

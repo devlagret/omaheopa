@@ -76,17 +76,17 @@ class AcctLedgerReportController extends Controller
         
         $accountbalancedetail = AcctAccountBalanceDetail::join('acct_account', 'acct_account.account_id','=','acct_account_balance_detail.account_id')
         ->where('acct_account_balance_detail.account_id' ,$account_id)
-        // ->whereMonth('acct_account_balance_detail.transaction_date','>=',$start_month)
-        // ->whereMonth('acct_account_balance_detail.transaction_date','<=',$end_month)
-        // ->whereYear('acct_account_balance_detail.transaction_date',$year)
+        ->whereMonth('acct_account_balance_detail.transaction_date','>=',$start_month)
+        ->whereMonth('acct_account_balance_detail.transaction_date','<=',$end_month)
+        ->whereYear('acct_account_balance_detail.transaction_date',$year)
         // ->where('acct_account_balance_detail.company_id', Auth::user()->company_id)
         ->orderBy('acct_account_balance_detail.transaction_date', 'ASC')
         ->orderBy('acct_account_balance_detail.account_balance_detail_id', 'ASC')
         ->get();
         $accountbalancedetail_old = AcctAccountBalanceDetail::join('acct_account', 'acct_account.account_id','=','acct_account_balance_detail.account_id')
         ->where('acct_account_balance_detail.account_id' ,$account_id)
-        // ->whereMonth('acct_account_balance_detail.transaction_date',$start_month-1)
-        // ->whereYear('acct_account_balance_detail.transaction_date',$year)
+        ->whereMonth('acct_account_balance_detail.transaction_date',$start_month-1)
+        ->whereYear('acct_account_balance_detail.transaction_date',$year)
         // ->where('acct_account_balance_detail.company_id', Auth::user()->company_id)
         ->orderBy('acct_account_balance_detail.transaction_date', 'DESC')
         ->orderBy('acct_account_balance_detail.account_balance_detail_id', 'DESC')
@@ -136,7 +136,7 @@ class AcctLedgerReportController extends Controller
             );
             array_push($acctgeneralledgerreport, $acctgeneralledgerreport_detail);
         }
-        dd($acctgeneralledgerreport);
+        // dd($acctgeneralledgerreport);
   
         return view('content.AcctLedgerReport.ListLedgerReport', compact('monthlist','yearlist','accountlist', 'acctgeneralledgerreport','accountbalancedetail_old','account','year','start_month','end_month','account_id'));
     }
