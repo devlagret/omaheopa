@@ -3,11 +3,11 @@
 @section('title',  "MOZAIC Omah'e Opa")
 @section('js')
 <script>
-/*
+
     function function_elements_add(name, value){
 		$.ajax({
 				type: "POST",
-				url : "{{route('add-item-unit-elements')}}",
+				url : "{{route('add-warehouse-elements')}}",
 				data : {
                     'name'      : name,
                     'value'     : value,
@@ -20,14 +20,14 @@
     function reset_add(){
 		$.ajax({
 				type: "GET",
-				url : "{{route('add-reset-item-unit')}}",
+				url : "{{route('add-reset-warehouse')}}",
 				success: function(msg){
                     location.reload();
 			}
 
 		});
 	}
-*/
+
 $(document).ready(function() {
         if($("#gp").is(":checked")){
             $('#input-merchant').hide();
