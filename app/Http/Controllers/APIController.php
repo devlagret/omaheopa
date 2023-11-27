@@ -2142,16 +2142,14 @@ class APIController extends Controller
             // JournalVoucherItem::create($journal_credit);
 
             $msg = 'Tambah Tiket Penjualan Berhasil';
-            return redirect('/sales-tiket/add')->with('msg',$msg);
+            return  response([
+                'message' => 'Data Berhasil Disimpan'
+            ],201); ;
         } else{
             return response([
                 'message' => 'Data Tidak Berhasil Disimpan'
             ],401);            
         }
-        
-        return response([
-            'message' => 'Data Berhasil Disimpan'
-        ],201);
     }
     //END API TIKET Penjualan Wahana
 
@@ -2382,8 +2380,9 @@ class APIController extends Controller
             // );
             // JournalVoucherItem::create($journal_credit);
 
-            $msg = 'Tambah Tiket Penjualan Berhasil';
-            return redirect('/sales-tiket/add')->with('msg',$msg);
+            return response([
+                'message' => 'Data Berhasil Disimpan'
+            ],201);
         } else{
             return response([
                 'message' => 'Data Tidak Berhasil Disimpan'
@@ -2391,9 +2390,7 @@ class APIController extends Controller
         }
         
 
-        return response([
-            'message' => 'Data Berhasil Disimpan'
-        ],201);
+    
     }
     public function tes(){
         return Auth::user();    
