@@ -1966,7 +1966,7 @@ class APIController extends Controller
 
         if($item){
             return response([
-                'data' => $item, 
+                'data' => $item,$units, 
                 // 'unit' => $units,
                 // 'merchant' => $merchant,
                 // 'category' => $category
