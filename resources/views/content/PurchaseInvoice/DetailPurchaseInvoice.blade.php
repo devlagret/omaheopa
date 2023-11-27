@@ -5,6 +5,10 @@
 <script>
 
 @if(!empty($purchaseinvoice->item))
+        @php
+            $count = count($purchaseinvoice->item);
+            $no = 1;
+        @endphp
         const datamdl = {
             @foreach ($purchaseinvoice->item as $key => $val)
                 {{$val->purchase_invoice_item_id}}:{"Kategori": "{{$val->category->item_category_name??'-'}}",
@@ -13,7 +17,7 @@
                             @if (!empty($val['discount_percentage'])&&$val['discount_percentage']!=0)
                             ,"Diskon":"{{$val['discount_amount']}} ({{$val['discount_percentage']}}%)"
                             @endif
-                            }
+                            }@if ($count>1&&$no!=$count){{','}}@endif @php $no++; @endphp
             @endforeach
             };
         @endif

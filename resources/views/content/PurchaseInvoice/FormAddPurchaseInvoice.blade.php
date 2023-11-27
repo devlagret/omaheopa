@@ -695,6 +695,10 @@
         }
         $('#purchase_invoice_due_day').val(diff);
         @if(!empty($arraydatases))
+        @php
+            $count = count($arraydatases);
+            $no = 1;
+        @endphp
         const datamdl = {
             @foreach ($arraydatases as $key => $val)
                 {{$key}}:{"Kategori": "{{$val['item_category_name']??'-'}}",
@@ -703,7 +707,7 @@
                             @if (!empty($val['discount_percentage'])&&$val['discount_percentage']!=0)
                             ,"Diskon":"{{$val['discount_amount']}} ({{$val['discount_percentage']}}%)"
                             @endif
-                            }
+                            }@if ($count>1&&$no!=$count){{','}}@endif @php $no++; @endphp
             @endforeach
             };
         @endif
