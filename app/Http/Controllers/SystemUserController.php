@@ -37,7 +37,7 @@ class SystemUserController extends Controller
      */
     public function index()
     {
-        $systemuser = User::with('merchant')->where('data_state','=','0')
+        $systemuser = User::with('merchant')->where('data_state','0')
         ->where('company_id', Auth::user()->company_id)
         ->where('user_level', 0)
         ->get();
@@ -58,12 +58,12 @@ class SystemUserController extends Controller
     public function processAddSystemUser(Request $request)
     {
         $fields = $request->validate([
-            'name'                  => 'required',
+            'name'                  => 'required|unique:system_user,name,null,user_id,data_state,0',
             'full_name'             => 'required',
             'password'              => 'required',
             'user_group_id'         => 'required',
             'merchant_id'            => 'required'
-        ]);
+        ],['name.unique'=>'Username Sudah Digunakan, Harap Gunakan Username Lain!']);
         try {
         DB::beginTransaction();
         User::create([
@@ -106,12 +106,12 @@ class SystemUserController extends Controller
     public function processEditSystemUser(Request $request)
     {
         $fields = $request->validate([
-            'user_id'                   => 'required',
+            'user_id'                   => 'required|unique:system_user,name,null,user_id,data_state,0',
             'name'                      => 'required',
             'full_name'                 => 'required',
             'user_group_id'             => 'required',
             'merchant_id'                => 'required'
-        ]);
+        ],['name.unique'=>'Username Sudah Digunakan, Harap Gunakan Username Lain!']);
 
         $user                   = User::findOrFail($fields['user_id']);
         $user->name             = $fields['name'];
@@ -136,7 +136,7 @@ class SystemUserController extends Controller
     public function deleteSystemUser($user_id)
     {
         $user = User::findOrFail($user_id);
-        $user->data_state = 1;
+        $user->data_state = '1';
         if($user->save())
         {
             $msg = 'Hapus System User Berhasil';

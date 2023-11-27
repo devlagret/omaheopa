@@ -39,6 +39,13 @@ function openform(){
     {{session('msg')}}
 </div>
 @endif
+@if(count($errors) > 0)
+<div class="alert alert-danger" role="alert">
+    @foreach ($errors->all() as $error)
+              <li>{{ $error }}</li>
+    @endforeach
+</div>
+@endif
     <div class="card border border-dark">
     <div class="card-header border-dark bg-dark">
         <h5 class="mb-0 float-left">
