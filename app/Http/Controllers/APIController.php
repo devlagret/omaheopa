@@ -2028,7 +2028,7 @@ class APIController extends Controller
             'total_amount'              => $fields['total_amount'],
             'paid_amount'               => $fields['paid_amount'],
             'change_amount'             => $request->change_amount,
-            // 'sales_status'              => 0,
+            'sales_status'              => 0,
             'company_id'                => Auth::user()->company_id,
             'created_id'                => Auth::id(),
             'updated_id'                => Auth::id()
